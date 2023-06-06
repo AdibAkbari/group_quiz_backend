@@ -2,7 +2,7 @@
 let data = {
     // TODO: insert your data structure that contains 
     // users + quizzes here
-      users: [
+    users: [
         {
             uId: 1,
             nameFirst: 'Rani',
