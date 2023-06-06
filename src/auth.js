@@ -4,7 +4,7 @@
  * @param = {string} password
  * @param = {string} nameFirst
  * @param = {string} nameLast
- * @returns = {number} authuserId
+ * @returns = {authUserId: 1} authuserId
  */
 
 function adminAuthRegister (email, password, nameFirst, nameLast) {
