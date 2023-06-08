@@ -3,9 +3,8 @@
  * 
  * @param {number} authUserId - passes through authUserId
  * @param {number} quizId - passes through the quizId of the quiz to remove
- * @returns {} - empty object
+ * @returns { } - empty object
  */
 function adminQuizRemove(authUserId, quizId) {
-    return {
-    }
+    return { }
 }
