@@ -5,7 +5,7 @@
  * @returns {quizId: 2} - returns quizId: 2
  */
 function adminQuizCreate(authUserId, name, description) {
-        return {
-            quizId: 2
-        }
+    return {
+        quizId: 2
     }
+}
