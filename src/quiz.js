@@ -1,3 +1,4 @@
+
 /** 
  * Provide a list of all quizzes that are owned by the currently logged in user.
  * @param = {number} authUserId
@@ -72,4 +73,18 @@ function adminQuizInfo(authUserId, quizId) {
  */
 function adminQuizNameUpdate(authUserId, quizId, name) {
     return { }
+}
+
+/**
+ * Update the description of the relevant quiz.
+ * @param {number} authUserId - passes through authors user ID
+ * @param {number} quizId - passes through the id number for the quiz
+ * @param {string} description - passes through description of quiz
+ * @returns {} - doesn't return anything
+ */
+
+function adminQuizDescriptionUpdate (authUserID, quizId, description) {
+    
+    return { }
+
 }
