@@ -1,4 +1,4 @@
-
+/**
  * Provide a list of all quizzes that are owned by the currently logged in user.
  * @param = {number} authUserId
  * @returns = {quizzes: [{quizId: number, name: string,}]} object
@@ -27,10 +27,9 @@ function adminQuizCreate(authUserId, name, description) {
     return {
         quizId: 2
     }
->>>>>>> src/quiz.js
 }
+
 /**
-<<<<<<< src/quiz.js
  * Given a particular quiz, permanently remove the quiz.
  * 
  * @param {number} authUserId - passes through authUserId
@@ -39,5 +38,26 @@ function adminQuizCreate(authUserId, name, description) {
  */
 function adminQuizRemove(authUserId, quizId) {
     return { }
-=======
+}
 
+/**
+ * Get all of the relevant information about the current quiz.
+ * @param {number} authUserId - passes through the authUserId
+ * @param {number} quizId - passes through the quizId 
+ * @returns {
+ *           quizId: 1,
+ *           name: 'My Quiz',
+ *           timeCreated: 1683125870,
+ *           timeLastEdited: 1683125871,
+ *           description: 'This is my quiz',
+ *          } - returns Quiz info 
+ */
+function adminQuizInfo(authUserId, quizId) {
+    return {
+        quizId: 1,
+        name: 'My Quiz',
+        timeCreated: 1683125870,
+        timeLastEdited: 1683125871,
+        description: 'This is my quiz',
+    }
+}
