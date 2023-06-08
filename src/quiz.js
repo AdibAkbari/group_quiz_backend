@@ -1,4 +1,5 @@
 /**
+ * Get all of the relevant information about the current quiz.
  * @param {number} authUserId - passes through the authUserId
  * @param {number} quizId - passes through the quizId 
  * @returns {
