@@ -1,5 +1,8 @@
-// YOU SHOULD MODIFY THIS OBJECT BELOW
-const data = {};
+// data structure for storing user data and quiz data 
+const data = {
+  users: [],
+  quizzes: []
+};
 
 // YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1
 

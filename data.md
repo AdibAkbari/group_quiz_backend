@@ -16,6 +16,19 @@ let data = {
     quizzes: [
         {
             quizId: 1,
+            questions: [
+                {
+                    question: 'What is 1 + 1?',
+                    answer: '2',
+                }
+            ],
+            creator: 'Rani',
+            players: [
+                {
+                    uId: 9,
+                    score: 2,
+                }
+            ],
             name: 'My Quiz',
             timeCreated: 1683125870,
             timeLastEdited: 1683125871,
