@@ -332,7 +332,517 @@ Please see section 6 for information on **due date** and on how you will **demon
 
 ## 🐶 3. Iteration 1: Basic Functionality and Tests
 
-Coming later!
+
+[You can watch the iteration 1 introductory video here.](https://youtu.be/VPlNNy-gK2w) This video is not required watching (the specification is clear by itself) though many students will watch this for the practical demo of how to get started.
+
+### 🐶 3.1. Task
+
+In this iteration, you are expected to:
+
+1. Write tests for and implement the basic functionality of Toohak. The basic functionality is defined as the `adminAuth*`, `adminQuiz*` capabilities/functions, as per the interface section below.
+    * Test files you add should all be in the form `*.test.js`.
+    * Do NOT attempt to try and write or start a web server. Don't overthink how these functions are meant to connect to a frontend yet. That is for the next iteration. In this iteration you are just focusing on the basic backend functionality.
+
+2. Write down any assumptions that you feel you are making in your interpretation of the specification.
+    * These should be placed in the `assumptions.md` file in the root of your repository. If you've not written markdown before (we assume most of you haven't), it's not necessary to research the format. [Markdown](https://www.markdownguide.org/basic-syntax/) is essentially plain text with a few extra features for basic formatting. You can just stick with plain text if you find that easier.
+    * We will only be marking the quality of SIX of your assumptions. You can indicate which ones you would like marked, otherwise we will look at the first six.
+
+3. Follow best practices for git, project management, and effective teamwork, as discussed in lectures.
+    * The marking will be heavily biased toward how well you follow good practices and work together as a team. Just having a "working" solution at the end is not, on its own, sufficient to even get a passing mark.
+
+    * You need to use the [**GitLab Issue Boards**](https://docs.gitlab.com/ee/user/project/issue_board.html) for your task tracking and allocation. Spend some time getting to know how to use the taskboard. If you would like to use another collaborative task tracker e.g. Jira, Trello, Airtable, etc. you must first get approval from your tutor and grant them administrator access to your team board.
+
+    * You are expected to meet regularly with your group and document the meetings via meeting minutes, which should be stored at a timestamped location in your repo (e.g. uploading a word doc/pdf or writing in the GitLab repo Wiki after each meeting).
+
+    * You should have regular standups and be able to demonstrate evidence of this to your tutor.
+
+    * For this iteration, you will need to collectively make a minimum of **12 merge requests** into `master`.
+
+
+### 🐶 3.2. Storing data
+
+Nearly all of the functions will likely have to reference some "data source" to store information. E.g. If you register two users, create two quizzes, all of that information needs to be "stored" somewhere. The most important thing for iteration 1 is not to overthink this problem.
+
+Firstly, you should **not** use an SQL database, or something like firebase.
+
+Secondly, you don't need to make anything persist. What that means is that if you run all your tests, and then run them again later, it's OK for the data to be "fresh" each time you run the tests. We will cover persistence in another iteration.
+
+Inside `src/dataStore.js` we have provided you with an object called `data` which will contain the information that you will need to access across multiple functions. An explanation of how to `get` and `set` the data is in `dataStore.js`. You will need to determine the internal structure of the object. If you wish, you are allowed to modify this data structure.
+
+For example, you could define a structure in a file that is empty, and as functions are called, the structure populates and fills up like the one below:
+
+```javascript
+let data = {
+    users: [
+        {
+            id: 1,
+            nameFirst: 'user1',
+        },
+        {
+            id: 2,
+            nameFirst: 'user2',
+        },
+    ],
+    quizzes: [
+        {
+            id: 1,
+            name: 'quiz1',
+        },
+        {
+            id: 2,
+            name: 'quiz2',
+        },
+    ],
+}
+```
+### 🐶 3.3. Implementing and testing features
+
+You should first approach this project by considering its distinct "features". Each feature should add some meaningful functionality to the project, but still be as small as possible. You should aim to size features as the smallest amount of functionality that adds value without making the project more unstable. For each feature you should:
+
+1. Create a new branch.
+1. Write function stub/s for your feature. This may have been completed in iteration 0 for some functions.
+1. Write tests for that feature and commit them to the branch. These will fail as you have not yet implemented the feature.
+1. Implement that feature.
+1. Make any changes to the tests such that they pass with the given implementation. You should not have to do a lot here. If you find that you are, you're not spending enough time on your tests.
+1. Consider any assumptions you made in the previous steps and add them to `assumptions.md`.
+1. Create a merge request for the branch.
+1. Get someone in your team who **did not** work on the feature to review the merge request.
+1. Fix any issues identified in the review.
+1. After merge request is **approved** by a different team member, merge the merge request into `master` .
+
+For this project, a feature is typically sized somewhere between a single function, and a whole file of functions (e.g. `auth.js`). It is up to you and your team to decide what each feature is.
+
+There is no requirement that each feature is implemented by only one person. In fact, we encourage you to work together closely on features, especially to help those who may still be coming to grips with Javascript.
+
+Please pay careful attention to the following:
+
+* We want to see **evidence that you wrote your tests before writing the implementation**. As noted above, the commits containing your initial tests should appear *before* your implementation for every feature branch. If we don't see this evidence, we will assume you did not write your tests first and your mark will be reduced.
+* Merging in merge requests with failing tests is **very bad practice**. Not only does this interfere with your team's ability to work on different features at the same time, and thus slow down development, it is something you will be **penalised** for in marking.
+* Similarly, merging in branches with untested features is also **bad practice**. We will assume, and you should too, that any code without tests does not work.
+* Pushing directly to `master` is not possible for this repo. The only way to get code into `master` is via a merge request. If you discover you have a bug in `master` that got through testing, create a bugfix branch and merge that in via a merge request.
+* As is the case with any system or functionality, there will be some things that you can test extensively, some things that you can test sparsely/fleetingly, and some things that you can't meaningfully test at all. You should aim to test as extensively as you can, and make judgements as to what things fall into what categories.
+
+### 🐶 3.4. Testing guidelines & advice
+
+#### 🐶 3.4.1. Test Structure
+The tests you write should be as small and independent as possible. This makes it easier to identify why a particular test may be failing. Similarly, try to make it clear what each test is testing for. Meaningful test names and documentation help with this. An example of how to structure tests has been done in:
+
+* `src/echo.js`
+* `src/echo.test.js`
+
+_The echo functionality is tested, both for correct behaviour and for failing behaviour. As echo is relatively simple functionality, only 2 tests are required. For the larger features, you will need many tests to account for many different behaviours._
+
+#### 🐶 3.4.2. Black Box Testing
+
+Your tests should be *black box* unit tests:
+  * Black box means they should not depend your specific implementation, but rather work with *any* faithful implementation of the project interface specification. I.e. you should design your tests such that if they were run against another group's backend they would still pass.
+  * For iteration 1, you should *not* be importing the `data` object itself or directly accessing it via the `get` or `set` functions from `src/dataStore.js` inside your tests.
+  * Unit tests mean the tests focus on testing particular functions, rather than the system as a whole. Certain unit tests will depend on other tests succeeding. It's OK to write tests that are only a valid test if other functions are correct (e.g. to test `quiz` functions you can assume that `auth` is implemented correctly).
+
+This will mean you will use code like this to test login, for instance:
+
+```javascript
+let result = adminAuthRegister('validemail@gmail.com', '123abc!@#', 'Jake', 'Renzella')
+adminAuthLogin('validemail@gmail.com', '123abc!@#') // Expect to work since we registered
+```
+
+#### 🐶 3.4.3. Resetting state
+
+You should reset the state of the application (e.g. deleting all users, quizzes, etc.) at the start of every test. That way you know none of them are accidentally dependent on an earlier test. You can use a function for this that is run at the beginning of each test (hint: `clear`).
+
+#### 🐶 3.4.4. Other help
+
+* If you find yourself needing similar code at the start of a series of tests, consider using Jest's [**beforeEach**](https://jestjs.io/docs/api#beforeeachfn-timeout) to avoid repetition.
+
+Sometimes you may ask "What happens if X?". In cases where we don't specify behaviour, we call this **undefined behaviour**. When something has undefined behaviour, you can have it behave any reasonable way you want - because there is no expectation or assumption of how it should act.
+
+A common question asked throughout the project is usually "How can I test this?" or "Can I test this?". In any situation, most things can be tested thoroughly. However, some things can only be tested sparsely, and on some other rare occasions, some things can't be tested at all. A challenge of this project is for you to use your discretion to figure out what to test, and how much to test. Often, you can use the functions you've already written to test new functions in a black-box manner.
+
+### 🐶 3.5. Iteration 1 Interface
+
+The functions required for iteration 1 are described below.
+
+All error cases should return <code>{error: 'specific error message here'}</code>, where the error message in quotation marks can be anything you like (this will not be marked).
+
+The following are strings: `email`, `password`, `nameFirst`, `nameLast`, `name`, `description`.
+
+The following are integers: `authUserId`, `quizId`.
+
+<table>
+  <tr>
+    <th>Name & Description</th>
+    <th style="width:18%">Data Types</th>
+    <th style="width:32%">Error returns</th>
+  </tr>
+  <tr>
+    <td>
+      <code>adminAuthRegister</code>
+      <br /><br />
+      Register a user with an email, password, and names, then returns their <code>authUserId</code> value.
+    </td>
+    <td>
+      <b>Parameters:</b><br />
+      <code>( email, password, nameFirst, nameLast )</code>
+      <br /><br />
+      <b>Return type if no error:</b><br />
+      <code>{ authUserId }</code>
+    </td>
+    <td>
+      <b>Return object <code>{error: 'specific error message here'}</code></b> when any of:
+      <ul>
+        <li>Email address is used by another user</li>
+        <li>Email does not satisfy this: https://www.npmjs.com/package/validator (validator.isEmail function)</li>
+        <li>NameFirst contains characters other than lowercase letters, uppercase letters, spaces, hyphens, or apostrophes</li>
+        <li>NameFirst is less than 2 characters or more than 20 characters</li>
+        <li>NameLast contains characters other than lowercase letters, uppercase letters, spaces, hyphens, or apostrophes</li>
+        <li>NameLast is less than 2 characters or more than 20 characters</li>
+        <li>Password is less than 8 characters</li>
+        <li>Password does not contain at least one number and at least one letter</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>adminAuthLogin</code>
+      <br /><br />
+      Given a registered user's email and password returns their <code>authUserId</code> value.
+    </td>
+    <td>
+      <b>Parameters:</b><br />
+      <code>( email, password )</code>
+      <br /><br />
+      <b>Return type if no error:</b><br />
+      <code>{ authUserId }</code>
+    </td>
+    <td>
+      <b>Return object <code>{error: 'specific error message here'}</code></b> when any of:
+      <ul>
+        <li>Email address does not exist</li>
+        <li>Password is not correct for the given email</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>adminUserDetails</code>
+      <br /><br />
+      Given an admin user's authUserId, return details about the user.
+      <li>"name" is the first and last name concatenated with a single space between them</li>
+      <li>numSuccessfulLogins includes logins direct via registration, and is counted from the moment of registration starting at 1</li>
+      <li>numFailedPasswordsSinceLastLogin is reset every time they have a successful login, and simply counts the number of attempted logins that failed due to incorrect password, only since the last login</li>
+    </td>
+    <td>
+      <b>Parameters:</b><br />
+      <code>( authUserId )</code>
+      <br /><br />
+      <b>Return type if no error:</b><br />
+      <code>{ user:
+  {
+    userId,
+    name,
+    email,
+    numSuccessfulLogins,
+    numFailedPasswordsSinceLastLogin,
+  }
+}</code>
+    </td>
+    <td>
+      <b>Return object <code>{error: 'specific error message here'}</code></b> when any of:
+      <ul>
+        <li>AuthUserId is not a valid user</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>adminQuizList</code>
+      <br /><br />
+      Provide a list of all quizzes that are owned by the currently logged in user.
+    </td>
+    <td>
+      <b>Parameters:</b><br />
+      <code>( authUserId )</code>
+      <br /><br />
+      <b>Return type if no error:</b><br />
+      <code>{ quizzes: [
+    {
+      quizId,
+      name,
+    }
+  ]
+}</code>
+    </td>
+    <td>
+      <b>Return object <code>{error: 'specific error message here'}</code></b> when any of:
+      <ul>
+        <li>AuthUserId is not a valid user</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>adminQuizCreate</code>
+      <br /><br />
+      Given basic details about a new quiz, create one for the logged in user.
+    </td>
+    <td>
+      <b>Parameters:</b><br />
+      <code>( authUserId, name, description )</code>
+      <br /><br />
+      <b>Return type if no error:</b><br />
+      <code>{ quizId }</code>
+    </td>
+    <td>
+      <b>Return object <code>{error: 'specific error message here'}</code></b> when any of:
+      <ul>
+        <li>AuthUserId is not a valid user</li>
+        <li>Name contains any characters that are not alphanumeric or are spaces</li>
+        <li>Name is either less than 3 characters long or more than 30 characters long</li>
+        <li>Name is already used by the current logged in user for another quiz</li>
+        <li>Description is more than 100 characters in length (note: empty strings are OK)</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>adminQuizRemove</code>
+      <br /><br />
+      Given a particular quiz, permanently remove the quiz.
+    </td>
+    <td>
+      <b>Parameters:</b><br />
+      <code>( authUserId, quizId )</code>
+      <br /><br />
+      <b>Return type if no error:</b><br />
+      <code>{ }</code>
+    </td>
+    <td>
+      <b>Return object <code>{error: 'specific error message here'}</code></b> when any of:
+      <ul>
+        <li>AuthUserId is not a valid user</li>
+        <li>Quiz ID does not refer to a valid quiz</li>
+        <li>Quiz ID does not refer to a quiz that this user owns</li>
+        <li>All sessions for this quiz must be in END state</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>adminQuizInfo</code>
+      <br /><br />
+      Get all of the relevant information about the current quiz.
+    </td>
+    <td>
+      <b>Parameters:</b><br />
+      <code>( authUserId, quizId )</code>
+      <br /><br />
+      <b>Return type if no error:</b><br />
+      <code>{
+  quizId,
+  name,
+  timeCreated,
+  timeLastEdited,
+  description,
+}</code>
+    </td>
+    <td>
+      <b>Return object <code>{error: 'specific error message here'}</code></b> when any of:
+      <ul>
+        <li>AuthUserId is not a valid user</li>
+        <li>Quiz ID does not refer to a valid quiz</li>
+        <li>Quiz ID does not refer to a quiz that this user owns</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>adminQuizNameUpdate</code>
+      <br /><br />
+      Update the name of the relevant quiz.
+    </td>
+    <td>
+      <b>Parameters:</b><br />
+      <code>( authUserId, quizId, name )</code>
+      <br /><br />
+      <b>Return type if no error:</b><br />
+      <code>{ }</code>
+    </td>
+    <td>
+      <b>Return object <code>{error: 'specific error message here'}</code></b> when any of:
+      <ul>
+        <li>AuthUserId is not a valid user</li>
+        <li>Quiz ID does not refer to a valid quiz</li>
+        <li>Quiz ID does not refer to a quiz that this user owns</li>
+        <li>Name contains any characters that are not alphanumeric or are spaces</li>
+        <li>Name is either less than 3 characters long or more than 30 characters long</li>
+        <li>Name is already used by the current logged in user for another quiz</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>adminQuizDescriptionUpdate</code>
+      <br /><br />
+      Update the description of the relevant quiz.
+    </td>
+    <td>
+      <b>Parameters:</b><br />
+      <code>( authUserId, quizId, description )</code>
+      <br /><br />
+      <b>Return type if no error:</b><br />
+      <code>{ }</code>
+    </td>
+    <td>
+      <b>Return object <code>{error: 'specific error message here'}</code></b> when any of:
+      <ul>
+        <li>AuthUserId is not a valid user</li>
+        <li>Quiz ID does not refer to a valid quiz</li>
+        <li>Quiz ID does not refer to a quiz that this user owns</li>
+        <li>Name contains any characters that are not alphanumeric or are spaces</li>
+        <li>Name is either less than 3 characters long or more than 30 characters long</li>
+        <li>Name is already used by the current logged in user for another quiz</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>clear</code>
+      <br /><br />
+      Reset the state of the application back to the start.
+    </td>
+    <td>
+      <b>Parameters:</b><br />
+      <code>( )</code>
+      <br /><br />
+      <b>Return type if no error:</b><br />
+      <code>{ }</code>
+    </td>
+    <td>
+    </td>
+  </tr>
+</table>
+
+### 🐶 3.6. Authorisation
+
+Elements of securely storing passwords and other tricky authorisation methods are not required for iteration 1. You can simply store passwords plainly, and use the user ID to identify each user. We will discuss ways to improve the quality and methods of these capabilities in the later iterations.
+
+Note that the `authUserId` variable is simply the user ID of the user who is making the function call. For example,
+* A user registers an account with Toohak and is assigned some integer ID, e.g. `42` as their user ID.
+* When they make subsequent calls to functions, their user ID - in this case, `42` - is passed in as the `authUserId` argument.
+
+Since `authUserId` refers to the user ID of the user calling the functions, you do NOT need to store separate user IDs (e.g. a uId or userId + a authUserId) to identify each user in your data structure - you only need to store one user ID. How you name this user ID property in your data structure is up to you.
+
+### 🐶 3.7. Bad Assumptions
+
+Here are a few examples of bad assumptions:
+
+* Assume that all groups store their data in a field called data which is located in dataStore.js
+* Assume all individual return values are returned as single values rather than being stored in an object
+* Assume the functions are written correctly
+* Assume the input authUserId is valid
+
+Bad assumptions are usually ones that directly contradict an explicit or implicit requirement in the specification. Good assumptions are ones that fill holes or gaps in requirements. 
+
+Avoid "assumptions" that simply describe the implementation details irrelevant to the client, e.g. a particular method of ID generation. Instead, consider the scenarios in which the expected behaviour of Toohak is not addressed clearly in the spec and document, with reasoning, your assumptions regarding such scenarios.
+
+### 🐶 3.8. Working in parallel
+
+This iteration provides challenges for many groups when it comes to working in parallel. Your group's initial reaction will be that you need to complete registration before you can complete quiz creation, and then quiz creation must be done before you update a quiz name, etc.
+
+There are several approaches that you can consider to overcome these challenges:
+
+* Have people working on down-stream tasks (like the quiz implementation) work with stubbed versions of the up-stream tasks. E.g. The register function is stubbed to return a successful dummy response, and therefore two people can start work in parallel.
+* Co-ordinate with your team to ensure prerequisite features are completed first (e.g. Giuliana completes `adminAuthRegister` on Monday meaning Hayden can start `adminQuizCreate` on Tuesday).
+* You can pull any other remote branch into your own using the command `git pull origin <branch_name>`.
+    * This can be helpful when two people are working on functions on separate branches where one function is a prerequisite of the other, and an implementation is required to keep the pipeline passing.
+    * You should pull from `master` on a regular basis to ensure your code remains up-to-date.
+
+### 🐶 3.9. Marking Criteria
+
+<table>
+  <tr>
+    <th>Section</th>
+    <th>Weighting</th>
+    <th>Criteria</th>
+  </tr>
+  <tr>
+    <td>Automarking (Testing & Implementation)</td>
+    <td>40%</td>
+    <td><ul>
+      <li>Correct implementation of specified functions</li>
+      <li>Correctly written tests based on the specification requirements</li>
+    </ul></td>
+  </tr>
+  <tr>
+    <td>Code Quality</td>
+    <td>25%</td>
+    <td><ul>
+      <li>Demonstrated an understanding of good test <b>coverage</b> (no need to run a coverage checker in this iteration)</li>
+      <li>Demonstrated an understanding of the importance of <b>clarity</b> in communicating the purpose of tests and code</li>
+      <li>Demonstrated an understanding of thoughtful test <b>design</b></li>
+      <li>Appropriate use of Javascript data structures (arrays, objects, etc.)</li>
+      <li>Appropriate style as covered so far in introductory programming.
+    </ul></td>
+  </tr>
+  <tr>
+    <td>Git Practices</td>
+    <td>15%</td>
+    <td><ul>
+      <li>Meaningful and informative git commit names being used</li>
+      <li>Effective use of merge requests (from branches being made) across the team (as covered in lectures)</li>
+      <li>At least 12 merge requests into master made</li>
+    </ul></td>
+  </tr>
+  <tr>
+    <td>Project Management & Teamwork</td>
+    <td>15%</td>
+    <td><ul>
+      <li>A generally equal contribution between team members</li>
+      <li>Clear evidence of reflection on group's performance and state of the team, with initiative to improve in future iterations</li>
+      <li>Effective use of course-provided MS Teams for communication, demonstrating an ability to competently manage teamwork online</li>
+      <li>Use of issue board on Gitlab OR another tool approved by your tutor to track and manage tasks</li>
+      <li>Effective use of agile methods such as standups</li>
+      <li>Minutes/notes taken from group meetings (and stored in a logical place in the repo)</li>
+    </ul></td>
+  </tr>
+  <tr>
+    <td>Assumptions markdown file</td>
+    <td>5%</td>
+    <td><ul>
+      <li>Clear and obvious effort and time gone into thinking about possible assumptions that are being made when interpreting the specification</li>
+    </ul></td>
+  </tr>
+</table>
+
+For this and for all future milestones, you should consider the other expectations as outlined in section 6 below.
+
+The formula used for automarking in this iteration is:
+
+`Mark = t * i` (Mark equals `t` multiplied by `i`)
+
+Where:
+ * `t` is the mark you receive for your tests running against your code (100% = your implementation passes all of your tests)
+ * `i` is the mark you receive for our course tests (hidden) running against your code (100% = your implementation passes all of our tests)
+
+### 🐶 3.10. Dryrun
+
+We have provided a very simple dryrun for iteration 1 consisting of a few tests, including your implementation of `adminAuthRegister`, `adminAuthLogin`, `adminQuizCreate`. These only check the format of your return types and simple expected behaviour, so do not rely on these as an indicator of the correctness of your implementation or tests.
+
+To run the dryrun, you should be on a CSE machine (i.e. using `VLAB` or `ssh`'ed into CSE) and in the root directory of your project (e.g. `/project-backend`) and use the command:
+
+```bash
+1531 dryrun 1
+```
+
+Tips to ensure dryrun runs successfully:
+* Files used for imports are appended with `.js` e.g. `import { clearV1 } from './other.js';`
+* Files sit within the `/src` directory
+
+### 🐶 3.11. Submission & Peer Assessment
+
+Please see section 6 for information on **due date** and on how you will **demonstrate this iteration**.
+
+Please see section 7.5 for information on **peer assessment**.
 
 ## 🐝 4. Iteration 2: Building a Web Server
 
