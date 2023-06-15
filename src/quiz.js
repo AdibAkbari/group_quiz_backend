@@ -1,10 +1,10 @@
 
 /** 
  * Provide a list of all quizzes that are owned by the currently logged in user.
- * @param = {number} authUserId
- * @returns = {quizzes: [{quizId: number, name: string,}]} object
+ * 
+ * @param {number} authUserId - passes through authUserId
+ * @returns {quizzes: [{quizId: number, name: string,}]} - returns an object
  */
-
 function adminQuizList (authUserId) {
     return {
         quizzes:
@@ -19,6 +19,7 @@ function adminQuizList (authUserId) {
 
 /**
  * Given basic details about a new quiz, create one for the logged in user.
+ * 
  * @param {number} authUserId - passes through authUserId
  * @param {string} name - passes through the name of the user
  * @param {string} description - passes through the description
@@ -43,6 +44,7 @@ function adminQuizRemove(authUserId, quizId) {
 
 /**
  * Get all of the relevant information about the current quiz.
+ * 
  * @param {number} authUserId - passes through the authUserId
  * @param {number} quizId - passes through the quizId 
  * @returns {
@@ -77,12 +79,12 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
 
 /**
  * Update the description of the relevant quiz.
+ * 
  * @param {number} authUserId - passes through authors user ID
  * @param {number} quizId - passes through the id number for the quiz
  * @param {string} description - passes through description of quiz
  * @returns {} - doesn't return anything
  */
-
 function adminQuizDescriptionUpdate (authUserID, quizId, description) {
     
     return { }
