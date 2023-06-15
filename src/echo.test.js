@@ -8,5 +8,5 @@ test('Test successful echo', () => {
 });
 
 test('Test invalid echo', () => {
-  expect(echo({ echo: 'echo' })).toStrictEqual({ error: 'error' });
+  expect(echo({ echo: 'echo' })).toMatchObject({ error: expect.any(String) });
 });

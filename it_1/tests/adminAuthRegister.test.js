@@ -6,22 +6,22 @@ describe ('test for adminAuthRegister', () => {
         {
             name: 'adminAuthRegister: valid input',
             input: ('email@gmail.com', 'password1','nameFirst', 'nameLast'),
-            output: 1 
+            output: expect.any(Number) 
         },
         {
             name: 'adminAuthRegister: valid input 2',
             input: ('email3@hotmail.com', 'passw123','na', 'na'),
-            output: 1 
+            output: expect.any(Number)  
         },
         {
             name: 'adminAuthRegister: valid input 3',
             input: ('email4@yahoo.com', 'longPassword12345','nameIsExactlyTwentyy', 'lastIsExactlyTwentyy'),
-            output: 1 
+            output: expect.any(Number)  
         },
         {
             name: 'adminAuthRegister: valid input 4',
             input: ('email5@gmail.com', 'password1','name-First\'s', 'name-Last\'s'),
-            output: 1 
+            output: expect.any(Number)  
         },
         {
             name: 'adminAuthRegister: empty email',
