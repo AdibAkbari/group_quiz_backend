@@ -3,8 +3,7 @@
  * @param {} - no parameters
  * @returns {} - doesn't return anything
  */
-
-function clear () {
+export function clear () {
     
     return { }
 
