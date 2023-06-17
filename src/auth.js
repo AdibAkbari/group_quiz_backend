@@ -1,3 +1,5 @@
+import { setData, getData } from './dataStore.js'
+
 /**
  * Register a user with an email, password, and names, then returns their 
  * authUserId value.
@@ -8,9 +10,15 @@
  * @param {string} nameLast 
  * @returns {authUserId: 1} authuserId
  */
-function adminAuthRegister (email, password, nameFirst, nameLast) {
+export function adminAuthRegister (email, password, nameFirst, nameLast) {
+    let store = getData();
+    let authUserId = store.users.length + 1;
+    let user = {email, password, nameFirst, nameLast, authUserId};
+    
+    store.users.push(user);
+    setData(store);
     return {
-        authUserId: 1,
+        authUserId
     }
 }
 
@@ -21,7 +29,7 @@ function adminAuthRegister (email, password, nameFirst, nameLast) {
  * @param {string} password - passes through the password of the user 
  * @returns {authUserId: 1} - returns authUserId: 1
  */
-function adminAuthLogin(email, password) {
+export function adminAuthLogin(email, password) {
     return {
       authUserId: 1,
     }
@@ -36,7 +44,7 @@ function adminAuthLogin(email, password) {
  *                     numSuccessfulLogins: number,
  *                     numFailedPasswordsSinceLastLogin: number}}} object
  */
-function adminUserDetails(authUserId) {
+export function adminUserDetails(authUserId) {
     return { 
         user: 
         {
