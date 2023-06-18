@@ -1,3 +1,5 @@
+import { getData, setData } from "./dataStore.js";
+
  
 /** 
  * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -26,10 +28,85 @@ function adminQuizList (authUserId) {
  * @returns {quizId: 2} - returns quizId: 2
  */
 export function adminQuizCreate(authUserId, name, description) {
-    return {
-        quizId: 2
+    if (!checkNameValidity(name, authUserId)) {
+        return {error: 'name not valid'};
     }
+    
+    // invalid description
+    if (description.length > 100) {
+        return {error: 'description too long'};
+    }
+
+    // invalid authUserId
+    let userIdValid = false;
+    for (const user of getData().users) {
+        if (user.authUserId === authUserId) {
+            userIdValid = true;
+        }
+      }
+      if (userIdValid === false) {
+        return {error: 'authUserId does not refer to valid user'};
+      }
+    
+    // create new quizId
+    let id = getData().quizzes.length + 1;
+
+    // create new Date object
+    const date = new Date();
+
+    // get and set data to add quiz object to quizzes array
+    let data = getData();
+    data.quizzes.push(
+      {
+        name: name,
+        description: description,
+        quizId: id,
+        creator: authUserId,
+        questions: [],
+        players: [],
+        timeCreated: date.getTime(),
+        timeLastEdited: date.getTime(),
+      }
+    );
+    setData(data);
+  
+    return {
+      quizId: id,
+    };
 }
+
+/**
+ * Helper function for adminQuizCreate to check if a quiz name is valid
+ * 
+ * @param {number} authUserId id of the user
+ * @param {String} name name of the quiz
+ * @returns {Boolean} whether the name is valid
+ */
+function checkNameValidity(name, authUserId) {
+    // length must be between 3 and 30 characters
+    if (name.length < 3 || name.length > 30) {
+        return false;
+    }
+    // only alpha-numeric characters
+    for (let i = 0; i < name.length; i++) {
+        let char = name.charCodeAt(i);
+        if ((char < 48) || (char > 57 && char < 65) || (char > 90 && char < 97) || (char > 122))
+        {
+            return false;
+        }
+    }
+
+    // name cannot be already used by user for another quiz
+    const quizzes = getData().quizzes;
+    for (const quiz of quizzes) {
+        if (quiz.creator === authUserId && quiz.name === name) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 
 /**
  * Given a particular quiz, permanently remove the quiz.
