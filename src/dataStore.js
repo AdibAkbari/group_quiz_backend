@@ -1,5 +1,5 @@
 // data structure for storing user data and quiz data 
-const data = {
+let data = {
   users: [],
   quizzes: []
 };
