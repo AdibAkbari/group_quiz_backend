@@ -1,4 +1,4 @@
-
+ 
 /** 
  * Provide a list of all quizzes that are owned by the currently logged in user.
  * 
@@ -25,7 +25,7 @@ function adminQuizList (authUserId) {
  * @param {string} description - passes through the description
  * @returns {quizId: 2} - returns quizId: 2
  */
-function adminQuizCreate(authUserId, name, description) {
+export function adminQuizCreate(authUserId, name, description) {
     return {
         quizId: 2
     }

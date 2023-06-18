@@ -8,7 +8,7 @@
  * @param {string} nameLast 
  * @returns {authUserId: 1} authuserId
  */
-function adminAuthRegister (email, password, nameFirst, nameLast) {
+export function adminAuthRegister (email, password, nameFirst, nameLast) {
     return {
         authUserId: 1,
     }
