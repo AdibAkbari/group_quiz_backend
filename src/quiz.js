@@ -5,7 +5,7 @@
  * @param {number} authUserId - passes through authUserId
  * @returns {quizzes: [{quizId: number, name: string,}]} - returns an object
  */
-function adminQuizList (authUserId) {
+export function adminQuizList (authUserId) {
     return {
         quizzes:
         [
@@ -25,7 +25,7 @@ function adminQuizList (authUserId) {
  * @param {string} description - passes through the description
  * @returns {quizId: 2} - returns quizId: 2
  */
-function adminQuizCreate(authUserId, name, description) {
+export function adminQuizCreate(authUserId, name, description) {
     return {
         quizId: 2
     }
