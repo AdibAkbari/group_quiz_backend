@@ -1,6 +1,7 @@
 import { 
     adminUserDetails,
-    adminAuthRegister 
+    adminAuthRegister,
+    adminAuthLogin 
 } from '../auth.js';
 
 const ERROR = { error: expect.any(String) };
@@ -91,19 +92,41 @@ describe('multiple users registered', () => {
         user3 = adminAuthRegister('email3@gmail.com', 'password3', 'FirstnameC', 'LastnameC');
       });
 
-    test.each([
-        {input: user1.authUserId, name: 'FirstnameA LastnameA', email: 'email1@gmail.com'},
-        {input: user2.authUserId, name: 'FirstnameB LastnameB', email: 'email2@gmail.com'},
-        {input: user3.authUserId, name: 'FirstnameC LastnameC', email: 'email3@gmail.com'},
-    ]) ('Testing each user', (input, name, email) => {
-        expect(adminUserDetails(input)).toStrictEqual({
+    test('Finding user 1', () => {
+        expect(adminUserDetails(user1.authUserId)).toStrictEqual({
             user: {
-                userId: input,
-                name: name,
-                email: email,
+                userId: user1.authUserId,
+                name: 'FirstnameA LastnameA',
+                email: 'email1@gmail.com',
+                numSuccessfulLogins: expect.any(Number),
+                numFailedPasswordsSinceLastLogin: expect.any(Number)
+            }
+        })
+    });  
+
+    test('Finding user 2', () => {
+        expect(adminUserDetails(user2.authUserId)).toStrictEqual({
+            user: {
+                userId: user2.authUserId,
+                name: 'FirstnameB LastnameB',
+                email: 'email2@gmail.com',
                 numSuccessfulLogins: expect.any(Number),
                 numFailedPasswordsSinceLastLogin: expect.any(Number)
             }
         })
     });
-})
+    
+    test('Finding user 3', () => {
+        expect(adminUserDetails(user3.authUserId)).toStrictEqual({
+            user: {
+                userId: user3.authUserId,
+                name: 'FirstnameC LastnameC',
+                email: 'email3@gmail.com',
+                numSuccessfulLogins: expect.any(Number),
+                numFailedPasswordsSinceLastLogin: expect.any(Number)
+            }
+        })
+    })  
+
+    
+});
