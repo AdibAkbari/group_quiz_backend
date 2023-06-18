@@ -4,7 +4,7 @@ let data = {
     // users + quizzes here
     users: [
         {
-            uId: 1,
+            authUserId: 1,
             nameFirst: 'Rani',
             nameLast: 'Jiang',
             email: 'ranivorous@gmail.com',
