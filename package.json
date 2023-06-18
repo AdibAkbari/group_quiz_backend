@@ -1,6 +1,6 @@
 {
     "scripts": {
-        "test": "jest --testMatch '**/?(*.)+(test).js'"
+        "test": "jest"
     },
     "dependencies": {
         "rewire": "^6.0.0",
