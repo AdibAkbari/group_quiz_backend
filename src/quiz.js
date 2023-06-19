@@ -76,15 +76,15 @@ function adminQuizInfo(authUserId, quizId) {
 export function adminQuizNameUpdate(authUserId, quizId, name) {
     // Check inputted UserId is valid
     if (isValidUserId(authUserId) === false) {
-        return {error: 'AuthUserId is not a valid user'};
+        return {error: 'Please enter a valid user'};
     }
     // Check inputted quizId is valid
     if (isValidQuizId(quizId) === false) {
-        return {error: 'Quiz ID does not refer to valid quiz'};
+        return {error: 'Please enter a valid quiz'};
     }
     // Check inputted Quiz ID does not refer to a quiz that this user owns
     if (isValidCreator(quizId, authUserId) === false) {
-        return {error: 'Quiz ID does not refer to a quiz that this user owns'};
+        return {error: 'You do not own this quiz'};
     }
     // Check inputted name is valid
     if (!checkNameValidity(name, authUserId)) {
@@ -94,13 +94,14 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
     let data = getData();
     for (const current of data.quizzes) {
         if (current.quizId  === quizId) {
-            let newName = current.name; 
-            newName = name;
+            let newName = current;
+            newName.name = name;
+            newName.timeLastEdited = date.getTime();
+            
             setData(newName);
         }
     };
 
-    
     return { }
 }
 
