@@ -1,3 +1,36 @@
+/**
+ * Helper function to determine if the authUserId exist
+ * 
+ * @param {number} authUserId 
+ * @returns {boolean} - returns true if does exist
+ * @returns {boolean} - returns false if it dosn't exist 
+ */
+function checkUserId(authUserId) {
+    for (const user of getData().users) {
+        if (user.authUserId === authUserId) {
+            return true;
+        }
+      }
+    
+    return false;
+}
+
+/**
+ * Helper function to determine if the quizId exist
+ * 
+ * @param {number} quizId 
+ * @returns {boolean} - returns true if does exist
+ * @returns {boolean} - returns false if it dosn't exist 
+ */
+function checkQuizId(quizId) {
+    for (const quiz of getData().quizzes) {
+        if (quiz.quizId  === quizId) {
+            return true;
+        }
+      }
+    
+    return false;
+}
 
 /** 
  * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -39,6 +72,16 @@ function adminQuizCreate(authUserId, name, description) {
  * @returns { } - empty object
  */
 export function adminQuizRemove(authUserId, quizId) {
+    
+    if (checkUserId(authUserId) === false) {
+        return {error: 'AuthUserId is not a valid user'};
+    }
+
+    if (checkQuizId(quizId) === false) {
+        return {error: 'Quiz ID does not refer to valid quiz'};
+    }
+
+    
     return { }
 }
 
