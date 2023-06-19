@@ -1,4 +1,5 @@
 import { setData, getData } from './dataStore.js'
+import validator from 'validator';
 
 /**
  * Register a user with an email, password, and names, then returns their 
@@ -14,13 +15,23 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
     let store = getData();
     let authUserId = store.users.length + 1;
     let user = {email, password, nameFirst, nameLast, authUserId};
-    
+
+    if (!validator.isEmail(email)) {
+        return {error: 'Email is Invalid'};
+    };
+
+    if (store.users.filter(mail => mail.email === email).length > 0) {
+        return {error: 'Email already in use'}
+    };
+
     store.users.push(user);
     setData(store);
     return {
-        authUserId
-    }
+        authUserId: authUserId
+    };
 }
+
+console.log(adminAuthRegister('email@gmail.com', 'password1','nameFirst', 'nameLast'));
 
 /**
  * Given a registered user's email and password returns their authUserId value.
