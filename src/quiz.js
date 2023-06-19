@@ -73,7 +73,7 @@ function adminQuizInfo(authUserId, quizId) {
  * @param {string} name - passes through the name to update with
  * @returns { } - empty object
  */
-export function adminQuizNameUpdate(authUserId, quizId, name) {
+function adminQuizNameUpdate(authUserId, quizId, name) {
     return { }
 }
 
