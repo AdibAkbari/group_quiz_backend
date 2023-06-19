@@ -52,8 +52,15 @@ export function adminQuizRemove(authUserId, quizId) {
         return {error: 'Quiz ID does not refer to a quiz that this user owns'};
     }
 
+    let data = getData();
+    for (const current of data.quizzes) {
+        if (current.quizId  === quizId) {
+            let removed = data.quizzes.splice(current, 1);
+            setData(removed);
+        }
+    };
     
-    return { }
+    return { };
 }
 
 /**
