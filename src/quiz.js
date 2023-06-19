@@ -1,19 +1,23 @@
 /**
- * Helper function to determine if the authUserId exist
+ * Checks whether a given number is a valid user id
  * 
  * @param {number} authUserId 
- * @returns {boolean} - returns true if does exist
- * @returns {boolean} - returns false if it dosn't exist 
+ * @returns {boolean} true if valid, false if invalid
  */
-function checkUserId(authUserId) {
-    for (const user of getData().users) {
-        if (user.authUserId === authUserId) {
+function isValidUserId(authUserId) {
+    if(isNaN(authUserId)) {
+        return false;
+    };
+
+    let data = getData();
+    for (const current of data.users) {
+        if (current.authUserId === authUserId) {
             return true;
         }
-      }
-    
+    };
     return false;
 }
+
 
 /**
  * Helper function to determine if the quizId exist
@@ -22,12 +26,17 @@ function checkUserId(authUserId) {
  * @returns {boolean} - returns true if does exist
  * @returns {boolean} - returns false if it dosn't exist 
  */
-function checkQuizId(quizId) {
-    for (const quiz of getData().quizzes) {
-        if (quiz.quizId  === quizId) {
+function isValidQuizId(quizId) {
+    if(isNaN(quizId)) {
+        return false;
+    };
+
+    let data = getData();
+    for (const current of data.quizzes) {
+        if (current.quizId  === quizId) {
             return true;
         }
-      }
+    };
     
     return false;
 }
@@ -73,11 +82,11 @@ function adminQuizCreate(authUserId, name, description) {
  */
 export function adminQuizRemove(authUserId, quizId) {
     
-    if (checkUserId(authUserId) === false) {
+    if (isValidUserId(authUserId) === false) {
         return {error: 'AuthUserId is not a valid user'};
     }
 
-    if (checkQuizId(quizId) === false) {
+    if (isValidQuizId(quizId) === false) {
         return {error: 'Quiz ID does not refer to valid quiz'};
     }
 
