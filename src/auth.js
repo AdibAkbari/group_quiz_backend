@@ -17,11 +17,38 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
     let user = {email, password, nameFirst, nameLast, authUserId};
 
     if (!validator.isEmail(email)) {
-        return {error: 'Email is Invalid'};
+        return { error: 'Email is Invalid' };
     };
 
     if (store.users.filter(mail => mail.email === email).length > 0) {
-        return {error: 'Email already in use'}
+        return { error: 'Email already in use' }
+    };
+
+    if (nameFirst.length < 2 || nameFirst.length > 20) {
+        return { error: 'First name must be 2 to 20 characters' };
+    };
+
+    const expressionName = /^[A-Za-z\s'-]+$/
+    if (!expressionName.test(nameFirst)) {
+        return { error: 'First name must only contain letters, spaces, hyphens or apostrophes' };
+    };
+
+    if (nameLast.length < 2 || nameLast.length > 20) {
+        return { error: 'Last name must be 2 to 20 characters' };
+    };
+
+    if (!expressionName.test(nameLast)) {
+        return { error: 'Last name must only contain letters, spaces, hyphens or apostrophes' };
+    };
+
+    if (password.length < 8) {
+        return { error: 'Password must be at least 8 characters' };
+    }
+
+    const letters = /[a-zA-Z]/;
+    const numbers = /\d/;
+    if (!letters.test(password) || !numbers.test(password)) {
+        return { error: 'Password must contain at least one letter and one number' };
     };
 
     store.users.push(user);
@@ -30,8 +57,6 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
         authUserId: authUserId
     };
 }
-
-console.log(adminAuthRegister('email@gmail.com', 'password1','nameFirst', 'nameLast'));
 
 /**
  * Given a registered user's email and password returns their authUserId value.

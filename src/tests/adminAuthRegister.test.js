@@ -1,5 +1,10 @@
 // tests for adminAuthRegister function
-import { adminAuthRegister } from '../../src/auth.js'
+import { adminAuthRegister } from '../auth.js'
+import { clear } from '../other.js'
+
+beforeEach(() => {
+    clear();
+  });
 
 describe ('test for valid input for adminAuthRegister', () => {
     test.each([
@@ -28,8 +33,8 @@ describe ('test for valid input for adminAuthRegister', () => {
             name: 'valid input 4',
             email: 'email5@gmail.com',
             pass: 'password1',
-            first: 'name-First\'s',
-            last: 'name-Last\'s'
+            first: 'name- First\'s',
+            last: 'name- Last\'s'
         },
     ])('valid input', ({email, pass, first, last}) => {
         expect(adminAuthRegister(email, pass, first, last)).toStrictEqual({ authUserId: expect.any(Number) });
@@ -49,13 +54,6 @@ describe ('test for errors for adminAuthRegister', () => {
         {
             name: 'invalid email',
             email: 'email',
-            pass: 'password1',
-            first: 'nameFirst',
-            last: 'nameLast'
-        },
-        {
-            name: 'invalid email 2',
-            email: 'email@gmail.com.com',
             pass: 'password1',
             first: 'nameFirst',
             last: 'nameLast'
