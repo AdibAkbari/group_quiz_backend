@@ -1,45 +1,3 @@
-/**
- * Checks whether a given number is a valid user id
- * 
- * @param {number} authUserId 
- * @returns {boolean} true if valid, false if invalid
- */
-function isValidUserId(authUserId) {
-    if(isNaN(authUserId)) {
-        return false;
-    };
-
-    let data = getData();
-    for (const current of data.users) {
-        if (current.authUserId === authUserId) {
-            return true;
-        }
-    };
-    return false;
-}
-
-
-/**
- * Helper function to determine if the quizId exist
- * 
- * @param {number} quizId 
- * @returns {boolean} - returns true if does exist
- * @returns {boolean} - returns false if it dosn't exist 
- */
-function isValidQuizId(quizId) {
-    if(isNaN(quizId)) {
-        return false;
-    };
-
-    let data = getData();
-    for (const current of data.quizzes) {
-        if (current.quizId  === quizId) {
-            return true;
-        }
-    };
-    
-    return false;
-}
 
 /** 
  * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -88,6 +46,10 @@ export function adminQuizRemove(authUserId, quizId) {
 
     if (isValidQuizId(quizId) === false) {
         return {error: 'Quiz ID does not refer to valid quiz'};
+    }
+
+    if (isValidCreator(quizId, authUserId) === false) {
+        return {error: 'Quiz ID does not refer to a quiz that this user owns'};
     }
 
     
@@ -141,4 +103,72 @@ function adminQuizDescriptionUpdate (authUserID, quizId, description) {
     
     return { }
 
+}
+
+/**
+ * Checks whether a given number is a valid user id
+ * 
+ * @param {number} authUserId 
+ * @returns {boolean} true if valid, false if invalid
+ */
+function isValidUserId(authUserId) {
+    if(isNaN(authUserId)) {
+        return false;
+    };
+
+    let data = getData();
+    for (const current of data.users) {
+        if (current.authUserId === authUserId) {
+            return true;
+        }
+    };
+    return false;
+}
+
+
+/**
+ * Helper function to determine if the quizId exist
+ * 
+ * @param {number} quizId 
+ * @returns {boolean} - returns true if does exist
+ * @returns {boolean} - returns false if it dosn't exist 
+ */
+function isValidQuizId(quizId) {
+    if(isNaN(quizId)) {
+        return false;
+    };
+
+    let data = getData();
+    for (const current of data.quizzes) {
+        if (current.quizId  === quizId) {
+            return true;
+        }
+    };
+    
+    return false;
+}
+
+/**
+ * Helper function to determine if Quiz ID does not refer to a quiz that this user owns
+ * 
+ * @param {number} quizId 
+ * @param {number} authUserID 
+ * @returns {boolean} - returns true if user does own quiz
+ * @returns {boolean} - returns false if user does not own quiz
+ */
+function isValidCreator(quizId, authUserID) {
+    if(isNaN(quizId) || isNaN(authUserID)) {
+        return false;
+    };
+
+    let data = getData();
+    for (const current of data.quizzes) {
+        if (current.quizId  === quizId) {
+            if (current.creator  === authUserID) {
+                return true;
+            }
+        }
+    };
+    
+    return false;
 }
