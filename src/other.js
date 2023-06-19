@@ -1,11 +1,20 @@
+import { getData, setData } from './dataStore.js';
+
 /**
  * Reset the state of the application back to the start.
+ * 
  * @param {} - no parameters
  * @returns {} - doesn't return anything
  */
-
-function clear () {
+export function clear () {
+    let data = getData();
     
-    return { }
+    data = {
+        users: [],
+        quizzes: [],
+    };
+    
+    setData(data);
 
+    return { };
 }
