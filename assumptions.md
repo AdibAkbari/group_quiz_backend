@@ -1,0 +1,1 @@
+1. Assume the new name to be updated for the quiz is different from the current name
