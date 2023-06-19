@@ -38,7 +38,7 @@ function adminQuizCreate(authUserId, name, description) {
  * @param {number} quizId - passes through the quizId of the quiz to remove
  * @returns { } - empty object
  */
-function adminQuizRemove(authUserId, quizId) {
+export function adminQuizRemove(authUserId, quizId) {
     return { }
 }
 
@@ -73,7 +73,7 @@ function adminQuizInfo(authUserId, quizId) {
  * @param {string} name - passes through the name to update with
  * @returns { } - empty object
  */
-function adminQuizNameUpdate(authUserId, quizId, name) {
+export function adminQuizNameUpdate(authUserId, quizId, name) {
     return { }
 }
 
