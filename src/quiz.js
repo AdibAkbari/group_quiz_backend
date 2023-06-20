@@ -52,7 +52,8 @@ export function adminQuizCreate(authUserId, name, description) {
     let id = getData().quizzes.length + 1;
 
     // create new Date object
-    const date = new Date();
+    const timeNow = Math.floor((new Date()).getTime() / 1000);
+
 
     // get and set data to add quiz object to quizzes array
     let data = getData();
@@ -64,8 +65,8 @@ export function adminQuizCreate(authUserId, name, description) {
         creator: authUserId,
         questions: [],
         players: [],
-        timeCreated: date.getTime(),
-        timeLastEdited: date.getTime(),
+        timeCreated: timeNow,
+        timeLastEdited: timeNow,
       }
     );
     setData(data);
@@ -88,12 +89,9 @@ function checkNameValidity(name, authUserId) {
         return false;
     }
     // only alpha-numeric characters
-    for (let i = 0; i < name.length; i++) {
-        let char = name.charCodeAt(i);
-        if ((char < 48) || (char > 57 && char < 65) || (char > 90 && char < 97) || (char > 122))
-        {
-            return false;
-        }
+    const alphaNumeric = /^[a-zA-Z0-9]*$/;
+    if (!alphaNumeric.test(name)) {
+        return false;
     }
 
     // name cannot be already used by user for another quiz

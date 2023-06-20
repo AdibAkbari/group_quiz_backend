@@ -7,7 +7,7 @@ const ERROR = { error: expect.any(String) };
 let user;
 beforeEach(() => {
     clear();
-    user = adminAuthRegister('email@gmail.com', 'pass','first', 'last');
+    user = adminAuthRegister('email@gmail.com', 'password1', 'first', 'last');
 });
   
 describe('invalid name edge cases', () => {
