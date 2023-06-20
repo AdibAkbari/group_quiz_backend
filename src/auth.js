@@ -12,10 +12,6 @@ import validator from 'validator';
  * @returns {authUserId: 1} authuserId
  */
 export function adminAuthRegister (email, password, nameFirst, nameLast) {
-    let store = getData();
-    let authUserId = store.users.length + 1;
-    let user = {email, password, nameFirst, nameLast, authUserId};
-
     if (!validator.isEmail(email)) {
         return { error: 'Email is Invalid' };
     };
@@ -50,6 +46,12 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
     if (!letters.test(password) || !numbers.test(password)) {
         return { error: 'Password must contain at least one letter and one number' };
     };
+
+    let store = getData();
+    let authUserId = store.users.length + 1;
+    let numSuccessfulLogins = 1;
+    let numFailedPasswordsSinceLastLogin = 0;
+    let user = {email, password, nameFirst, nameLast, authUserId, numSuccessfulLogins, numFailedPasswordsSinceLastLogin};
 
     store.users.push(user);
     setData(store);
