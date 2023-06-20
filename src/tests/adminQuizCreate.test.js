@@ -14,7 +14,6 @@ describe('invalid name edge cases', () => {
     test.each([
         { name: 'test1;' }, // not alpha-numeric
         { name: 'user\'s test' }, // not alpha-numeric
-        { name: 'test quiz' }, // spaces
         { name: 'Q1' }, // <3 chars
         { name: '0123456789012345678901234567890' }, // >30 chars
         ])("invalid quiz name: '$name'", ({ name }) => {
@@ -47,7 +46,7 @@ test('invalid description (>100 characters)', () => {
 describe('valid input tests', () => {
     // test adminQuizCreate correct output
     test('valid input - testing quizId creation', () => {
-        expect(adminQuizCreate(user.authUserId, 'TestQuiz', 'Test')).toStrictEqual(
+        expect(adminQuizCreate(user.authUserId, 'Test quiz', 'Test')).toStrictEqual(
             {quizId: expect.any(Number)});
     });
 

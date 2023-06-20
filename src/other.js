@@ -120,7 +120,7 @@ export function checkNameValidity(name, authUserId) {
         return false;
     }
     // only alpha-numeric characters
-    const alphaNumeric = /^[a-zA-Z0-9]*$/;
+    const alphaNumeric = /^[a-zA-Z0-9\s]*$/;
     if (!alphaNumeric.test(name)) {
         return false;
     }
