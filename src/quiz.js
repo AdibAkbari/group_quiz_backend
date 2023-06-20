@@ -1,3 +1,4 @@
+import { getData, setData } from './dataStore.js';
 
 /** 
  * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -164,10 +165,6 @@ function isValidQuizId(quizId) {
  * @returns {boolean} - returns false if user does not own quiz
  */
 function isValidCreator(quizId, authUserID) {
-    if(isNaN(quizId) || isNaN(authUserID)) {
-        return false;
-    };
-
     let data = getData();
     for (const current of data.quizzes) {
         if (current.quizId  === quizId) {
