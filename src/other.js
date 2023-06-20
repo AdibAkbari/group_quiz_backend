@@ -58,38 +58,6 @@ function findUserIndex(authUserId) {
     return -1;
 }
 
-/**
- * Helper function for adminQuizCreate to check if a quiz name is valid
- * 
- * @param {number} authUserId id of the user
- * @param {String} name name of the quiz
- * @returns {Boolean} whether the name is valid
- */
-function checkNameValidity(name, authUserId) {
-    // length must be between 3 and 30 characters
-    if (name.length < 3 || name.length > 30) {
-        return false;
-    }
-    // only alpha-numeric characters
-    for (let i = 0; i < name.length; i++) {
-        let char = name.charCodeAt(i);
-        if ((char < 48) || (char > 57 && char < 65) || (char > 90 && char < 97) || (char > 122))
-        {
-            return false;
-        }
-    }
-    // name cannot be already used by user for another quiz
-    const quizzes = getData().quizzes;
-    for (const quiz of quizzes) {
-        if (quiz.creator === authUserId && quiz.name === name) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-
 
 /**
  * Helper function to determine if the quizId exist
