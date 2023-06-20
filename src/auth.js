@@ -12,6 +12,8 @@ import validator from 'validator';
  * @returns {authUserId: 1} authuserId
  */
 export function adminAuthRegister (email, password, nameFirst, nameLast) {
+    let store = getData();
+
     if (!validator.isEmail(email)) {
         return { error: 'Email is Invalid' };
     };
@@ -47,7 +49,6 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
         return { error: 'Password must contain at least one letter and one number' };
     };
 
-    let store = getData();
     let authUserId = store.users.length + 1;
     let numSuccessfulLogins = 1;
     let numFailedPasswordsSinceLastLogin = 0;

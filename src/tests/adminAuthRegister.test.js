@@ -6,6 +6,8 @@ beforeEach(() => {
     clear();
   });
 
+const ERROR = { error: expect.any(String) };
+
 describe ('test for valid input for adminAuthRegister', () => {
     test.each([
         {
@@ -52,8 +54,8 @@ describe ('test for errors for adminAuthRegister', () => {
             name: 'invalid email',
             email: 'email'
         },
-    ])('invalid email test', ({email}) => {
-        expect(adminAuthRegister(email, 'password1', 'nameFirst', 'nameLast')).toStrictEqual({ error: expect.any(String) });
+    ])('invalid email test: $email', ({email}) => {
+        expect(adminAuthRegister(email, 'password1', 'nameFirst', 'nameLast')).toStrictEqual(ERROR);
     });
 
     test.each([
@@ -77,8 +79,8 @@ describe ('test for errors for adminAuthRegister', () => {
             name: 'nameLast too long',
             last: 'nameLastIsMoreThanTwenty'
         },
-    ])('invalid nameLast tests', ({last}) => {
-        expect(adminAuthRegister('email2@gmail.com', 'password1', 'nameFirst', last)).toStrictEqual({ error: expect.any(String) });
+    ])('invalid nameLast tests: $last', ({last}) => {
+        expect(adminAuthRegister('email2@gmail.com', 'password1', 'nameFirst', last)).toStrictEqual(ERROR);
     });
 
     test.each([
@@ -102,8 +104,8 @@ describe ('test for errors for adminAuthRegister', () => {
             name: 'nameFirst too long',
             first: 'nameFirstIsMoreThanTwenty'
         },
-    ])('invalid nameFirst tests', ({first}) => {
-        expect(adminAuthRegister('email2@gmail.com', 'password1', first, 'nameLast')).toStrictEqual({ error: expect.any(String) });
+    ])('invalid nameFirst tests: $first', ({first}) => {
+        expect(adminAuthRegister('email2@gmail.com', 'password1', first, 'nameLast')).toStrictEqual(ERROR);
     });
 
     test.each([
@@ -123,13 +125,13 @@ describe ('test for errors for adminAuthRegister', () => {
             name: 'password must contain letter',
             pass: '12345678'
         },
-    ])('invalid password tests', ({pass}) => {
-        expect(adminAuthRegister('email2@gmail.com', pass, 'nameFirst', 'nameLast')).toStrictEqual({ error: expect.any(String) });
+    ])('invalid password tests: $pass', ({pass}) => {
+        expect(adminAuthRegister('email2@gmail.com', pass, 'nameFirst', 'nameLast')).toStrictEqual(ERROR);
     });
 
     test('email already used', () => {
         const user = adminAuthRegister('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
-        expect(adminAuthRegister('email@gmail.com', 'password12', 'nameFirsts', 'nameLasts')).toStrictEqual({ error: expect.any(String) });
+        expect(adminAuthRegister('email@gmail.com', 'password12', 'nameFirsts', 'nameLasts')).toStrictEqual(ERROR);
     });
 });
 
