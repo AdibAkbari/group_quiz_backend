@@ -28,7 +28,7 @@ export function clear () {
  * @param {number} authUserId 
  * @returns {boolean} true if valid, false if invalid
  */
-function isValidUserId(authUserId) {
+export function isValidUserId(authUserId) {
     if(isNaN(authUserId)) {
         return false;
     };
@@ -48,7 +48,7 @@ function isValidUserId(authUserId) {
  * @param {number} authUserId 
  * @returns {number} index number that corresponds to user id
  */
-function findUserIndex(authUserId) {
+export function findUserIndex(authUserId) {
     let data = getData();
     for (const i in data.users) {
         if (data.users[i].authUserId === authUserId) {
@@ -66,7 +66,7 @@ function findUserIndex(authUserId) {
  * @returns {boolean} - returns true if does exist
  * @returns {boolean} - returns false if it dosn't exist 
  */
-function isValidQuizId(quizId) {
+export function isValidQuizId(quizId) {
     if(isNaN(quizId)) {
         return false;
     };
@@ -91,7 +91,7 @@ function isValidQuizId(quizId) {
  * @returns {boolean} - returns true if user does own quiz
  * @returns {boolean} - returns false if user does not own quiz
  */
-function isValidCreator(quizId, authUserID) {
+export function isValidCreator(quizId, authUserID) {
     let data = getData();
     for (const current of data.quizzes) {
         if (current.quizId  === quizId) {
@@ -114,7 +114,7 @@ function isValidCreator(quizId, authUserID) {
  * @param {String} name name of the quiz
  * @returns {Boolean} whether the name is valid
  */
-function checkNameValidity(name, authUserId) {
+export function checkNameValidity(name, authUserId) {
     // length must be between 3 and 30 characters
     if (name.length < 3 || name.length > 30) {
         return false;
