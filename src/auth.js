@@ -19,7 +19,7 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
     };
 
     if (store.users.filter(mail => mail.email === email).length > 0) {
-        return { error: 'Email already in use' }
+        return { error: 'Email already in use' };
     };
 
     if (nameFirst.length < 2 || nameFirst.length > 20) {
@@ -41,7 +41,7 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
 
     if (password.length < 8) {
         return { error: 'Password must be at least 8 characters' };
-    }
+    };
 
     const letters = /[a-zA-Z]/;
     const numbers = /\d/;
