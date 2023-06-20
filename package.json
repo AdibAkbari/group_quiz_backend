@@ -4,7 +4,7 @@
     },
     "dependencies": {
         "rewire": "^6.0.0",
-        "validator": "^13.7.0"
+        "validator": "^13.9.0"
     },
     "devDependencies": {
         "@babel/cli": "^7.22.5",
