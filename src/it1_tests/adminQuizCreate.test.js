@@ -7,14 +7,13 @@ const ERROR = { error: expect.any(String) };
 let user;
 beforeEach(() => {
     clear();
-    user = adminAuthRegister('email@gmail.com', 'pass','first', 'last');
+    user = adminAuthRegister('email@gmail.com', 'password1', 'first', 'last');
 });
   
 describe('invalid name edge cases', () => {
     test.each([
         { name: 'test1;' }, // not alpha-numeric
         { name: 'user\'s test' }, // not alpha-numeric
-        { name: 'test quiz' }, // spaces
         { name: 'Q1' }, // <3 chars
         { name: '0123456789012345678901234567890' }, // >30 chars
         ])("invalid quiz name: '$name'", ({ name }) => {
@@ -47,23 +46,23 @@ test('invalid description (>100 characters)', () => {
 describe('valid input tests', () => {
     // test adminQuizCreate correct output
     test('valid input - testing quizId creation', () => {
-        expect(adminQuizCreate(user.authUserId, 'TestQuiz', 'Test')).toStrictEqual(
+        expect(adminQuizCreate(user.authUserId, 'Test quiz', 'Test')).toStrictEqual(
             {quizId: expect.any(Number)});
     });
 
-    // NOTE: Relies on adminQuizInfo, so will comment for now.
+    // NOTE: Relies on adminQuizInfo, so will skip for now.
     // test that the quiz is correctly added to the array of quizzes
-    // test('testing correct quiz object creation', () => {
-    //     const quiz = adminQuizCreate(user.authUserId, 'TestQuiz', 'Test');     
-    //     expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual(
-    //         {
-    //             quizId: quiz.quizId,
-    //             name: 'TestQuiz',
-    //             timeCreated: expect.any(Number),
-    //             timeLastEdited: expect.any(Number),
-    //             description: 'Test',
-    //         }
-    //     );
-    // });
+    test.skip('testing correct quiz object creation', () => {
+        const quiz = adminQuizCreate(user.authUserId, 'TestQuiz', 'Test');     
+        expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual(
+            {
+                quizId: quiz.quizId,
+                name: 'TestQuiz',
+                timeCreated: expect.any(Number),
+                timeLastEdited: expect.any(Number),
+                description: 'Test',
+            }
+        );
+    });
 
 });

@@ -1,4 +1,5 @@
 import { getData, setData } from "./dataStore.js";
+import { checkNameValidity, isValidUserId} from "./other.js";
 
  
 /** 
@@ -40,6 +41,11 @@ export function adminQuizList (authUserId) {
  * @returns {quizId: 2} - returns quizId: 2
  */
 export function adminQuizCreate(authUserId, name, description) {
+    // invalid authUserId
+    if (!isValidUserId(authUserId)) {
+        return {error: 'authUserId does not refer to valid user'};
+    }
+
     if (!checkNameValidity(name, authUserId)) {
         return {error: 'name not valid'};
     }
@@ -48,23 +54,13 @@ export function adminQuizCreate(authUserId, name, description) {
     if (description.length > 100) {
         return {error: 'description too long'};
     }
-
-    // invalid authUserId
-    let userIdValid = false;
-    for (const user of getData().users) {
-        if (user.authUserId === authUserId) {
-            userIdValid = true;
-        }
-      }
-      if (userIdValid === false) {
-        return {error: 'authUserId does not refer to valid user'};
-      }
     
     // create new quizId
     let id = getData().quizzes.length + 1;
 
     // create new Date object
-    const date = new Date();
+    const timeNow = Math.floor((new Date()).getTime() / 1000);
+
 
     // get and set data to add quiz object to quizzes array
     let data = getData();
@@ -76,8 +72,8 @@ export function adminQuizCreate(authUserId, name, description) {
         creator: authUserId,
         questions: [],
         players: [],
-        timeCreated: date.getTime(),
-        timeLastEdited: date.getTime(),
+        timeCreated: timeNow,
+        timeLastEdited: timeNow,
       }
     );
     setData(data);
@@ -85,38 +81,6 @@ export function adminQuizCreate(authUserId, name, description) {
     return {
       quizId: id,
     };
-}
-
-/**
- * Helper function for adminQuizCreate to check if a quiz name is valid
- * 
- * @param {number} authUserId id of the user
- * @param {String} name name of the quiz
- * @returns {Boolean} whether the name is valid
- */
-function checkNameValidity(name, authUserId) {
-    // length must be between 3 and 30 characters
-    if (name.length < 3 || name.length > 30) {
-        return false;
-    }
-    // only alpha-numeric characters
-    for (let i = 0; i < name.length; i++) {
-        let char = name.charCodeAt(i);
-        if ((char < 48) || (char > 57 && char < 65) || (char > 90 && char < 97) || (char > 122))
-        {
-            return false;
-        }
-    }
-
-    // name cannot be already used by user for another quiz
-    const quizzes = getData().quizzes;
-    for (const quiz of quizzes) {
-        if (quiz.creator === authUserId && quiz.name === name) {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 
@@ -180,21 +144,3 @@ function adminQuizDescriptionUpdate (authUserID, quizId, description) {
 
 }
 
-/**
- * Checks whether a given number is a valid user id
- * 
- * @param {number} authUserId 
- * @returns {boolean} true if valid, false if invalid
- */
-function isValidUserId(authUserId) {
-    if(isNaN(authUserId)) {
-        return false;
-    };
-    let data = getData();
-    for (const current of data.users) {
-        if (current.authUserId === authUserId) {
-            return true;
-        }
-    };
-    return false;
-}

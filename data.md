@@ -22,7 +22,7 @@ let data = {
                     answer: '2',
                 }
             ],
-            creator: 'Rani',
+            creator: 1,
             players: [
                 {
                     uId: 9,
