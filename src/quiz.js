@@ -1,5 +1,5 @@
 import { getData, setData } from "./dataStore.js";
-import { checkNameValidity, isValidUserId} from "./other.js";
+import { checkNameValidity, isValidUserId, isValidQuizId, isValidCreator} from "./other.js";
 
  
 /** 
@@ -125,8 +125,27 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
  * @param {string} description - passes through description of quiz
  * @returns {} - doesn't return anything
  */
-function adminQuizDescriptionUpdate (authUserID, quizId, description) {
-    
-    return { }
+export function adminQuizDescriptionUpdate (authUserID, quizId, description) {
+    if (!isValidUserId(authUserID)) {
+        return { error: 'authUserId does not refer to valid user'};
+    };
 
+    if (!isValidQuizId(quizId)) {
+        return { error: 'quizId does not refer to valid quiz'};
+    };
+
+    if (!isValidCreator(quizId, authUserID)) {
+        return { error: 'quizId does not refer to a quiz that this user owns'};
+    };
+
+    if (description.length > 100) {
+        return {error: 'description must be less than 100 characters'};
+    }
+
+    let store = getData();
+    const quizIndex = store.quizzes.findIndex(id => id.quizId === quizId);
+    store.quizzes[quizIndex].description = description;
+    setData(store);
+
+    return { };
 }
