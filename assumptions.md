@@ -1,4 +1,5 @@
-For adminQuizList
-- Assume that if user is the owner of no quizzes, an empty array will be returned as opposed to an error message
-- Assume that the array of quizzes can have objects appear in any order
-- assume that each quiz has a unique id, so that if a set is taken of the quiz array, no duplicate items will be removed
+Assumptions:
+- assume passwords of just white space are accepted
+- assume user names and quiz names cannot just be white space\
+- assume authUserId and quizId must be unique
+- for adminQuizList: assume that the array of quizzes can have objects appear in any order
