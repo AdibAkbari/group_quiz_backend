@@ -31,18 +31,16 @@ describe('adminQuizNameUpdate', () => {
 
     // Testing the user does not own the quiz that is trying to be removed 
     test('Quiz ID does not refer to a quiz that this user owns', () => {
-        let user2 = adminAuthRegister('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast');;
+        let user2 = adminAuthRegister('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast');
         let quiz2 = adminQuizCreate(user2.authUserId, 'quiz2', '' );
         
         expect(adminQuizNameUpdate(user.authUserId, quiz2.quizId, 'NewQuizName')).toStrictEqual(ERROR);
     });
 
-    // Output error if new name contains not alphanumeric characters or spaces
+    // Output error if new name contains not alphanumeric characters
     test.each([
         { name: '!@#$%^&*'},
-        { name: 'New Quiz'},
-        { name: '        '},
-    ])('Name contains any characters that are not alphanumeric or are spaces', ({name}) => {
+    ])('Name contains any characters that are not alphanumeric or are spaces: "$name"', ({name}) => {
         expect(adminQuizNameUpdate(user.authUserId, quiz.quizId, name)).toStrictEqual(ERROR);
     });
 
@@ -50,13 +48,13 @@ describe('adminQuizNameUpdate', () => {
     test.each([
         { name: 'q1'},
         { name: 'namemorethanthirtycharacterslong'},
-    ])('Name is either less than 3 characters long or more than 30 characters long', ({name}) => {
+    ])('Length of name is too short/long: "$name"', ({name}) => {
         expect(adminQuizNameUpdate(user.authUserId, quiz.quizId, name)).toStrictEqual(ERROR);
     });
     
     // Output error if the name is already used by the current logged in user for another quiz 
     test('Name is already used by the current logged in user for another quiz', () => {
-        let quiz2 = adminQuizCreate(user2.authUserId, 'quiz2', '' );
+        let quiz2 = adminQuizCreate(user.authUserId, 'quiz2', '' );
         expect(adminQuizNameUpdate(user.authUserId, quiz2.quizId, 'quiz1')).toStrictEqual(ERROR);
     });
 
@@ -68,7 +66,9 @@ describe('adminQuizNameUpdate', () => {
         { name: '123456789'},
         { name: '1quiz'},
         { name: 'Quiz1'},
-    ])('Successful Quiz Name Update', ({name}) => {
+        { name: 'New Quiz'},
+        { name: '        '},
+    ])('Successful Quiz Name Update: "$name"', ({name}) => {
         expect(adminQuizNameUpdate(user.authUserId, quiz.quizId, name)).toStrictEqual({});
     });
 })
