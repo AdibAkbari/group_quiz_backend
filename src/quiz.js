@@ -1,6 +1,5 @@
 import { getData, setData } from "./dataStore.js";
-import { checkNameValidity, isValidUserId} from "./other.js";
-
+import { checkNameValidity, isValidCreator, isValidQuizId, isValidUserId} from "./other.js";
  
 /** 
  * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -8,7 +7,7 @@ import { checkNameValidity, isValidUserId} from "./other.js";
  * @param {number} authUserId - passes through authUserId
  * @returns {quizzes: [{quizId: number, name: string,}]} - returns an object
  */
-function adminQuizList (authUserId) {
+export function adminQuizList (authUserId) {
     return {
         quizzes:
         [
@@ -78,7 +77,7 @@ export function adminQuizCreate(authUserId, name, description) {
  * @param {number} quizId - passes through the quizId of the quiz to remove
  * @returns { } - empty object
  */
-function adminQuizRemove(authUserId, quizId) {
+export function adminQuizRemove(authUserId, quizId) {
     return { }
 }
 
@@ -95,15 +94,38 @@ function adminQuizRemove(authUserId, quizId) {
  *           description: 'This is my quiz',
  *          } - returns Quiz info 
  */
-function adminQuizInfo(authUserId, quizId) {
+export function adminQuizInfo(authUserId, quizId) {
+    
+    if (!isValidUserId(authUserId)) {
+        return {error: 'authUserId does not refer to valid user'};
+    }
+
+    if (!isValidQuizId(quizId)) {
+        return {error: 'quizId does not refer to valid quiz'};
+    }
+
+    if (!isValidCreator(quizId, authUserId)) {
+        return {error: 'quizId does not refer to quiz that this user owns'};
+    }
+
+    let data = getData();
+    for (const quiz of data.quizzes) {
+        if(quiz.quizId === quizId) {
+            return {
+                quizId: quiz.quizId,
+                name: quiz.name,
+                timeCreated: quiz.timeCreated,
+                timeLastEdited: quiz.timeLastEdited,
+                description: quiz.description,
+            }
+        }
+    };
+    
     return {
-        quizId: 1,
-        name: 'My Quiz',
-        timeCreated: 1683125870,
-        timeLastEdited: 1683125871,
-        description: 'This is my quiz',
+        error: 'Quiz could not be found'
     }
 }
+
 
 /**
  * Update the name of the relevant quiz.
@@ -113,7 +135,7 @@ function adminQuizInfo(authUserId, quizId) {
  * @param {string} name - passes through the name to update with
  * @returns { } - empty object
  */
-function adminQuizNameUpdate(authUserId, quizId, name) {
+export function adminQuizNameUpdate(authUserId, quizId, name) {
     return { }
 }
 
@@ -125,7 +147,7 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
  * @param {string} description - passes through description of quiz
  * @returns {} - doesn't return anything
  */
-function adminQuizDescriptionUpdate (authUserID, quizId, description) {
+export function adminQuizDescriptionUpdate (authUserID, quizId, description) {
     
     return { }
 
