@@ -1,3 +1,4 @@
+import { getData, setData } from './dataStore.js';
 
 /** 
  * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -87,18 +88,17 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
         return {error: 'You do not own this quiz'};
     }
     // Check inputted name is valid
-    if (!checkNameValidity(name, authUserId)) {
+    if (!isValidName(name, authUserId)) {
         return {error: 'Name not valid'};
     }
 
     let data = getData();
     for (const current of data.quizzes) {
         if (current.quizId  === quizId) {
-            let newName = current;
-            newName.name = name;
-            newName.timeLastEdited = date.getTime();
+            current.name = name;
+            current.timeLastEdited = date.getTime();
             
-            setData(newName);
+            setData(data);
         }
     };
 
