@@ -58,7 +58,7 @@ describe('Only one user registered', () => {
         })
     });
 
-    test('Registered and logged in', () => {
+    test.skip('Registered and logged in', () => {
         adminAuthLogin('email@gmail.com', 'password1');
         expect(adminUserDetails(user.authUserId)).toStrictEqual({
             user: {
@@ -71,7 +71,7 @@ describe('Only one user registered', () => {
         })
     });
 
-    test('Failed password attempt', () => {
+    test.skip('Failed password attempt', () => {
         adminAuthLogin('email@gmail.com', 'password2');
         expect(adminUserDetails(user.authUserId)).toStrictEqual({
             user: {

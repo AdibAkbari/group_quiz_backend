@@ -1,6 +1,8 @@
 
 import { setData, getData } from './dataStore.js'
 import validator from 'validator';
+import { isValidUserId, findUserIndex } from "./other.js";
+
 
 /**
  * Register a user with an email, password, and names, then returns their 
@@ -113,37 +115,3 @@ export function adminUserDetails(authUserId) {
     }
 }
 
-/**
- * Checks whether a given number is a valid user id
- * 
- * @param {number} authUserId 
- * @returns {boolean} true if valid, false if invalid
- */
-function isValidUserId(authUserId) {
-    if(isNaN(authUserId)) {
-        return false;
-    };
-    let data = getData();
-    for (const current of data.users) {
-        if (current.authUserId === authUserId) {
-            return true;
-        }
-    };
-    return false;
-}
-
-/**
- * finds the array index of a given user id
- * 
- * @param {number} authUserId 
- * @returns {number} index number that corresponds to user id
- */
-function findUserIndex(authUserId) {
-    let data = getData();
-    for (const i in data.users) {
-        if (data.users[i].authUserId === authUserId) {
-            return i;
-        }
-    }
-    return -1;
-}
