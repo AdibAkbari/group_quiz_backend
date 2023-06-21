@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 import { getData, setData } from './dataStore.js';
+=======
+import { getData, setData } from "./dataStore.js";
+import { checkNameValidity, isValidUserId} from "./other.js";
+>>>>>>> 69a0ec3199046fc861442c109cdba0fd1900fce1
 
+ 
 /** 
  * Provide a list of all quizzes that are owned by the currently logged in user.
  * 
@@ -26,10 +32,47 @@ function adminQuizList (authUserId) {
  * @param {string} description - passes through the description
  * @returns {quizId: 2} - returns quizId: 2
  */
-function adminQuizCreate(authUserId, name, description) {
-    return {
-        quizId: 2
+export function adminQuizCreate(authUserId, name, description) {
+    // invalid authUserId
+    if (!isValidUserId(authUserId)) {
+        return {error: 'authUserId does not refer to valid user'};
     }
+
+    if (!checkNameValidity(name, authUserId)) {
+        return {error: 'name not valid'};
+    }
+    
+    // invalid description
+    if (description.length > 100) {
+        return {error: 'description too long'};
+    }
+    
+    // create new quizId
+    let id = getData().quizzes.length + 1;
+
+    // create new Date object
+    const timeNow = Math.floor((new Date()).getTime() / 1000);
+
+
+    // get and set data to add quiz object to quizzes array
+    let data = getData();
+    data.quizzes.push(
+      {
+        name: name,
+        description: description,
+        quizId: id,
+        creator: authUserId,
+        questions: [],
+        players: [],
+        timeCreated: timeNow,
+        timeLastEdited: timeNow,
+      }
+    );
+    setData(data);
+  
+    return {
+      quizId: id,
+    };
 }
 
 /**
