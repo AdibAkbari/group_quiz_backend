@@ -12,6 +12,7 @@ export function clear () {
     data = {
         users: [],
         quizzes: [],
+        quizCount: 0,
     };
     
     setData(data);
