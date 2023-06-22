@@ -51,9 +51,8 @@ describe('valid input tests', () => {
             {quizId: expect.any(Number)});
     });
 
-    // NOTE: Relies on adminQuizInfo, so will skip for now.
     // test that the quiz is correctly added to the array of quizzes
-    test.skip('testing correct quiz object creation', () => {
+    test('testing correct quiz object creation', () => {
         const quiz = adminQuizCreate(user.authUserId, 'TestQuiz', 'Test');     
         expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual(
             {
