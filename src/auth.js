@@ -1,5 +1,6 @@
 import { setData, getData } from './dataStore.js'
 import validator from 'validator';
+import { isWhiteSpace } from './other.js'
 
 /**
  * Register a user with an email, password, and names, then returns their 
@@ -37,6 +38,10 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
 
     if (!expressionName.test(nameLast)) {
         return { error: 'Last name must only contain letters, spaces, hyphens or apostrophes' };
+    };
+
+    if (isWhiteSpace(nameFirst) || isWhiteSpace(nameLast)) {
+        return { error: 'First name and Last name cannot be solely white space' };
     };
 
     if (password.length < 8) {
