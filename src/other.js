@@ -123,6 +123,11 @@ export function checkNameValidity(name, authUserId) {
         return false;
     }
 
+    // return false if name is only whitespace
+    if (isWhiteSpace(name)) {
+        return false;
+    }
+
     // name cannot be already used by user for another quiz
     const quizzes = getData().quizzes;
     for (const quiz of quizzes) {

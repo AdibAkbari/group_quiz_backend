@@ -14,6 +14,7 @@ describe('invalid name edge cases', () => {
     test.each([
         { name: 'test1;' }, // not alpha-numeric
         { name: 'user\'s test' }, // not alpha-numeric
+        { name: '     '}, // only whitespaces
         { name: 'Q1' }, // <3 chars
         { name: '0123456789012345678901234567890' }, // >30 chars
         ])("invalid quiz name: '$name'", ({ name }) => {
