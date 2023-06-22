@@ -41,9 +41,7 @@ describe('valid input', () => {
         expect(adminQuizDescriptionUpdate(user.authUserId, quiz.quizId, 'New Description')).toStrictEqual({ });
     });
 
-    // NOTE: Relies on adminQuizInfo, so will skip for now.
-    // test that the quiz is correctly added to the array of quizzes
-    test.skip('testing correct quiz description change', () => {     
+    test('testing correct quiz description change', () => {     
         adminQuizDescriptionUpdate(user.authUserId, quiz.quizId, 'New Description');    
         expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual(
             {
