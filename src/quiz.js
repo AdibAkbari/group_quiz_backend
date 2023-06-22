@@ -1,5 +1,5 @@
 import { getData, setData } from "./dataStore.js";
-import { checkNameValidity, isValidCreator, isValidQuizId, isValidUserId} from "./other.js";
+import { checkNameValidity, isValidCreator, isValidQuizId, isValidUserId, isWhiteSpace} from "./other.js";
  
 /** 
  * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -165,6 +165,10 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
     if (!checkNameValidity(name, authUserId)) {
         return {error: 'Name not valid'};
     }
+    // Check name isn't just whitespace
+    if (isWhiteSpace(name)) {
+        return { error: 'Quiz name cannot be solely white space' };
+    };
 
     let data = getData();
     const timeNow = Math.floor((new Date()).getTime() / 1000);
