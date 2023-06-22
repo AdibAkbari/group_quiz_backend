@@ -8,15 +8,27 @@ import { checkNameValidity, isValidUserId, isValidQuizId, isValidCreator} from "
  * @param {number} authUserId - passes through authUserId
  * @returns {quizzes: [{quizId: number, name: string,}]} - returns an object
  */
-function adminQuizList (authUserId) {
+export function adminQuizList (authUserId) {
+    let data = getData();
+    
+    if (!isValidUserId(authUserId)) {
+        return {
+            error: 'AuthUserId is not a valid user'
+        }
+    };
+
+    let quizzes = [];
+
+    for (const quiz of data.quizzes) {
+        if (quiz.creator === authUserId) {
+            let quizId = quiz.quizId;
+            let name = quiz.name;
+            quizzes.push({quizId, name});
+        }
+    };
+    
     return {
-        quizzes:
-        [
-            {
-                quizId: 1,
-                name: 'My Quiz',
-            }
-        ]
+        quizzes: quizzes
     }
 }
 
@@ -70,6 +82,7 @@ export function adminQuizCreate(authUserId, name, description) {
       quizId: id,
     };
 }
+
 
 /**
  * Given a particular quiz, permanently remove the quiz.
@@ -149,3 +162,4 @@ export function adminQuizDescriptionUpdate (authUserID, quizId, description) {
 
     return { };
 }
+
