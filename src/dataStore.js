@@ -1,7 +1,8 @@
 // data structure for storing user data and quiz data 
 let data = {
   users: [],
-  quizzes: []
+  quizzes: [],
+  quizCount: 0,
 };
 
 // YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1
