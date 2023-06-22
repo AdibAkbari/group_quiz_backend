@@ -157,7 +157,9 @@ export function adminQuizDescriptionUpdate (authUserID, quizId, description) {
 
     let store = getData();
     const quizIndex = store.quizzes.findIndex(id => id.quizId === quizId);
+    const timeNow = Math.floor((new Date()).getTime() / 1000);
     store.quizzes[quizIndex].description = description;
+    store.quizzes[quizIndex].timeLastEdited = timeNow;
     setData(store);
 
     return { };
