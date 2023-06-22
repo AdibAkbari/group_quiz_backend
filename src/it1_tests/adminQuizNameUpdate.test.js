@@ -5,20 +5,16 @@ import { clear } from '../other.js';
 
 const ERROR = { error: expect.any(String) };
 
+let user;
+let quiz;
+// Before each test, clear data and then create a new user and new quiz 
 beforeEach(() => {
     clear();
+    user = adminAuthRegister('user1@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast');
+    quiz = adminQuizCreate(user.authUserId, 'quiz1', '' );
 });
 
-describe('adminQuizNameUpdate', () => {
-    
-    let user;
-    let quiz;
-    // Before each test, clear data and then create a new user and new quiz 
-    beforeEach(() => {
-        user = adminAuthRegister('user1@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast');
-        quiz = adminQuizCreate(user.authUserId, 'quiz1', '' );
-    });
-    
+describe('Invalid adminQuizNameUpdate', () => {   
     // Testing AuthUserId does not exist 
     test('AuthUserId is not a valid user', () => {
         expect(adminQuizNameUpdate(user.authUserId + 1, quiz.quizId, 'NewQuizName')).toStrictEqual(ERROR);
@@ -40,6 +36,8 @@ describe('adminQuizNameUpdate', () => {
     // Output error if new name contains not alphanumeric characters
     test.each([
         { name: '!@#$%^&*'},
+        { name: 'user\'s test'},
+        { name: 'test1;'},
     ])('Name contains any characters that are not alphanumeric or are spaces: "$name"', ({name}) => {
         expect(adminQuizNameUpdate(user.authUserId, quiz.quizId, name)).toStrictEqual(ERROR);
     });
@@ -62,7 +60,9 @@ describe('adminQuizNameUpdate', () => {
     test('Name is just whitespace', () => {
         expect(adminQuizNameUpdate(user.authUserId, quiz.quizId, '          ')).toStrictEqual(ERROR);
     });
+})
 
+describe('Valid adminQuizNameUpdate', () => {
     // Successfully update the name of the quiz 
     test.each([
         { name: 'qz1'},
