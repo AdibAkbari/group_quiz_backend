@@ -79,6 +79,10 @@ describe ('test for errors for adminAuthRegister', () => {
             testName: 'nameLast too long',
             last: 'nameLastIsMoreThanTwenty'
         },
+        {
+            testName: 'nameLast whitespace',
+            last: '    '
+        },
     ])('$testName: $last', ({last}) => {
         expect(adminAuthRegister('email2@gmail.com', 'password1', 'nameFirst', last)).toStrictEqual(ERROR);
     });
@@ -103,6 +107,10 @@ describe ('test for errors for adminAuthRegister', () => {
         {
             testName: 'nameFirst too long',
             first: 'nameFirstIsMoreThanTwenty'
+        },
+        {
+            testName: 'nameFirst whitespace',
+            first: '    '
         },
     ])('$testName: $first', ({first}) => {
         expect(adminAuthRegister('email2@gmail.com', 'password1', first, 'nameLast')).toStrictEqual(ERROR);
