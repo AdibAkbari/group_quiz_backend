@@ -54,15 +54,13 @@ export function adminQuizCreate(authUserId, name, description) {
         return {error: 'description too long'};
     }
     
-    // create new quizId
-    let id = getData().quizzes.length + 1;
-
-    // create new Date object
+    // get time in seconds
     const timeNow = Math.floor((new Date()).getTime() / 1000);
-
 
     // get and set data to add quiz object to quizzes array
     let data = getData();
+    data.quizCount++; // increment quizCount by 1
+    let id = data.quizCount;
     data.quizzes.push(
       {
         name: name,
@@ -192,8 +190,29 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
  * @returns {} - doesn't return anything
  */
 export function adminQuizDescriptionUpdate (authUserID, quizId, description) {
-    
-    return { }
+    if (!isValidUserId(authUserID)) {
+        return { error: 'authUserId does not refer to valid user'};
+    };
 
+    if (!isValidQuizId(quizId)) {
+        return { error: 'quizId does not refer to valid quiz'};
+    };
+
+    if (!isValidCreator(quizId, authUserID)) {
+        return { error: 'quizId does not refer to a quiz that this user owns'};
+    };
+
+    if (description.length > 100) {
+        return {error: 'description must be less than 100 characters'};
+    }
+
+    let store = getData();
+    const quizIndex = store.quizzes.findIndex(id => id.quizId === quizId);
+    const timeNow = Math.floor((new Date()).getTime() / 1000);
+    store.quizzes[quizIndex].description = description;
+    store.quizzes[quizIndex].timeLastEdited = timeNow;
+    setData(store);
+
+    return { };
 }
 
