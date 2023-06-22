@@ -94,8 +94,8 @@ export function adminQuizRemove(authUserId, quizId) {
     let data = getData();
     for (const current of data.quizzes) {
         if (current.quizId  === quizId) {
-            let removed = data.quizzes.splice(current, 1);
-            setData(removed);
+            data.quizzes.splice(current, 1);
+            setData(data);
         }
     };
     
