@@ -171,7 +171,7 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
     let data = getData();
     const timeNow = Math.floor((new Date()).getTime() / 1000);
     for (const current of data.quizzes) {
-        if (current.quizId  === quizId) {
+        if (current.quizId === quizId) {
             current.name = name;
             current.timeLastEdited = timeNow;
             setData(data);
