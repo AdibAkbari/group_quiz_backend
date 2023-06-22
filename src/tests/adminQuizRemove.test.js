@@ -50,7 +50,8 @@ describe('adminQuizRemove', () => {
         
         adminQuizRemove(user.authUserId, quizToRemove.quizId);
 
-        expect(adminQuizList(user.authUserId)).toStrictEqual({ 
+        let received = adminQuizList(user.authUserId);
+        let expected = { 
             quizzes: [
             {
                 quizId: quiz.quizId,
@@ -65,7 +66,12 @@ describe('adminQuizRemove', () => {
                 name: 'quiz3',
             },
           ]
-        })
+        }
+
+        const receivedSet = new Set(received.quizzes);
+        const expectedSet = new Set(expected.quizzes);
+        expect(receivedSet).toStrictEqual(expectedSet);
+
     });
     
 })
