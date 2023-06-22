@@ -1,5 +1,5 @@
 import { getData, setData } from "./dataStore.js";
-import { checkNameValidity, isValidUserId} from "./other.js";
+import { checkNameValidity, isValidUserId, isValidQuizId, isValidCreator} from "./other.js";
 
  
 /** 
@@ -8,15 +8,27 @@ import { checkNameValidity, isValidUserId} from "./other.js";
  * @param {number} authUserId - passes through authUserId
  * @returns {quizzes: [{quizId: number, name: string,}]} - returns an object
  */
-function adminQuizList (authUserId) {
+export function adminQuizList (authUserId) {
+    let data = getData();
+    
+    if (!isValidUserId(authUserId)) {
+        return {
+            error: 'AuthUserId is not a valid user'
+        }
+    };
+
+    let quizzes = [];
+
+    for (const quiz of data.quizzes) {
+        if (quiz.creator === authUserId) {
+            let quizId = quiz.quizId;
+            let name = quiz.name;
+            quizzes.push({quizId, name});
+        }
+    };
+    
     return {
-        quizzes:
-        [
-            {
-                quizId: 1,
-                name: 'My Quiz',
-            }
-        ]
+        quizzes: quizzes
     }
 }
 
@@ -43,15 +55,13 @@ export function adminQuizCreate(authUserId, name, description) {
         return {error: 'description too long'};
     }
     
-    // create new quizId
-    let id = getData().quizzes.length + 1;
-
-    // create new Date object
+    // get time in seconds
     const timeNow = Math.floor((new Date()).getTime() / 1000);
-
 
     // get and set data to add quiz object to quizzes array
     let data = getData();
+    data.quizCount++; // increment quizCount by 1
+    let id = data.quizCount;
     data.quizzes.push(
       {
         name: name,
@@ -71,6 +81,7 @@ export function adminQuizCreate(authUserId, name, description) {
     };
 }
 
+
 /**
  * Given a particular quiz, permanently remove the quiz.
  * 
@@ -78,7 +89,7 @@ export function adminQuizCreate(authUserId, name, description) {
  * @param {number} quizId - passes through the quizId of the quiz to remove
  * @returns { } - empty object
  */
-function adminQuizRemove(authUserId, quizId) {
+export function adminQuizRemove(authUserId, quizId) {
     return { }
 }
 
@@ -95,15 +106,38 @@ function adminQuizRemove(authUserId, quizId) {
  *           description: 'This is my quiz',
  *          } - returns Quiz info 
  */
-function adminQuizInfo(authUserId, quizId) {
+export function adminQuizInfo(authUserId, quizId) {
+    
+    if (!isValidUserId(authUserId)) {
+        return {error: 'authUserId does not refer to valid user'};
+    }
+
+    if (!isValidQuizId(quizId)) {
+        return {error: 'quizId does not refer to valid quiz'};
+    }
+
+    if (!isValidCreator(quizId, authUserId)) {
+        return {error: 'quizId does not refer to quiz that this user owns'};
+    }
+
+    let data = getData();
+    for (const quiz of data.quizzes) {
+        if(quiz.quizId === quizId) {
+            return {
+                quizId: quiz.quizId,
+                name: quiz.name,
+                timeCreated: quiz.timeCreated,
+                timeLastEdited: quiz.timeLastEdited,
+                description: quiz.description,
+            }
+        }
+    };
+    
     return {
-        quizId: 1,
-        name: 'My Quiz',
-        timeCreated: 1683125870,
-        timeLastEdited: 1683125871,
-        description: 'This is my quiz',
+        error: 'Quiz could not be found'
     }
 }
+
 
 /**
  * Update the name of the relevant quiz.
@@ -113,7 +147,7 @@ function adminQuizInfo(authUserId, quizId) {
  * @param {string} name - passes through the name to update with
  * @returns { } - empty object
  */
-function adminQuizNameUpdate(authUserId, quizId, name) {
+export function adminQuizNameUpdate(authUserId, quizId, name) {
     return { }
 }
 
@@ -125,8 +159,30 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
  * @param {string} description - passes through description of quiz
  * @returns {} - doesn't return anything
  */
-function adminQuizDescriptionUpdate (authUserID, quizId, description) {
-    
-    return { }
+export function adminQuizDescriptionUpdate (authUserID, quizId, description) {
+    if (!isValidUserId(authUserID)) {
+        return { error: 'authUserId does not refer to valid user'};
+    };
 
+    if (!isValidQuizId(quizId)) {
+        return { error: 'quizId does not refer to valid quiz'};
+    };
+
+    if (!isValidCreator(quizId, authUserID)) {
+        return { error: 'quizId does not refer to a quiz that this user owns'};
+    };
+
+    if (description.length > 100) {
+        return {error: 'description must be less than 100 characters'};
+    }
+
+    let store = getData();
+    const quizIndex = store.quizzes.findIndex(id => id.quizId === quizId);
+    const timeNow = Math.floor((new Date()).getTime() / 1000);
+    store.quizzes[quizIndex].description = description;
+    store.quizzes[quizIndex].timeLastEdited = timeNow;
+    setData(store);
+
+    return { };
 }
+
