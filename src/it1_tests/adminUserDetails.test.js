@@ -34,18 +34,6 @@ describe('Only one user registered', () => {
         user = adminAuthRegister('email@gmail.com', 'password1', 'Firstname', 'Lastname');
       });
 
-    test('Correct data types', () => {
-        expect(adminUserDetails(user.authUserId)).toStrictEqual({
-            user: {
-                userId: expect.any(Number),
-                name: expect.any(String),
-                email: expect.any(String),
-                numSuccessfulLogins: expect.any(Number),
-                numFailedPasswordsSinceLastLogin: expect.any(Number)
-            }
-        })
-    });
-
     test('Just registered', () => {
         expect(adminUserDetails(user.authUserId)).toStrictEqual({
             user: {
