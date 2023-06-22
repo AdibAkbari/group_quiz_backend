@@ -1,4 +1,4 @@
-import { adminQuizCreate, adminQuizNameUpdate} from '../quiz.js';
+import { adminQuizCreate, adminQuizNameUpdate, adminQuizList} from '../quiz.js';
 import { adminAuthRegister } from '../auth.js';
 import { clear } from '../other.js';
 
@@ -71,4 +71,25 @@ describe('adminQuizNameUpdate', () => {
     ])('Successful Quiz Name Update: "$name"', ({name}) => {
         expect(adminQuizNameUpdate(user.authUserId, quiz.quizId, name)).toStrictEqual({});
     });
+
+    // Successfully update the name of the quiz 
+    // test.each([
+    //     { name: 'qz1'},
+    //     { name: 'Short'},
+    //     { name: 'LongQuizNameWithClosetoMaxName'},
+    //     { name: '123456789'},
+    //     { name: '1quiz'},
+    //     { name: 'Quiz1'},
+    //     { name: 'New Quiz'},
+    //     { name: '        '},
+    // ])('Successful Quiz Name Update: "$name"', ({name}) => {
+    //     adminQuizNameUpdate(user.authUserId, quiz.quizId, name)
+    //     expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual({ 
+    //          quizId: quiz.quizId,
+    //          name: name,
+    //          timeCreated: quiz.timeCreated,
+    //          timeLastEdited: quiz.timeLastEdited,
+    //          description: quiz.description,
+    //     });
+    // });
 })
