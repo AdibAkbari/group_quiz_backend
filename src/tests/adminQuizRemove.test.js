@@ -38,7 +38,34 @@ describe('adminQuizRemove', () => {
     });
     
     // Sucessfully remove the quiz 
-    test('Sucessful quiz remove', () => {
+    test('Sucessful quiz remove return', () => {
         expect(adminQuizRemove(user.authUserId, quiz.quizId)).toStrictEqual({});
     });
+
+    // Check that the quiz is actually removed
+    test.skip('Sucessful quiz remove integrated check', () => {
+        let quiz2 = adminQuizCreate(user.authUserId, 'quiz2', '' );
+        let quizToRemove = adminQuizCreate(user.authUserId, 'quizToRemove', '' );
+        let quiz3 = adminQuizCreate(user.authUserId, 'quiz3', '' );
+        
+        adminQuizRemove(user.authUserId, quizToRemove.quizId);
+
+        expect(adminQuizList(user.authUserId)).toStrictEqual({ 
+            quizzes: [
+            {
+                quizId: quiz.quizId,
+                name: 'quiz1',
+            }, 
+            {
+                quizId: quiz2.quizId,
+                name: 'quiz2',
+            }, 
+            {
+                quizId: quiz3.quizId,
+                name: 'quiz3',
+            },
+          ]
+        })
+    });
+    
 })
