@@ -10,7 +10,7 @@ const ERROR = { error: expect.any(String) };
 let user;
 beforeEach(() => {
     clear();
-    user = adminAuthRegister('email@gmail.com', 'pass', 'first', 'last');
+    user = adminAuthRegister('email@gmail.com', 'password1', 'first', 'last');
 });
 
 
@@ -28,13 +28,13 @@ describe('Password not correct for given email (but correct for another email)',
     test('Error output for incorrect password', () => {
         expect(adminAuthLogin('email@gmail.com', 'pass2')).toStrictEqual(ERROR);
     });
-    // Relies on adminUserDetails - commented
-    // test('Correct incrementation of numFailedPasswordsSinceLastLogin', () => {
-    //     adminAuthLogin('email@gmail.com', 'pass2');
-    //     expect(
-    //         adminUserDetails(user.authUserId).user.numFailedPasswordsSinceLastLogin
-    //     ).toBe(1);
-    // });
+    // Relies on adminUserDetails - skipped
+    test.skip('Correct incrementation of numFailedPasswordsSinceLastLogin', () => {
+        adminAuthLogin('email@gmail.com', 'pass2');
+        expect(
+            adminUserDetails(user.authUserId).user.numFailedPasswordsSinceLastLogin
+        ).toBe(1);
+    });
 });
 
 describe('Valid email and password', () => {
@@ -42,17 +42,17 @@ describe('Valid email and password', () => {
         expect(adminAuthLogin('email@gmail.com', 'pass')).toStrictEqual(
             { authUserId: expect.any(Number) });
     });
-    // // Relies on adminUserDetails - commented
-    // test('Correct incrementation of numSuccessfulLogins', () => {
-    //     adminAuthLogin('email@gmail.com', 'pass');
-    //     expect(
-    //         adminUserDetails(user.authUserId).user.numSuccessfulLogins
-    //     ).toBe(2);
-    // });
-    // test('Correct reset of numFailedPasswordsSinceLastLogin', () => {
-    //     adminAuthLogin('email@gmail.com', 'pass');
-    //     expect(
-    //         adminUserDetails(user.authUserId).user.numFailedPasswordsSinceLastLogin
-    //     ).toBe(0);
-    // });
+    // Relies on adminUserDetails - skipped
+    test.skip('Correct incrementation of numSuccessfulLogins', () => {
+        adminAuthLogin('email@gmail.com', 'pass');
+        expect(
+            adminUserDetails(user.authUserId).user.numSuccessfulLogins
+        ).toBe(2);
+    });
+    test.skip('Correct reset of numFailedPasswordsSinceLastLogin', () => {
+        adminAuthLogin('email@gmail.com', 'pass');
+        expect(
+            adminUserDetails(user.authUserId).user.numFailedPasswordsSinceLastLogin
+        ).toBe(0);
+    });
 });
