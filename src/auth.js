@@ -69,11 +69,36 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
  * @param {string} password - passes through the password of the user 
  * @returns {authUserId: 1} - returns authUserId: 1
  */
-function adminAuthLogin(email, password) {
+export function adminAuthLogin(email, password) {
+    let emailExists = false;
+    let newData = getData();
+    let userIndex;
+
+    for (const user of newData.users) {
+        if (user.email === email) {
+            emailExists = true;
+            userIndex = newData.users.indexOf(user);
+        }
+    }
+    if (emailExists === false) {
+        return { error: 'email does not exist' };
+    }
+
+    if (newData.users[userIndex].password !== password) {
+        newData.users[userIndex].numFailedPasswordsSinceLastLogin++;
+        setData(newData);
+        return { error: 'password does not match given email' }
+    }
+    newData.users[userIndex].numSuccessfulLogins++;
+    newData.users[userIndex].numFailedPasswordsSinceLastLogin = 0;
+
+    setData(newData);
+
     return {
         authUserId: newData.users[userIndex].authUserId,
     }
 }
+
 
 
 /**

@@ -15,22 +15,22 @@ beforeEach(() => {
 
 
 test('Email address does not exist', () => {
-    expect(adminAuthLogin('emailFail@gmail.com', 'pass')).toStrictEqual(ERROR);
+    expect(adminAuthLogin('emailFail@gmail.com', 'password1')).toStrictEqual(ERROR);
 });
 
 
 describe('Password not correct for given email (but correct for another email)', () => {
     let user2;
     beforeEach(() => {
-        user2 = adminAuthRegister('email2@gmail.com', 'pass2', 'first', 'last');
+        user2 = adminAuthRegister('email2@gmail.com', 'password2', 'first', 'last');
     });
 
     test('Error output for incorrect password', () => {
-        expect(adminAuthLogin('email@gmail.com', 'pass2')).toStrictEqual(ERROR);
+        expect(adminAuthLogin('email@gmail.com', 'password2')).toStrictEqual(ERROR);
     });
     // Relies on adminUserDetails - skipped
     test.skip('Correct incrementation of numFailedPasswordsSinceLastLogin', () => {
-        adminAuthLogin('email@gmail.com', 'pass2');
+        adminAuthLogin('email@gmail.com', 'password2');
         expect(
             adminUserDetails(user.authUserId).user.numFailedPasswordsSinceLastLogin
         ).toBe(1);
@@ -39,18 +39,18 @@ describe('Password not correct for given email (but correct for another email)',
 
 describe('Valid email and password', () => {
     test('Testing authUserId output', () => {
-        expect(adminAuthLogin('email@gmail.com', 'pass')).toStrictEqual(
+        expect(adminAuthLogin('email@gmail.com', 'password1')).toStrictEqual(
             { authUserId: expect.any(Number) });
     });
     // Relies on adminUserDetails - skipped
     test.skip('Correct incrementation of numSuccessfulLogins', () => {
-        adminAuthLogin('email@gmail.com', 'pass');
+        adminAuthLogin('email@gmail.com', 'password1');
         expect(
             adminUserDetails(user.authUserId).user.numSuccessfulLogins
         ).toBe(2);
     });
     test.skip('Correct reset of numFailedPasswordsSinceLastLogin', () => {
-        adminAuthLogin('email@gmail.com', 'pass');
+        adminAuthLogin('email@gmail.com', 'password1');
         expect(
             adminUserDetails(user.authUserId).user.numFailedPasswordsSinceLastLogin
         ).toBe(0);
