@@ -55,15 +55,13 @@ export function adminQuizCreate(authUserId, name, description) {
         return {error: 'description too long'};
     }
     
-    // create new quizId
-    let id = getData().quizzes.length + 1;
-
-    // create new Date object
+    // get time in seconds
     const timeNow = Math.floor((new Date()).getTime() / 1000);
-
 
     // get and set data to add quiz object to quizzes array
     let data = getData();
+    data.quizCount++; // increment quizCount by 1
+    let id = data.quizCount;
     data.quizzes.push(
       {
         name: name,

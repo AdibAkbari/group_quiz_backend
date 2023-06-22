@@ -14,6 +14,7 @@ describe('invalid name edge cases', () => {
     test.each([
         { name: 'test1;' }, // not alpha-numeric
         { name: 'user\'s test' }, // not alpha-numeric
+        { name: '     '}, // only whitespaces
         { name: 'Q1' }, // <3 chars
         { name: '0123456789012345678901234567890' }, // >30 chars
         ])("invalid quiz name: '$name'", ({ name }) => {
@@ -50,9 +51,8 @@ describe('valid input tests', () => {
             {quizId: expect.any(Number)});
     });
 
-    // NOTE: Relies on adminQuizInfo, so will skip for now.
     // test that the quiz is correctly added to the array of quizzes
-    test.skip('testing correct quiz object creation', () => {
+    test('testing correct quiz object creation', () => {
         const quiz = adminQuizCreate(user.authUserId, 'TestQuiz', 'Test');     
         expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual(
             {
