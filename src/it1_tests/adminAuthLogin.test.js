@@ -28,7 +28,7 @@ describe('Password not correct for given email (but correct for another email)',
     test('Error output for incorrect password', () => {
         expect(adminAuthLogin('email@gmail.com', 'password2')).toStrictEqual(ERROR);
     });
-    // Relies on adminUserDetails - skipped
+    
     test('Correct incrementation of numFailedPasswordsSinceLastLogin', () => {
         adminAuthLogin('email@gmail.com', 'password2');
         expect(
@@ -42,7 +42,7 @@ describe('Valid email and password', () => {
         expect(adminAuthLogin('email@gmail.com', 'password1')).toStrictEqual(
             { authUserId: expect.any(Number) });
     });
-    // Relies on adminUserDetails - skipped
+    
     test('Correct incrementation of numSuccessfulLogins', () => {
         adminAuthLogin('email@gmail.com', 'password1');
         expect(
