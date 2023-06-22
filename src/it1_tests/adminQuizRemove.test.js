@@ -1,4 +1,4 @@
-import { adminQuizRemove, adminQuizCreate } from '../quiz.js';
+import { adminQuizRemove, adminQuizCreate, adminQuizList } from '../quiz.js';
 import { adminAuthRegister } from '../auth.js';
 import { clear } from '../other.js';
 
@@ -43,7 +43,7 @@ describe('adminQuizRemove', () => {
     });
 
     // Check that the quiz is actually removed
-    test.skip('Sucessful quiz remove integrated check', () => {
+    test('Sucessful quiz remove integrated check', () => {
         let quiz2 = adminQuizCreate(user.authUserId, 'quiz2', '' );
         let quizToRemove = adminQuizCreate(user.authUserId, 'quizToRemove', '' );
         let quiz3 = adminQuizCreate(user.authUserId, 'quiz3', '' );
@@ -74,4 +74,14 @@ describe('adminQuizRemove', () => {
 
     });
     
+    // check that once a quiz is removed, the next quiz still has a unique quiz id
+    test.skip('Unique quiz Id once a quiz is removed', () => {
+        let quizToRemove = adminQuizCreate(user.authUserId, 'quizToRemove', '' );
+        let quiz2 = adminQuizCreate(user.authUserId, 'quiz2', '' );
+        adminQuizRemove(user.authUserId, quizToRemove.quizId);
+        let quiz3 = adminQuizCreate(user.authUserId, 'quiz3', '' );
+        expect(quiz3.quizId).not.toStrictEqual(quiz.quizId);
+        expect(quiz3.quizId).not.toStrictEqual(quiz2.quizId);
+
+    })
 })

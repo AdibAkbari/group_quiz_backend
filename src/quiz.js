@@ -105,9 +105,9 @@ export function adminQuizRemove(authUserId, quizId) {
     }
 
     let data = getData();
-    for (const current of data.quizzes) {
-        if (current.quizId  === quizId) {
-            data.quizzes.splice(current, 1);
+    for (const i in data.quizzes) {
+        if (data.quizzes[i].quizId  === quizId) {
+            data.quizzes.splice(i, 1);
             setData(data);
         }
     };
@@ -207,4 +207,6 @@ export function adminQuizDescriptionUpdate (authUserID, quizId, description) {
 
     return { };
 }
+
+
 
