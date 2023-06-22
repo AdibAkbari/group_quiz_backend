@@ -1,4 +1,5 @@
-import { getData, setData } from './dataStore.js';
+import { getData, setData } from "./dataStore.js";
+import { checkNameValidity, isValidUserId, isValidCreator, isValidQuizId} from "./other.js";
 
 /** 
  * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -26,10 +27,47 @@ function adminQuizList (authUserId) {
  * @param {string} description - passes through the description
  * @returns {quizId: 2} - returns quizId: 2
  */
-function adminQuizCreate(authUserId, name, description) {
-    return {
-        quizId: 2
+export function adminQuizCreate(authUserId, name, description) {
+    // invalid authUserId
+    if (!isValidUserId(authUserId)) {
+        return {error: 'authUserId does not refer to valid user'};
     }
+
+    if (!checkNameValidity(name, authUserId)) {
+        return {error: 'name not valid'};
+    }
+    
+    // invalid description
+    if (description.length > 100) {
+        return {error: 'description too long'};
+    }
+    
+    // create new quizId
+    let id = getData().quizzes.length + 1;
+
+    // create new Date object
+    const timeNow = Math.floor((new Date()).getTime() / 1000);
+
+
+    // get and set data to add quiz object to quizzes array
+    let data = getData();
+    data.quizzes.push(
+      {
+        name: name,
+        description: description,
+        quizId: id,
+        creator: authUserId,
+        questions: [],
+        players: [],
+        timeCreated: timeNow,
+        timeLastEdited: timeNow,
+      }
+    );
+    setData(data);
+  
+    return {
+      quizId: id,
+    };
 }
 
 /**
@@ -111,68 +149,4 @@ function adminQuizDescriptionUpdate (authUserID, quizId, description) {
     
     return { }
 
-}
-
-/**
- * Checks whether a given number is a valid user id
- * 
- * @param {number} authUserId 
- * @returns {boolean} true if valid, false if invalid
- */
-function isValidUserId(authUserId) {
-    if(isNaN(authUserId)) {
-        return false;
-    };
-
-    let data = getData();
-    for (const current of data.users) {
-        if (current.authUserId === authUserId) {
-            return true;
-        }
-    };
-    return false;
-}
-
-
-/**
- * Helper function to determine if the quizId exist
- * 
- * @param {number} quizId 
- * @returns {boolean} - returns true if does exist
- * @returns {boolean} - returns false if it dosn't exist 
- */
-function isValidQuizId(quizId) {
-    if(isNaN(quizId)) {
-        return false;
-    };
-
-    let data = getData();
-    for (const current of data.quizzes) {
-        if (current.quizId  === quizId) {
-            return true;
-        }
-    };
-    
-    return false;
-}
-
-/**
- * Helper function to determine if Quiz ID does not refer to a quiz that this user owns
- * 
- * @param {number} quizId 
- * @param {number} authUserID 
- * @returns {boolean} - returns true if user does own quiz
- * @returns {boolean} - returns false if user does not own quiz
- */
-function isValidCreator(quizId, authUserID) {
-    let data = getData();
-    for (const current of data.quizzes) {
-        if (current.quizId  === quizId) {
-            if (current.creator  === authUserID) {
-                return true;
-            }
-        }
-    };
-    
-    return false;
 }
