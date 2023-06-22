@@ -1,5 +1,6 @@
-import { setData, getData } from "./dataStore.js";
+import { setData, getData } from './dataStore.js'
 import validator from 'validator';
+
 /**
  * Register a user with an email, password, and names, then returns their 
  * authUserId value.
@@ -68,31 +69,7 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
  * @param {string} password - passes through the password of the user 
  * @returns {authUserId: 1} - returns authUserId: 1
  */
-export function adminAuthLogin(email, password) {
-    let emailExists = false;
-    let newData = getData();
-    let userIndex;
-
-    for (const user of newData.users) {
-        if (user.email === email) {
-            emailExists = true;
-            userIndex = newData.users.indexOf(user);
-        }
-    }
-    if (emailExists === false) {
-        return { error: 'email does not exist' };
-    }
-
-    if (newData.users[userIndex].password !== password) {
-        newData.users[userIndex].numFailedPasswordsSinceLastLogin++;
-        setData(newData);
-        return { error: 'password does not match given email' }
-    }
-    newData.users[userIndex].numSuccessfulLogins++;
-    newData.users[userIndex].numFailedPasswordsSinceLastLogin = 0;
-
-    setData(newData);
-
+function adminAuthLogin(email, password) {
     return {
         authUserId: newData.users[userIndex].authUserId,
     }
@@ -109,8 +86,8 @@ export function adminAuthLogin(email, password) {
  *                     numFailedPasswordsSinceLastLogin: number}}} object
  */
 export function adminUserDetails(authUserId) {
-    return {
-        user:
+    return { 
+        user: 
         {
             userId: 1,
             name: 'Hayden Smith',
