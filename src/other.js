@@ -12,6 +12,7 @@ export function clear () {
     data = {
         users: [],
         quizzes: [],
+        quizCount: 0,
     };
     
     setData(data);
@@ -19,8 +20,8 @@ export function clear () {
     return { };
 }
 
-// HELPER FUNCTIONS
 
+// HELPER FUNCTIONS
 
 /**
  * Checks whether a given number is a valid user id
@@ -82,7 +83,6 @@ export function isValidQuizId(quizId) {
 }
 
 
-
 /**
  * Helper function to determine if Quiz ID does not refer to a quiz that this user owns
  * 
@@ -103,8 +103,6 @@ export function isValidCreator(quizId, authUserID) {
     
     return false;
 }
-
-
 
 
 /**
@@ -136,3 +134,19 @@ export function checkNameValidity(name, authUserId) {
     return true;
 }
 
+
+/**
+ * Check if given string is purely whitespace
+ * 
+ * @param {string} - name
+ * @returns {boolean} - true/false
+ */
+export function isWhiteSpace (name) {
+    let expression = /^[\s]+$/
+    
+    if (expression.test(name)) {
+        return true;
+    }
+
+    return false;
+}

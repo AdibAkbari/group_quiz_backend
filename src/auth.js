@@ -1,5 +1,7 @@
+
 import { setData, getData } from './dataStore.js'
 import validator from 'validator';
+import { isValidUserId, findUserIndex, isWhiteSpace } from "./other.js";
 
 /**
  * Register a user with an email, password, and names, then returns their 
@@ -37,6 +39,10 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
 
     if (!expressionName.test(nameLast)) {
         return { error: 'Last name must only contain letters, spaces, hyphens or apostrophes' };
+    };
+
+    if (isWhiteSpace(nameFirst) || isWhiteSpace(nameLast)) {
+        return { error: 'First name and Last name cannot be solely white space' };
     };
 
     if (password.length < 8) {
@@ -84,14 +90,31 @@ export function adminAuthLogin(email, password) {
  *                     numFailedPasswordsSinceLastLogin: number}}} object
  */
 export function adminUserDetails(authUserId) {
+    let data = getData();
+    
+    if (!isValidUserId(authUserId)) {
+        return {
+            error: 'AuthUserId is not a valid user'
+        }
+    };
+
+    let i = findUserIndex(authUserId);
+    if (i === -1) {
+        return {
+            error: 'AuthUserId is not a valid user'
+        }
+    }
+    let name = `${data.users[i].nameFirst} ${data.users[i].nameLast}`;
+
     return { 
         user: 
         {
-            userId: 1,
-            name: 'Hayden Smith',
-            email: 'hayden.smith@unsw.edu.au',
-            numSuccessfulLogins: 3,
-            numFailedPasswordsSinceLastLogin: 1,
+            userId: data.users[i].authUserId,
+            name: name,
+            email: data.users[i].email,
+            numSuccessfulLogins: data.users[i].numSuccessfulLogins,
+            numFailedPasswordsSinceLastLogin: data.users[i].numFailedPasswordsSinceLastLogin,
         }
     }
 }
+
