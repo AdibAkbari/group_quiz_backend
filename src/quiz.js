@@ -1,7 +1,6 @@
 import { getData, setData } from "./dataStore.js";
-import { checkNameValidity, isValidUserId, isValidQuizId, isValidCreator} from "./other.js";
+import { checkNameValidity, isValidUserId, isValidCreator, isValidQuizId} from "./other.js";
 
- 
 /** 
  * Provide a list of all quizzes that are owned by the currently logged in user.
  * 
@@ -90,7 +89,28 @@ export function adminQuizCreate(authUserId, name, description) {
  * @returns { } - empty object
  */
 export function adminQuizRemove(authUserId, quizId) {
-    return { }
+    
+    if (isValidUserId(authUserId) === false) {
+        return {error: 'AuthUserId is not a valid user'};
+    }
+
+    if (isValidQuizId(quizId) === false) {
+        return {error: 'Quiz ID does not refer to valid quiz'};
+    }
+
+    if (isValidCreator(quizId, authUserId) === false) {
+        return {error: 'Quiz ID does not refer to a quiz that this user owns'};
+    }
+
+    let data = getData();
+    for (const i in data.quizzes) {
+        if (data.quizzes[i].quizId  === quizId) {
+            data.quizzes.splice(i, 1);
+            setData(data);
+        }
+    };
+    
+    return { };
 }
 
 /**
@@ -185,4 +205,6 @@ export function adminQuizDescriptionUpdate (authUserID, quizId, description) {
 
     return { };
 }
+
+
 
