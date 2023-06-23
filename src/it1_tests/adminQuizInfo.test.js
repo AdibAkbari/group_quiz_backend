@@ -87,7 +87,7 @@ describe('Valid inputs', () => {
 })
 
 describe('testing with other functions', () => {
-  test.skip('removing quiz', () => {
+  test('removing quiz', () => {
     expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual({
       quizId: quiz.quizId,
       name: 'Cats',
@@ -101,7 +101,7 @@ describe('testing with other functions', () => {
 
   });
 
-  test.skip('name update', () => {
+  test('name update', () => {
     expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual({
       quizId: quiz.quizId,
       name: 'Cats',
@@ -121,7 +121,7 @@ describe('testing with other functions', () => {
 
   });
 
-  test.skip('description update', () => {
+  test('description update', () => {
     expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual({
       quizId: quiz.quizId,
       name: 'Cats',
