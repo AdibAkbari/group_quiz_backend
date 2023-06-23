@@ -11,7 +11,7 @@ import { isValidUserId, findUserIndex, isWhiteSpace } from "./other.js";
  * @param {string} password 
  * @param {string} nameFirst 
  * @param {string} nameLast 
- * @returns {authUserId: 1} authuserId
+ * @returns {{authUserId: number}} 
  */
 export function adminAuthRegister (email, password, nameFirst, nameLast) {
     let store = getData();
@@ -71,9 +71,9 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
 /**
  * Given a registered user's email and password returns their authUserId value.
  * 
- * @param {string} email - passes through the email of the user
- * @param {string} password - passes through the password of the user 
- * @returns {authUserId: 1} - returns authUserId: 1
+ * @param {string} email
+ * @param {string} password 
+ * @returns {{authUserId: number}}
  */
 export function adminAuthLogin(email, password) {
     let emailExists = false;
@@ -109,12 +109,16 @@ export function adminAuthLogin(email, password) {
 
 /**
  * Given an admin user's authUserId, return details about the user.
- * "name" is the first and last name concatenated with a single space between them
+ * "name" is the first and last name concatenated with a single space between them.
  * 
  * @param {number} authUserId
- * @returns {{user: {userId: number, name: string, email: string, 
- *                     numSuccessfulLogins: number,
- *                     numFailedPasswordsSinceLastLogin: number}}} object
+ * @returns {{user: {
+ *              userId: number, 
+ *              name: string, 
+ *              email: string, 
+ *              numSuccessfulLogins: number,
+ *              numFailedPasswordsSinceLastLogin: number
+ *              }}} 
  */
 export function adminUserDetails(authUserId) {
     let data = getData();

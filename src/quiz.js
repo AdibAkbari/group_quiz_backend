@@ -36,7 +36,7 @@ export function adminQuizList (authUserId) {
 }
 
 /**
- * Given basic details about a new quiz, create one for the logged in user.
+ * Given basic details about a new quiz, create one for the user.
  * 
  * @param {number} authUserId
  * @param {string} name
@@ -118,7 +118,7 @@ export function adminQuizRemove(authUserId, quizId) {
 }
 
 /**
- * Get all of the relevant information about the current quiz
+ * Get all of the relevant information about the current quiz.
  * 
  * @param {number} authUserId
  * @param {number} quizId
@@ -166,7 +166,7 @@ export function adminQuizInfo(authUserId, quizId) {
 /**
  * Update the name of the relevant quiz given the authUserId
  * of the owner of the quiz, the quizId of the quiz to change and the
- * new name
+ * new name.
  * 
  * @param {number} authUserId
  * @param {number} quizId
@@ -211,7 +211,7 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
 /**
  * Update the description of the relevant quiz given the authUserId
  * of the owner of the quiz, the quizId of the quiz to change and the
- * new description
+ * new description.
  * 
  * @param {number} authUserId
  * @param {number} quizId
