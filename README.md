@@ -8,7 +8,7 @@
 
 ## Change Log
 
-N/A
+* 16/06: `adminQuizDescriptionUpdate` has correct error conditions added.
 
 ## 🫡 0. Aims:
 
@@ -622,7 +622,6 @@ The following are integers: `authUserId`, `quizId`.
         <li>AuthUserId is not a valid user</li>
         <li>Quiz ID does not refer to a valid quiz</li>
         <li>Quiz ID does not refer to a quiz that this user owns</li>
-        <li>All sessions for this quiz must be in END state</li>
       </ul>
     </td>
   </tr>
@@ -698,9 +697,7 @@ The following are integers: `authUserId`, `quizId`.
         <li>AuthUserId is not a valid user</li>
         <li>Quiz ID does not refer to a valid quiz</li>
         <li>Quiz ID does not refer to a quiz that this user owns</li>
-        <li>Name contains any characters that are not alphanumeric or are spaces</li>
-        <li>Name is either less than 3 characters long or more than 30 characters long</li>
-        <li>Name is already used by the current logged in user for another quiz</li>
+        <li>Description is more than 100 characters in length (note: empty strings are OK)</li>
       </ul>
     </td>
   </tr>
