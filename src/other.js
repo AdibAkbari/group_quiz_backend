@@ -4,7 +4,7 @@ import { getData, setData } from './dataStore.js';
  * Reset the state of the application back to the start.
  * 
  * @param {} - no parameters
- * @returns {} - doesn't return anything
+ * @returns {{ }} - empty object
  */
 export function clear () {
     let data = getData();
@@ -108,8 +108,8 @@ export function isValidCreator(quizId, authUserID) {
 /**
  * Helper function for adminQuizCreate to check if a quiz name is valid
  * 
- * @param {number} authUserId id of the user
- * @param {String} name name of the quiz
+ * @param {number} authUserId 
+ * @param {String} name
  * @returns {Boolean} whether the name is valid
  */
 export function checkNameValidity(name, authUserId) {
@@ -143,8 +143,8 @@ export function checkNameValidity(name, authUserId) {
 /**
  * Check if given string is purely whitespace
  * 
- * @param {string} - name
- * @returns {boolean} - true/false
+ * @param {string} name
+ * @returns {boolean}
  */
 export function isWhiteSpace (name) {
     let expression = /^[\s]+$/
