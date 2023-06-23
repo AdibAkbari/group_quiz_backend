@@ -1,6 +1,6 @@
 import { getData, setData } from "./dataStore.js";
-import { checkNameValidity, isValidUserId, isValidCreator, isValidQuizId} from "./other.js";
-
+import { checkNameValidity, isValidCreator, isValidQuizId, isValidUserId, isWhiteSpace} from "./other.js";
+ 
 /** 
  * Provide a list of all quizzes that are owned by the currently logged in user.
  * 
@@ -168,6 +168,37 @@ export function adminQuizInfo(authUserId, quizId) {
  * @returns { } - empty object
  */
 export function adminQuizNameUpdate(authUserId, quizId, name) {
+    // Check inputted UserId is valid
+    if (isValidUserId(authUserId) === false) {
+        return {error: 'Please enter a valid user'};
+    }
+    // Check inputted quizId is valid
+    if (isValidQuizId(quizId) === false) {
+        return {error: 'Please enter a valid quiz'};
+    }
+    // Check inputted Quiz ID does not refer to a quiz that this user owns
+    if (isValidCreator(quizId, authUserId) === false) {
+        return {error: 'You do not own this quiz'};
+    }
+    // Check inputted name is valid
+    if (!checkNameValidity(name, authUserId)) {
+        return {error: 'Name not valid'};
+    }
+    // Check name isn't just whitespace
+    if (isWhiteSpace(name)) {
+        return { error: 'Quiz name cannot be solely white space' };
+    };
+
+    let data = getData();
+    const timeNow = Math.floor((new Date()).getTime() / 1000);
+    for (const current of data.quizzes) {
+        if (current.quizId === quizId) {
+            current.name = name;
+            current.timeLastEdited = timeNow;
+            setData(data);
+        }
+    };
+
     return { }
 }
 
