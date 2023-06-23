@@ -11,7 +11,7 @@ describe('clear test', () => {
     });
 
     //Check that clear returns the correct object 
-    test.skip('integrated clear test', () => {
+    test('integrated clear test', () => {
         let user = adminAuthRegister('email@gmail.com', 'password1', 'nameFirst', 'nameLast' );
         let quiz = adminQuizCreate(user.authUserId, 'quiz1', '' );
         
