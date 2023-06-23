@@ -67,6 +67,7 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
     };
 }
 
+
 /**
  * Given a registered user's email and password returns their authUserId value.
  * 
@@ -75,10 +76,36 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
  * @returns {authUserId: 1} - returns authUserId: 1
  */
 export function adminAuthLogin(email, password) {
+    let emailExists = false;
+    let newData = getData();
+    let userIndex;
+
+    for (const user of newData.users) {
+        if (user.email === email) {
+            emailExists = true;
+            userIndex = newData.users.indexOf(user);
+        }
+    }
+    if (emailExists === false) {
+        return { error: 'email does not exist' };
+    }
+
+    if (newData.users[userIndex].password !== password) {
+        newData.users[userIndex].numFailedPasswordsSinceLastLogin++;
+        setData(newData);
+        return { error: 'password does not match given email' }
+    }
+    newData.users[userIndex].numSuccessfulLogins++;
+    newData.users[userIndex].numFailedPasswordsSinceLastLogin = 0;
+
+    setData(newData);
+
     return {
-      authUserId: 1,
+        authUserId: newData.users[userIndex].authUserId,
     }
 }
+
+
 
 /**
  * Given an admin user's authUserId, return details about the user.
