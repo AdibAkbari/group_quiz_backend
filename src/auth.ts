@@ -3,6 +3,24 @@ import { setData, getData } from './dataStore.js'
 import validator from 'validator';
 import { isValidUserId, findUserIndex, isWhiteSpace } from "./other.js";
 
+export interface userId {
+    authUserId: number;
+}
+
+export interface error {
+    error: string;
+}
+
+export interface user {
+    user: {
+        userId: number; 
+        name: string; 
+        email: string; 
+        numSuccessfulLogins: number;
+        numFailedPasswordsSinceLastLogin: number;
+    }
+}
+
 /**
  * Register a user with an email, password, and names, then returns their 
  * authUserId value.
@@ -13,7 +31,7 @@ import { isValidUserId, findUserIndex, isWhiteSpace } from "./other.js";
  * @param {string} nameLast 
  * @returns {{authUserId: number}} 
  */
-export function adminAuthRegister (email, password, nameFirst, nameLast) {
+export function adminAuthRegister (email: string, password: string, nameFirst: string, nameLast: string): userId | error {
     let store = getData();
 
     if (!validator.isEmail(email)) {
@@ -75,7 +93,7 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
  * @param {string} password 
  * @returns {{authUserId: number}}
  */
-export function adminAuthLogin(email, password) {
+export function adminAuthLogin(email: string, password: string): userId | error {
     let emailExists = false;
     let newData = getData();
     let userIndex;
@@ -120,7 +138,7 @@ export function adminAuthLogin(email, password) {
  *              numFailedPasswordsSinceLastLogin: number
  *              }}} 
  */
-export function adminUserDetails(authUserId) {
+export function adminUserDetails(authUserId: number): user | error {
     let data = getData();
     
     if (!isValidUserId(authUserId)) {
