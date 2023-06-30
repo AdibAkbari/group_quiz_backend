@@ -1,4 +1,4 @@
-import { getData, setData } from './dataStore.js';
+import { getData, setData, Data, Quizzes } from './dataStore';
 
 /**
  * Reset the state of the application back to the start.
@@ -6,8 +6,8 @@ import { getData, setData } from './dataStore.js';
  * @param {} - no parameters
  * @returns {{ }} - empty object
  */
-export function clear () {
-    let data = getData();
+export function clear (): {} {
+    let data: Data = getData();
     
     data = {
         users: [],
@@ -29,11 +29,11 @@ export function clear () {
  * @param {number} authUserId 
  * @returns {boolean} true if valid, false if invalid
  */
-export function isValidUserId(authUserId) {
-    if(isNaN(authUserId)) {
+export function isValidUserId(authUserId: number): boolean {
+    if (isNaN(authUserId)) {
         return false;
     };
-    let data = getData();
+    const data: Data = getData();
     for (const current of data.users) {
         if (current.authUserId === authUserId) {
             return true;
@@ -49,11 +49,11 @@ export function isValidUserId(authUserId) {
  * @param {number} authUserId 
  * @returns {number} index number that corresponds to user id
  */
-export function findUserIndex(authUserId) {
-    let data = getData();
+export function findUserIndex(authUserId: number): number {
+    const data: Data = getData();
     for (const i in data.users) {
         if (data.users[i].authUserId === authUserId) {
-            return i;
+            return parseInt(i);
         }
     }
     return -1;
@@ -67,12 +67,12 @@ export function findUserIndex(authUserId) {
  * @returns {boolean} - returns true if does exist
  * @returns {boolean} - returns false if it dosn't exist 
  */
-export function isValidQuizId(quizId) {
+export function isValidQuizId(quizId: number): boolean {
     if(isNaN(quizId)) {
         return false;
     };
 
-    let data = getData();
+    const data: Data = getData();
     for (const current of data.quizzes) {
         if (current.quizId  === quizId) {
             return true;
@@ -91,8 +91,8 @@ export function isValidQuizId(quizId) {
  * @returns {boolean} - returns true if user does own quiz
  * @returns {boolean} - returns false if user does not own quiz
  */
-export function isValidCreator(quizId, authUserID) {
-    let data = getData();
+export function isValidCreator(quizId: number, authUserID: number): boolean {
+    const data: Data = getData();
     for (const current of data.quizzes) {
         if (current.quizId  === quizId) {
             if (current.creator  === authUserID) {
@@ -112,13 +112,13 @@ export function isValidCreator(quizId, authUserID) {
  * @param {String} name
  * @returns {Boolean} whether the name is valid
  */
-export function checkNameValidity(name, authUserId) {
+export function checkNameValidity(name: string, authUserId: number): boolean {
     // length must be between 3 and 30 characters
     if (name.length < 3 || name.length > 30) {
         return false;
     }
     // only alpha-numeric characters
-    const alphaNumeric = /^[a-zA-Z0-9\s]*$/;
+    const alphaNumeric: RegExp = /^[a-zA-Z0-9\s]*$/;
     if (!alphaNumeric.test(name)) {
         return false;
     }
@@ -129,7 +129,7 @@ export function checkNameValidity(name, authUserId) {
     }
 
     // name cannot be already used by user for another quiz
-    const quizzes = getData().quizzes;
+    const quizzes: Quizzes[] = getData().quizzes;
     for (const quiz of quizzes) {
         if (quiz.creator === authUserId && quiz.name === name) {
             return false;
@@ -146,8 +146,8 @@ export function checkNameValidity(name, authUserId) {
  * @param {string} name
  * @returns {boolean}
  */
-export function isWhiteSpace (name) {
-    let expression = /^[\s]+$/
+export function isWhiteSpace (name: string): boolean {
+    const expression: RegExp = /^[\s]+$/
     
     if (expression.test(name)) {
         return true;

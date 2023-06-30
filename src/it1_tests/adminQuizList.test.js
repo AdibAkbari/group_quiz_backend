@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { adminQuizList, adminQuizCreate } from '../quiz';
 import { adminAuthRegister } from '../auth'
 import { clear } from '../other';

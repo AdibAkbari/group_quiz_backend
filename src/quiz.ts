@@ -1,40 +1,8 @@
-import { getData, setData } from "./dataStore";
+import { getData, setData, Data, Error } from "./dataStore";
 import { checkNameValidity, isValidCreator, isValidQuizId, isValidUserId, isWhiteSpace} from "./other";
- 
 
-interface users {
-    email: string,
-    password: string,
-    nameFirst: string,
-    nameLast: string,
-    authUserId: number,
-    numSuccessfulLogins: number,
-    numFailedPasswordsSinceLastLogin: number,
-}
 
-interface quizzes {
-    name: string,
-    description: string
-    quizId: number,
-    creator: number,
-    questions: {questions: string, answer: string}[],
-    players: {authUserId: number, score: number}[],
-    timeCreated: number,
-    timeLastEdited: number,
-    
-}
-
-interface data {
-    users: users[],
-    quizzes: quizzes[],
-    quizCount: number
-}
-
-interface error {
-    error: string
-}
-
-interface quizList {
+interface QuizList {
     quizId: number,
     name: string
 }
@@ -49,8 +17,8 @@ interface quizList {
  *              }>
  *          }}
  */
-export function adminQuizList (authUserId: number): {quizzes: quizList[]} | error {
-    const data: data = getData();
+export function adminQuizList (authUserId: number): {quizzes: QuizList[]} | Error {
+    const data: Data = getData();
     
     if (!isValidUserId(authUserId)) {
         return {
@@ -58,7 +26,7 @@ export function adminQuizList (authUserId: number): {quizzes: quizList[]} | erro
         }
     };
 
-    let quizzes: quizList[] = [];
+    let quizzes: QuizList[] = [];
 
     for (const quiz of data.quizzes) {
         if (quiz.creator === authUserId) {
@@ -81,7 +49,7 @@ export function adminQuizList (authUserId: number): {quizzes: quizList[]} | erro
  * @param {string} description
  * @returns {{quizId: number}} quizId
  */
-export function adminQuizCreate(authUserId: number, name: string, description: string): {quizId: number} | error {
+export function adminQuizCreate(authUserId: number, name: string, description: string): {quizId: number} | Error {
     // invalid authUserId
     if (!isValidUserId(authUserId)) {
         return {error: 'authUserId does not refer to valid user'};
@@ -100,7 +68,7 @@ export function adminQuizCreate(authUserId: number, name: string, description: s
     const timeNow: number = Math.floor((new Date()).getTime() / 1000);
 
     // get and set data to add quiz object to quizzes array
-    let data: data = getData();
+    let data: Data = getData();
     data.quizCount++; // increment quizCount by 1
     const id: number = data.quizCount;
     data.quizzes.push(
@@ -130,7 +98,7 @@ export function adminQuizCreate(authUserId: number, name: string, description: s
  * @param {number} quizId
  * @returns {{ }} empty object
  */
-export function adminQuizRemove(authUserId: number, quizId: number): {} | error {
+export function adminQuizRemove(authUserId: number, quizId: number): {} | Error {
     
     if (isValidUserId(authUserId) === false) {
         return {error: 'AuthUserId is not a valid user'};
@@ -144,7 +112,7 @@ export function adminQuizRemove(authUserId: number, quizId: number): {} | error 
         return {error: 'Quiz ID does not refer to a quiz that this user owns'};
     }
 
-    let data: data = getData();
+    let data: Data = getData();
     for (const i in data.quizzes) {
         if (data.quizzes[i].quizId  === quizId) {
             data.quizzes.splice(parseInt(i), 1);
@@ -168,7 +136,7 @@ export function adminQuizRemove(authUserId: number, quizId: number): {} | error 
  *           description: string,
  *          }} 
  */
-export function adminQuizInfo(authUserId: number, quizId: number): error | {
+export function adminQuizInfo(authUserId: number, quizId: number): Error | {
     quizId: number, name: string, timeCreated: number, timeLastEdited: number, description: string
 } {
     
@@ -184,7 +152,7 @@ export function adminQuizInfo(authUserId: number, quizId: number): error | {
         return {error: 'quizId does not refer to quiz that this user owns'};
     }
 
-    const data: data = getData();
+    const data: Data = getData();
     for (const quiz of data.quizzes) {
         if(quiz.quizId === quizId) {
             return {
@@ -213,7 +181,7 @@ export function adminQuizInfo(authUserId: number, quizId: number): error | {
  * @param {string} name
  * @returns {{ }} empty object
  */
-export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): {} | error {
+export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): {} | Error {
     // Check inputted UserId is valid
     if (isValidUserId(authUserId) === false) {
         return {error: 'Please enter a valid user'};
@@ -235,7 +203,7 @@ export function adminQuizNameUpdate(authUserId: number, quizId: number, name: st
         return { error: 'Quiz name cannot be solely white space' };
     };
 
-    let data: data = getData();
+    let data: Data = getData();
     const timeNow: number = Math.floor((new Date()).getTime() / 1000);
     for (const current of data.quizzes) {
         if (current.quizId === quizId) {
@@ -258,7 +226,7 @@ export function adminQuizNameUpdate(authUserId: number, quizId: number, name: st
  * @param {string} description
  * @returns {{ }}
  */
-export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, description: string): {} | error {
+export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, description: string): {} | Error {
     if (!isValidUserId(authUserID)) {
         return { error: 'authUserId does not refer to valid user'};
     };
@@ -275,7 +243,7 @@ export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, 
         return {error: 'description must be less than 100 characters'};
     }
 
-    let store: data = getData();
+    let store: Data = getData();
     const quizIndex: number = store.quizzes.findIndex(id => id.quizId === quizId);
     const timeNow: number = Math.floor((new Date()).getTime() / 1000);
     store.quizzes[quizIndex].description = description;
