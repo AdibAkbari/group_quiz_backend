@@ -1,5 +1,5 @@
 
-import { setData, getData } from './dataStore.js'
+import { setData, getData } from './dataStore'
 import validator from 'validator';
 import { isValidUserId, findUserIndex, isWhiteSpace } from "./other";
 

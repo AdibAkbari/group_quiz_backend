@@ -1,3 +1,4 @@
+// @ts-nocheck
 // data structure for storing user data and quiz data 
 let data = {
   users: [],
