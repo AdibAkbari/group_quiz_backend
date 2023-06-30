@@ -96,7 +96,7 @@ export function adminQuizCreate(authUserId: number, name: string, description: s
  * @param {number} quizId
  * @returns {{ }} empty object
  */
-export function adminQuizRemove(authUserId: number, quizId: number): {} | Error {
+export function adminQuizRemove(authUserId: number, quizId: number): Record<string, never> | Error {
   if (isValidUserId(authUserId) === false) {
     return { error: 'AuthUserId is not a valid user' };
   }
@@ -176,7 +176,7 @@ export function adminQuizInfo(authUserId: number, quizId: number): Error | {
  * @param {string} name
  * @returns {{ }} empty object
  */
-export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): {} | Error {
+export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): Record<string, never> | Error {
   // Check inputted UserId is valid
   if (isValidUserId(authUserId) === false) {
     return { error: 'Please enter a valid user' };
@@ -221,7 +221,7 @@ export function adminQuizNameUpdate(authUserId: number, quizId: number, name: st
  * @param {string} description
  * @returns {{ }}
  */
-export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, description: string): {} | Error {
+export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, description: string): Record<string, never> | Error {
   if (!isValidUserId(authUserID)) {
     return { error: 'authUserId does not refer to valid user' };
   }

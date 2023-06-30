@@ -137,7 +137,7 @@ describe('test for errors for adminAuthRegister', () => {
   });
 
   test('email already used', () => {
-    const user = adminAuthRegister('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
+    adminAuthRegister('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
     expect(adminAuthRegister('email@gmail.com', 'password12', 'nameFirsts', 'nameLasts')).toStrictEqual(ERROR);
   });
 });

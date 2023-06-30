@@ -17,9 +17,8 @@ test('Email address does not exist', () => {
 });
 
 describe('Password not correct for given email (but correct for another email)', () => {
-  let user2;
   beforeEach(() => {
-    user2 = adminAuthRegister('email2@gmail.com', 'password2', 'first', 'last');
+    adminAuthRegister('email2@gmail.com', 'password2', 'first', 'last');
   });
 
   test('Error output for incorrect password', () => {

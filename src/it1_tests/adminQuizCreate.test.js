@@ -33,13 +33,9 @@ test('authUserId not valid user', () => {
 
 // description more than 100 character error
 test('invalid description (>100 characters)', () => {
-  expect(adminQuizCreate
-  (
-    user.authUserId,
-    'TestQuiz',
-    // string of length 101
-    '01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890'
-  )).toStrictEqual(ERROR);
+  // string of length 101
+  const longString = '01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890';
+  expect(adminQuizCreate(user.authUserId, 'TestQuiz', longString)).toStrictEqual(ERROR);
 });
 
 describe('valid input tests', () => {

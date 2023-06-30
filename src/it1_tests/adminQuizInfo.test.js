@@ -70,7 +70,7 @@ describe('Valid inputs', () => {
 
   test('more than one quiz created by user', () => {
     const user2 = adminAuthRegister('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB');
-    const quiz2 = adminQuizCreate(user2.authUserId, 'Dogs', 'A quiz about dogs');
+    adminQuizCreate(user2.authUserId, 'Dogs', 'A quiz about dogs');
     const quiz3 = adminQuizCreate(user.authUserId, 'Birds', 'A quiz about birds');
     expect(adminQuizInfo(user.authUserId, quiz3.quizId)).toStrictEqual({
       quizId: quiz3.quizId,

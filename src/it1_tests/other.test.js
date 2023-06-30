@@ -13,7 +13,7 @@ describe('clear test', () => {
   // Check that clear returns the correct object
   test('integrated clear test', () => {
     const user = adminAuthRegister('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
-    const quiz = adminQuizCreate(user.authUserId, 'quiz1', '');
+    adminQuizCreate(user.authUserId, 'quiz1', '');
 
     clear();
 

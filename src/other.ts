@@ -6,7 +6,7 @@ import { getData, setData, Data, Quizzes } from './dataStore';
  * @param {} - no parameters
  * @returns {{ }} - empty object
  */
-export function clear (): {} {
+export function clear (): Record<string, never> {
   let data: Data = getData();
 
   data = {

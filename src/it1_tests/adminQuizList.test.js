@@ -96,10 +96,10 @@ describe('User does own quizzes', () => {
   test('user owns multiple quizzes', () => {
     const user2 = adminAuthRegister('email1@gmail.com', 'password2', 'FirstnameB', 'LastnameB');
     const quiz2 = adminQuizCreate(user.authUserId, 'Dogs', 'A quiz about dogs');
-    const quiz3 = adminQuizCreate(user2.authUserId, 'Birds', 'A quiz about birds');
+    adminQuizCreate(user2.authUserId, 'Birds', 'A quiz about birds');
     const quiz4 = adminQuizCreate(user.authUserId, 'Ducks', 'A quiz about ducks');
     const quiz5 = adminQuizCreate(user.authUserId, 'Lizards', 'A quiz about lizards');
-    const quiz6 = adminQuizCreate(user2.authUserId, 'Goats', 'A quiz about goats');
+    adminQuizCreate(user2.authUserId, 'Goats', 'A quiz about goats');
 
     const received = adminQuizList(user.authUserId);
     const expected = {
