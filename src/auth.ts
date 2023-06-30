@@ -41,7 +41,7 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
     return { error: 'First name must be 2 to 20 characters' };
   }
 
-  const expressionName: RegExp = /^[A-Za-z\s'-]+$/;
+  const expressionName = /^[A-Za-z\s'-]+$/;
   if (!expressionName.test(nameFirst)) {
     return { error: 'First name must only contain letters, spaces, hyphens or apostrophes' };
   }
@@ -62,15 +62,15 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
     return { error: 'Password must be at least 8 characters' };
   }
 
-  const letters: RegExp = /[a-zA-Z]/;
-  const numbers: RegExp = /\d/;
+  const letters = /[a-zA-Z]/;
+  const numbers = /\d/;
   if (!letters.test(password) || !numbers.test(password)) {
     return { error: 'Password must contain at least one letter and one number' };
   }
 
   const authUserId: number = store.users.length + 1;
-  const numSuccessfulLogins: number = 1;
-  const numFailedPasswordsSinceLastLogin: number = 0;
+  const numSuccessfulLogins = 1;
+  const numFailedPasswordsSinceLastLogin = 0;
   const user: Users = { email, password, nameFirst, nameLast, authUserId, numSuccessfulLogins, numFailedPasswordsSinceLastLogin };
 
   store.users.push(user);
@@ -88,7 +88,7 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
  * @returns {{authUserId: number}}
  */
 export function adminAuthLogin(email: string, password: string): Error | UserId {
-  let emailExists: boolean = false;
+  let emailExists = false;
   const newData: Data = getData();
   let userIndex: number;
 
@@ -145,7 +145,7 @@ export function adminUserDetails(authUserId: number): User | Error {
       error: 'AuthUserId is not a valid user'
     };
   }
-  const name: string = `${data.users[i].nameFirst} ${data.users[i].nameLast}`;
+  const name = `${data.users[i].nameFirst} ${data.users[i].nameLast}`;
 
   return {
     user:

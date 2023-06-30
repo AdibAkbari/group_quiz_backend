@@ -5,19 +5,19 @@ import { adminQuizCreate, adminQuizList } from '../quiz';
 const ERROR = { error: expect.any(String) };
 
 describe('clear test', () => {
-    //Check that clear returns the correct object 
-    test('returns empty data', () => {
-        expect(clear()).toStrictEqual({});
-    });
+  // Check that clear returns the correct object
+  test('returns empty data', () => {
+    expect(clear()).toStrictEqual({});
+  });
 
-    //Check that clear returns the correct object 
-    test('integrated clear test', () => {
-        let user = adminAuthRegister('email@gmail.com', 'password1', 'nameFirst', 'nameLast' );
-        let quiz = adminQuizCreate(user.authUserId, 'quiz1', '' );
-        
-        clear();
+  // Check that clear returns the correct object
+  test('integrated clear test', () => {
+    const user = adminAuthRegister('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
+    const quiz = adminQuizCreate(user.authUserId, 'quiz1', '');
 
-        expect(adminUserDetails(user.authUserId)).toStrictEqual(ERROR);
-        expect(adminQuizList(user.authUserId)).toStrictEqual(ERROR);
-    });
-})
+    clear();
+
+    expect(adminUserDetails(user.authUserId)).toStrictEqual(ERROR);
+    expect(adminQuizList(user.authUserId)).toStrictEqual(ERROR);
+  });
+});
