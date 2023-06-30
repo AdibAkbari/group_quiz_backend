@@ -1,4 +1,4 @@
-// data structure for storing user data and quiz data 
+// data structure for storing user data and quiz data
 let data = {
   users: [],
   quizzes: [],
