@@ -1,7 +1,7 @@
 
 import { setData, getData } from './dataStore.js'
 import validator from 'validator';
-import { isValidUserId, findUserIndex, isWhiteSpace } from "./other.js";
+import { isValidUserId, findUserIndex, isWhiteSpace } from "./other";
 
 export interface userId {
     authUserId: number;

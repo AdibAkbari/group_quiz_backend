@@ -1,6 +1,7 @@
+// @ts-nocheck
 // tests for adminAuthRegister function
-import { adminAuthRegister } from '../auth.js'
-import { clear } from '../other.js'
+import { userId, error, adminAuthRegister } from '../auth';
+import { clear } from '../other';
 
 beforeEach(() => {
     clear();
@@ -138,7 +139,7 @@ describe ('test for errors for adminAuthRegister', () => {
     });
 
     test('email already used', () => {
-        const user = adminAuthRegister('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
+        const userId = adminAuthRegister('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
         expect(adminAuthRegister('email@gmail.com', 'password12', 'nameFirsts', 'nameLasts')).toStrictEqual(ERROR);
     });
 });
