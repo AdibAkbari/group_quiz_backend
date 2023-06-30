@@ -1,6 +1,47 @@
 import { getData, setData } from "./dataStore.js";
-import { checkNameValidity, isValidCreator, isValidQuizId, isValidUserId, isWhiteSpace} from "./other.js";
+import { checkNameValidity, isValidCreator, isValidQuizId, isValidUserId, isWhiteSpace} from "./other.ts";
  
+// interface quizzes {
+//     quizzes: quiz[]
+// }
+
+interface users {
+    email: string,
+    password: string,
+    nameFirst: string,
+    nameLast: string,
+    authUserId: number,
+    numSuccessfulLogins: number,
+    numFailedPasswordsSinceLastLogin: number,
+}
+
+interface quizzes {
+    name: string,
+    description: string
+    quizId: number,
+    creator: number,
+    questions: {questions: string, answer: string}[],
+    players: {authUserId: number, score: number}[],
+    timeCreated: number,
+    timeLastEdited: number,
+    
+}
+
+interface data {
+    users: users[],
+    quizzes: quizzes[],
+    quizCount: number
+}
+
+interface error {
+    error: string
+}
+
+interface quizList {
+    quizId: number,
+    name: string
+}
+
 /** 
  * Provide a list of all quizzes that are owned by the currently logged in user.
  * 
@@ -11,8 +52,8 @@ import { checkNameValidity, isValidCreator, isValidQuizId, isValidUserId, isWhit
  *              }>
  *          }}
  */
-export function adminQuizList (authUserId) {
-    let data = getData();
+export function adminQuizList (authUserId: number): {quizzes: quizList[]} | error {
+    const data: data = getData();
     
     if (!isValidUserId(authUserId)) {
         return {
@@ -20,12 +61,12 @@ export function adminQuizList (authUserId) {
         }
     };
 
-    let quizzes = [];
+    let quizzes: quizList[] = [];
 
     for (const quiz of data.quizzes) {
         if (quiz.creator === authUserId) {
-            let quizId = quiz.quizId;
-            let name = quiz.name;
+            const quizId: number = quiz.quizId;
+            const name: string = quiz.name;
             quizzes.push({quizId, name});
         }
     };
@@ -43,7 +84,7 @@ export function adminQuizList (authUserId) {
  * @param {string} description
  * @returns {{quizId: number}} quizId
  */
-export function adminQuizCreate(authUserId, name, description) {
+export function adminQuizCreate(authUserId: number, name: string, description: string): {quizId: number} | error {
     // invalid authUserId
     if (!isValidUserId(authUserId)) {
         return {error: 'authUserId does not refer to valid user'};
@@ -59,12 +100,12 @@ export function adminQuizCreate(authUserId, name, description) {
     }
     
     // get time in seconds
-    const timeNow = Math.floor((new Date()).getTime() / 1000);
+    const timeNow: number = Math.floor((new Date()).getTime() / 1000);
 
     // get and set data to add quiz object to quizzes array
-    let data = getData();
+    let data: data = getData();
     data.quizCount++; // increment quizCount by 1
-    let id = data.quizCount;
+    const id: number = data.quizCount;
     data.quizzes.push(
       {
         name: name,
@@ -92,7 +133,7 @@ export function adminQuizCreate(authUserId, name, description) {
  * @param {number} quizId
  * @returns {{ }} empty object
  */
-export function adminQuizRemove(authUserId, quizId) {
+export function adminQuizRemove(authUserId: number, quizId: number): {} | error {
     
     if (isValidUserId(authUserId) === false) {
         return {error: 'AuthUserId is not a valid user'};
@@ -106,10 +147,10 @@ export function adminQuizRemove(authUserId, quizId) {
         return {error: 'Quiz ID does not refer to a quiz that this user owns'};
     }
 
-    let data = getData();
+    let data: data = getData();
     for (const i in data.quizzes) {
         if (data.quizzes[i].quizId  === quizId) {
-            data.quizzes.splice(i, 1);
+            data.quizzes.splice(parseInt(i), 1);
             setData(data);
         }
     };
@@ -130,7 +171,9 @@ export function adminQuizRemove(authUserId, quizId) {
  *           description: string,
  *          }} 
  */
-export function adminQuizInfo(authUserId, quizId) {
+export function adminQuizInfo(authUserId: number, quizId: number): error | {
+    quizId: number, name: string, timeCreated: number, timeLastEdited: number, description: string
+} {
     
     if (!isValidUserId(authUserId)) {
         return {error: 'authUserId does not refer to valid user'};
@@ -144,7 +187,7 @@ export function adminQuizInfo(authUserId, quizId) {
         return {error: 'quizId does not refer to quiz that this user owns'};
     }
 
-    let data = getData();
+    const data: data = getData();
     for (const quiz of data.quizzes) {
         if(quiz.quizId === quizId) {
             return {
@@ -173,7 +216,7 @@ export function adminQuizInfo(authUserId, quizId) {
  * @param {string} name
  * @returns {{ }} empty object
  */
-export function adminQuizNameUpdate(authUserId, quizId, name) {
+export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): {} | error {
     // Check inputted UserId is valid
     if (isValidUserId(authUserId) === false) {
         return {error: 'Please enter a valid user'};
@@ -195,8 +238,8 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
         return { error: 'Quiz name cannot be solely white space' };
     };
 
-    let data = getData();
-    const timeNow = Math.floor((new Date()).getTime() / 1000);
+    let data: data = getData();
+    const timeNow: number = Math.floor((new Date()).getTime() / 1000);
     for (const current of data.quizzes) {
         if (current.quizId === quizId) {
             current.name = name;
@@ -218,7 +261,7 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
  * @param {string} description
  * @returns {{ }}
  */
-export function adminQuizDescriptionUpdate (authUserID, quizId, description) {
+export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, description: string): {} | error {
     if (!isValidUserId(authUserID)) {
         return { error: 'authUserId does not refer to valid user'};
     };
@@ -235,9 +278,9 @@ export function adminQuizDescriptionUpdate (authUserID, quizId, description) {
         return {error: 'description must be less than 100 characters'};
     }
 
-    let store = getData();
-    const quizIndex = store.quizzes.findIndex(id => id.quizId === quizId);
-    const timeNow = Math.floor((new Date()).getTime() / 1000);
+    let store: data = getData();
+    const quizIndex: number = store.quizzes.findIndex(id => id.quizId === quizId);
+    const timeNow: number = Math.floor((new Date()).getTime() / 1000);
     store.quizzes[quizIndex].description = description;
     store.quizzes[quizIndex].timeLastEdited = timeNow;
     setData(store);
