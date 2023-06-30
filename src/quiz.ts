@@ -1,5 +1,5 @@
-import { getData, setData } from './dataStore.js';
-import { checkNameValidity, isValidCreator, isValidQuizId, isValidUserId, isWhiteSpace } from './other.js';
+import { getData, setData } from './dataStore';
+import { checkNameValidity, isValidCreator, isValidQuizId, isValidUserId, isWhiteSpace } from './other';
 
 /**
  * Provide a list of all quizzes that are owned by the currently logged in user.

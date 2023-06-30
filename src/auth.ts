@@ -1,20 +1,16 @@
-import { setData, getData } from './dataStore'
+import { error, setData, getData } from './dataStore';
 import validator from 'validator';
-import { isValidUserId, findUserIndex, isWhiteSpace } from "./other";
+import { isValidUserId, findUserIndex, isWhiteSpace } from './other';
 
 export interface userId {
     authUserId: number;
 }
 
-export interface error {
-    error: string;
-}
-
 export interface user {
     user: {
-        userId: number; 
-        name: string; 
-        email: string; 
+        userId: number;
+        name: string;
+        email: string;
         numSuccessfulLogins: number;
         numFailedPasswordsSinceLastLogin: number;
     }
@@ -30,7 +26,7 @@ export interface user {
  * @param {string} nameLast
  * @returns {{authUserId: number}}
  */
-export function adminAuthRegister (email, password, nameFirst, nameLast) {
+export function adminAuthRegister (email: string, password: string, nameFirst: string, nameLast: string): error | userId {
   const store = getData();
 
   if (!validator.isEmail(email)) {
@@ -91,7 +87,7 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
  * @param {string} password
  * @returns {{authUserId: number}}
  */
-export function adminAuthLogin(email, password) {
+export function adminAuthLogin(email: string, password: string): error | userId {
   let emailExists = false;
   const newData = getData();
   let userIndex;
@@ -134,7 +130,7 @@ export function adminAuthLogin(email, password) {
  *              numFailedPasswordsSinceLastLogin: number
  *              }}}
  */
-export function adminUserDetails(authUserId) {
+export function adminUserDetails(authUserId: number): user | error {
   const data = getData();
 
   if (!isValidUserId(authUserId)) {

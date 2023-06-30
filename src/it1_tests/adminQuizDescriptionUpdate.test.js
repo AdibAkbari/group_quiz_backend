@@ -1,7 +1,6 @@
-// @ts-nocheck
-import {adminQuizCreate, adminQuizInfo, adminQuizDescriptionUpdate} from '../quiz';
-import {userId, error, adminAuthRegister} from '../auth';
-import {clear} from '../other';
+import { adminQuizCreate, adminQuizInfo, adminQuizDescriptionUpdate } from '../quiz';
+import { adminAuthRegister } from '../auth';
+import { clear } from '../other';
 
 const ERROR = { error: expect.any(String) };
 let user;

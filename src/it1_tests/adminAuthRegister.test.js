@@ -1,6 +1,5 @@
-// @ts-nocheck
 // tests for adminAuthRegister function
-import { userId, error, adminAuthRegister } from '../auth';
+import { adminAuthRegister } from '../auth';
 import { clear } from '../other';
 
 beforeEach(() => {

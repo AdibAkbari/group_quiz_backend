@@ -1,11 +1,13 @@
-// @ts-nocheck
-
-// data structure for storing user data and quiz data 
+// data structure for storing user data and quiz data
 let data = {
   users: [],
   quizzes: [],
   quizCount: 0,
 };
+
+export interface error {
+  error: string;
+}
 
 // YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1
 
