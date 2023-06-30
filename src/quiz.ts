@@ -1,9 +1,6 @@
-import { getData, setData } from "./dataStore.js";
-import { checkNameValidity, isValidCreator, isValidQuizId, isValidUserId, isWhiteSpace} from "./other.ts";
+import { getData, setData } from "./dataStore";
+import { checkNameValidity, isValidCreator, isValidQuizId, isValidUserId, isWhiteSpace} from "./other";
  
-// interface quizzes {
-//     quizzes: quiz[]
-// }
 
 interface users {
     email: string,

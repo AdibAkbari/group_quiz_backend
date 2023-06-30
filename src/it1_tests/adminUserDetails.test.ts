@@ -1,10 +1,12 @@
+// @ts-nocheck
+
 import { 
     adminUserDetails,
     adminAuthRegister,
     adminAuthLogin 
-} from '../auth.js';
+} from '../auth';
 
-import { clear } from '../other.js';
+import { clear } from '../other';
 
 
 const ERROR = { error: expect.any(String) };
