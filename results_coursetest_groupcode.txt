@@ -1,0 +1,82 @@
+npm verb cli /import/kamen/3/cs1531/.nvm/versions/node/v18.16.0/bin/node /import/kamen/3/cs1531/.nvm/versions/node/v18.16.0/bin/npm
+npm info using npm@9.5.1
+npm info using node@v18.16.0
+npm verb title npm run test course_tests/
+npm verb argv "run" "test" "--loglevel" "verbose" "course_tests/"
+npm verb logfile logs-max:10 dir:/import/kamen/3/cs1531/.npm/_logs/2023-06-24T16_32_04_309Z-
+npm verb logfile /import/kamen/3/cs1531/.npm/_logs/2023-06-24T16_32_04_309Z-debug-0.log
+
+> test
+> jest course_tests/
+
+npm http fetch GET 200 https://registry.npmjs.org/npm 41ms (cache hit)
+PASS course_tests/tests/quiz_tests/quizInfo.test.js
+PASS course_tests/tests/quiz_tests/quizCreate.test.js
+PASS course_tests/tests/auth_tests/authRegister.test.js
+PASS course_tests/tests/auth_tests/userDetails.test.js
+PASS course_tests/tests/quiz_tests/quizDescriptionUpdate.test.js
+FAIL course_tests/tests/quiz_tests/quizList.test.js
+  ● Test invalid token structure - quiz list
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 6
+
+      Object {
+    -   "error": Any<String>,
+    +   "quizzes": Array [
+    +     Object {
+    +       "name": "test quiz",
+    +       "quizId": 1,
+    +     },
+    +   ],
+      }
+
+      42 | test('Test invalid token structure - quiz list', () => {
+      43 |   const res = adminQuizList(1);
+    > 44 |   expect(res).toStrictEqual({ error: expect.any(String) });
+         |               ^
+      45 | });
+
+      at Object.toStrictEqual (course_tests/tests/quiz_tests/quizList.test.js:44:15)
+
+FAIL course_tests/tests/quiz_tests/quizRemove.test.js
+  ● Test token invalid structure - quiz deletion
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 3
+    + Received  + 1
+
+    - Object {
+    -   "error": Any<String>,
+    - }
+    + Object {}
+
+      20 | test('Test token invalid structure - quiz deletion', () => {
+      21 |   const res = adminQuizRemove(1, quizId);
+    > 22 |   expect(res).toStrictEqual({ error: expect.any(String)});
+         |               ^
+      23 | });
+      24 |
+      25 | test('Test quiz deletion - invalid quiz error', () => {
+
+      at Object.toStrictEqual (course_tests/tests/quiz_tests/quizRemove.test.js:22:15)
+
+PASS course_tests/tests/other_tests/clear.test.js
+PASS course_tests/tests/auth_tests/authLogin.test.js
+PASS course_tests/tests/quiz_tests/quizNameUpdate.test.js
+
+Test Suites: 2 failed, 8 passed, 10 total
+Tests:       2 failed, 52 passed, 54 total
+Snapshots:   0 total
+Time:        2.554 s
+Ran all test suites matching /course_tests\//i.
+npm notice 
+npm notice New minor version of npm available! 9.5.1 -> 9.7.2
+npm notice Changelog: <https://github.com/npm/cli/releases/tag/v9.7.2>
+npm notice Run `npm install -g npm@9.7.2` to update!
+npm notice 
+npm verb exit 1
+npm verb code 1
