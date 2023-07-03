@@ -37,6 +37,24 @@ app.get('/echo', (req: Request, res: Response) => {
   return res.json(ret);
 });
 
+// Quiz Name Update //
+app.put('/v1/admin/quiz/{quizid}/name', (req: Request, res) => {
+    const quizid = parseInt(req.params.quizid);
+    const { token, name } = req.body;
+
+    const response = adminQuizNameUpdate(token, quizid, name);
+
+    if ('error' in result) {
+      res.status(400);
+    }
+    res.json(result);
+});
+  
+// clear // 
+app.delete('/v1/clear', (req: Request, res: Response) => {
+    res.json(clear());
+});
+
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================
