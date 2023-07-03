@@ -1,7 +1,20 @@
-
-import { setData, getData } from './dataStore.js';
+import { setData, getData, Error, Data, Users } from './dataStore';
 import validator from 'validator';
-import { isValidUserId, findUserIndex, isWhiteSpace } from './other.js';
+import { isValidUserId, findUserIndex, isWhiteSpace } from './other';
+
+export interface UserId {
+    authUserId: number;
+}
+
+export interface User {
+    user: {
+        userId: number;
+        name: string;
+        email: string;
+        numSuccessfulLogins: number;
+        numFailedPasswordsSinceLastLogin: number;
+    }
+}
 
 /**
  * Register a user with an email, password, and names, then returns their
@@ -13,7 +26,7 @@ import { isValidUserId, findUserIndex, isWhiteSpace } from './other.js';
  * @param {string} nameLast
  * @returns {{authUserId: number}}
  */
-export function adminAuthRegister (email, password, nameFirst, nameLast) {
+export function adminAuthRegister (email: string, password: string, nameFirst: string, nameLast: string): Error | UserId {
   const store = getData();
 
   if (!validator.isEmail(email)) {
@@ -55,10 +68,10 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
     return { error: 'Password must contain at least one letter and one number' };
   }
 
-  const authUserId = store.users.length + 1;
+  const authUserId: number = store.users.length + 1;
   const numSuccessfulLogins = 1;
   const numFailedPasswordsSinceLastLogin = 0;
-  const user = { email, password, nameFirst, nameLast, authUserId, numSuccessfulLogins, numFailedPasswordsSinceLastLogin };
+  const user: Users = { email, password, nameFirst, nameLast, authUserId, numSuccessfulLogins, numFailedPasswordsSinceLastLogin };
 
   store.users.push(user);
   setData(store);
@@ -74,10 +87,10 @@ export function adminAuthRegister (email, password, nameFirst, nameLast) {
  * @param {string} password
  * @returns {{authUserId: number}}
  */
-export function adminAuthLogin(email, password) {
+export function adminAuthLogin(email: string, password: string): Error | UserId {
   let emailExists = false;
-  const newData = getData();
-  let userIndex;
+  const newData: Data = getData();
+  let userIndex: number;
 
   for (const user of newData.users) {
     if (user.email === email) {
@@ -117,8 +130,8 @@ export function adminAuthLogin(email, password) {
  *              numFailedPasswordsSinceLastLogin: number
  *              }}}
  */
-export function adminUserDetails(authUserId) {
-  const data = getData();
+export function adminUserDetails(authUserId: number): User | Error {
+  const data: Data = getData();
 
   if (!isValidUserId(authUserId)) {
     return {
