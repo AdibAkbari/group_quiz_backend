@@ -47,7 +47,7 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   if ('error' in result) {
     return res.status(400);
   }
-  res.json(result);
+  return res.json(result);
 })
 
 // ====================================================================
