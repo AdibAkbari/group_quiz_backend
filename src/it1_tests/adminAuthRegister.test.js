@@ -1,6 +1,6 @@
 // tests for adminAuthRegister function
-import { adminAuthRegister } from '../auth.js';
-import { clear } from '../other.js';
+import { adminAuthRegister } from '../auth';
+import { clear } from '../other';
 
 beforeEach(() => {
   clear();
