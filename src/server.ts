@@ -6,6 +6,9 @@ import cors from 'cors';
 import YAML from 'yaml';
 import sui from 'swagger-ui-express';
 import fs from 'fs';
+import {
+  adminQuizDescriptionUpdate,
+} from './quiz'
 
 // Set up web app
 const app = express();
@@ -36,6 +39,27 @@ app.get('/echo', (req: Request, res: Response) => {
   }
   return res.json(ret);
 });
+
+// adminQuizDescriptionUpdate //
+app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const { userId, description } = req.body;
+  const result = adminQuizDescriptionUpdate(userId, quizId, description);
+
+  if (
+    result === { error: 'quizId does not refer to valid quiz' } ||
+    result === { error: 'quizId does not refer to a quiz that this user owns' } ||
+    result === { error: 'description must be less than 100 characters' }
+  ) {
+    return res.status(400);
+  }
+  if (
+    result === { error: 'authUserId does not refer to valid user' }
+  ) {
+    return res.status(401);
+  }
+  res.json(result)
+}) 
 
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
