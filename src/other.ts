@@ -13,6 +13,8 @@ export function clear (): Record<string, never> {
     users: [],
     quizzes: [],
     quizCount: 0,
+    tokens: [],
+    trash: [],
   };
 
   setData(data);
