@@ -1,6 +1,6 @@
 import request from 'sync-request';
 
-import { port, url } from './config.json';
+import { port, url } from '../config.json';
 const SERVER_URL = `${url}:${port}`;
 
 export function authLoginRequest(email: string, password: string) {
@@ -23,6 +23,19 @@ export function authRegisterRequest(email: string, password: string, nameFirst: 
         }
     );
     return JSON.parse(res.body.toString())
+}
+
+export function adminUserDetailsRequest(token: string) {
+    const res = request(
+        'GET',
+        SERVER_URL + '/v1/admin/user/details',
+        {
+            qs: {
+                token: token,
+            }
+        }
+    );
+    return JSON.parse(res.toString());
 }
 
 export function clearRequest() {

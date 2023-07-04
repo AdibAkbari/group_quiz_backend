@@ -80,7 +80,7 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
   
   const timeNow: number = Math.floor((new Date()).getTime() / 1000);
   const tokenId: number = Math.random() * timeNow;
-  const token: Token = { tokenId, authUserId }; 
+  const token: Token = { tokenId: tokenId, userId: authUserId }; 
   store.tokens.push(token);
   setData(store);
   
