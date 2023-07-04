@@ -1,6 +1,6 @@
 import request from 'sync-request';
 
-import { port, url } from './config.json';
+import { port, url } from '../config.json';
 const SERVER_URL = `${url}:${port}`;
 
 export function authLoginRequest(email: string, password: string) {
@@ -22,7 +22,7 @@ export function authRegisterRequest(email: string, password: string, nameFirst: 
           json: { email: email, password: password, nameFirst: nameFirst, nameLast: nameLast },
         }
     );
-    return JSON.parse(res.body.toString())
+    return JSON.parse(res.body.toString());
 }
 
 export function clearRequest() {
@@ -30,5 +30,12 @@ export function clearRequest() {
         'DELETE',
         SERVER_URL + '/v1/clear'
     );
-    return JSON.parse(res.body.toString())
+    // return JSON.parse(res.body.toString())
+
+    try {
+        JSON.parse(res.body.toString())
+    }
+    catch (error) {
+        console.log('Error', error, res.body.toString())
+    }
 }

@@ -72,7 +72,7 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
     return { error: 'Password must contain at least one letter and one number' };
   }
 
-  const authUserId: number = store.users.length + 1;
+  const userId: number = store.users.length + 1;
   const numSuccessfulLogins = 1;
   const numFailedPasswordsSinceLastLogin = 0;
   const user: Users = { email, password, nameFirst, nameLast, authUserId, numSuccessfulLogins, numFailedPasswordsSinceLastLogin };
@@ -80,7 +80,7 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
   
   const timeNow: number = Math.floor((new Date()).getTime() / 1000);
   const tokenId: number = Math.random() * timeNow;
-  const token: Token = { tokenId, authUserId }; 
+  const token: Token = { tokenId, userId }; 
   store.tokens.push(token);
   setData(store);
   
