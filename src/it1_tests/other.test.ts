@@ -1,4 +1,8 @@
-import { clearRequest } from './testRoutes';
+import { 
+    clearRequest, 
+    authRegisterRequest, 
+    authLoginRequest 
+} from './testRoutes';
 
 describe('clearV1 Tests', () => {
   // Check that clear returns the correct object
