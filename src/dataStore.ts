@@ -47,6 +47,7 @@ export interface Data {
   quizzes: Quizzes[];
   quizCount: number;
   tokens: Token[];
+  trash: Quizzes[];
 }
 
 export interface Error {
@@ -59,6 +60,7 @@ let data: Data = {
   quizzes: [],
   quizCount: 0,
   tokens: [],
+  trash: [],
 };
 
 // YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1
