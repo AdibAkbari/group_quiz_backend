@@ -9,22 +9,44 @@ export interface Users {
   numFailedPasswordsSinceLastLogin: number;
 }
 
+export interface Question {
+  questionId: number;
+  question: string;
+  duration: number;
+  thumbnailUrl: string;
+  points: number;
+  answers: Answer[];
+}
+
+export interface Answer {
+  answerId: number;
+  answer: string;
+  colour: string;
+  correct: boolean;
+}
+
 export interface Quizzes {
-  name: string;
-  description: string;
   quizId: number;
-  creator: number;
-  questions: {questions: string, answer: string}[];
-  players: {authUserId: number, score: number}[];
+  name: string;
   timeCreated: number;
   timeLastEdited: number;
+  description: string;
+  numQuestions: number;
+  questions: Question[];
+  creator: number;
+  duration: number;
+}
 
+export interface Token {
+  tokenId: number;
+  userId: number;
 }
 
 export interface Data {
   users: Users[];
   quizzes: Quizzes[];
   quizCount: number;
+  tokens: Token[];
 }
 
 export interface Error {
@@ -36,6 +58,7 @@ let data: Data = {
   users: [],
   quizzes: [],
   quizCount: 0,
+  tokens: [],
 };
 
 // YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1
