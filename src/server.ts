@@ -6,6 +6,9 @@ import cors from 'cors';
 import YAML from 'yaml';
 import sui from 'swagger-ui-express';
 import fs from 'fs';
+import {
+  adminAuthRegister,
+} from './auth'
 
 // Set up web app
 const app = express();
@@ -37,18 +40,15 @@ app.get('/echo', (req: Request, res: Response) => {
   return res.json(ret);
 });
 
-// Quiz Name Update //
-app.put('/v1/admin/quiz/{quizid}/name', (req: Request, res) => {
-    const quizid = parseInt(req.params.quizid);
-    const { token, name } = req.body;
-
-    const response = adminQuizNameUpdate(token, quizid, name);
-
-    if ('error' in result) {
-      res.status(400);
-    }
-    res.json(result);
-});
+// adminAuthRegister // 
+app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
+  const { email, password, nameFirst, nameLast } = req.body;
+  const result = adminAuthRegister(email, password, nameFirst, nameLast);
+  if ('error' in result) {
+    return res.status(400);
+  }
+  return res.json(result);
+})
   
 // clear // 
 app.delete('/v1/clear', (req: Request, res: Response) => {
