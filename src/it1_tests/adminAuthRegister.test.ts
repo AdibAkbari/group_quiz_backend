@@ -8,6 +8,8 @@ beforeEach(() => {
   clearRequest();
 });
 
+const ERROR = { error: expect.any(String)};
+
 describe('valid input authRegisterRequestV1 tests', () => {
   test.each([
     {
@@ -39,7 +41,10 @@ describe('valid input authRegisterRequestV1 tests', () => {
       last: 'name- Last\'s'
     },
   ])('$testName', ({ email, pass, first, last }) => {
-    expect(authRegisterRequest(email, pass, first, last)).toStrictEqual({ token: expect.any(Number) });
+    const user = authRegisterRequest(email, pass, first, last);
+    expect(user.body).toStrictEqual({ token: expect.any(String) });
+    expect(parseInt(user.body.token)).toStrictEqual(expect.any(Number));
+    expect(user.statusCode).toBe(200);
   });
 });
 
@@ -54,7 +59,9 @@ describe('test for errors for adminAuthRegister', () => {
       email: 'email'
     },
   ])('$testName: $email', ({ email }) => {
-    expect(authRegisterRequest(email, 'password1', 'nameFirst', 'nameLast').statusCode).toBe(400);
+    const user = authRegisterRequest(email, 'password1', 'nameFirst', 'nameLast');
+    expect(user.statusCode).toBe(400);
+    expect(user.body).toStrictEqual(ERROR);
   });
 
   test.each([
@@ -83,7 +90,9 @@ describe('test for errors for adminAuthRegister', () => {
       last: '    '
     },
   ])('$testName: $last', ({ last }) => {
-    expect(authRegisterRequest('email2@gmail.com', 'password1', 'nameFirst', last).statusCode).toBe(400);
+    const user = authRegisterRequest('email2@gmail.com', 'password1', 'nameFirst', last);
+    expect(user.statusCode).toBe(400);
+    expect(user.body).toStrictEqual(ERROR);
   });
 
   test.each([
@@ -112,7 +121,9 @@ describe('test for errors for adminAuthRegister', () => {
       first: '    '
     },
   ])('$testName: $first', ({ first }) => {
-    expect(authRegisterRequest('email2@gmail.com', 'password1', first, 'nameLast').statusCode).toBe(400);
+    let user = authRegisterRequest('email2@gmail.com', 'password1', first, 'nameLast');
+    expect(user.statusCode).toBe(400);
+    expect(user.body).toStrictEqual(ERROR);
   });
 
   test.each([
@@ -133,7 +144,9 @@ describe('test for errors for adminAuthRegister', () => {
       pass: '12345678'
     },
   ])('$testName: $pass', ({ pass }) => {
-    expect(authRegisterRequest('email2@gmail.com', pass, 'nameFirst', 'nameLast').statusCode).toBe(400);
+    let user = (authRegisterRequest('email2@gmail.com', pass, 'nameFirst', 'nameLast'));
+    expect(user.statusCode).toBe(400);
+    expect(user.body).toStrictEqual(ERROR);
   });
 
   test('email already used', () => {

@@ -22,7 +22,10 @@ export function authRegisterRequest(email: string, password: string, nameFirst: 
           json: { email: email, password: password, nameFirst: nameFirst, nameLast: nameLast },
         }
     );
-    return JSON.parse(res.body.toString());
+    return {
+        body: JSON.parse(res.body.toString()),
+        statusCode: JSON.parse(res.statusCode.toString())
+    };
 }
 
 export function clearRequest() {
