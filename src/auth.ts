@@ -1,6 +1,6 @@
 import { setData, getData, Error, Data, Users, Token } from './dataStore';
 import validator from 'validator';
-import { isValidUserId, findUserIndex, isWhiteSpace } from './other';
+import { isValidUserId, findUserIndex, isWhiteSpace } from './helper';
 
 export interface UserId {
     authUserId: number;
