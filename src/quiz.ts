@@ -21,36 +21,48 @@ interface QuizCreate {
 /**
  * Provide a list of all quizzes that are owned by the currently logged in user.
  *
- * @param {number} authUserId
+ * @param {number} token
  * @returns {{quizzes: Array<{
  *                  quizId: number,
  *                  name: string
  *              }>
  *          }}
  */
-export function adminQuizList (authUserId: number): {quizzes: QuizList[]} | Error {
+export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
   const data: Data = getData();
 
-  if (!isValidUserId(authUserId)) {
+  if (!isValidTokenStructure(token)) {
     return {
-      error: 'AuthUserId is not a valid user'
+      error: 'token is an invalid structure'
     };
   }
 
-  const quizzes: QuizList[] = [];
+  if(!isTokenLoggedIn(token)) {
+    return {
+      error: 'token is not logged in'
+    };
+  }
 
+  const authUserId = findUserFromToken(token);
+
+  const newList = data.quizzes.filter(id => id.creator === authUserId);
+  const quizzes: QuizList[] = newList.map((quiz) => { return {quizId: quiz.quizId, name: quiz.name}});
+
+/*
   for (const quiz of data.quizzes) {
     if (quiz.creator === authUserId) {
       const quizId: number = quiz.quizId;
-      const name: string = quiz.name;
+     // const name: string = quiz.name;
       quizzes.push({ quizId, name });
     }
   }
-
+*/
   return {
     quizzes: quizzes
   };
 }
+
+
 
 /**
  * Given basic details about a new quiz, create one for the user.

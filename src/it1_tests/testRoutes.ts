@@ -31,7 +31,7 @@ export function authRegisterRequest(email: string, password: string, nameFirst: 
 export function adminQuizListRequest(token: string) {
     const res = request(
         'GET',
-        SERVER_URL + 'v1/admin/quiz/list',
+        SERVER_URL + '/v1/admin/quiz/list',
         {
             qs: {
                 token: token,
