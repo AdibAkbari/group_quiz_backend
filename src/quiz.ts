@@ -193,28 +193,37 @@ export function adminQuizInfo(authUserId: number, quizId: number): Error | {
  * of the owner of the quiz, the quizId of the quiz to change and the
  * new name.
  *
- * @param {number} tokenId
+ * @param {string} token
  * @param {number} quizId
  * @param {string} name
  * @returns {{ }} empty object
  */
-export function adminQuizNameUpdate(tokenId: string, quizId: number, name: string): Record<string, never> | Error {
-  
-    // Check inputted quizId is valid
-  if (isValidQuizId(quizId) === false) {
-    return { error: 'Invalid QuizId' };
+export function adminQuizNameUpdate(token: string, quizId: number, name: string): Record<string, never> | Error {
+  // Check if token structure is invalid
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+  // Check if token is not logged in 
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+  // Check inputted quizId is valid
+  if (!isValidQuizId(quizId)) {
+    return { error: 'Invalid: QuizId' };
+  }
+  // Get authUserId from token 
+  const authUserId = findUserFromToken(token);
+  // Check if the name is valid
+  if (!checkNameValidity(name, authUserId)) {
+    return { error: 'Invalid: Name' };
   }
   // Check inputted Quiz ID does not refer to a quiz that this user owns
-  if (isValidCreator(quizId, authUserId) === false) {
-    return { error: 'Invalid QuizId' };
-  }
-  // Check inputted name is valid
-  if (!checkNameValidity(name, authUserId)) {
-    return { error: 'Invalid Name' };
+  if (!isValidCreator(quizId, authUserId)) {
+    return { error: 'Invalid: You do not own this quiz' };
   }
   // Check name isn't just whitespace
   if (isWhiteSpace(name)) {
-    return { error: 'Invalid Name' };
+    return { error: 'Invalid: Quiz name cannot be solely white space' };
   }
 
   const data: Data = getData();
