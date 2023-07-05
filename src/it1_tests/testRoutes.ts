@@ -22,7 +22,10 @@ export function authRegisterRequest(email: string, password: string, nameFirst: 
           json: { email: email, password: password, nameFirst: nameFirst, nameLast: nameLast },
         }
     );
-    return JSON.parse(res.body.toString())
+    return {
+        body: JSON.parse(res.body.toString()),
+        statusCode: JSON.parse(res.statusCode.toString())
+    };
 }
 
 export function adminUserDetailsRequest(token: string) {
@@ -35,7 +38,10 @@ export function adminUserDetailsRequest(token: string) {
             }
         }
     );
-    return JSON.parse(res.toString());
+    return {
+        body: JSON.parse(res.body.toString()),
+        statusCode: JSON.parse(res.statusCode.toString())
+    };
 }
 
 export function clearRequest() {
@@ -43,5 +49,12 @@ export function clearRequest() {
         'DELETE',
         SERVER_URL + '/v1/clear'
     );
-    return JSON.parse(res.body.toString())
+    // return JSON.parse(res.body.toString())
+
+    try {
+        JSON.parse(res.body.toString())
+    }
+    catch (error) {
+        console.log('Error', error, res.body.toString())
+    }
 }

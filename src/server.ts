@@ -9,6 +9,7 @@ import fs from 'fs';
 import {
   adminAuthRegister,
 } from './auth'
+import { clear } from './other'
 
 // Set up web app
 const app = express();
@@ -42,17 +43,17 @@ app.get('/echo', (req: Request, res: Response) => {
 
 // adminAuthRegister // 
 app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
-  const { email, password, nameFirst, nameLast } = req.body;
-  const result = adminAuthRegister(email, password, nameFirst, nameLast);
+  //const { email, password, nameFirst, nameLast } = req.body;
+  const result = adminAuthRegister(req.body.email, req.body.password, req.body.nameFirst, req.body.nameLast);
   if ('error' in result) {
-    return res.status(400);
+    res.status(400);
   }
-  return res.json(result);
+  res.json(result);
 })
   
 // clear // 
 app.delete('/v1/clear', (req: Request, res: Response) => {
-    res.json(clear());
+  res.json(clear());
 });
 
 // ====================================================================

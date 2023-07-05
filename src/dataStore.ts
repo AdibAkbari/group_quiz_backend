@@ -38,7 +38,7 @@ export interface Quizzes {
 }
 
 export interface Token {
-  tokenId: number;
+  tokenId: string;
   userId: number;
 }
 

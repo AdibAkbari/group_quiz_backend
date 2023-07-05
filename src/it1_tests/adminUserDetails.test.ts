@@ -20,14 +20,15 @@ beforeEach(() => {
 
 describe('Token invalid', () => {
   
-  test('Token just letters', () => {
-    const details = adminUserDetailsRequest('hello');
-    expect(details.body).toStrictEqual(ERROR);
-    expect(details.statusCode).toStrictEqual(401);
-  });
-
-  test('Token includes letters', () => {
-    const details = adminUserDetailsRequest('38eha');
+  test.each([
+    {testName: 'token just letters', token: 'hello'},
+    {testName: 'token starts with letters', token: 'a54364'},
+    {testName: 'token ends with letters', token: '54356s'},
+    {testName: 'token includes letter', token: '5436h86'},
+    {testName: 'token has space', token: '4324 757'},
+    {testName: 'token has other characters', token: '6365,53'},
+  ])('token is not a valid structure: $testName', ({token}) => {
+    const details = adminUserDetailsRequest(token);
     expect(details.body).toStrictEqual(ERROR);
     expect(details.statusCode).toStrictEqual(401);
   });
@@ -39,7 +40,7 @@ describe('Token invalid', () => {
   });
 
   test('TokenId not logged in', () => {
-    const user = authRegisterRequest('email@gmail.com', 'password1', 'NameFirst', 'NameLast');
+    const user = authRegisterRequest('email@gmail.com', 'password1', 'NameFirst', 'NameLast').body;
     const userDetails = adminUserDetailsRequest(user.token + 1)
     expect(userDetails.body).toStrictEqual(ERROR);
     expect(userDetails.statusCode).toStrictEqual(403);
@@ -50,7 +51,7 @@ describe('Token invalid', () => {
 describe('Only one user registered', () => {
   let user: Token;
   beforeEach(() => {
-    user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname');
+    user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
   });
 
   test('Just registered', () => {
@@ -103,9 +104,9 @@ describe('multiple users registered', () => {
   let user2: Token;
   let user3: Token;
   beforeEach(() => {
-    user1 = authRegisterRequest('email1@gmail.com', 'password1', 'FirstnameA', 'LastnameA');
-    user2 = authRegisterRequest('email2@gmail.com', 'password2', 'FirstnameB', 'LastnameB');
-    user3 = authRegisterRequest('email3@gmail.com', 'password3', 'FirstnameC', 'LastnameC');
+    user1 = authRegisterRequest('email1@gmail.com', 'password1', 'FirstnameA', 'LastnameA').body;
+    user2 = authRegisterRequest('email2@gmail.com', 'password2', 'FirstnameB', 'LastnameB').body;
+    user3 = authRegisterRequest('email3@gmail.com', 'password3', 'FirstnameC', 'LastnameC').body;
   });
 
   test('Finding user 1', () => {
