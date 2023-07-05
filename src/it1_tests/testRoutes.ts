@@ -28,6 +28,22 @@ export function authRegisterRequest(email: string, password: string, nameFirst: 
     };
 }
 
+export function adminUserDetailsRequest(token: string) {
+    const res = request(
+        'GET',
+        SERVER_URL + '/v1/admin/user/details',
+        {
+            qs: {
+                token: token,
+            }
+        }
+    );
+    return {
+        body: JSON.parse(res.body.toString()),
+        statusCode: JSON.parse(res.statusCode.toString())
+    };
+}
+
 export function clearRequest() {
     const res = request(
         'DELETE',
