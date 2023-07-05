@@ -171,31 +171,28 @@ export function adminQuizInfo(authUserId: number, quizId: number): Error | {
  * of the owner of the quiz, the quizId of the quiz to change and the
  * new name.
  *
- * @param {number} authUserId
+ * @param {number} tokenId
  * @param {number} quizId
  * @param {string} name
  * @returns {{ }} empty object
  */
-export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): Record<string, never> | Error {
-  // Check inputted UserId is valid
-  if (isValidUserId(authUserId) === false) {
-    return { error: 'Please enter a valid user' };
-  }
-  // Check inputted quizId is valid
+export function adminQuizNameUpdate(tokenId: string, quizId: number, name: string): Record<string, never> | Error {
+  
+    // Check inputted quizId is valid
   if (isValidQuizId(quizId) === false) {
-    return { error: 'Please enter a valid quiz' };
+    return { error: 'Invalid QuizId' };
   }
   // Check inputted Quiz ID does not refer to a quiz that this user owns
   if (isValidCreator(quizId, authUserId) === false) {
-    return { error: 'You do not own this quiz' };
+    return { error: 'Invalid QuizId' };
   }
   // Check inputted name is valid
   if (!checkNameValidity(name, authUserId)) {
-    return { error: 'Name not valid' };
+    return { error: 'Invalid Name' };
   }
   // Check name isn't just whitespace
   if (isWhiteSpace(name)) {
-    return { error: 'Quiz name cannot be solely white space' };
+    return { error: 'Invalid Name' };
   }
 
   const data: Data = getData();

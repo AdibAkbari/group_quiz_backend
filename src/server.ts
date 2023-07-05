@@ -50,6 +50,23 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   }
   res.json(result);
 })
+
+// adminQuizNameUpdate // 
+app.post('/v1/admin/quiz/{quizid}/name', (req: Request, res: Response) => {
+    const result = adminQuizNameUpdate(req.body.token, req.params.quizid, req.body.name);
+    
+    if ('error' in result) {
+      res.status(401);
+    } else if ('error' in result) {
+      res.status(403);
+    } else if ('Invalid QuizId' in result) {
+      res.status(400);
+    } else if ('Invalid Name' in result) {
+      res.status(400);
+    } 
+    
+    res.json(result);
+  })
   
 // clear // 
 app.delete('/v1/clear', (req: Request, res: Response) => {

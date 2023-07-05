@@ -28,6 +28,20 @@ export function authRegisterRequest(email: string, password: string, nameFirst: 
     };
 }
 
+export function quizNameUpdateRequest(tokenId: string, quizId: number, name: string) {
+    const res = request(
+        'PUT',
+        SERVER_URL + `/v1/admin/quiz/${quizid}/name`,
+        {
+          json: { token, name },
+        }
+    );
+    return {
+        body: JSON.parse(res.body.toString()),
+        statusCode: JSON.parse(res.statusCode.toString())
+    };
+}
+
 export function clearRequest() {
     const res = request(
         'DELETE',
