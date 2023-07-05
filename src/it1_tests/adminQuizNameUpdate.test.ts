@@ -1,16 +1,20 @@
 import { adminQuizCreate, adminQuizNameUpdate, adminQuizInfo } from '../quiz';
-import { adminAuthRegister } from '../auth';
-import { clear } from '../other';
+
+import { 
+    clearRequest, 
+    authRegisterRequest, 
+    quizNameUpdateRequest, 
+    quizInfoRequest, 
+    quizCreateRequest,
+  } from './testRoutes';
 
 const ERROR = { error: expect.any(String) };
 
-let user;
-let quiz;
 // Before each test, clear data and then create a new user and new quiz
 beforeEach(() => {
-  clear();
-  user = adminAuthRegister('user1@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast');
-  quiz = adminQuizCreate(user.authUserId, 'quiz1', '');
+  clearRequest();
+  // authRegisterRequest
+  // quizCreateRequest
 });
 
 describe('Invalid adminQuizNameUpdate', () => {
