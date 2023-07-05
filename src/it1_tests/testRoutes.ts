@@ -1,7 +1,14 @@
 import request from 'sync-request';
 
 import { port, url } from '../config.json';
+import { Token } from 'yaml/dist/parse/cst';
 const SERVER_URL = `${url}:${port}`;
+
+interface Answer {
+    answer: string,
+    correct: boolean
+}
+
 
 export function authLoginRequest(email: string, password: string) {
     const res = request(
@@ -55,4 +62,35 @@ export function clearRequest() {
     catch (error) {
         console.log('Error', error, res.body.toString())
     }
+}
+
+
+
+// New functions
+
+interface Answer {
+    answer: string,
+    correct: boolean
+}
+
+export function createQuizQuestionRequest(quizId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
+    const res = request(
+        'POST',
+        SERVER_URL + `/v1/admin/quiz/${quizId}/question`,
+        {
+            json: {
+                token: token,
+                questionBody: {
+                    question,
+                    duration,
+                    points,
+                    answers
+                }
+            }
+        }
+    );
+    return {
+        body: JSON.parse(res.body.toString()),
+        statusCode: JSON.parse(res.statusCode.toString())
+    };
 }
