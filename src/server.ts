@@ -9,6 +9,12 @@ import fs from 'fs';
 import {
   adminQuizDescriptionUpdate,
 } from './quiz'
+import{
+  adminAuthRegister,
+} from './auth'
+import { 
+  clear
+} from './other'
 
 // Set up web app
 const app = express();
@@ -40,6 +46,7 @@ app.get('/echo', (req: Request, res: Response) => {
   return res.json(ret);
 });
 
+<<<<<<< HEAD
 // adminQuizDescriptionUpdate //
 app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
@@ -60,6 +67,22 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   }
   res.json(result)
 }) 
+=======
+// adminAuthRegister // 
+app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
+  //const { email, password, nameFirst, nameLast } = req.body;
+  const result = adminAuthRegister(req.body.email, req.body.password, req.body.nameFirst, req.body.nameLast);
+  if ('error' in result) {
+    res.status(400);
+  }
+  res.json(result);
+})
+  
+// clear // 
+app.delete('/v1/clear', (req: Request, res: Response) => {
+  res.json(clear());
+});
+>>>>>>> 0f0fef1078c6d1df379f9b858d50ca07f094cbc6
 
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
