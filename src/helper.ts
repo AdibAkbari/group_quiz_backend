@@ -1,4 +1,4 @@
-import { getData, setData, Data, Quizzes } from './dataStore';
+import { getData, setData, Data, Quizzes, Token, Users } from './dataStore';
 
 // HELPER FUNCTIONS
 
@@ -19,6 +19,44 @@ export function isValidUserId(authUserId: number): boolean {
       }
     }
     return false;
+  }
+
+   /**
+   * Helper function to determine whether token is a valid structure
+   * 
+   * @param {string} token 
+   * @returns {boolean}
+   */
+  export function isValidTokenStructure(token: string): boolean {
+    if (/^\d+$/.test(token)) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * checks whether a given token corresponds to a tokenId that is logged in
+   * 
+   * @param {string} token 
+   * @returns {boolean}
+   */
+  export function isTokenLoggedIn(token: string): boolean {
+    const data: Data = getData();
+    if (data.tokens.find(id => id.tokenId === token) === undefined) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * from a tokenId, return the corresponding userId
+   * 
+   * @param {string} token 
+   * @returns {number} userId
+   */  
+  export function findUserFromToken(token: string): number  {
+    const data: Data = getData();
+    return (data.tokens.find(id => id.tokenId === token)).userId;
   }
   
   /**
