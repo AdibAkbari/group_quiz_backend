@@ -1,6 +1,6 @@
 import { setData, getData, Error, Data, Users, Token } from './dataStore';
 import validator from 'validator';
-import { isValidUserId, findUserIndex, isWhiteSpace } from './helper';
+import { isValidTokenStructure, isTokenLoggedIn, findUserFromToken, isWhiteSpace } from './helper';
 
 export interface UserId {
     authUserId: number;
@@ -79,7 +79,7 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
   store.users.push(user);
   
   const timeNow: number = Math.floor((new Date()).getTime() / 1000);
-  const tokenId: string = (Math.random() * timeNow).toString();
+  const tokenId: string = (Math.floor(Math.random() * timeNow)).toString();
   const token: Token = { tokenId, userId }; 
   store.tokens.push(token);
   setData(store);
@@ -128,10 +128,10 @@ export function adminAuthLogin(email: string, password: string): Error | UserId 
 }
 
 /**
- * Given an admin user's authUserId, return details about the user.
+ * Given an admin user's token, return details about the user.
  * "name" is the first and last name concatenated with a single space between them.
  *
- * @param {number} authUserId
+ * @param {number} token
  * @returns {{user: {
  *              userId: number,
  *              name: string,
@@ -140,31 +140,33 @@ export function adminAuthLogin(email: string, password: string): Error | UserId 
  *              numFailedPasswordsSinceLastLogin: number
  *              }}}
  */
-export function adminUserDetails(authUserId: number): User | Error {
+export function adminUserDetails(token: string): User | Error {
   const data: Data = getData();
 
-  if (!isValidUserId(authUserId)) {
+  if (!isValidTokenStructure(token)) {
     return {
-      error: 'AuthUserId is not a valid user'
+      error: 'token is an invalid structure'
     };
   }
 
-  const i = findUserIndex(authUserId);
-  if (i === -1) {
+  if(!isTokenLoggedIn(token)) {
     return {
-      error: 'AuthUserId is not a valid user'
+      error: 'token is not logged in'
     };
   }
-  const name = `${data.users[i].nameFirst} ${data.users[i].nameLast}`;
+
+  const userId = findUserFromToken(token);
+  const index = data.users.findIndex(id => id.authUserId === userId);
+  const name = `${data.users[index].nameFirst} ${data.users[index].nameLast}`;
 
   return {
     user:
         {
-          userId: data.users[i].authUserId,
+          userId: data.users[index].authUserId,
           name: name,
-          email: data.users[i].email,
-          numSuccessfulLogins: data.users[i].numSuccessfulLogins,
-          numFailedPasswordsSinceLastLogin: data.users[i].numFailedPasswordsSinceLastLogin,
+          email: data.users[index].email,
+          numSuccessfulLogins: data.users[index].numSuccessfulLogins,
+          numFailedPasswordsSinceLastLogin: data.users[index].numFailedPasswordsSinceLastLogin,
         }
   };
 }
