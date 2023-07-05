@@ -9,6 +9,10 @@ import fs from 'fs';
 import {
   adminAuthRegister,
 } from './auth'
+import {
+  adminQuizCreate,
+  adminQuizNameUpdate,
+} from './quiz'
 import { clear } from './other'
 
 // Set up web app
@@ -51,22 +55,39 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   res.json(result);
 })
 
+// adminQuizCreate // 
+app.post('/v1/admin/quiz', (req: Request, res: Response) => {
+  const response = adminQuizCreate(req.body.token, req.body.name, req.body.description);
+  if ('error' in response) {
+    if (response.error.includes("Structure")) {
+      return res.status(401).json(response);
+    } else if (response.error.includes("logged")) {
+      return res.status(403).json(response);
+    } else if (response.error.includes("Name") || response.error.includes("Description")) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+})
+
 // adminQuizNameUpdate // 
-app.post('/v1/admin/quiz/{quizid}/name', (req: Request, res: Response) => {
-    const result = adminQuizNameUpdate(req.body.token, req.params.quizid, req.body.name);
+app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
+    const response = adminQuizNameUpdate(req.body.token, req.params.quizid, req.body.name);
     
-    if ('error' in result) {
-      res.status(401);
-    } else if ('error' in result) {
-      res.status(403);
-    } else if ('Invalid QuizId' in result) {
-      res.status(400);
-    } else if ('Invalid Name' in result) {
-      res.status(400);
-    } 
+    if ('error' in response) {
+      if (response.error.includes("Structure")) {
+        return res.status(401).json(response);
+      } else if (response.error.includes("logged")) {
+        return res.status(403).json(response);
+      } else if (response.error.includes("Name") || response.error.includes("QuizId") || 
+                 response.error.includes("own") || response.error.includes("white space")) {
+        return res.status(400).json(response);
+      }
+    }
     
-    res.json(result);
-  })
+    res.json(response);
+})
+
   
 // clear // 
 app.delete('/v1/clear', (req: Request, res: Response) => {

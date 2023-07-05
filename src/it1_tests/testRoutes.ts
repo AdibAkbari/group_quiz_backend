@@ -28,12 +28,12 @@ export function authRegisterRequest(email: string, password: string, nameFirst: 
     };
 }
 
-export function quizNameUpdateRequest(tokenId: string, quizId: number, name: string) {
+export function quizCreateRequest(token: string, name: string, description: string) {
     const res = request(
-        'PUT',
-        SERVER_URL + `/v1/admin/quiz/${quizid}/name`,
+        'POST',
+        SERVER_URL + '/v1/admin/quiz',
         {
-          json: { token, name },
+          json: { token: token, name: name, description: description},
         }
     );
     return {
@@ -41,6 +41,21 @@ export function quizNameUpdateRequest(tokenId: string, quizId: number, name: str
         statusCode: JSON.parse(res.statusCode.toString())
     };
 }
+
+export function quizNameUpdateRequest(token: string, quizid: number, name: string) {
+    const res = request(
+        'PUT',
+        SERVER_URL + `/v1/admin/quiz/${quizid}/name`,
+        {
+          json: { token: token, name: name},
+        }
+    );
+    return {
+        body: JSON.parse(res.body.toString()),
+        statusCode: JSON.parse(res.statusCode.toString())
+    };
+}
+        
 
 export function clearRequest() {
     const res = request(
