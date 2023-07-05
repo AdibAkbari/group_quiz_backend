@@ -22,13 +22,13 @@ export interface User {
 
 /**
  * Register a user with an email, password, and names, then returns their
- * authUserId value.
+ * token value.
  *
  * @param {string} email
  * @param {string} password
  * @param {string} nameFirst
  * @param {string} nameLast
- * @returns {{authUserId: number}}
+ * @returns {{token: number}}
  */
 export function adminAuthRegister (email: string, password: string, nameFirst: string, nameLast: string): Error | TokenId {
   const store = getData();

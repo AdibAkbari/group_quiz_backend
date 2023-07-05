@@ -50,7 +50,7 @@ app.get('/echo', (req: Request, res: Response) => {
 // adminQuizDescriptionUpdate //
 app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
-  const { userId, description } = req.body;
+  const { token, description } = req.body;
   const result = adminQuizDescriptionUpdate(userId, quizId, description);
 
   if (

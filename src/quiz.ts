@@ -1,5 +1,13 @@
 import { getData, setData, Data, Error } from './dataStore';
-import { checkNameValidity, isValidCreator, isValidQuizId, isValidUserId, isWhiteSpace } from './helper';
+import { 
+  checkNameValidity, 
+  isValidCreator, 
+  isValidQuizId, 
+  isValidUserId, 
+  isWhiteSpace, 
+  isValidTokenStructure, 
+  isTokenLoggedIn, 
+  findUserFromToken} from './helper';
 
 interface QuizList {
     quizId: number,
@@ -216,16 +224,12 @@ export function adminQuizNameUpdate(authUserId: number, quizId: number, name: st
  * of the owner of the quiz, the quizId of the quiz to change and the
  * new description.
  *
- * @param {number} authUserId
  * @param {number} quizId
+ * @param {string} token
  * @param {string} description
  * @returns {{ }}
  */
-export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, description: string): Record<string, never> | Error {
-  if (!isValidUserId(authUserID)) {
-    return { error: 'authUserId does not refer to valid user' };
-  }
-
+export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, description: string): Record<string, never> | Error {
   if (!isValidQuizId(quizId)) {
     return { error: 'quizId does not refer to valid quiz' };
   }
@@ -236,6 +240,14 @@ export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, 
 
   if (description.length > 100) {
     return { error: 'description must be less than 100 characters' };
+  }
+
+  if (!isValidTokenStructure(tokenId)) {
+    return { error: 'token is not a valid structure' };
+  }
+
+  if (!isTokenLoggedIn(tokenId)) {
+    return { error: 'token is not for a currently logged in session' }
   }
 
   const store: Data = getData();

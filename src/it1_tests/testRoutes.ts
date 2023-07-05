@@ -28,6 +28,20 @@ export function authRegisterRequest(email: string, password: string, nameFirst: 
     };
 }
 
+export function quizDescriptionUpdateRequest(quizId: number, token: string, description: string) {
+    const res = request(
+        'PUT',
+        SERVER_URL + '/v1/admin/quiz/:quizid/description',
+        {
+            json: { quizId: quizId, token: token, description: description},
+        }
+    );
+    return {
+        body: JSON.parse(res.body.toString()),
+        statusCode: JSON.parse(res.statusCode.toString())
+    };
+}
+
 export function adminUserDetailsRequest(token: string) {
     const res = request(
         'GET',
