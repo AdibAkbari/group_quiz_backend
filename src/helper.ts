@@ -2,6 +2,9 @@ import { getData, setData, Data, Quizzes } from './dataStore';
 
 // HELPER FUNCTIONS
 
+
+// SHOULD BE ABLE TO DELETE THIS //
+// since we only check token validity now //
 /**
  * Checks whether a given number is a valid user id
  *
@@ -20,23 +23,46 @@ export function isValidUserId(authUserId: number): boolean {
     }
     return false;
   }
-  
+
   /**
-   * finds the array index of a given user id
-   *
-   * @param {number} authUserId
-   * @returns {number} index number that corresponds to user id
+   * Helper function to determine whether token is a valid structure
+   * 
+   * @param {string} token 
+   * @returns {boolean}
    */
-  export function findUserIndex(authUserId: number): number {
-    const data: Data = getData();
-    for (const i in data.users) {
-      if (data.users[i].authUserId === authUserId) {
-        return parseInt(i);
-      }
+  export function isValidTokenStructure(token: string): boolean {
+    if (/^\d+$/.test(token)) {
+      return true;
     }
-    return -1;
+    return false;
+  }
+
+  /**
+   * checks whether a given token corresponds to a tokenId that is logged in
+   * 
+   * @param {string} token 
+   * @returns {boolean}
+   */
+  export function isTokenLoggedIn(token: string): boolean {
+    const data: Data = getData();
+    if (data.tokens.find(id => id.tokenId === token) === undefined) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * from a tokenId, return the corresponding userId
+   * 
+   * @param {string} token 
+   * @returns {number} userId
+   */  
+  export function findUserFromToken(token: string):number  {
+    const data: Data = getData();
+    return (data.tokens.find(id => id.tokenId === token)).userId;
   }
   
+
   /**
    * Helper function to determine if the quizId exist
    *
@@ -58,6 +84,8 @@ export function isValidUserId(authUserId: number): boolean {
   
     return false;
   }
+
+  
   
   /**
    * Helper function to determine if Quiz ID does not refer to a quiz that this user owns
