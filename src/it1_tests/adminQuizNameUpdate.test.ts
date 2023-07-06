@@ -4,7 +4,7 @@ import {
     clearRequest, 
     authRegisterRequest, 
     quizNameUpdateRequest, 
-    //quizInfoRequest, 
+    quizInfoRequest, 
     quizCreateRequest,
        } from './testRoutes';
 
@@ -140,13 +140,16 @@ describe('Valid adminQuizNameUpdate', () => {
     const newQuiz = quizNameUpdateRequest(user.token, quiz.quizId, name);
     expect(newQuiz.body).toStrictEqual({});
     expect(newQuiz.statusCode).toStrictEqual(200);
-    // expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual({
-    //   quizId: quiz.quizId,
-    //   name: name,
-    //   timeCreated: expect.any(Number),
-    //   timeLastEdited: expect.any(Number),
-    //   description: '',
-    // });
+    
+    const quizInfo = quizInfoRequest(user.token, quiz.quizId);
+    expect(quizInfo.body).toStrictEqual({
+        quizId: quiz.quizId,
+        name: name,
+        timeCreated: expect.any(Number),
+        timeLastEdited: expect.any(Number),
+        description: '',
+    });
+    expect(quizInfo.statusCode).toStrictEqual(200);
 
   });
 });

@@ -105,12 +105,5 @@ export function clearRequest() {
         'DELETE',
         SERVER_URL + '/v1/clear'
     );
-    // return JSON.parse(res.body.toString())
-
-    try {
-        JSON.parse(res.body.toString())
-    }
-    catch (error) {
-        console.log('Error', error, res.body.toString())
-    }
+    return JSON.parse(res.body.toString())
 }

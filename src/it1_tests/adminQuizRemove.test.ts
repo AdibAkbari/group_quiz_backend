@@ -1,7 +1,7 @@
 import { 
     clearRequest, 
     authRegisterRequest, 
-    //quizInfoRequest, 
+    quizInfoRequest, 
     quizCreateRequest,
     quizRemoveRequest,
     adminQuizListRequest, 
@@ -122,12 +122,17 @@ describe('Successfully removed quiz check', () => {
   });
 
   // check that once a quiz is removed, the quiz id no longer exists
-//   test('No quiz Id once a quiz is removed', () => {
-//     adminQuizRemove(user.authUserId, quiz.quizId);
-//     expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual(ERROR);
-//     adminQuizCreate(user.authUserId, 'quiz2', '');
-//     expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual(ERROR);
-//   });
+  test('No quiz Id once a quiz is removed', () => {
+    quizRemoveRequest(user.token, quiz.quizId);
+    const quizInfo = quizInfoRequest(user.token, quiz.quizId);
+    expect(quizInfo.body).toStrictEqual(ERROR);
+    expect(quizInfo.statusCode).toStrictEqual(400);
+
+    quizCreateRequest(user.token, 'quiz2', '');
+    const quizInfo2 = quizInfoRequest(user.token, quiz.quizId);
+    expect(quizInfo2.body).toStrictEqual(ERROR);
+    expect(quizInfo2.statusCode).toStrictEqual(400);
+  });
 
   // check that once a quiz is removed, the next quiz still has a unique quiz id
   test('Unique quiz Id once a quiz is removed', () => {
