@@ -10,6 +10,7 @@
 
 * 16/06: `adminQuizDescriptionUpdate` has correct error conditions added.
 * 03/07: See commit for changes - mostly slight fixes to swagger and other tweaks. 4.10. "Error Returning" also has some clearer explanations of the order to throw errors in.
+* 04/07: Clarification of the order of errors to be thrown in. The docs automatically changed the ordering from how they're defined. See section 4.10.
 
 ## 🫡 0. Aims:
 
@@ -1004,7 +1005,7 @@ Either a `400 (Bad Request)` or `401 (Unauthorized)` or `403 (Forbidden)` is thr
 
 To throw one of these errors, simply use the code `res.status(400).send(JSON.stringify({ error: 'specific error message here' }))` or `res.status(400).json({ error: 'specific error message here' })` in your server where 400 is the error.
 
-Errors are thrown in the order that they are defined in the swagger doc, which is typically 400, then 401, then 403.
+Errors are thrown in the order that they are defined in the swagger doc, which is typically 401, then 403, then 400.
 
 ### 🐝 4.11. Working with the frontend
 
