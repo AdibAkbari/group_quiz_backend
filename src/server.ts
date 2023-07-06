@@ -72,7 +72,10 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
 
 // adminQuizNameUpdate // 
 app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
-    const response = adminQuizNameUpdate(req.body.token, req.params.quizid, req.body.name);
+    const token = req.body.token as string;
+    const name = req.body.name as string;
+    
+    const response = adminQuizNameUpdate(token, parseInt(req.params.quizid), name);
     
     if ('error' in response) {
       if (response.error.includes("Structure")) {
