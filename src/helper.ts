@@ -89,7 +89,7 @@ export function isValidUserId(authUserId: number): boolean {
   
     const data: Data = getData();
     for (const current of data.quizzes) {
-      if (current.quizId == quizId) {
+      if (current.quizId === quizId) {
         return true;
       }
     }
@@ -108,8 +108,8 @@ export function isValidUserId(authUserId: number): boolean {
   export function isValidCreator(quizId: number, authUserID: number): boolean {
     const data: Data = getData();
     for (const current of data.quizzes) {
-      if (current.quizId == quizId) {
-        if (current.creator == authUserID) {
+      if (current.quizId === quizId) {
+        if (current.creator === authUserID) {
           return true;
         }
       }

@@ -7,11 +7,12 @@ import YAML from 'yaml';
 import sui from 'swagger-ui-express';
 import fs from 'fs';
 import {
-  adminAuthRegister,
+  adminAuthRegister, adminUserDetails,
 } from './auth'
 import {
   adminQuizCreate,
   adminQuizRemove,
+  adminQuizList,
 } from './quiz'
 import { clear } from './other'
 
@@ -55,6 +56,21 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   res.json(result);
 })
 
+// adminQuizList //
+app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
+  const token = req.query.token as string;
+  const response = adminQuizList(token);
+  if ('error' in response) {
+    if (response.error.includes("structure")) {
+      return res.status(401).json(response);
+    } else if (response.error.includes("logged")) {
+      return res.status(403).json(response);
+    }
+  }
+  res.json(response);
+})
+
+
 // adminQuizCreate // 
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const response = adminQuizCreate(req.body.token, req.body.name, req.body.description);
@@ -72,7 +88,7 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
 
 // adminQuizRemove // 
 app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
-  const response = adminQuizRemove(req.query.token, req.params.quizid);
+  const response = adminQuizRemove(req.query.token, parseInt(req.params.quizid));
   if ('error' in response) {
     if (response.error.includes("Structure")) {
       return res.status(401).json(response);

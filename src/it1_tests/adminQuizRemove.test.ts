@@ -4,6 +4,7 @@ import {
     //quizInfoRequest, 
     quizCreateRequest,
     quizRemoveRequest,
+    adminQuizListRequest, 
 } from './testRoutes';
 
 
@@ -90,35 +91,35 @@ describe('Successfully removed quiz check', () => {
   });
 
   // Check that the quiz is actually removed
-//   test('Sucessful quiz remove integrated check', () => {
-//     const quiz2 = adminQuizCreate(user.authUserId, 'quiz2', '');
-//     const quizToRemove = adminQuizCreate(user.authUserId, 'quizToRemove', '');
-//     const quiz3 = adminQuizCreate(user.authUserId, 'quiz3', '');
+  test('Sucessful quiz remove integrated check', () => {
+    const quiz2 = quizCreateRequest(user.token, 'quiz2', '').body;
+    const quizToRemove = quizCreateRequest(user.token, 'quizToRemove', '').body;
+    const quiz3 = quizCreateRequest(user.token, 'quiz3', '').body;
 
-//     adminQuizRemove(user.authUserId, quizToRemove.quizId);
+    quizRemoveRequest(user.token, quizToRemove.quizId);
 
-//     const received = adminQuizList(user.authUserId);
-//     const expected = {
-//       quizzes: [
-//         {
-//           quizId: quiz.quizId,
-//           name: 'quiz1',
-//         },
-//         {
-//           quizId: quiz2.quizId,
-//           name: 'quiz2',
-//         },
-//         {
-//           quizId: quiz3.quizId,
-//           name: 'quiz3',
-//         },
-//       ]
-//     };
+    const received = adminQuizListRequest(user.token).body;
+    const expected = {
+      quizzes: [
+        {
+          quizId: quiz.quizId,
+          name: 'quiz1',
+        },
+        {
+          quizId: quiz2.quizId,
+          name: 'quiz2',
+        },
+        {
+          quizId: quiz3.quizId,
+          name: 'quiz3',
+        },
+      ]
+    };
 
-//     const receivedSet = new Set(received.quizzes);
-//     const expectedSet = new Set(expected.quizzes);
-//     expect(receivedSet).toStrictEqual(expectedSet);
-//   });
+    const receivedSet = new Set(received.quizzes);
+    const expectedSet = new Set(expected.quizzes);
+    expect(receivedSet).toStrictEqual(expectedSet);
+  });
 
   // check that once a quiz is removed, the quiz id no longer exists
 //   test('No quiz Id once a quiz is removed', () => {
