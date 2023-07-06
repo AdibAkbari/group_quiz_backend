@@ -11,6 +11,7 @@
 * 16/06: `adminQuizDescriptionUpdate` has correct error conditions added.
 * 03/07: See commit for changes - mostly slight fixes to swagger and other tweaks. 4.10. "Error Returning" also has some clearer explanations of the order to throw errors in.
 * 04/07: Clarification of the order of errors to be thrown in. The docs automatically changed the ordering from how they're defined. See section 4.10.
+* 05/07: Correctly stated auth/logout is `POST` (previously it was `PUT`); GET `admin/quiz/{quizid}` no longer includes thumbnail; `trash/empty` route now correctly includes the `quizIds` in query.
 
 ## 🫡 0. Aims:
 

@@ -243,8 +243,6 @@ components:
           $ref: '#/components/prim/QuizQuestion'
         duration:
           $ref: '#/components/prim/QuizQuestionDuration'
-        thumbnailUrl:
-          $ref: '#/components/prim/Url'
         points:
           $ref: '#/components/prim/QuizQuestionPoints'
         answers:
@@ -626,15 +624,12 @@ components:
           $ref: '#/components/prim/Token'
     QuizTrashEmptyIter2:
       in: query
-      name: token
+      name: quizIds
       required: true
       schema:
-        token:
-          $ref: '#/components/prim/Token'
-        quizIds:
-          type: string
-          example: "[3,4,5,6,7]"
-          description: A JSONified array of quiz id numbers
+        type: string
+        example: "[3,4,5,6,7]"
+        description: A JSONified array of quiz id numbers
     QuizTrashEmptyIter3:
       in: body
       name: body
@@ -954,7 +949,7 @@ paths:
             $ref: '#/components/return/Error'
 
   /v1/admin/auth/logout:
-    put:
+    post:
       summary: Logs out an admin user who has an active session.
       description: Should be called with a token that is returned after either a login or register has been made.
       tags:
@@ -1137,7 +1132,7 @@ paths:
         - "Iteration 2 (Using Iteration 1)"
       parameters:
         - $ref: '#/components/path/QuizId'
-        - $ref: '#/components/body/QuizDeleteIter2'
+        - $ref: '#/components/query/Token'
       responses:
         200:
           description: OK
@@ -1312,6 +1307,7 @@ paths:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (New)"
       parameters:
+        - $ref: '#/components/query/Token'
         - $ref: '#/components/body/QuizTrashEmptyIter2'
       responses:
         200:
