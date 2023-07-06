@@ -97,18 +97,11 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
  * @param {string} password
  * @returns {{authUserId: number}}
  */
-export function adminAuthLogin(email: string, password: string): Error | UserId {
-  let emailExists = false;
-  const newData: Data = getData();
-  let userIndex: number;
+export function adminAuthLogin(email: string, password: string): Error | TokenId {
+  const newData = getData();
+  const userIndex = newData.users.findIndex((user) => user.email === email);
 
-  for (const user of newData.users) {
-    if (user.email === email) {
-      emailExists = true;
-      userIndex = newData.users.indexOf(user);
-    }
-  }
-  if (emailExists === false) {
+  if (userIndex === -1) {
     return { error: 'email does not exist' };
   }
 
@@ -117,13 +110,14 @@ export function adminAuthLogin(email: string, password: string): Error | UserId 
     setData(newData);
     return { error: 'password does not match given email' };
   }
+
   newData.users[userIndex].numSuccessfulLogins++;
   newData.users[userIndex].numFailedPasswordsSinceLastLogin = 0;
 
   setData(newData);
 
   return {
-    authUserId: newData.users[userIndex].authUserId,
+    token: newData.users[userIndex].authUserId.toString()
   };
 }
 
