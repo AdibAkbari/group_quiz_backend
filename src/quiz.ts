@@ -18,6 +18,14 @@ interface QuizCreate {
     quizId: number,
 }
 
+interface QuizInfo {
+    quizId: number, 
+    name: string, 
+    timeCreated: number, 
+    timeLastEdited: number, 
+    description: string
+}
+
 /**
  * Provide a list of all quizzes that are owned by the currently logged in user.
  *
@@ -145,7 +153,7 @@ export function adminQuizRemove(authUserId: number, quizId: number): Record<stri
 /**
  * Get all of the relevant information about the current quiz.
  *
- * @param {number} authUserId
+ * @param {string} token
  * @param {number} quizId
  * @returns {{
  *           quizId: number,
@@ -155,19 +163,23 @@ export function adminQuizRemove(authUserId: number, quizId: number): Record<stri
  *           description: string,
  *          }}
  */
-export function adminQuizInfo(authUserId: number, quizId: number): Error | {
-    quizId: number, name: string, timeCreated: number, timeLastEdited: number, description: string
-} {
-  if (!isValidUserId(authUserId)) {
-    return { error: 'authUserId does not refer to valid user' };
+export function adminQuizInfo(token: string, quizId: number): Error | QuizInfo {
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
   }
 
   if (!isValidQuizId(quizId)) {
-    return { error: 'quizId does not refer to valid quiz' };
+    return { error: 'Invalid: QuizId' };
   }
 
+  const authUserId = findUserFromToken(token);
+
   if (!isValidCreator(quizId, authUserId)) {
-    return { error: 'quizId does not refer to quiz that this user owns' };
+    return { error: 'Invalid: Creator' };
   }
 
   const data: Data = getData();
@@ -182,10 +194,6 @@ export function adminQuizInfo(authUserId: number, quizId: number): Error | {
       };
     }
   }
-
-  return {
-    error: 'Quiz could not be found'
-  };
 }
 
 /**

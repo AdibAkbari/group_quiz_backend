@@ -55,7 +55,21 @@ export function quizNameUpdateRequest(token: string, quizid: number, name: strin
         statusCode: JSON.parse(res.statusCode.toString())
     };
 }
-        
+
+
+export function quizInfoRequest (token: string, quizid: number) {
+    const res = request(
+        'GET',
+        SERVER_URL + `/v1/admin/quiz/${quizid}`,
+        {
+          qs: { token: token},
+        }
+    );
+    return {
+        body: JSON.parse(res.body.toString()),
+        statusCode: JSON.parse(res.statusCode.toString())
+    };
+}
 
 export function clearRequest() {
     const res = request(

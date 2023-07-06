@@ -91,6 +91,25 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
     res.json(response);
 })
 
+// adminQuizInfo // 
+app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+    const token = req.query.token as string;
+    const response = adminQuizInfo(token, parseInt(req.params.quizid));
+    
+    if ('error' in response) {
+      if (response.error.includes("Structure")) {
+        return res.status(401).json(response);
+      } else if (response.error.includes("logged")) {
+        return res.status(403).json(response);
+      } else if (response.error.includes("Creator") || response.error.includes("QuizId")) {
+        return res.status(400).json(response);
+      }
+    }
+    
+    res.json(response);
+})
+
+
   
 // clear // 
 app.delete('/v1/clear', (req: Request, res: Response) => {
