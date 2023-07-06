@@ -21,5 +21,3 @@ export function clear (): Record<string, never> {
 
   return { };
 }
-
-

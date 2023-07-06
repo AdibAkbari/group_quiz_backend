@@ -1,19 +1,22 @@
 import {
   authRegisterRequest,
   authLoginRequest,
-  // userDetailsRequest
+  adminUserDetailsRequest,
+  clearRequest
 } from './testRoutes';
-import { clear } from '../other';
 
+interface TokenId {
+  token: string
+}
 const ERROR = { error: expect.any(String) };
-let user;
-beforeEach(() => {
-  clear();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
-});
-describe("adminAuthLogin", () => {
+let user: TokenId;
 
-  describe("error cases", () => {
+beforeEach(() => {
+  clearRequest();
+  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
+});
+describe('adminAuthLogin', () => {
+  describe('error cases', () => {
     test('Email address does not exist', () => {
       expect(authLoginRequest('emailFail@gmail.com', 'password1')).toStrictEqual(ERROR);
     });
@@ -27,10 +30,10 @@ describe("adminAuthLogin", () => {
         expect(authLoginRequest('email@gmail.com', 'password2')).toStrictEqual(ERROR);
       });
 
-      test.skip('Correct incrementation of numFailedPasswordsSinceLastLogin', () => {
+      test('Correct incrementation of numFailedPasswordsSinceLastLogin', () => {
         authLoginRequest('email@gmail.com', 'password2');
         expect(
-          adminUserDetails(user.authUserId).user.numFailedPasswordsSinceLastLogin
+          adminUserDetailsRequest(user.token).body.user.numFailedPasswordsSinceLastLogin
         ).toBe(1);
       });
     });
@@ -42,16 +45,16 @@ describe("adminAuthLogin", () => {
         { token: expect.any(String) });
     });
 
-    test.skip('Correct incrementation of numSuccessfulLogins', () => {
+    test('Correct incrementation of numSuccessfulLogins', () => {
       authLoginRequest('email@gmail.com', 'password1');
       expect(
-        adminUserDetails(user.authUserId).user.numSuccessfulLogins
+        adminUserDetailsRequest(user.token).body.user.numSuccessfulLogins
       ).toBe(2);
     });
-    test.skip('Correct reset of numFailedPasswordsSinceLastLogin', () => {
+    test('Correct reset of numFailedPasswordsSinceLastLogin', () => {
       authLoginRequest('email@gmail.com', 'password1');
       expect(
-        adminUserDetails(user.authUserId).user.numFailedPasswordsSinceLastLogin
+        adminUserDetailsRequest(user.token).body.user.numFailedPasswordsSinceLastLogin
       ).toBe(0);
     });
   });
