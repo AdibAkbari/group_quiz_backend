@@ -161,24 +161,12 @@ export function adminQuizRemove(token: number, quizId: number): Record<string, n
   }
 
   const data: Data = getData();
-  for (const i in data.quizzes) {
-    if (data.quizzes[i].quizId === quizId) {
-      data.trash.push(
-        {
-          quizId: data.quizzes[i].quizId,
-          name: data.quizzes[i].name,
-          timeCreated: data.quizzes[i].timeCreated,
-          timeLastEdited: data.quizzes[i].timeLastEdited,
-          description: data.quizzes[i].description,
-          numQuestions: data.quizzes[i].numQuestions,
-          questions: data.quizzes[i].questions,
-          creator: data.quizzes[i].creator,
-          duration: data.quizzes[i].duration,
-        }
-      );
-      data.quizzes.splice(parseInt(i), 1);
-      setData(data);
-    }
+  const index = data.quizzes.findIndex((quiz) => quiz.quizId === quizId);
+
+  if (index !== -1) {
+    data.trash.push(data.quizzes[index]);
+    data.quizzes.splice(index, 1);
+    setData(data);
   }
 
   return { };
