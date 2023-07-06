@@ -35,10 +35,18 @@ export function clearRequest() {
     );
     return JSON.parse(res.body.toString())
 
-    // try {
-    //     JSON.parse(res.body.toString())
-    // }
-    // catch (error) {
-    //     console.log('Error', error, res.body.toString())
-    // }
+}
+
+export function authLogoutRequest(tokenId: string) {
+    const res = request(
+        'PUT',
+        SERVER_URL + '/v1/admin/auth/logout',
+        {
+            json: { tokenId: tokenId},
+        }
+    );
+    return {
+        body: JSON.parse(res.body.toString()),
+        statusCode: JSON.parse(res.statusCode.toString())
+    };
 }

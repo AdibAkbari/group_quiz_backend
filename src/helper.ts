@@ -43,8 +43,9 @@ export function isValidUserId(authUserId: number): boolean {
    * @param {string} token 
    * @returns {boolean}
    */
-  export function isTokenLoggedIn(token: string): boolean {
+  export function isTokenLoggedIn(token: string) {
     const data: Data = getData();
+    console.log(data);
     if (data.tokens.find(id => id.tokenId === token) === undefined) {
       return false;
     }

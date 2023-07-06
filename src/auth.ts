@@ -1,6 +1,6 @@
 import { setData, getData, Error, Data, Users, Token } from './dataStore';
 import validator from 'validator';
-import { isValidUserId, findUserIndex, isWhiteSpace } from './helper';
+import { isValidUserId, findUserIndex, isWhiteSpace, isValidTokenStructure, isTokenLoggedIn } from './helper';
 
 export interface UserId {
     authUserId: number;
@@ -167,4 +167,28 @@ export function adminUserDetails(authUserId: number): User | Error {
           numFailedPasswordsSinceLastLogin: data.users[i].numFailedPasswordsSinceLastLogin,
         }
   };
+}
+
+/**
+ * Given a session token, log out the user.
+ *
+ * @param {string} tokenId
+ * @returns {{ }} Empty Object
+*/
+export function adminAuthLogout (tokenId: string): Record<string, never> | Error {
+  const data: Data = getData();
+
+  if (!isValidTokenStructure(tokenId)) {
+    return { error: 'Token is not a valid structure' };
+  }
+
+  if (!isTokenLoggedIn(tokenId)) {
+    return { error: 'This token is for a user who has already logged out' };
+  }
+
+  const index: number = data.tokens.findIndex(token => token.tokenId === tokenId);
+  data.tokens.splice(index, 1);
+  setData(data);
+  return { };
+
 }

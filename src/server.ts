@@ -8,6 +8,7 @@ import sui from 'swagger-ui-express';
 import fs from 'fs';
 import {
   adminAuthRegister,
+  adminAuthLogout,
 } from './auth'
 import { clear } from './other'
 
@@ -54,6 +55,19 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
 // clear // 
 app.delete('/v1/clear', (req: Request, res: Response) => {
   res.json(clear());
+});
+
+// adminAuthLogout //
+app.put('/v1/admin/auth/logout', (req: Request, res: Response) => {
+  const response = adminAuthLogout(req.body.tokenId);
+  if ('error' in response) {
+    if (response.error.includes("structure")) {
+      return res.status(401).json(response);
+    } else if (response.error.includes("logged")) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
 });
 
 // ====================================================================
