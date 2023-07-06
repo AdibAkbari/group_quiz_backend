@@ -80,10 +80,16 @@ describe('Invalid adminQuizNameUpdate', () => {
 
   // Output error if new name contains not alphanumeric characters
   test.each([
-    { name: '!@#$%^&*' },
-    { name: 'user\'s test' },
-    { name: 'test1;' },
-  ])('Name contains any characters that are not alphanumeric or are spaces: "$name"', ({ name }) => {
+    { name: '!@#$%^&*', 
+      test: 'No letters'
+    },
+    { name: 'user\'s test',
+      test: 'Invalid apostrophe' 
+    },
+    { name: 'test1;',
+      test: 'Invalid semi colon'  
+    },
+  ])('"$test": "$name"', ({ name, test }) => {
     const newQuiz = quizNameUpdateRequest(user.token, quiz.quizId, name);
     expect(newQuiz.body).toStrictEqual(ERROR);
     expect(newQuiz.statusCode).toStrictEqual(400);
@@ -91,9 +97,13 @@ describe('Invalid adminQuizNameUpdate', () => {
 
   // Output error if new name is either less than 3 characters long or more than 30 characters long
   test.each([
-    { name: 'q1' },
-    { name: 'namemorethanthirtycharacterslong' },
-  ])('Length of name is too short/long: "$name"', ({ name }) => {
+    { name: 'q1',
+      test: '< 3'
+    },
+    { name: 'namemorethanthirtycharacterslong',
+      test: '> 30'
+    },
+  ])('"$test": "$name"', ({ name, test }) => {
     const newQuiz = quizNameUpdateRequest(user.token, quiz.quizId, name);
     expect(newQuiz.body).toStrictEqual(ERROR);
     expect(newQuiz.statusCode).toStrictEqual(400);
