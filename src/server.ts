@@ -88,7 +88,8 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
 
 // adminQuizRemove // 
 app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
-  const response = adminQuizRemove(req.query.token, parseInt(req.params.quizid));
+    const token = req.query.token as string;
+    const response = adminQuizRemove(token, parseInt(req.params.quizid));
   if ('error' in response) {
     if (response.error.includes("Structure")) {
       return res.status(401).json(response);
