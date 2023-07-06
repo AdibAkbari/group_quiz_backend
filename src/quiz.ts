@@ -29,36 +29,48 @@ interface QuizInfo {
 /**
  * Provide a list of all quizzes that are owned by the currently logged in user.
  *
- * @param {number} authUserId
+ * @param {number} token
  * @returns {{quizzes: Array<{
  *                  quizId: number,
  *                  name: string
  *              }>
  *          }}
  */
-export function adminQuizList (authUserId: number): {quizzes: QuizList[]} | Error {
+export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
   const data: Data = getData();
 
-  if (!isValidUserId(authUserId)) {
+  if (!isValidTokenStructure(token)) {
     return {
-      error: 'AuthUserId is not a valid user'
+      error: 'token is an invalid structure'
     };
   }
 
-  const quizzes: QuizList[] = [];
+  if(!isTokenLoggedIn(token)) {
+    return {
+      error: 'token is not logged in'
+    };
+  }
 
+  const authUserId = findUserFromToken(token);
+
+  const newList = data.quizzes.filter(id => id.creator === authUserId);
+  const quizzes: QuizList[] = newList.map((quiz) => { return {quizId: quiz.quizId, name: quiz.name}});
+
+/*
   for (const quiz of data.quizzes) {
     if (quiz.creator === authUserId) {
       const quizId: number = quiz.quizId;
-      const name: string = quiz.name;
+     // const name: string = quiz.name;
       quizzes.push({ quizId, name });
     }
   }
-
+*/
   return {
     quizzes: quizzes
   };
 }
+
+
 
 /**
  * Given basic details about a new quiz, create one for the user.
@@ -122,26 +134,48 @@ export function adminQuizCreate(token: string, name: string, description: string
 /**
  * Given a particular quizId, permanently remove the quiz.
  *
- * @param {number} authUserId
+ * @param {string} token
  * @param {number} quizId
  * @returns {{ }} empty object
  */
-export function adminQuizRemove(authUserId: number, quizId: number): Record<string, never> | Error {
-  if (isValidUserId(authUserId) === false) {
-    return { error: 'AuthUserId is not a valid user' };
+export function adminQuizRemove(token: number, quizId: number): Record<string, never> | Error {
+  // invalid token structure
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
   }
 
-  if (isValidQuizId(quizId) === false) {
-    return { error: 'Quiz ID does not refer to valid quiz' };
+  // token is not logged in
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
   }
 
-  if (isValidCreator(quizId, authUserId) === false) {
-    return { error: 'Quiz ID does not refer to a quiz that this user owns' };
+  if (!isValidQuizId(quizId)) {
+    return { error: 'Invalid: QuizId' };
+  }
+
+  // get authUserId from token 
+  const authUserId = findUserFromToken(token);
+
+  if (!isValidCreator(quizId, authUserId)) {
+    return { error: 'Invalid: user does not own quiz' };
   }
 
   const data: Data = getData();
   for (const i in data.quizzes) {
     if (data.quizzes[i].quizId === quizId) {
+      data.trash.push(
+        {
+          quizId: data.quizzes[i].quizId,
+          name: data.quizzes[i].name,
+          timeCreated: data.quizzes[i].timeCreated,
+          timeLastEdited: data.quizzes[i].timeLastEdited,
+          description: data.quizzes[i].description,
+          numQuestions: data.quizzes[i].numQuestions,
+          questions: data.quizzes[i].questions,
+          creator: data.quizzes[i].creator,
+          duration: data.quizzes[i].duration,
+        }
+      );
       data.quizzes.splice(parseInt(i), 1);
       setData(data);
     }
