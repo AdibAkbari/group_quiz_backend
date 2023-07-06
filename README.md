@@ -9,6 +9,7 @@
 ## Change Log
 
 * 16/06: `adminQuizDescriptionUpdate` has correct error conditions added.
+* 03/07: See commit for changes - mostly slight fixes to swagger and other tweaks. 4.10. "Error Returning" also has some clearer explanations of the order to throw errors in.
 
 ## 🫡 0. Aims:
 
@@ -913,7 +914,7 @@ npm start
 
 This will start the server on the port in the src/server.ts file, using `ts-node`.
 
-If you get an error stating that the address is already in use, you can change the port number in `config.json` to any number from `1024` to `49151`. Is it likely that another student may be using your original port number.
+If you get an error stating that the address is already in use, you can change the port number in `config.json` to any number from `49152` to `65535`. Is it likely that another student may be using your original port number.
 
 ### 🐝 4.3. Implementing and testing features
 
@@ -1003,6 +1004,8 @@ Either a `400 (Bad Request)` or `401 (Unauthorized)` or `403 (Forbidden)` is thr
 
 To throw one of these errors, simply use the code `res.status(400).send(JSON.stringify({ error: 'specific error message here' }))` or `res.status(400).json({ error: 'specific error message here' })` in your server where 400 is the error.
 
+Errors are thrown in the order that they are defined in the swagger doc, which is typically 400, then 401, then 403.
+
 ### 🐝 4.11. Working with the frontend
 
 There is a SINGLE repository available for all students at 
@@ -1030,7 +1033,7 @@ development.
 
 Our recommendation with this iteration is that you start out trying to implement the new functions similarly to how you did in iteration 1.
 
-1. Write HTTP unit tests. These will fail as you have not yet implemented the feature.
+1. Write HTTP tests. These will fail as you have not yet implemented the feature.
     * Hint: It would be a good idea to consider good test design and the usage of helper functions for your HTTP tests. Is there a way so that you do not have to completely rewrite your tests from iteration 1?
 2. Implement the feature and write the Express route/endpoint for that feature too.
   * HINT: make sure GET and DELETE requests utilise query parameters, whereas POST and PUT requests utilise JSONified bodies.

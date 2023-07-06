@@ -189,7 +189,7 @@ components:
         questions:
           type: array
           items:
-            $ref: '#/components/group/QuizQuestion'
+            $ref: '#/components/group/QuizQuestionIter2'
         duration:
           $ref: '#/components/prim/Duration'
 
@@ -220,6 +220,21 @@ components:
           $ref: '#/components/prim/Url'
 
     QuizQuestion:
+      type: object
+      properties:
+        questionId:
+          $ref: '#/components/prim/QuestionId'
+        question:
+          $ref: '#/components/prim/QuizQuestion'
+        duration:
+          $ref: '#/components/prim/QuizQuestionDuration'
+        thumbnailUrl:
+          $ref: '#/components/prim/Url'
+        points:
+          $ref: '#/components/prim/QuizQuestionPoints'
+        answers:
+          $ref: '#/components/prim/QuizQuestionAnswers'
+    QuizQuestionIter2:
       type: object
       properties:
         questionId:
@@ -610,18 +625,16 @@ components:
         token:
           $ref: '#/components/prim/Token'
     QuizTrashEmptyIter2:
-      in: body
-      name: body
+      in: query
+      name: token
       required: true
       schema:
-        type: object
-        properties:
-          token:
-            $ref: '#/components/prim/Token'
-          quizIds:
-            type: string
-            example: "[3,4,5,6,7]"
-            description: A JSONified array of quiz id numbers
+        token:
+          $ref: '#/components/prim/Token'
+        quizIds:
+          type: string
+          example: "[3,4,5,6,7]"
+          description: A JSONified array of quiz id numbers
     QuizTrashEmptyIter3:
       in: body
       name: body
@@ -1147,7 +1160,7 @@ paths:
             $ref: '#/components/return/Error'
     get:
       summary: Get info about current quiz
-      description: Get all of the relevant information about the current quiz including questions
+      description: Get all of the relevant information about the current quiz including questions. Please look at the Colour data type to understand how it's generated.
       tags:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (Using Iteration 1)"
@@ -1360,7 +1373,7 @@ paths:
       summary: Create quiz question
       description: |
         Create a new stub question for a particular quiz.
-        When this route is called, and a question is created, the lastEdited time is set as the same as the created time, and the colours of a question are randomly generated.
+        When this route is called, and a question is created, the lastEdited time for quiz is set as the time this question was created, and the colours of a question are randomly generated.
       tags:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (New)"
