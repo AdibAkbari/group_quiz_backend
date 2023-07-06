@@ -18,6 +18,11 @@ interface QuizCreate {
     quizId: number,
 }
 
+interface Answers {
+  answer: string,
+  correct: boolean
+}
+
 /**
  * Provide a list of all quizzes that are owned by the currently logged in user.
  *
@@ -268,4 +273,19 @@ export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, 
   setData(store);
 
   return { };
+}
+
+
+// NEW FUNCTIONS
+export function createQuizQuestion(quizId: number, token: string, question: string, duration: number, points: number, answers: Answers[]): {questionId: number} | Error {
+
+  if(!isValidQuizId(quizId)) {
+    return {error: 'invalid quiz Id'};
+  }
+  if(!isValidCreator) {
+    return {error: 'invalid quiz Id'};
+  }
+
+
+  return {error: 'nothing written'}
 }

@@ -2,7 +2,9 @@ import {
   quizCreateRequest, 
   authRegisterRequest, 
   clearRequest,
-  createQuizQuestionRequest
+  createQuizQuestionRequest,
+//  quizQuestionDeleteRequest,
+//  adminQuizInfoRequest
 } from './testRoutes';
 
 interface Token {

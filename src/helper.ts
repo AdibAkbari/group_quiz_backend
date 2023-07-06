@@ -88,13 +88,19 @@ export function isValidUserId(authUserId: number): boolean {
     }
   
     const data: Data = getData();
-    for (const current of data.quizzes) {
-      if (current.quizId === quizId) {
-        return true;
-      }
+    // for (const current of data.quizzes) {
+    //   if (current.quizId === quizId) {
+    //     return true;
+    //   }
+    // }
+    // return false;
+
+    if (data.quizzes.find(id => id.quizId === quizId) === undefined) {
+      return false;
     }
+    return true;
   
-    return false;
+    
   }
   
   /**
