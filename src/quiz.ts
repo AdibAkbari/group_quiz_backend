@@ -107,6 +107,7 @@ export function adminQuizCreate(token: string, name: string, description: string
       questions: [],
       creator: authUserId,
       duration: 0,
+      questionCount: 0
     }
   );
   setData(data);
@@ -276,7 +277,6 @@ export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, 
 }
 
 
-// NEW FUNCTIONS
 export function createQuizQuestion(quizId: number, token: string, question: string, duration: number, points: number, answers: Answers[]): {questionId: number} | Error {
 
   // Error checking for token
@@ -334,29 +334,38 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
   }
 
   // Creating new quiz question
+  data.quizzes[index].questionCount++;
+  const questionId: number = data.quizzes[index].questionCount;
 
+  let answerArray: Answer[] = [];
+  let colours = ["red", "orange", "yellow", "green", "blue", "purple", "pink"];
+  let answerId = 0;
 
-  // export interface Question {
-  //   questionId: number;
-  //   question: string;
-  //   duration: number;
-  //   thumbnailUrl: string;
-  //   points: number;
-  //   answers: Answer[];
-  // }
-  
-  // export interface Answer {
-  //   answerId: number;
-  //   answer: string;
-  //   colour: string;
-  //   correct: boolean;
-  // }
+  for(const current of answers) {
+    let colour = Math.floor(Math.random()*colours.length);
+    answerId++;
+    answerArray.push({
+      answerId: answerId,
+      answer: current.answer,
+      colour: colours[colour],
+      correct: current.correct
+    })
+    colours = colours.splice(colour, 1);
+  }
 
-  
-  
-  
+  data.quizzes[index].questions.push({
+    questionId: questionId,
+    question: question,
+    duration: duration,
+    points: points,
+    answers: answerArray
+  });
 
+  const timeNow: number = Math.floor(Date.now() / 1000);
+  data.quizzes[index].timeLastEdited = timeNow;
 
+  return {
+    questionId: questionId
+  }
 
-  return {error: 'nothing written'}
 }
