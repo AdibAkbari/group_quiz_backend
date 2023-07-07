@@ -1,27 +1,6 @@
-import { getData, setData, Data, Quizzes, Token, Users } from './dataStore';
+import { getData, Data, Quizzes } from './dataStore';
 
 // HELPER FUNCTIONS
-
-// SHOULD BE ABLE TO DELETE THIS //
-// since we only check token validity now //
-/**
- * Checks whether a given number is a valid user id
- *
- * @param {number} authUserId
- * @returns {boolean} true if valid, false if invalid
- */
-export function isValidUserId(authUserId: number): boolean {
-  if (isNaN(authUserId)) {
-    return false;
-  }
-  const data: Data = getData();
-  for (const current of data.users) {
-    if (current.authUserId === authUserId) {
-      return true;
-    }
-  }
-  return false;
-}
 
 /**
    * Helper function to determine whether token is a valid structure
@@ -59,6 +38,22 @@ export function isTokenLoggedIn(token: string): boolean {
 export function findUserFromToken(token: string): number {
   const data: Data = getData();
   return (data.tokens.find(id => id.tokenId === token)).userId;
+}
+
+/**
+   * finds the array index of a given user id
+   *
+   * @param {number} authUserId
+   * @returns {number} index number that corresponds to user id
+   */
+export function findUserIndex(authUserId: number): number {
+  const data: Data = getData();
+  for (const i in data.users) {
+    if (data.users[i].authUserId === authUserId) {
+      return parseInt(i);
+    }
+  }
+  return -1;
 }
 
 /**

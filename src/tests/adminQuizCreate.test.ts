@@ -60,7 +60,7 @@ describe('invalid name/description edge cases', () => {
   // description more than 100 character error
   test('invalid description (>100 characters)', () => {
     // string of length 101
-    const longString = '01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890';
+    const longString = '0'.repeat(101);
     const quiz = quizCreateRequest(user.token, 'TestQuiz', longString);
     expect(quiz.statusCode).toBe(400);
     expect(quiz.body).toStrictEqual(ERROR);

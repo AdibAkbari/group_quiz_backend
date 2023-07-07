@@ -9,9 +9,11 @@ import fs from 'fs';
 import {
   adminAuthLogin,
   adminAuthRegister, adminUserDetails,
-} from './auth';
+} from './auth';;
 import {
   adminQuizCreate,
+} from './quiz';
+import { clear } from './other';
 } from './quiz';
 import { clear } from './other';
 
@@ -53,7 +55,7 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
     return res.status(400);
   }
   res.json(result);
-});
+})
 
 // adminAuthLogin //
 app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
@@ -78,7 +80,7 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
     }
   }
   res.json(response);
-});
+})
 
 // adminUserDetails
 app.get('/v1/admin/user/details', (req: Request, res: Response) => {
