@@ -1,5 +1,5 @@
 import { getData, setData, Data, Error } from './dataStore';
-import { checkNameValidity, isValidCreator, isValidQuizId, isValidUserId, isWhiteSpace } from './other';
+import { checkNameValidity, isValidCreator, isValidQuizId, isValidUserId, isWhiteSpace } from './helper';
 
 interface QuizList {
     quizId: number,
