@@ -7,7 +7,7 @@ export interface UserId {
 }
 
 export interface TokenId {
-  token: number;
+  token: string;
 }
 
 export interface User {
@@ -72,15 +72,15 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
     return { error: 'Password must contain at least one letter and one number' };
   }
 
-  const authUserId: number = store.users.length + 1;
+  const userId: number = store.users.length + 1;
   const numSuccessfulLogins = 1;
   const numFailedPasswordsSinceLastLogin = 0;
-  const user: Users = { email, password, nameFirst, nameLast, authUserId, numSuccessfulLogins, numFailedPasswordsSinceLastLogin };
+  const user: Users = { email, password, nameFirst, nameLast, authUserId: userId, numSuccessfulLogins, numFailedPasswordsSinceLastLogin };
   store.users.push(user);
 
   const timeNow: number = Math.floor((new Date()).getTime() / 1000);
-  const tokenId: number = Math.random() * timeNow;
-  const token: Token = { tokenId, authUserId };
+  const tokenId: string = (Math.floor(Math.random() * timeNow)).toString();
+  const token: Token = { tokenId, userId };
   store.tokens.push(token);
   setData(store);
 
