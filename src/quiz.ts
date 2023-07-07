@@ -1,4 +1,4 @@
-import { getData, setData, Data, Error } from './dataStore';
+import { getData, setData, Data, Error, Question, Answer } from './dataStore';
 import { checkNameValidity, 
          isValidCreator, 
          isValidQuizId, 
@@ -279,12 +279,83 @@ export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, 
 // NEW FUNCTIONS
 export function createQuizQuestion(quizId: number, token: string, question: string, duration: number, points: number, answers: Answers[]): {questionId: number} | Error {
 
+  // Error checking for token
+  if(!isValidTokenStructure(token)) {
+    return {error: 'invalid token structure'};
+  }
+  if(!isTokenLoggedIn(token)) {
+    return {error: 'token is not logged in'};
+  }
+
+  // Error checking for quizId
   if(!isValidQuizId(quizId)) {
     return {error: 'invalid quiz Id'};
   }
   if(!isValidCreator) {
     return {error: 'invalid quiz Id'};
   }
+
+  // Error checking for quiz question inputs
+  if(question.length < 5 || question.length > 50) {
+    return {error: 'invalid input: question must be 5-50 characters long'}
+  }
+
+  if(answers.length > 6 || answers.length < 2) {
+    return {error: 'invalid input: must have 2-6 answers'};
+  }
+
+  if(duration <= 0) {
+    return {error: 'invalid input: question duration must be a positive number'};
+  }
+
+  if(points < 1 || points > 10) {
+    return {error: 'invalid input: points must be between 1 and 10'};
+  }
+
+  if(answers.find(answer => (answer.answer.length > 30 || answer.answer.length < 1)) !== undefined) {
+    return {error: 'invalid input: answers must be 1-30 characters long'};
+  }
+
+  for(const current of answers) {
+    if((answers.filter(answer => answer.answer === current.answer)).length > 1) {
+      return {error: 'invalid input: cannot have duplicate answer strings'};
+    }
+  }
+
+  if(answers.find(answer => answer.correct === true) === undefined) {
+    return {error: 'invalid input: must be at least one correct answer'};
+  }
+
+  let data = getData();
+  const index = data.quizzes.findIndex(id => id.quizId === quizId);
+
+  if(data.quizzes[index].duration + duration > 180) {
+    return {error: 'invalid input: question durations cannot exceed 3 minutes'};
+  }
+
+  // Creating new quiz question
+
+
+  // export interface Question {
+  //   questionId: number;
+  //   question: string;
+  //   duration: number;
+  //   thumbnailUrl: string;
+  //   points: number;
+  //   answers: Answer[];
+  // }
+  
+  // export interface Answer {
+  //   answerId: number;
+  //   answer: string;
+  //   colour: string;
+  //   correct: boolean;
+  // }
+
+  
+  
+  
+
 
 
   return {error: 'nothing written'}
