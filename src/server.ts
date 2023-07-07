@@ -10,7 +10,7 @@ import {
   adminAuthRegister,
 } from './auth'
 import {
-  adminQuizCreate,
+  adminQuizCreate, createQuizQuestion,
 } from './quiz'
 import { clear } from './other'
 
@@ -63,6 +63,21 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
     } else if (response.error.includes("logged")) {
       return res.status(403).json(response);
     } else if (response.error.includes("Name") || response.error.includes("Description")) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+})
+
+// createQuizQuestion
+app.post('/v1/admin/quiz/{quizid}/question', (req: Request, res: Response) => {
+  const response = createQuizQuestion(req.body.quizId, req.body.token, req.body.questionBody.question, req.body.questionBody.duration, req.body.questionBody.points, req.body.questionBody.answers);
+  if ('error' in response) {
+    if (response.error.includes("Structure")) {
+      return res.status(401).json(response);
+    } else if (response.error.includes("logged")) {
+      return res.status(403).json(response);
+    } else if (response.error.includes("invalid input")) {
       return res.status(400).json(response);
     }
   }
