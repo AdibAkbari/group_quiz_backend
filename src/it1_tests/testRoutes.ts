@@ -29,16 +29,9 @@ export function authRegisterRequest(email: string, password: string, nameFirst: 
 }
 
 export function clearRequest() {
-    const res = request(
-        'DELETE',
-        SERVER_URL + '/v1/clear'
-    );
-    return JSON.parse(res.body.toString())
-
-    // try {
-    //     JSON.parse(res.body.toString())
-    // }
-    // catch (error) {
-    //     console.log('Error', error, res.body.toString())
-    // }
+  const res = request(
+    'DELETE',
+    SERVER_URL + '/v1/clear'
+  );
+  return JSON.parse(res.body.toString());
 }

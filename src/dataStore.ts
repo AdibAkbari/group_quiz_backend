@@ -9,6 +9,13 @@ export interface Users {
   numFailedPasswordsSinceLastLogin: number;
 }
 
+export interface Answer {
+  answerId: number;
+  answer: string;
+  colour: string;
+  correct: boolean;
+}
+
 export interface Question {
   questionId: number;
   question: string;
@@ -16,13 +23,6 @@ export interface Question {
   thumbnailUrl: string;
   points: number;
   answers: Answer[];
-}
-
-export interface Answer {
-  answerId: number;
-  answer: string;
-  colour: string;
-  correct: boolean;
 }
 
 export interface Quizzes {

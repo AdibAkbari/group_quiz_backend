@@ -77,14 +77,13 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
   const numFailedPasswordsSinceLastLogin = 0;
   const user: Users = { email, password, nameFirst, nameLast, authUserId: userId, numSuccessfulLogins, numFailedPasswordsSinceLastLogin };
   store.users.push(user);
-  
+
   const timeNow: number = Math.floor((new Date()).getTime() / 1000);
   const tokenId: string = (Math.floor(Math.random() * timeNow)).toString();
   const token: Token = { tokenId, userId }; 
   store.tokens.push(token);
   setData(store);
   
-
   return {
     token: tokenId
   };

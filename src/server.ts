@@ -9,7 +9,7 @@ import fs from 'fs';
 import {
   adminAuthRegister,
 } from './auth'
-import { clear } from './other'
+import { clear } from './other';
 
 // Set up web app
 const app = express();
@@ -50,8 +50,8 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   }
   res.json(result);
 })
-  
-// clear // 
+
+// clear //
 app.delete('/v1/clear', (req: Request, res: Response) => {
   res.json(clear());
 });
