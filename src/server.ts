@@ -9,6 +9,9 @@ import fs from 'fs';
 import {
   adminAuthRegister,
 } from './auth';
+import {
+  adminQuizCreate,
+} from './quiz';
 import { clear } from './other';
 
 // Set up web app
@@ -49,6 +52,21 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
     res.status(400);
   }
   res.json(result);
+});
+
+// adminQuizCreate //
+app.post('/v1/admin/quiz', (req: Request, res: Response) => {
+  const response = adminQuizCreate(req.body.token, req.body.name, req.body.description);
+  if ('error' in response) {
+    if (response.error.includes('Structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('Name') || response.error.includes('Description')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
 });
 
 // clear //
