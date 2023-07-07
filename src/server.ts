@@ -8,12 +8,12 @@ import sui from 'swagger-ui-express';
 import fs from 'fs';
 import {
   adminAuthRegister,
-} from './auth'
+} from './auth';
 import {
   adminQuizCreate,
   adminQuizNameUpdate,
-} from './quiz'
-import { clear } from './other'
+} from './quiz';
+import { clear } from './other';
 
 // Set up web app
 const app = express();
@@ -45,54 +45,53 @@ app.get('/echo', (req: Request, res: Response) => {
   return res.json(ret);
 });
 
-// adminAuthRegister // 
+// adminAuthRegister //
 app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
-  //const { email, password, nameFirst, nameLast } = req.body;
+  // const { email, password, nameFirst, nameLast } = req.body;
   const result = adminAuthRegister(req.body.email, req.body.password, req.body.nameFirst, req.body.nameLast);
   if ('error' in result) {
     res.status(400);
   }
   res.json(result);
-})
+});
 
-// adminQuizCreate // 
+// adminQuizCreate //
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const response = adminQuizCreate(req.body.token, req.body.name, req.body.description);
   if ('error' in response) {
-    if (response.error.includes("Structure")) {
+    if (response.error.includes('Structure')) {
       return res.status(401).json(response);
-    } else if (response.error.includes("logged")) {
+    } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
-    } else if (response.error.includes("Name") || response.error.includes("Description")) {
+    } else if (response.error.includes('Name') || response.error.includes('Description')) {
       return res.status(400).json(response);
     }
   }
   res.json(response);
-})
+});
 
-// adminQuizNameUpdate // 
+// adminQuizNameUpdate //
 app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
-    const token = req.body.token as string;
-    const name = req.body.name as string;
-    
-    const response = adminQuizNameUpdate(token, parseInt(req.params.quizid), name);
-    
-    if ('error' in response) {
-      if (response.error.includes("Structure")) {
-        return res.status(401).json(response);
-      } else if (response.error.includes("logged")) {
-        return res.status(403).json(response);
-      } else if (response.error.includes("Name") || response.error.includes("QuizId") || 
-                 response.error.includes("own") || response.error.includes("white space")) {
-        return res.status(400).json(response);
-      }
-    }
-    
-    res.json(response);
-})
+  const token = req.body.token as string;
+  const name = req.body.name as string;
 
-  
-// clear // 
+  const response = adminQuizNameUpdate(token, parseInt(req.params.quizid), name);
+
+  if ('error' in response) {
+    if (response.error.includes('Structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('Name') || response.error.includes('QuizId') ||
+                 response.error.includes('own') || response.error.includes('white space')) {
+      return res.status(400).json(response);
+    }
+  }
+
+  res.json(response);
+});
+
+// clear //
 app.delete('/v1/clear', (req: Request, res: Response) => {
   res.json(clear());
 });

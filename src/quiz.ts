@@ -1,13 +1,14 @@
 import { getData, setData, Data, Error } from './dataStore';
-import { checkNameValidity, 
-         isValidCreator, 
-         isValidQuizId, 
-         isValidUserId, 
-         isWhiteSpace,
-         isValidTokenStructure,
-         isTokenLoggedIn,
-         findUserFromToken, 
-        } from './helper';
+import {
+  checkNameValidity,
+  isValidCreator,
+  isValidQuizId,
+  isValidUserId,
+  isWhiteSpace,
+  isValidTokenStructure,
+  isTokenLoggedIn,
+  findUserFromToken,
+} from './helper';
 
 interface QuizList {
     quizId: number,
@@ -71,7 +72,7 @@ export function adminQuizCreate(token: string, name: string, description: string
     return { error: 'Token not logged in' };
   }
 
-  // get authUserId from token 
+  // get authUserId from token
   const authUserId = findUserFromToken(token);
 
   // invalid name
@@ -203,7 +204,7 @@ export function adminQuizNameUpdate(token: string, quizId: number, name: string)
   if (!isValidTokenStructure(token)) {
     return { error: 'Invalid Token Structure' };
   }
-  // Check if token is not logged in 
+  // Check if token is not logged in
   if (!isTokenLoggedIn(token)) {
     return { error: 'Token not logged in' };
   }
@@ -211,7 +212,7 @@ export function adminQuizNameUpdate(token: string, quizId: number, name: string)
   if (!isValidQuizId(quizId)) {
     return { error: 'Invalid: QuizId' };
   }
-  // Get authUserId from token 
+  // Get authUserId from token
   const authUserId = findUserFromToken(token);
   // Check if the name is valid
   if (!checkNameValidity(name, authUserId)) {
@@ -230,7 +231,7 @@ export function adminQuizNameUpdate(token: string, quizId: number, name: string)
   const timeNow = Math.floor(Date.now() / 1000);
 
   const quizToUpdate = data.quizzes.find((current) => current.quizId === quizId);
-  
+
   if (quizToUpdate) {
     quizToUpdate.name = name;
     quizToUpdate.timeLastEdited = timeNow;

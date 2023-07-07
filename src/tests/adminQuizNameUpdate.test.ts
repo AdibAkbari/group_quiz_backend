@@ -1,12 +1,10 @@
-import { adminQuizCreate, adminQuizNameUpdate, adminQuizInfo } from '../quiz';
-
-import { 
-    clearRequest, 
-    authRegisterRequest, 
-    quizNameUpdateRequest, 
-    //quizInfoRequest, 
-    quizCreateRequest,
-       } from './testRoutes';
+import {
+  clearRequest,
+  authRegisterRequest,
+  quizNameUpdateRequest,
+  // quizInfoRequest,
+  quizCreateRequest,
+} from './testRoutes';
 
 const ERROR = { error: expect.any(String) };
 
@@ -27,27 +25,26 @@ beforeEach(() => {
 });
 
 describe('Token invalid', () => {
-  
   test.each([
-    {testName: 'token just letters', token: 'hello'},
-    {testName: 'token starts with letters', token: 'a54364'},
-    {testName: 'token ends with letters', token: '54356s'},
-    {testName: 'token includes letter', token: '5436h86'},
-    {testName: 'token has space', token: '4324 757'},
-    {testName: 'token only whitespace', token: '  '},
-    {testName: 'token has other characters', token: '6365,53'},
-    {testName: 'empty string', token: ''},
-    {testName: 'token has decimal point', token: '53.74'},
-    {testName: 'token has negative sign', token: '-37294'},
-    {testName: 'token has positive sign', token: '+38594'},
-  ])('token is not a valid structure: $testName', ({token}) => {
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+    { testName: 'token ends with letters', token: '54356s' },
+    { testName: 'token includes letter', token: '5436h86' },
+    { testName: 'token has space', token: '4324 757' },
+    { testName: 'token only whitespace', token: '  ' },
+    { testName: 'token has other characters', token: '6365,53' },
+    { testName: 'empty string', token: '' },
+    { testName: 'token has decimal point', token: '53.74' },
+    { testName: 'token has negative sign', token: '-37294' },
+    { testName: 'token has positive sign', token: '+38594' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
     const newQuiz = quizNameUpdateRequest(token, quiz.quizId, 'TestQuizUpdate');
     expect(newQuiz.body).toStrictEqual(ERROR);
     expect(newQuiz.statusCode).toStrictEqual(401);
   });
 
   test('Nobody logged in', () => {
-    const newQuiz = quizNameUpdateRequest("7", quiz.quizId, 'TestQuizUpdate');
+    const newQuiz = quizNameUpdateRequest('7', quiz.quizId, 'TestQuizUpdate');
     expect(newQuiz.body).toStrictEqual(ERROR);
     expect(newQuiz.statusCode).toStrictEqual(403);
   });
@@ -57,7 +54,6 @@ describe('Token invalid', () => {
     expect(newQuiz.body).toStrictEqual(ERROR);
     expect(newQuiz.statusCode).toStrictEqual(403);
   });
-
 });
 
 describe('Invalid adminQuizNameUpdate', () => {
@@ -80,14 +76,17 @@ describe('Invalid adminQuizNameUpdate', () => {
 
   // Output error if new name contains not alphanumeric characters
   test.each([
-    { name: '!@#$%^&*', 
+    {
+      name: '!@#$%^&*',
       test: 'No letters'
     },
-    { name: 'user\'s test',
-      test: 'Invalid apostrophe' 
+    {
+      name: 'user\'s test',
+      test: 'Invalid apostrophe'
     },
-    { name: 'test1;',
-      test: 'Invalid semi colon'  
+    {
+      name: 'test1;',
+      test: 'Invalid semi colon'
     },
   ])('"$test": "$name"', ({ name, test }) => {
     const newQuiz = quizNameUpdateRequest(user.token, quiz.quizId, name);
@@ -97,10 +96,12 @@ describe('Invalid adminQuizNameUpdate', () => {
 
   // Output error if new name is either less than 3 characters long or more than 30 characters long
   test.each([
-    { name: 'q1',
+    {
+      name: 'q1',
       test: '< 3'
     },
-    { name: 'namemorethanthirtycharacterslong',
+    {
+      name: 'namemorethanthirtycharacterslong',
       test: '> 30'
     },
   ])('"$test": "$name"', ({ name, test }) => {
@@ -115,7 +116,6 @@ describe('Invalid adminQuizNameUpdate', () => {
     const newQuiz = quizNameUpdateRequest(user.token, quiz2.quizId, 'quiz1');
     expect(newQuiz.body).toStrictEqual(ERROR);
     expect(newQuiz.statusCode).toStrictEqual(400);
-    
   });
 
   // Output error if the name is just white space
@@ -147,6 +147,5 @@ describe('Valid adminQuizNameUpdate', () => {
     //   timeLastEdited: expect.any(Number),
     //   description: '',
     // });
-
   });
 });
