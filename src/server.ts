@@ -11,6 +11,7 @@ import {
 } from './auth';
 import {
   adminQuizCreate,
+  adminQuizTransfer,
 } from './quiz';
 import { clear } from './other';
 
@@ -57,6 +58,24 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
 // adminQuizCreate //
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const response = adminQuizCreate(req.body.token, req.body.name, req.body.description);
+  if ('error' in response) {
+    if (response.error.includes('Structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('Name') || response.error.includes('Description')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
+// adminQuizTransfer //
+app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
+  const token = req.body.token as string
+  const userEmail = req.body.userEmail as string
+  const response = adminQuizTransfer(token, parseInt(req.params.quizid), userEmail);
+  
   if ('error' in response) {
     if (response.error.includes('Structure')) {
       return res.status(401).json(response);

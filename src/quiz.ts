@@ -270,3 +270,16 @@ export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, 
 
   return { };
 }
+
+
+/**
+ * Transfer ownership of a quiz to a different user based on their email
+ *
+ * @param {string} token
+ * @param {number} quizId
+ * @param {string} userEmail
+ * @returns {{ }}
+ */
+export function adminQuizTransfer (token: string, quizId: number, userEmail: string): Record<string, never> | Error {
+  return { };
+}

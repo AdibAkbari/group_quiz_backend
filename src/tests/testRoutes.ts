@@ -42,6 +42,20 @@ export function quizCreateRequest(token: string, name: string, description: stri
   };
 }
 
+export function quizTransferRequest (token: string, quizid: number, userEmail: string) {
+  const res = request(
+    'POST',
+    SERVER_URL + `/v1/admin/quiz/${quizid}/transfer`,
+    {
+      json: { token: token, userEmail: userEmail },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function clearRequest() {
   const res = request(
     'DELETE',
