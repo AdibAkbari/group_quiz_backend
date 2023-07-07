@@ -47,7 +47,7 @@ describe('Token invalid', () => {
   });
 
   test('Unused tokenId', () => {
-    const list = adminQuizListRequest(user.token + 1)
+    const list = adminQuizListRequest(user.token + user2.token)
     expect(list.body).toStrictEqual(ERROR);
     expect(list.statusCode).toStrictEqual(403);
   });
