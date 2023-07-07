@@ -1,9 +1,13 @@
-import { setData, getData, Error, Data, Users } from './dataStore';
+import { setData, getData, Error, Data, Users, Token } from './dataStore';
 import validator from 'validator';
-import { isValidUserId, findUserIndex, isWhiteSpace } from './other';
+import { isValidUserId, findUserIndex, isWhiteSpace } from './helper';
 
 export interface UserId {
     authUserId: number;
+}
+
+export interface TokenId {
+  token: string;
 }
 
 export interface User {
@@ -26,7 +30,7 @@ export interface User {
  * @param {string} nameLast
  * @returns {{authUserId: number}}
  */
-export function adminAuthRegister (email: string, password: string, nameFirst: string, nameLast: string): Error | UserId {
+export function adminAuthRegister (email: string, password: string, nameFirst: string, nameLast: string): Error | TokenId {
   const store = getData();
 
   if (!validator.isEmail(email)) {
@@ -68,15 +72,21 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
     return { error: 'Password must contain at least one letter and one number' };
   }
 
-  const authUserId: number = store.users.length + 1;
+  const userId: number = store.users.length + 1;
   const numSuccessfulLogins = 1;
   const numFailedPasswordsSinceLastLogin = 0;
-  const user: Users = { email, password, nameFirst, nameLast, authUserId, numSuccessfulLogins, numFailedPasswordsSinceLastLogin };
-
+  const user: Users = { email, password, nameFirst, nameLast, authUserId: userId, numSuccessfulLogins, numFailedPasswordsSinceLastLogin };
   store.users.push(user);
+  
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  const tokenId: string = (Math.floor(Math.random() * timeNow)).toString();
+  const token: Token = { tokenId, userId }; 
+  store.tokens.push(token);
   setData(store);
+  
+
   return {
-    authUserId: authUserId
+    token: tokenId
   };
 }
 
