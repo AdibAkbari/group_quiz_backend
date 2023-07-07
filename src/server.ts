@@ -8,16 +8,11 @@ import sui from 'swagger-ui-express';
 import fs from 'fs';
 import {
   adminAuthRegister,
-<<<<<<< HEAD
-} from './auth'
+} from './auth';
 import {
   adminQuizCreate,
-} from './quiz'
-import { clear } from './other'
-=======
-} from './auth';
+} from './quiz';
 import { clear } from './other';
->>>>>>> a742962dd8e47f8b5fb325edb492ed5e6d171a8a
 
 // Set up web app
 const app = express();
@@ -57,30 +52,24 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
     res.status(400);
   }
   res.json(result);
-<<<<<<< HEAD
-})
+});
 
-// adminQuizCreate // 
+// adminQuizCreate //
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const response = adminQuizCreate(req.body.token, req.body.name, req.body.description);
   if ('error' in response) {
-    if (response.error.includes("Structure")) {
+    if (response.error.includes('Structure')) {
       return res.status(401).json(response);
-    } else if (response.error.includes("logged")) {
+    } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
-    } else if (response.error.includes("Name") || response.error.includes("Description")) {
+    } else if (response.error.includes('Name') || response.error.includes('Description')) {
       return res.status(400).json(response);
     }
   }
   res.json(response);
-})
-  
-// clear // 
-=======
 });
 
 // clear //
->>>>>>> a742962dd8e47f8b5fb325edb492ed5e6d171a8a
 app.delete('/v1/clear', (req: Request, res: Response) => {
   res.json(clear());
 });

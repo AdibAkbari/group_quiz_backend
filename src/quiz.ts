@@ -1,13 +1,14 @@
 import { getData, setData, Data, Error } from './dataStore';
-import { checkNameValidity, 
-         isValidCreator, 
-         isValidQuizId, 
-         isValidUserId, 
-         isWhiteSpace,
-         isValidTokenStructure,
-         isTokenLoggedIn,
-         findUserFromToken, 
-        } from './helper';
+import {
+  checkNameValidity,
+  isValidCreator,
+  isValidQuizId,
+  isValidUserId,
+  isWhiteSpace,
+  isValidTokenStructure,
+  isTokenLoggedIn,
+  findUserFromToken,
+} from './helper';
 
 interface QuizList {
     quizId: number,
@@ -71,7 +72,7 @@ export function adminQuizCreate(token: string, name: string, description: string
     return { error: 'Token not logged in' };
   }
 
-  // get authUserId from token 
+  // get authUserId from token
   const authUserId = findUserFromToken(token);
 
   // invalid name
