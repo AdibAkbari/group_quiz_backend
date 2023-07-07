@@ -130,7 +130,7 @@ export function adminQuizCreate(token: string, name: string, description: string
  * @param {number} quizId
  * @returns {{ }} empty object
  */
-export function adminQuizRemove(token: number, quizId: number): Record<string, never> | Error {
+export function adminQuizRemove(token: string, quizId: number): Record<string, never> | Error {
   // invalid token structure
   if (!isValidTokenStructure(token)) {
     return { error: 'Invalid Token Structure' };
@@ -174,6 +174,22 @@ export function adminQuizRemove(token: number, quizId: number): Record<string, n
   }
 
   return { };
+}
+
+/**
+ * View the quizzes that are currently in the trash
+ * 
+ * @param token 
+ * @returns {{quizzes: Array<{
+*                  quizId: number,
+*                  name: string
+*              }>
+*          }}
+*/
+export function adminQuizTrash(token: string): {quizzes: QuizList[]} | Error {
+  return {
+    quizzes: []
+  };
 }
 
 /**

@@ -72,6 +72,20 @@ export function quizRemoveRequest(token: string, quizid: number) {
     };
 }
 
+export function quizTrashRequest(token: string) {
+  const res = request(
+    'GET',
+    SERVER_URL + '/v1/admin/quiz/trash',
+    {
+      qs: {token: token}
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  }
+}
+
 export function clearRequest() {
     const res = request(
         'DELETE',
