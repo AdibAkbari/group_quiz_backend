@@ -1,13 +1,14 @@
 import { getData, setData, Data, Error } from './dataStore';
-import { checkNameValidity, 
-         isValidCreator, 
-         isValidQuizId, 
-         isValidUserId, 
-         isWhiteSpace,
-         isValidTokenStructure,
-         isTokenLoggedIn,
-         findUserFromToken, 
-        } from './helper';
+import {
+  checkNameValidity,
+  isValidCreator,
+  isValidQuizId,
+  isValidUserId,
+  isWhiteSpace,
+  isValidTokenStructure,
+  isTokenLoggedIn,
+  findUserFromToken,
+} from './helper';
 
 interface QuizList {
     quizId: number,
@@ -37,7 +38,7 @@ export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
     };
   }
 
-  if(!isTokenLoggedIn(token)) {
+  if (!isTokenLoggedIn(token)) {
     return {
       error: 'token is not logged in'
     };
@@ -46,9 +47,9 @@ export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
   const authUserId = findUserFromToken(token);
 
   const newList = data.quizzes.filter(id => id.creator === authUserId);
-  const quizzes: QuizList[] = newList.map((quiz) => { return {quizId: quiz.quizId, name: quiz.name}});
+  const quizzes: QuizList[] = newList.map((quiz) => { return { quizId: quiz.quizId, name: quiz.name }; });
 
-/*
+  /*
   for (const quiz of data.quizzes) {
     if (quiz.creator === authUserId) {
       const quizId: number = quiz.quizId;
@@ -61,8 +62,6 @@ export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
     quizzes: quizzes
   };
 }
-
-
 
 /**
  * Given basic details about a new quiz, create one for the user.
@@ -83,7 +82,7 @@ export function adminQuizCreate(token: string, name: string, description: string
     return { error: 'Token not logged in' };
   }
 
-  // get authUserId from token 
+  // get authUserId from token
   const authUserId = findUserFromToken(token);
 
   // invalid name
@@ -145,7 +144,7 @@ export function adminQuizRemove(token: string, quizId: number): Record<string, n
     return { error: 'Invalid: QuizId' };
   }
 
-  // get authUserId from token 
+  // get authUserId from token
   const authUserId = findUserFromToken(token);
 
   if (!isValidCreator(quizId, authUserId)) {
@@ -178,8 +177,8 @@ export function adminQuizRemove(token: string, quizId: number): Record<string, n
 
 /**
  * View the quizzes that are currently in the trash
- * 
- * @param token 
+ *
+ * @param token
  * @returns {{quizzes: Array<{
 *                  quizId: number,
 *                  name: string
@@ -187,8 +186,20 @@ export function adminQuizRemove(token: string, quizId: number): Record<string, n
 *          }}
 */
 export function adminQuizTrash(token: string): {quizzes: QuizList[]} | Error {
+  // invalid token structure
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+
+  // token is not logged in
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+  const data = getData();
+  const trashQuizzes = data.trash.map((quiz) => { return { quizId: quiz.quizId, name: quiz.name }; });
+
   return {
-    quizzes: []
+    quizzes: trashQuizzes
   };
 }
 
