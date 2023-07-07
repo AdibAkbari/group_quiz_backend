@@ -6,7 +6,7 @@ import cors from 'cors';
 import YAML from 'yaml';
 import sui from 'swagger-ui-express';
 import fs from 'fs';
-import { clear } from './other'
+import { clear } from './other';
 
 // Set up web app
 const app = express();
@@ -37,10 +37,10 @@ app.get('/echo', (req: Request, res: Response) => {
   }
   return res.json(ret);
 });
-  
-// clear // 
+
+// clear //
 app.delete('/v1/clear', (req: Request, res: Response) => {
-    res.json(clear());
+  res.json(clear());
 });
 
 // ====================================================================
