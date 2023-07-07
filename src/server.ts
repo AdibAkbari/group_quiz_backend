@@ -8,7 +8,7 @@ import sui from 'swagger-ui-express';
 import fs from 'fs';
 import {
   adminAuthRegister,
-} from './auth'
+} from './auth';
 import { clear } from './other';
 
 // Set up web app
@@ -41,15 +41,15 @@ app.get('/echo', (req: Request, res: Response) => {
   return res.json(ret);
 });
 
-// adminAuthRegister // 
+// adminAuthRegister //
 app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
-  //const { email, password, nameFirst, nameLast } = req.body;
+  // const { email, password, nameFirst, nameLast } = req.body;
   const result = adminAuthRegister(req.body.email, req.body.password, req.body.nameFirst, req.body.nameLast);
   if ('error' in result) {
     res.status(400);
   }
   res.json(result);
-})
+});
 
 // clear //
 app.delete('/v1/clear', (req: Request, res: Response) => {

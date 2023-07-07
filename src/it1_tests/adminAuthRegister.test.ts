@@ -1,14 +1,14 @@
 // tests for authRegisterRequest function
-import { 
-  clearRequest, 
-  authRegisterRequest, 
+import {
+  clearRequest,
+  authRegisterRequest,
 } from './testRoutes';
 
 beforeEach(() => {
   clearRequest();
 });
 
-const ERROR = { error: expect.any(String)};
+const ERROR = { error: expect.any(String) };
 
 describe('valid input authRegisterRequestV1 tests', () => {
   test.each([
@@ -121,7 +121,7 @@ describe('test for errors for adminAuthRegister', () => {
       first: '    '
     },
   ])('$testName: $first', ({ first }) => {
-    let user = authRegisterRequest('email2@gmail.com', 'password1', first, 'nameLast');
+    const user = authRegisterRequest('email2@gmail.com', 'password1', first, 'nameLast');
     expect(user.statusCode).toBe(400);
     expect(user.body).toStrictEqual(ERROR);
   });
@@ -144,7 +144,7 @@ describe('test for errors for adminAuthRegister', () => {
       pass: '12345678'
     },
   ])('$testName: $pass', ({ pass }) => {
-    let user = (authRegisterRequest('email2@gmail.com', pass, 'nameFirst', 'nameLast'));
+    const user = (authRegisterRequest('email2@gmail.com', pass, 'nameFirst', 'nameLast'));
     expect(user.statusCode).toBe(400);
     expect(user.body).toStrictEqual(ERROR);
   });
