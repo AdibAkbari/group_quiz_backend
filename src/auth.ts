@@ -114,9 +114,12 @@ export function adminAuthLogin(email: string, password: string): Error | TokenId
   newData.users[userIndex].numFailedPasswordsSinceLastLogin = 0;
 
   setData(newData);
+  
+  const userId = newData.users[userIndex].authUserId;
+  const token = newData.tokens.find((token) => token.userId = userId);
 
   return {
-    token: newData.users[userIndex].authUserId.toString()
+    token: token.tokenId
   };
 }
 
