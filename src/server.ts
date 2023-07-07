@@ -8,12 +8,10 @@ import sui from 'swagger-ui-express';
 import fs from 'fs';
 import {
   adminAuthLogin,
-  adminAuthRegister, adminUserDetails,
-} from './auth';;
+  adminAuthRegister,
+} from './auth';
 import {
   adminQuizCreate,
-} from './quiz';
-import { clear } from './other';
 } from './quiz';
 import { clear } from './other';
 
@@ -52,10 +50,10 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   // const { email, password, nameFirst, nameLast } = req.body;
   const result = adminAuthRegister(req.body.email, req.body.password, req.body.nameFirst, req.body.nameLast);
   if ('error' in result) {
-    return res.status(400);
+    res.status(400);
   }
   res.json(result);
-})
+});
 
 // adminAuthLogin //
 app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
@@ -77,20 +75,6 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
       return res.status(403).json(response);
     } else if (response.error.includes('Name') || response.error.includes('Description')) {
       return res.status(400).json(response);
-    }
-  }
-  res.json(response);
-})
-
-// adminUserDetails
-app.get('/v1/admin/user/details', (req: Request, res: Response) => {
-  const token = req.query.token as string;
-  const response = adminUserDetails(token);
-  if ('error' in response) {
-    if (response.error.includes('structure')) {
-      return res.status(401).json(response);
-    } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
     }
   }
   res.json(response);
