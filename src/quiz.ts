@@ -204,6 +204,17 @@ export function adminQuizTrash(token: string): {quizzes: QuizList[]} | Error {
 }
 
 /**
+ * Given quizId restore the quiz from the trash back to an active quiz
+ * 
+ * @param {string} token
+ * @param {number} quizId
+ * @returns { } empty object
+ */
+export function adminQuizRestore(token: string, quizId: number): Record<string, never> | Error {
+  return { };
+}
+
+/**
  * Get all of the relevant information about the current quiz.
  *
  * @param {number} authUserId
