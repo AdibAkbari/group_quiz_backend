@@ -8,11 +8,16 @@ import sui from 'swagger-ui-express';
 import fs from 'fs';
 import {
   adminAuthRegister,
+<<<<<<< HEAD
 } from './auth'
 import {
   adminQuizCreate,
 } from './quiz'
 import { clear } from './other'
+=======
+} from './auth';
+import { clear } from './other';
+>>>>>>> a742962dd8e47f8b5fb325edb492ed5e6d171a8a
 
 // Set up web app
 const app = express();
@@ -44,14 +49,15 @@ app.get('/echo', (req: Request, res: Response) => {
   return res.json(ret);
 });
 
-// adminAuthRegister // 
+// adminAuthRegister //
 app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
-  //const { email, password, nameFirst, nameLast } = req.body;
+  // const { email, password, nameFirst, nameLast } = req.body;
   const result = adminAuthRegister(req.body.email, req.body.password, req.body.nameFirst, req.body.nameLast);
   if ('error' in result) {
     res.status(400);
   }
   res.json(result);
+<<<<<<< HEAD
 })
 
 // adminQuizCreate // 
@@ -70,6 +76,11 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
 })
   
 // clear // 
+=======
+});
+
+// clear //
+>>>>>>> a742962dd8e47f8b5fb325edb492ed5e6d171a8a
 app.delete('/v1/clear', (req: Request, res: Response) => {
   res.json(clear());
 });
