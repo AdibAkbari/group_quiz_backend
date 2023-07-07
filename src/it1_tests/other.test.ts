@@ -1,7 +1,7 @@
 import { 
     clearRequest, 
-    authRegisterRequest, 
-    authLoginRequest 
+    //authRegisterRequest, 
+    //authLoginRequest 
 } from './testRoutes';
 
 describe('clearV1 Tests', () => {
