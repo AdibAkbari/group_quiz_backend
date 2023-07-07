@@ -28,22 +28,6 @@ export function authRegisterRequest(email: string, password: string, nameFirst: 
   };
 }
 
-export function adminQuizListRequest(token: string) {
-  const res = request(
-    'GET',
-    SERVER_URL + '/v1/admin/quiz/list',
-    {
-      qs: {
-        token: token,
-      }
-    }
-  );
-  return {
-    body: JSON.parse(res.body.toString()),
-    statusCode: JSON.parse(res.statusCode.toString())
-  };
-}
-
 export function quizCreateRequest(token: string, name: string, description: string) {
   const res = request(
     'POST',
@@ -58,18 +42,10 @@ export function quizCreateRequest(token: string, name: string, description: stri
   };
 }
 
-
-
 export function clearRequest() {
   const res = request(
     'DELETE',
     SERVER_URL + '/v1/clear'
   );
-    // return JSON.parse(res.body.toString())
-
-  try {
-    JSON.parse(res.body.toString());
-  } catch (error) {
-    console.log('Error', error, res.body.toString());
-  }
+  return JSON.parse(res.body.toString());
 }

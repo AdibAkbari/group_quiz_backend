@@ -1,25 +1,6 @@
-import { getData, setData, Data, Quizzes, Token, Users } from './dataStore';
+import { getData, Data, Quizzes } from './dataStore';
 
 // HELPER FUNCTIONS
-
-/**
- * Checks whether a given number is a valid user id
- *
- * @param {number} authUserId
- * @returns {boolean} true if valid, false if invalid
- */
-export function isValidUserId(authUserId: number): boolean {
-  if (isNaN(authUserId)) {
-    return false;
-  }
-  const data: Data = getData();
-  for (const current of data.users) {
-    if (current.authUserId === authUserId) {
-      return true;
-    }
-  }
-  return false;
-}
 
 /**
    * Helper function to determine whether token is a valid structure
