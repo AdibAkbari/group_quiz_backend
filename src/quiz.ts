@@ -227,13 +227,14 @@ export function adminQuizNameUpdate(token: string, quizId: number, name: string)
   }
 
   const data: Data = getData();
-  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
-  for (const current of data.quizzes) {
-    if (current.quizId === quizId) {
-      current.name = name;
-      current.timeLastEdited = timeNow;
-      setData(data);
-    }
+  const timeNow = Math.floor(Date.now() / 1000);
+
+  const quizToUpdate = data.quizzes.find((current) => current.quizId === quizId);
+  
+  if (quizToUpdate) {
+    quizToUpdate.name = name;
+    quizToUpdate.timeLastEdited = timeNow;
+    setData(data);
   }
 
   return { };
