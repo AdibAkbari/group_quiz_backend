@@ -42,6 +42,23 @@ export function quizCreateRequest(token: string, name: string, description: stri
   };
 }
 
+export function adminQuizInfoRequest(token: string, quizId: number) {
+  const res = request(
+    'GET',
+    SERVER_URL + `/v1/admin/quiz/${quizId}`,
+    {
+      qs: {
+          token: token,
+      }
+    }
+);
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+
+}
+
 export function clearRequest() {
   const res = request(
     'DELETE',
@@ -49,3 +66,4 @@ export function clearRequest() {
   );
   return JSON.parse(res.body.toString());
 }
+
