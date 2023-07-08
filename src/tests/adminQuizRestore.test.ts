@@ -76,9 +76,8 @@ describe('adminQuizTrash', () => {
   });
 
   describe('Success cases', () => {
-
     let restoreQuizBody: Record<string, never>;
-    let restoreQuizStatusCode: number; 
+    let restoreQuizStatusCode: number;
     let quiz2: QuizCreate;
     let quiz3: QuizCreate;
     // creates 2 more quizzes and removes all quizzes to trash
@@ -91,7 +90,7 @@ describe('adminQuizTrash', () => {
       const restoreQuiz = quizRestoreRequest(user.token, quiz.quizId);
       restoreQuizBody = restoreQuiz.body;
       restoreQuizStatusCode = restoreQuiz.statusCode;
-    })
+    });
 
     test('outputs empty object', () => {
       expect(restoreQuizBody).toStrictEqual({});

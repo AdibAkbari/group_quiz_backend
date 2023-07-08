@@ -17,7 +17,7 @@ export function clear (): Record<string, never> {
     trash: [],
   };
 
-  setData(data);  
+  setData(data);
 
   return { };
 }
