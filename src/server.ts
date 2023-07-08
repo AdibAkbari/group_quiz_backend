@@ -9,6 +9,7 @@ import fs from 'fs';
 import {
   adminAuthLogin,
   adminAuthRegister,
+  adminUserDetails,
 } from './auth';
 import {
   adminQuizCreate,
@@ -53,6 +54,20 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
     res.status(400);
   }
   res.json(result);
+});
+
+// adminUserDetails
+app.get('/v1/admin/user/details', (req: Request, res: Response) => {
+  const token = req.query.token as string;
+  const response = adminUserDetails(token);
+  if ('error' in response) {
+    if (response.error.includes("structure")) {
+      return res.status(401).json(response);
+    } else if (response.error.includes("logged")) {
+      return res.status(403).json(response);
+    }
+  }
+  res.json(response);
 });
 
 // adminAuthLogin //
