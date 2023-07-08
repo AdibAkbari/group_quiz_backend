@@ -1,3 +1,4 @@
+import { Token } from 'yaml/dist/parse/cst';
 import { getData, setData, Data, Error } from './dataStore';
 import {
   checkNameValidity,
@@ -226,6 +227,17 @@ export function adminQuizRestore(token: string, quizId: number): Record<string, 
   // remove quiz to restore from trash
   data.trash.splice(quizIndex, 1);
   setData(data);
+  return { };
+}
+
+/**
+ * Permanently deletes the specific quizzes currently in trash
+ * 
+ * @param token 
+ * @param quizIds 
+ * @returns 
+ */
+export function adminQuizTrashEmpty(token: Token, quizIds: number[]): Record<string, never> | Error {
   return { };
 }
 
