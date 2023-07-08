@@ -276,6 +276,19 @@ export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, 
   return { };
 }
 
+/**
+ * Create a new stub question for a particular quiz.
+ * When this route is called, and a question is created, the timeLastEdited for quiz is set as the time this question was created
+ * and the colours of a question are randomly generated.
+ * 
+ * @param {number} quizId 
+ * @param {string} token 
+ * @param {string} question 
+ * @param {number} duration 
+ * @param {number} points 
+ * @param {Answers[]} answers 
+ * @returns {questionId: number}
+ */
 export function createQuizQuestion(quizId: number, token: string, question: string, duration: number, points: number, answers: Answers[]): {questionId: number} | Error {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
