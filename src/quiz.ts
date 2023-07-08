@@ -220,7 +220,7 @@ export function adminQuizRestore(token: string, quizId: number): Record<string, 
   if (data.trash[quizIndex].creator !== authUserId) {
     return { error: 'Invalid: user does not own quiz' };
   }
-  
+
   // add the quiz to restore to list of quizzes
   data.quizzes.push(data.trash[quizIndex]);
   // remove quiz to restore from trash
