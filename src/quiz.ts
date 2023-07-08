@@ -185,8 +185,8 @@ export function adminQuizTrash(token: string): {quizzes: QuizList[]} | Error {
 
   const data = getData();
   // maps list of quiz objects in trash to just have name and quizId
-  const trashQuizzes = data.trash.map((quiz) => { 
-    return { quizId: quiz.quizId, name: quiz.name }; 
+  const trashQuizzes = data.trash.map((quiz) => {
+    return { quizId: quiz.quizId, name: quiz.name };
   });
 
   return {
