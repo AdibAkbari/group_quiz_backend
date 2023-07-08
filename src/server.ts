@@ -7,6 +7,7 @@ import YAML from 'yaml';
 import sui from 'swagger-ui-express';
 import fs from 'fs';
 import {
+  adminAuthLogin,
   adminAuthRegister,
 } from './auth';
 import {
@@ -55,6 +56,16 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
     res.status(400);
   }
   res.json(result);
+});
+
+// adminAuthLogin //
+app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const response = adminAuthLogin(email, password);
+  if ('error' in response) {
+    return res.status(400).json(response);
+  }
+  res.json(response);
 });
 
 // adminQuizCreate //
