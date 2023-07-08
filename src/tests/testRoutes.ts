@@ -48,15 +48,14 @@ export function adminQuizInfoRequest(token: string, quizId: number) {
     SERVER_URL + `/v1/admin/quiz/${quizId}`,
     {
       qs: {
-          token: token,
+        token: token,
       }
     }
-);
+  );
   return {
     body: JSON.parse(res.body.toString()),
     statusCode: JSON.parse(res.statusCode.toString())
   };
-
 }
 
 export function clearRequest() {
@@ -66,4 +65,3 @@ export function clearRequest() {
   );
   return JSON.parse(res.body.toString());
 }
-

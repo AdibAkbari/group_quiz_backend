@@ -3,7 +3,6 @@ import {
   checkNameValidity,
   isValidCreator,
   isValidQuizId,
-  isValidUserId,
   isWhiteSpace,
   isValidTokenStructure,
   isTokenLoggedIn,
@@ -19,6 +18,25 @@ interface QuizCreate {
     quizId: number,
 }
 
+interface QuizInfoQuestions {
+  questionId: number,
+  question: string,
+  duration: number,
+  points: number,
+  answers: {answerId: number, answer: string, colour: string, correct: boolean}[],
+}
+
+interface QuizInfo {
+  quizId: number,
+  name: string,
+  timeCreated: number,
+  timeLastEdited: number,
+  description: string,
+  numQuestions: number,
+  questions: QuizInfoQuestions[],
+  duration: number
+}
+
 /**
  * Provide a list of all quizzes that are owned by the currently logged in user.
  *
@@ -32,11 +50,11 @@ interface QuizCreate {
 export function adminQuizList (authUserId: number): {quizzes: QuizList[]} | Error {
   const data: Data = getData();
 
-  if (!isValidUserId(authUserId)) {
-    return {
-      error: 'AuthUserId is not a valid user'
-    };
-  }
+  // if (!isValidUserId(authUserId)) {
+  //   return {
+  //     error: 'AuthUserId is not a valid user'
+  //   };
+  // }
 
   const quizzes: QuizList[] = [];
 
@@ -120,15 +138,15 @@ export function adminQuizCreate(token: string, name: string, description: string
  * @returns {{ }} empty object
  */
 export function adminQuizRemove(authUserId: number, quizId: number): Record<string, never> | Error {
-  if (isValidUserId(authUserId) === false) {
-    return { error: 'AuthUserId is not a valid user' };
-  }
+  // if (isValidUserId(authUserId) === false) {
+  //   return { error: 'AuthUserId is not a valid user' };
+  // }
 
   if (isValidQuizId(quizId) === false) {
     return { error: 'Quiz ID does not refer to valid quiz' };
   }
 
-  if (isValidCreator(quizId, authUserId) === false) {
+  if (isValidCreator(quizId, '123') === false) {
     return { error: 'Quiz ID does not refer to a quiz that this user owns' };
   }
 
@@ -156,36 +174,35 @@ export function adminQuizRemove(authUserId: number, quizId: number): Record<stri
  *           description: string,
  *          }}
  */
-export function adminQuizInfo(authUserId: number, quizId: number): Error | {
-    quizId: number, name: string, timeCreated: number, timeLastEdited: number, description: string
-} {
-  if (!isValidUserId(authUserId)) {
-    return { error: 'authUserId does not refer to valid user' };
+export function adminQuizInfo(token: string, quizId: number): Error | QuizInfo {
+  // Error checking for token
+  if (!isValidTokenStructure(token)) {
+    return { error: 'invalid token structure' };
+  }
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'token is not logged in' };
   }
 
+  // Error checking for quizId
   if (!isValidQuizId(quizId)) {
-    return { error: 'quizId does not refer to valid quiz' };
+    return { error: 'invalid quizId' };
   }
-
-  if (!isValidCreator(quizId, authUserId)) {
-    return { error: 'quizId does not refer to quiz that this user owns' };
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'invalid quizId' };
   }
 
   const data: Data = getData();
-  for (const quiz of data.quizzes) {
-    if (quiz.quizId === quizId) {
-      return {
-        quizId: quiz.quizId,
-        name: quiz.name,
-        timeCreated: quiz.timeCreated,
-        timeLastEdited: quiz.timeLastEdited,
-        description: quiz.description,
-      };
-    }
-  }
+  const quiz = data.quizzes.find(id => id.quizId === quizId);
 
   return {
-    error: 'Quiz could not be found'
+    quizId: quizId,
+    name: quiz.name,
+    timeCreated: quiz.timeCreated,
+    timeLastEdited: quiz.timeLastEdited,
+    description: quiz.description,
+    numQuestions: quiz.numQuestions,
+    questions: quiz.questions,
+    duration: quiz.duration
   };
 }
 
@@ -201,15 +218,15 @@ export function adminQuizInfo(authUserId: number, quizId: number): Error | {
  */
 export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): Record<string, never> | Error {
   // Check inputted UserId is valid
-  if (isValidUserId(authUserId) === false) {
-    return { error: 'Please enter a valid user' };
-  }
+  // if (isValidUserId(authUserId) === false) {
+  //   return { error: 'Please enter a valid user' };
+  // }
   // Check inputted quizId is valid
   if (isValidQuizId(quizId) === false) {
     return { error: 'Please enter a valid quiz' };
   }
   // Check inputted Quiz ID does not refer to a quiz that this user owns
-  if (isValidCreator(quizId, authUserId) === false) {
+  if (isValidCreator(quizId, '123') === false) {
     return { error: 'You do not own this quiz' };
   }
   // Check inputted name is valid
@@ -245,15 +262,15 @@ export function adminQuizNameUpdate(authUserId: number, quizId: number, name: st
  * @returns {{ }}
  */
 export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, description: string): Record<string, never> | Error {
-  if (!isValidUserId(authUserID)) {
-    return { error: 'authUserId does not refer to valid user' };
-  }
+  // if (!isValidUserId(authUserID)) {
+  //   return { error: 'authUserId does not refer to valid user' };
+  // }
 
   if (!isValidQuizId(quizId)) {
     return { error: 'quizId does not refer to valid quiz' };
   }
 
-  if (!isValidCreator(quizId, authUserID)) {
+  if (!isValidCreator(quizId, '123')) {
     return { error: 'quizId does not refer to a quiz that this user owns' };
   }
 

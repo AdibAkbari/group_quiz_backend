@@ -1,10 +1,10 @@
 import {
-  adminQuizInfoRequest, 
-  quizCreateRequest, 
+  adminQuizInfoRequest,
+  quizCreateRequest,
   authRegisterRequest,
   clearRequest,
   // createQuizQuestionRequest,
-  // adminQuizRemoveRequest, 
+  // adminQuizRemoveRequest,
   // adminQuizNameUpdateRequest,
   // adminQuizDescriptionUpdateRequest
 } from './testRoutes';
@@ -19,8 +19,6 @@ interface Quiz {
   quizId: number
 }
 
-
-
 let user: Token;
 let quiz: Quiz;
 beforeEach(() => {
@@ -30,39 +28,36 @@ beforeEach(() => {
 });
 
 describe('QuizId invalid', () => {
+  test('Quiz Id does not refer to a valid quiz', () => {
+    const result = adminQuizInfoRequest(user.token, quiz.quizId + 1);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(400);
+  });
 
-    test('Quiz Id does not refer to a valid quiz', () => {
-      const result = adminQuizInfoRequest(user.token, quiz.quizId + 1);
-      expect(result.body).toStrictEqual(ERROR);
-      expect(result.statusCode).toStrictEqual(400);
-    });
-  
-    test('Quiz Id does not refer to a quiz that this user owns', () => {
-      const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB').body;
-      const result = adminQuizInfoRequest(user2.token, quiz.quizId)
-      expect(result.body).toStrictEqual(ERROR);
-      expect(result.statusCode).toStrictEqual(400);
-      const quiz2 = quizCreateRequest(user2.token, 'Dogs', 'A quiz about dogs').body;
-      expect(adminQuizInfoRequest(user.token, quiz2.quizId).body).toStrictEqual(ERROR);
-    });
-
-})
+  test('Quiz Id does not refer to a quiz that this user owns', () => {
+    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB').body;
+    const result = adminQuizInfoRequest(user2.token, quiz.quizId);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(400);
+    const quiz2 = quizCreateRequest(user2.token, 'Dogs', 'A quiz about dogs').body;
+    expect(adminQuizInfoRequest(user.token, quiz2.quizId).body).toStrictEqual(ERROR);
+  });
+});
 
 describe('Token invalid', () => {
-  
   test.each([
-    {testName: 'token just letters', token: 'hello'},
-    {testName: 'token starts with letters', token: 'a54364'},
-    {testName: 'token ends with letters', token: '54356s'},
-    {testName: 'token includes letter', token: '5436h86'},
-    {testName: 'token has space', token: '4324 757'},
-    {testName: 'token only whitespace', token: '  '},
-    {testName: 'token has other characters', token: '6365,53'},
-    {testName: 'empty string', token: ''},
-    {testName: 'token has decimal point', token: '53.74'},
-    {testName: 'token has negative sign', token: '-37294'},
-    {testName: 'token has positive sign', token: '+38594'},
-  ])('token is not a valid structure: $testName', ({token}) => {
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+    { testName: 'token ends with letters', token: '54356s' },
+    { testName: 'token includes letter', token: '5436h86' },
+    { testName: 'token has space', token: '4324 757' },
+    { testName: 'token only whitespace', token: '  ' },
+    { testName: 'token has other characters', token: '6365,53' },
+    { testName: 'empty string', token: '' },
+    { testName: 'token has decimal point', token: '53.74' },
+    { testName: 'token has negative sign', token: '-37294' },
+    { testName: 'token has positive sign', token: '+38594' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
     const list = adminQuizInfoRequest(token, quiz.quizId);
     expect(list.body).toStrictEqual(ERROR);
     expect(list.statusCode).toStrictEqual(401);
@@ -73,10 +68,7 @@ describe('Token invalid', () => {
     expect(list.body).toStrictEqual(ERROR);
     expect(list.statusCode).toStrictEqual(403);
   });
-
 });
-
-
 
 describe('Valid inputs', () => {
   test('only one quiz created', () => {
@@ -97,7 +89,7 @@ describe('Valid inputs', () => {
   test('more than one quiz stored', () => {
     const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB').body;
     const quiz2 = quizCreateRequest(user2.token, 'Dogs', 'A quiz about dogs').body;
-    expect(adminQuizInfoRequest(user2.token, quiz2.quizId)).toStrictEqual({
+    expect(adminQuizInfoRequest(user2.token, quiz2.quizId).body).toStrictEqual({
       quizId: quiz2.quizId,
       name: 'Dogs',
       timeCreated: expect.any(Number),
@@ -228,7 +220,7 @@ describe.skip('quizzes with questions created', () => {
   //   expect(receivedQuestionsSet).toStrictEqual(expectedQuestionsSet);
   // })
 
-})
+});
 
 describe.skip('testing with other functions', () => {
   test('removing quiz', () => {
