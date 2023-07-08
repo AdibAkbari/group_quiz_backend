@@ -313,7 +313,7 @@ describe('Invalid params', () => {
       { testname: 'points is 10', question: 'valid question', duration: 5, points: 10 }
     ])('valid edge cases for question, duration and points: $testname', ({ question, duration, points }) => {
       const result = updateQuizQuestionRequest(quizId, questionId, user.token, question, duration, points, validAnswers);
-      expect(result.body.questionId).toStrictEqual(expect.any(Number));
+      expect(result.body).toStrictEqual({});
       expect(result.statusCode).toStrictEqual(200);
     });
 
@@ -321,7 +321,7 @@ describe('Invalid params', () => {
       createQuizQuestionRequest(quizId, user.token, 'Question 1', 60, 5, validAnswers);
       createQuizQuestionRequest(quizId, user.token, 'Question 2', 60, 5, validAnswers);
       const result = updateQuizQuestionRequest(quizId, questionId, user.token, 'New Question 1', 60, 5, validAnswers);
-      expect(result.body.questionId).toStrictEqual(expect.any(Number));
+      expect(result.body).toStrictEqual({});
       expect(result.statusCode).toStrictEqual(200);
     });
   });

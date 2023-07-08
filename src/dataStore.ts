@@ -56,10 +56,25 @@ export interface Error {
 
 // data structure for storing user data and quiz data
 let data: Data = {
-  users: [],
+  users: [
+    {
+      email: 'email@gmail.com',
+      password: 'password1',
+      nameFirst: 'firstname',
+      nameLast: 'lastname',
+      authUserId: 1,
+      numSuccessfulLogins: 1,
+      numFailedPasswordsSinceLastLogin: 0
+    }
+  ],
   quizzes: [],
   quizCount: 0,
-  tokens: [],
+  tokens: [
+    {
+      tokenId: '123',
+      userId: 1
+    }
+  ],
   trash: [],
 };
 

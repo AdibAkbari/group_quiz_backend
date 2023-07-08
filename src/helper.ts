@@ -51,15 +51,7 @@ export function isValidQuizId(quizId: number): boolean {
   if (isNaN(quizId)) {
     return false;
   }
-
   const data: Data = getData();
-  // for (const current of data.quizzes) {
-  //   if (current.quizId === quizId) {
-  //     return true;
-  //   }
-  // }
-  // return false;
-
   if (data.quizzes.find(id => id.quizId === quizId) === undefined) {
     return false;
   }
@@ -82,6 +74,22 @@ export function isValidCreator(quizId: number, token: string): boolean {
     return true;
   }
   return false;
+}
+
+/**
+ * Helper function to determine if question Id is a valid question within the given quiz
+ * 
+ * @param {number} quizId 
+ * @param {number} questionId 
+ * @returns {boolean} - returns true if questionId is a valid question within this quiz, false otherwise
+ */
+export function isValidQuestionId(quizId: number, questionId: number): boolean {
+  const data: Data = getData();
+  const index = data.quizzes.findIndex(id => id.quizId === quizId);
+  if (data.quizzes[index].questions.find(id => id.questionId === questionId) === undefined) {
+    return false;
+  }
+  return true;
 }
 
 /**

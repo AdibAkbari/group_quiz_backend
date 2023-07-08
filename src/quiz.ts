@@ -7,6 +7,7 @@ import {
   isValidTokenStructure,
   isTokenLoggedIn,
   findUserFromToken,
+  isValidQuestionId,
 } from './helper';
 
 interface QuizList {
@@ -391,5 +392,99 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
 
 
 export function updateQuizQuestion(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answers[]): {} | Error {
-  return {error: 'no code'}
+   // Error checking for token
+   if (!isValidTokenStructure(token)) {
+    return { error: 'invalid token structure' };
+  }
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'token is not logged in' };
+  }
+
+  // Error checking for quizId and questionId
+  if (!isValidQuizId(quizId)) {
+    return { error: 'invalid param: quiz Id' };
+  }
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'invalid param: quiz Id' };
+  }
+  if (!isValidQuestionId(quizId, questionId)) {
+    return {error: 'invalid param: questionId'};
+  }
+
+  // Error checking for quiz question inputs
+  if (question.length < 5 || question.length > 50) {
+    return { error: 'invalid input: question must be 5-50 characters long' };
+  }
+
+  // Note: assume question cannot be only whitespace
+  if (isWhiteSpace(question)) {
+    return { error: 'invalid input: question cannot be only whitespace' };
+  }
+
+  if (answers.length > 6 || answers.length < 2) {
+    return { error: 'invalid input: must have 2-6 answers' };
+  }
+
+  if (duration <= 0) {
+    return { error: 'invalid input: question duration must be a positive number' };
+  }
+
+  if (points < 1 || points > 10) {
+    return { error: 'invalid input: points must be between 1 and 10' };
+  }
+
+  if (answers.find(answer => (answer.answer.length > 30 || answer.answer.length < 1)) !== undefined) {
+    return { error: 'invalid input: answers must be 1-30 characters long' };
+  }
+
+  for (const current of answers) {
+    if ((answers.filter(answer => answer.answer === current.answer)).length > 1) {
+      return { error: 'invalid input: cannot have duplicate answer strings' };
+    }
+  }
+
+  if (answers.find(answer => answer.correct === true) === undefined) {
+    return { error: 'invalid input: must be at least one correct answer' };
+  }
+
+  const data = getData();
+  let currentQuiz = data.quizzes.find(id => id.quizId === quizId);
+  let qIndex = currentQuiz.questions.findIndex(id => id.questionId === questionId);
+  let newDuration = currentQuiz.duration + duration - currentQuiz.questions[qIndex].duration;
+
+  if (newDuration > 180) {
+    return { error: 'invalid input: question durations cannot exceed 3 minutes' };
+  }
+
+  //Updating quiz question
+  const answerArray: Answer[] = [];
+  const colours = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink'];
+  let answerId = 0;
+
+  for (const current of answers) {
+    const colour = Math.floor(Math.random() * colours.length);
+    answerId++;
+    answerArray.push({
+      answerId: answerId,
+      answer: current.answer,
+      colour: colours[colour],
+      correct: current.correct
+    });
+    colours.splice(colour, 1);
+  }
+
+    currentQuiz.questions[qIndex] = {
+    questionId: questionId,
+    question: question,
+    duration: duration,
+    points: points,
+    answers: answerArray
+  }
+
+  const timeNow: number = Math.floor(Date.now() / 1000);
+  currentQuiz.timeLastEdited = timeNow;
+  currentQuiz.duration = newDuration;
+  setData(data);
+
+  return {}
 }

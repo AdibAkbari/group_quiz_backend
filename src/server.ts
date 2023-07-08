@@ -11,7 +11,7 @@ import {
   adminAuthRegister,
 } from './auth';
 import {
-  adminQuizCreate, createQuizQuestion,
+  adminQuizCreate, createQuizQuestion, updateQuizQuestion
 } from './quiz';
 import { clear } from './other';
 
@@ -80,7 +80,7 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   res.json(response);
 });
 
-// createQuizQuestion
+// createQuizQuestion //
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const { question, duration, points, answers } = req.body.questionBody;
   const quizId = parseInt(req.params.quizid);
@@ -96,6 +96,24 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   }
   res.json(response);
 });
+
+// Update quiz question //
+app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Response) => {
+  const { question, duration, points, answers } = req.body.questionBody;
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const response = updateQuizQuestion(quizId, questionId, req.body.token, question, duration, points, answers);
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('input') || response.error.includes('param')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+})
 
 // clear //
 app.delete('/v1/clear', (req: Request, res: Response) => {
