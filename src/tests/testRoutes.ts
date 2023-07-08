@@ -84,20 +84,6 @@ export function quizRestoreRequest(token: string, quizId: number) {
   };
 }
 
-export function quizTrashEmptyRequest(token: string, quizIds: number[]) {
-  const res = request(
-    'DELETE',
-    SERVER_URL + '/v1/admin/quiz/trash/empty',
-    {
-      qs: { token: token, quizIds: quizIds }
-    }
-  );
-  return {
-    body: JSON.parse(res.body.toString()),
-    statusCode: JSON.parse(res.statusCode.toString())
-  };
-}
-
 export function clearRequest() {
   const res = request(
     'DELETE',

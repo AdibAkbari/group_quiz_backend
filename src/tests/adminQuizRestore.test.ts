@@ -63,7 +63,9 @@ describe('adminQuizTrash', () => {
       quizRemoveRequest(user.token, quiz.quizId);
       const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
       const quiz2 = quizCreateRequest(user2.token, 'quiz2', '').body;
-      // user tries to restore quiz created by user2
+      quizRemoveRequest(user2.token, quiz2.quizId);
+
+      // user tries to restore quiz created and removed by user2
       const restoreQuiz = quizRestoreRequest(user.token, quiz2.quizId);
       expect(restoreQuiz.body).toStrictEqual(ERROR);
       expect(restoreQuiz.statusCode).toStrictEqual(400);
