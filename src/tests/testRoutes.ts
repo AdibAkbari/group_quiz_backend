@@ -69,6 +69,29 @@ export function createQuizQuestionRequest(quizId: number, token: string, questio
   };
 }
 
+export function updateQuizQuestionRequest(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
+  const res = request(
+    'PUT',
+    SERVER_URL + `/v1/admin/quiz/${quizId}/question/${questionId}`,
+    {
+      json: {
+        token: token,
+        questionBody: {
+          question,
+          duration,
+          points,
+          answers
+        }
+      }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+
 export function clearRequest() {
   const res = request(
     'DELETE',

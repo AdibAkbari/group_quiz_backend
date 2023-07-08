@@ -388,3 +388,8 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
     questionId: questionId
   };
 }
+
+
+export function updateQuizQuestion(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answers[]): {} | Error {
+  return {error: 'no code'}
+}
