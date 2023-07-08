@@ -70,7 +70,7 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
     }
   }
   res.json(response);
-})
+});
 
 // adminQuizRemove //
 app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
@@ -86,7 +86,7 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
     }
   }
   res.json(response);
-});
+})
 
 // adminQuizTrash //
 app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
