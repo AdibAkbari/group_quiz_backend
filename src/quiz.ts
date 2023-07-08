@@ -230,6 +230,17 @@ export function adminQuizRestore(token: string, quizId: number): Record<string, 
 }
 
 /**
+ * Permanently deletes the specific quizzes currently in trash
+ * 
+ * @param token 
+ * @param quizIds 
+ * @returns 
+ */
+export function adminQuizTrashEmpty(token: string, quizIds: number[]): Record<string, never> | Error {
+  return { };
+}
+
+/**
    * Get all of the relevant information about the current quiz.
    *
    * @param {number} authUserId
