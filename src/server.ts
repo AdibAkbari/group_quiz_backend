@@ -70,14 +70,16 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
 })
 
 // createQuizQuestion
-app.post('/v1/admin/quiz/{quizid}/question', (req: Request, res: Response) => {
-  const response = createQuizQuestion(req.body.quizId, req.body.token, req.body.questionBody.question, req.body.questionBody.duration, req.body.questionBody.points, req.body.questionBody.answers);
+app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
+  const { question, duration, points, answers } = req.body.questionBody;
+  const quizId = parseInt(req.params.quizid);
+  const response = createQuizQuestion(quizId, req.body.token, question, duration, points, answers);
   if ('error' in response) {
-    if (response.error.includes("Structure")) {
+    if (response.error.includes("structure")) {
       return res.status(401).json(response);
     } else if (response.error.includes("logged")) {
       return res.status(403).json(response);
-    } else if (response.error.includes("invalid input")) {
+    } else if (response.error.includes("input") || response.error.includes("quiz Id")) {
       return res.status(400).json(response);
     }
   }

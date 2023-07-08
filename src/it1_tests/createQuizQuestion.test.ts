@@ -31,6 +31,7 @@ beforeEach(() => {
   quiz = quizCreateRequest(user.token, 'Cats', 'A quiz about cats').body;
 });
 
+
 describe('Valid answer inputs, invalid other input', () => {
     test('QuizId does not refer to a valid quiz', () => {
         const result = createQuizQuestionRequest(quiz.quizId + 1, user.token, "How are you?", 5, 5, validAnswers);
@@ -186,8 +187,9 @@ describe('Token invalid', () => {
         q1 = createQuizQuestionRequest(quiz.quizId, user.token, "Question 1", 5, 5, validAnswers).body;
     });
     
+
     test('create 1 question', () => {
-       expect(q1.questionId).toStrictEqual(expect.any(Number));
+        expect(q1.questionId).toStrictEqual(expect.any(Number));
     });
 
     test('unique question Id for each quiz', () => {

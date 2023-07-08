@@ -59,21 +59,6 @@ export function isValidUserId(authUserId: number): boolean {
     return (data.tokens.find(id => id.tokenId === token)).userId;
   }
   
-  /**
-   * finds the array index of a given user id
-   *
-   * @param {number} authUserId
-   * @returns {number} index number that corresponds to user id
-   */
-  export function findUserIndex(authUserId: number): number {
-    const data: Data = getData();
-    for (const i in data.users) {
-      if (data.users[i].authUserId === authUserId) {
-        return parseInt(i);
-      }
-    }
-    return -1;
-  }
   
   /**
    * Helper function to determine if the quizId exist
@@ -107,18 +92,16 @@ export function isValidUserId(authUserId: number): boolean {
    * Helper function to determine if Quiz ID does not refer to a quiz that this user owns
    *
    * @param {number} quizId
-   * @param {number} authUserID
+   * @param {number} token
    * @returns {boolean} - returns true if user does own quiz
    * @returns {boolean} - returns false if user does not own quiz
    */
-  export function isValidCreator(quizId: number, authUserID: number): boolean {
+  export function isValidCreator(quizId: number, token: string): boolean {
     const data: Data = getData();
-    for (const current of data.quizzes) {
-      if (current.quizId === quizId) {
-        if (current.creator === authUserID) {
-          return true;
-        }
-      }
+    const userId = findUserFromToken(token);
+    const index = data.quizzes.findIndex(id => id.quizId === quizId);
+    if (data.quizzes[index].creator === userId) {
+      return true;
     }
   
     return false;

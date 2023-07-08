@@ -133,7 +133,7 @@ export function adminQuizRemove(authUserId: number, quizId: number): Record<stri
     return { error: 'Quiz ID does not refer to valid quiz' };
   }
 
-  if (isValidCreator(quizId, authUserId) === false) {
+  if (isValidCreator(quizId, '12345') === false) {
     return { error: 'Quiz ID does not refer to a quiz that this user owns' };
   }
 
@@ -172,7 +172,7 @@ export function adminQuizInfo(authUserId: number, quizId: number): Error | {
     return { error: 'quizId does not refer to valid quiz' };
   }
 
-  if (!isValidCreator(quizId, authUserId)) {
+  if (!isValidCreator(quizId, '12345')) {
     return { error: 'quizId does not refer to quiz that this user owns' };
   }
 
@@ -214,7 +214,7 @@ export function adminQuizNameUpdate(authUserId: number, quizId: number, name: st
     return { error: 'Please enter a valid quiz' };
   }
   // Check inputted Quiz ID does not refer to a quiz that this user owns
-  if (isValidCreator(quizId, authUserId) === false) {
+  if (isValidCreator(quizId, '12345') === false) {
     return { error: 'You do not own this quiz' };
   }
   // Check inputted name is valid
@@ -258,7 +258,7 @@ export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, 
     return { error: 'quizId does not refer to valid quiz' };
   }
 
-  if (!isValidCreator(quizId, authUserID)) {
+  if (!isValidCreator(quizId, '12345')) {
     return { error: 'quizId does not refer to a quiz that this user owns' };
   }
 
@@ -291,13 +291,18 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
   if(!isValidQuizId(quizId)) {
     return {error: 'invalid quiz Id'};
   }
-  if(!isValidCreator) {
+  if(!isValidCreator(quizId, token)) {
     return {error: 'invalid quiz Id'};
   }
 
   // Error checking for quiz question inputs
   if(question.length < 5 || question.length > 50) {
     return {error: 'invalid input: question must be 5-50 characters long'}
+  }
+
+  // Note: assume question cannot be only whitespace
+  if(isWhiteSpace(question)) {
+    return {error: 'invalid input: question cannot be only whitespace'}
   }
 
   if(answers.length > 6 || answers.length < 2) {
@@ -350,7 +355,7 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
       colour: colours[colour],
       correct: current.correct
     })
-    colours = colours.splice(colour, 1);
+    colours.splice(colour, 1);
   }
 
   data.quizzes[index].questions.push({
@@ -363,6 +368,10 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
 
   const timeNow: number = Math.floor(Date.now() / 1000);
   data.quizzes[index].timeLastEdited = timeNow;
+  data.quizzes[index].duration += duration;
+  data.quizzes[index].numQuestions++;
+
+  setData(data);
 
   return {
     questionId: questionId
