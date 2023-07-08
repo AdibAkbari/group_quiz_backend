@@ -9,19 +9,19 @@ export interface Users {
   numFailedPasswordsSinceLastLogin: number;
 }
 
+export interface Answer {
+  answerId: number;
+  answer: string;
+  colour: string;
+  correct: boolean;
+}
+
 export interface Question {
   questionId: number;
   question: string;
   duration: number;
   points: number;
   answers: Answer[];
-}
-
-export interface Answer {
-  answerId: number;
-  answer: string;
-  colour: string;
-  correct: boolean;
 }
 
 export interface Quizzes {

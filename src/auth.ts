@@ -1,6 +1,6 @@
 import { setData, getData, Error, Data, Users, Token } from './dataStore';
 import validator from 'validator';
-import { isValidUserId, findUserIndex, isWhiteSpace } from './helper';
+import { isWhiteSpace } from './helper';
 
 export interface UserId {
     authUserId: number;
@@ -77,13 +77,12 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
   const numFailedPasswordsSinceLastLogin = 0;
   const user: Users = { email, password, nameFirst, nameLast, authUserId: userId, numSuccessfulLogins, numFailedPasswordsSinceLastLogin };
   store.users.push(user);
-  
+
   const timeNow: number = Math.floor((new Date()).getTime() / 1000);
   const tokenId: string = (Math.floor(Math.random() * timeNow)).toString();
-  const token: Token = { tokenId, userId }; 
+  const token: Token = { tokenId, userId };
   store.tokens.push(token);
   setData(store);
-  
 
   return {
     token: tokenId
@@ -140,31 +139,3 @@ export function adminAuthLogin(email: string, password: string): Error | UserId 
  *              numFailedPasswordsSinceLastLogin: number
  *              }}}
  */
-export function adminUserDetails(authUserId: number): User | Error {
-  const data: Data = getData();
-
-  if (!isValidUserId(authUserId)) {
-    return {
-      error: 'AuthUserId is not a valid user'
-    };
-  }
-
-  const i = findUserIndex(authUserId);
-  if (i === -1) {
-    return {
-      error: 'AuthUserId is not a valid user'
-    };
-  }
-  const name = `${data.users[i].nameFirst} ${data.users[i].nameLast}`;
-
-  return {
-    user:
-        {
-          userId: data.users[i].authUserId,
-          name: name,
-          email: data.users[i].email,
-          numSuccessfulLogins: data.users[i].numSuccessfulLogins,
-          numFailedPasswordsSinceLastLogin: data.users[i].numFailedPasswordsSinceLastLogin,
-        }
-  };
-}

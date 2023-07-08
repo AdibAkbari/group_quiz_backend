@@ -8,11 +8,11 @@ import sui from 'swagger-ui-express';
 import fs from 'fs';
 import {
   adminAuthRegister,
-} from './auth'
+} from './auth';
 import {
   adminQuizCreate, createQuizQuestion,
-} from './quiz'
-import { clear } from './other'
+} from './quiz';
+import { clear } from './other';
 
 // Set up web app
 const app = express();
@@ -44,30 +44,30 @@ app.get('/echo', (req: Request, res: Response) => {
   return res.json(ret);
 });
 
-// adminAuthRegister // 
+// adminAuthRegister //
 app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
-  //const { email, password, nameFirst, nameLast } = req.body;
+  // const { email, password, nameFirst, nameLast } = req.body;
   const result = adminAuthRegister(req.body.email, req.body.password, req.body.nameFirst, req.body.nameLast);
   if ('error' in result) {
     res.status(400);
   }
   res.json(result);
-})
+});
 
-// adminQuizCreate // 
+// adminQuizCreate //
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const response = adminQuizCreate(req.body.token, req.body.name, req.body.description);
   if ('error' in response) {
-    if (response.error.includes("Structure")) {
+    if (response.error.includes('Structure')) {
       return res.status(401).json(response);
-    } else if (response.error.includes("logged")) {
+    } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
-    } else if (response.error.includes("Name") || response.error.includes("Description")) {
+    } else if (response.error.includes('Name') || response.error.includes('Description')) {
       return res.status(400).json(response);
     }
   }
   res.json(response);
-})
+});
 
 // createQuizQuestion
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
@@ -75,18 +75,18 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const response = createQuizQuestion(quizId, req.body.token, question, duration, points, answers);
   if ('error' in response) {
-    if (response.error.includes("structure")) {
+    if (response.error.includes('structure')) {
       return res.status(401).json(response);
-    } else if (response.error.includes("logged")) {
+    } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
-    } else if (response.error.includes("input") || response.error.includes("quiz Id")) {
+    } else if (response.error.includes('input') || response.error.includes('quiz Id')) {
       return res.status(400).json(response);
     }
   }
   res.json(response);
-})
-  
-// clear // 
+});
+
+// clear //
 app.delete('/v1/clear', (req: Request, res: Response) => {
   res.json(clear());
 });
