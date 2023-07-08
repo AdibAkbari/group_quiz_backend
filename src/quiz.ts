@@ -1,13 +1,13 @@
 import { getData, setData, Data, Error } from './dataStore';
-import { checkNameValidity, 
-         isValidCreator, 
-         isValidQuizId, 
-         isValidUserId, 
-         isWhiteSpace,
-         isValidTokenStructure,
-         isTokenLoggedIn,
-         findUserFromToken, 
-        } from './helper';
+import {
+  checkNameValidity,
+  isValidCreator,
+  isValidQuizId,
+  isWhiteSpace,
+  isValidTokenStructure,
+  isTokenLoggedIn,
+  findUserFromToken,
+} from './helper';
 
 interface QuizList {
     quizId: number,
@@ -37,7 +37,7 @@ export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
     };
   }
 
-  if(!isTokenLoggedIn(token)) {
+  if (!isTokenLoggedIn(token)) {
     return {
       error: 'token is not logged in'
     };
@@ -46,9 +46,9 @@ export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
   const authUserId = findUserFromToken(token);
 
   const newList = data.quizzes.filter(id => id.creator === authUserId);
-  const quizzes: QuizList[] = newList.map((quiz) => { return {quizId: quiz.quizId, name: quiz.name}});
+  const quizzes: QuizList[] = newList.map((quiz) => { return { quizId: quiz.quizId, name: quiz.name }; });
 
-/*
+  /*
   for (const quiz of data.quizzes) {
     if (quiz.creator === authUserId) {
       const quizId: number = quiz.quizId;
@@ -61,8 +61,6 @@ export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
     quizzes: quizzes
   };
 }
-
-
 
 /**
  * Given basic details about a new quiz, create one for the user.
@@ -83,7 +81,7 @@ export function adminQuizCreate(token: string, name: string, description: string
     return { error: 'Token not logged in' };
   }
 
-  // get authUserId from token 
+  // get authUserId from token
   const authUserId = findUserFromToken(token);
 
   // invalid name
@@ -131,9 +129,9 @@ export function adminQuizCreate(token: string, name: string, description: string
  * @returns {{ }} empty object
  */
 export function adminQuizRemove(authUserId: number, quizId: number): Record<string, never> | Error {
-  if (isValidUserId(authUserId) === false) {
-    return { error: 'AuthUserId is not a valid user' };
-  }
+  // if (isValidUserId(authUserId) === false) {
+  //   return { error: 'AuthUserId is not a valid user' };
+  // }
 
   if (isValidQuizId(quizId) === false) {
     return { error: 'Quiz ID does not refer to valid quiz' };
@@ -170,9 +168,9 @@ export function adminQuizRemove(authUserId: number, quizId: number): Record<stri
 export function adminQuizInfo(authUserId: number, quizId: number): Error | {
     quizId: number, name: string, timeCreated: number, timeLastEdited: number, description: string
 } {
-  if (!isValidUserId(authUserId)) {
-    return { error: 'authUserId does not refer to valid user' };
-  }
+  // if (!isValidUserId(authUserId)) {
+  //   return { error: 'authUserId does not refer to valid user' };
+  // }
 
   if (!isValidQuizId(quizId)) {
     return { error: 'quizId does not refer to valid quiz' };
@@ -212,9 +210,9 @@ export function adminQuizInfo(authUserId: number, quizId: number): Error | {
  */
 export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): Record<string, never> | Error {
   // Check inputted UserId is valid
-  if (isValidUserId(authUserId) === false) {
-    return { error: 'Please enter a valid user' };
-  }
+  // if (isValidUserId(authUserId) === false) {
+  //   return { error: 'Please enter a valid user' };
+  // }
   // Check inputted quizId is valid
   if (isValidQuizId(quizId) === false) {
     return { error: 'Please enter a valid quiz' };
@@ -256,9 +254,9 @@ export function adminQuizNameUpdate(authUserId: number, quizId: number, name: st
  * @returns {{ }}
  */
 export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, description: string): Record<string, never> | Error {
-  if (!isValidUserId(authUserID)) {
-    return { error: 'authUserId does not refer to valid user' };
-  }
+  // if (!isValidUserId(authUserID)) {
+  //   return { error: 'authUserId does not refer to valid user' };
+  // }
 
   if (!isValidQuizId(quizId)) {
     return { error: 'quizId does not refer to valid quiz' };

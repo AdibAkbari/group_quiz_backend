@@ -1,4 +1,4 @@
-import { getData, setData, Data, Quizzes } from './dataStore';
+import { getData, setData, Data } from './dataStore';
 
 /**
  * Reset the state of the application back to the start.
@@ -21,5 +21,3 @@ export function clear (): Record<string, never> {
 
   return { };
 }
-
-

@@ -189,7 +189,7 @@ components:
         questions:
           type: array
           items:
-            $ref: '#/components/group/QuizQuestion'
+            $ref: '#/components/group/QuizQuestionIter2'
         duration:
           $ref: '#/components/prim/Duration'
 
@@ -230,6 +230,19 @@ components:
           $ref: '#/components/prim/QuizQuestionDuration'
         thumbnailUrl:
           $ref: '#/components/prim/Url'
+        points:
+          $ref: '#/components/prim/QuizQuestionPoints'
+        answers:
+          $ref: '#/components/prim/QuizQuestionAnswers'
+    QuizQuestionIter2:
+      type: object
+      properties:
+        questionId:
+          $ref: '#/components/prim/QuestionId'
+        question:
+          $ref: '#/components/prim/QuizQuestion'
+        duration:
+          $ref: '#/components/prim/QuizQuestionDuration'
         points:
           $ref: '#/components/prim/QuizQuestionPoints'
         answers:
@@ -610,18 +623,13 @@ components:
         token:
           $ref: '#/components/prim/Token'
     QuizTrashEmptyIter2:
-      in: body
-      name: body
+      in: query
+      name: quizIds
       required: true
       schema:
-        type: object
-        properties:
-          token:
-            $ref: '#/components/prim/Token'
-          quizIds:
-            type: string
-            example: "[3,4,5,6,7]"
-            description: A JSONified array of quiz id numbers
+        type: string
+        example: "[3,4,5,6,7]"
+        description: A JSONified array of quiz id numbers
     QuizTrashEmptyIter3:
       in: body
       name: body
@@ -941,7 +949,7 @@ paths:
             $ref: '#/components/return/Error'
 
   /v1/admin/auth/logout:
-    put:
+    post:
       summary: Logs out an admin user who has an active session.
       description: Should be called with a token that is returned after either a login or register has been made.
       tags:
@@ -1118,13 +1126,15 @@ paths:
   /v1/admin/quiz/{quizid}:
     delete:
       summary: Send a quiz to trash
-      description: Given a particular quiz, send it to the trash (can be recovered later)
+      description: |
+       - Given a particular quiz, send it to the trash (can be recovered later)
+       - When this route is called, the timeLastEdited is updated
       tags:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (Using Iteration 1)"
       parameters:
         - $ref: '#/components/path/QuizId'
-        - $ref: '#/components/body/QuizDeleteIter2'
+        - $ref: '#/components/query/Token'
       responses:
         200:
           description: OK
@@ -1147,7 +1157,7 @@ paths:
             $ref: '#/components/return/Error'
     get:
       summary: Get info about current quiz
-      description: Get all of the relevant information about the current quiz including questions
+      description: Get all of the relevant information about the current quiz including questions. Please look at the Colour data type to understand how it's generated.
       tags:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (Using Iteration 1)"
@@ -1299,6 +1309,7 @@ paths:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (New)"
       parameters:
+        - $ref: '#/components/query/Token'
         - $ref: '#/components/body/QuizTrashEmptyIter2'
       responses:
         200:
@@ -1360,7 +1371,7 @@ paths:
       summary: Create quiz question
       description: |
         Create a new stub question for a particular quiz.
-        When this route is called, and a question is created, the lastEdited time is set as the same as the created time, and the colours of a question are randomly generated.
+        When this route is called, and a question is created, the timeLastEdited for quiz is set as the time this question was created, and the colours of each answer are randomly generated again.
       tags:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (New)"
@@ -1400,7 +1411,7 @@ paths:
       summary: Update quiz question
       description: |
         Update the relevant details of a particular question within a quiz.
-        When this route is called, the last edited time is updated, and the colours of a question are randomly generated.
+        When this route is called, the timeLastEdited is updated, and the colours of a question are randomly generated.
       tags:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (New)"
@@ -1446,7 +1457,7 @@ paths:
       parameters:
         - $ref: '#/components/path/QuizId'
         - $ref: '#/components/path/QuestionId'
-        - $ref: '#/components/body/QuizQuestionDelete'
+        - $ref: '#/components/query/Token'
       responses:
         200:
           description: OK
@@ -1472,7 +1483,9 @@ paths:
   /v1/admin/quiz/{quizid}/question/{questionid}/move:
     put:
       summary: Move a quiz question
-      description: Move a question from one particular position in the quiz to another
+      description: | 
+       - Move a question from one particular position in the quiz to another
+       - When this route is called, the timeLastEdited is updated
       tags:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (New)"
@@ -1506,7 +1519,9 @@ paths:
   /v1/admin/quiz/{quizid}/question/{questionid}/duplicate:
     post:
       summary: Duplicate a quiz question
-      description: A particular question gets duplicated to immediately after where the source question is
+      description: | 
+       - A particular question gets duplicated to immediately after where the source question is
+       - When this route is called, the timeLastEdited is updated
       tags:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (New)"
