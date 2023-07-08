@@ -10,6 +10,7 @@ import {
   adminAuthLogin,
   adminAuthRegister,
   adminUserDetails,
+  updateUserDetails,
 } from './auth';
 import {
   adminQuizCreate,
@@ -67,6 +68,22 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
       return res.status(403).json(response);
     }
   }
+  res.json(response);
+});
+
+// updateUserDetails
+app.put('/v1/admin/user/details', (req: Request, res: Response) => {
+  const { token, email, nameFirst, nameLast } = req.body;
+  const response = updateUserDetails(token, email, nameFirst, nameLast);
+  if ('error' in response) { 
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('Email') || response.error.includes('name')) {
+      return res.status(400).json(response);
+    }
+  } 
   res.json(response);
 });
 

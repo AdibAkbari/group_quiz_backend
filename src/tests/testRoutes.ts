@@ -58,6 +58,20 @@ export function adminUserDetailsRequest(token: string) {
   };
 }
 
+export function updateUserDetailsRequest(token: string, email: string, nameFirst: string, nameLast: string) {
+  const res = request(
+    'PUT',
+    SERVER_URL + '/v1/admin/user/details',
+    {
+      json: { token: token, email: email, nameFirst: nameFirst, nameLast: nameLast },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function clearRequest() {
   const res = request(
     'DELETE',
