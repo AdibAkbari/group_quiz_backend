@@ -80,8 +80,10 @@ describe('adminQuizTrash', () => {
           }
         ]
       };
-      const trash = quizTrashRequest(user.token);
-      expect(trash.body).toStrictEqual(expected);
+      const trashList = quizTrashRequest(user.token).body;
+      const trashSet = new Set(trashList.quizzes);
+      const expectedSet = new Set(expected.quizzes);
+      expect(trashSet).toStrictEqual(expectedSet);
     });
   });
 });

@@ -182,8 +182,12 @@ export function adminQuizTrash(token: string): {quizzes: QuizList[]} | Error {
   if (!isTokenLoggedIn(token)) {
     return { error: 'Token not logged in' };
   }
+
   const data = getData();
-  const trashQuizzes = data.trash.map((quiz) => { return { quizId: quiz.quizId, name: quiz.name }; });
+  // maps list of quiz objects in trash to just have name and quizId
+  const trashQuizzes = data.trash.map((quiz) => {
+    return { quizId: quiz.quizId, name: quiz.name };
+  });
 
   return {
     quizzes: trashQuizzes
