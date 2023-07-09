@@ -159,7 +159,6 @@ export function adminQuizRemove(token: string, quizId: number): Record<string, n
   data.quizzes.splice(index, 1);
   setData(data);
 
-
   return { };
 }
 
