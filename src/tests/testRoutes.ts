@@ -42,6 +42,20 @@ export function quizCreateRequest(token: string, name: string, description: stri
   };
 }
 
+export function updateUserPasswordRequest(token: string, oldPassword: string, newPassword: string) {
+  const res = request(
+    'PUT',
+    SERVER_URL + '/v1/admin/user/password',
+    {
+      json: { token: token, oldPassword: oldPassword, newPassword: newPassword },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function clearRequest() {
   const res = request(
     'DELETE',
