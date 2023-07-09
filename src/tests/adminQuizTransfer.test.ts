@@ -17,12 +17,13 @@ interface QuizCreate {
 }
 // Before each test, clear data and then create a new user and new quiz
 let user: Token;
+let user2: Token;
 let quiz: QuizCreate;
 beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
   quiz = quizCreateRequest(user.token, 'quiz1', '').body;
-  user2 = authRegisterRequest('email2@gmail.com', 'password2', 'first2', 'last2').body;
+  user2 = authRegisterRequest('email2@gmail.com', 'password2', 'firsttwo', 'lasttwo').body;
 });
 
 
@@ -81,9 +82,9 @@ describe('invalid quizId', () => {
 
   // Quiz ID refers to a quiz that has a name that is already used by the target user
   test('User already has a quiz named', () => {
-    const quiz2 = quizCreateRequest(user2.token, 'quiz1', '').body;
+    const quiz2 = quizCreateRequest(user.token, 'quiz1', '').body;
 
-    const transfer = quizTransferRequest(user.token, quiz.quizId, 'email2@gmail.com');
+    const transfer = quizTransferRequest(user.token, quiz2.quizId, 'email2@gmail.com');
     expect(transfer.body).toStrictEqual(ERROR);
     expect(transfer.statusCode).toStrictEqual(400);
   });
@@ -128,6 +129,10 @@ describe('Successful quiz transfer', () => {
 //           name: 'quiz1'
 //         }
 //       ]
+//     });
+
+//     expect(adminQuizListRequest(user.token).body).toStrictEqual({
+//       quizzes: []
 //     });
 //   });
 

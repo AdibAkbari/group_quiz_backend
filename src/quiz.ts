@@ -8,6 +8,7 @@ import {
   isValidTokenStructure,
   isTokenLoggedIn,
   findUserFromToken,
+  isValidEmail
 } from './helper';
 
 interface QuizList {
@@ -281,5 +282,47 @@ export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, 
  * @returns {{ }}
  */
 export function adminQuizTransfer (token: string, quizId: number, userEmail: string): Record<string, never> | Error {
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
+  if (!isValidQuizId(quizId)) {
+    return { error: 'Invalid: QuizId' };
+  }
+
+  const authUserId = findUserFromToken(token);
+  if (!isValidCreator(quizId, authUserId)) {
+    return { error: 'Invalid: You do not own this quiz' };
+  }
+
+  console.log(userEmail)
+  // Check if email exist
+  if (!isValidEmail(userEmail)) {
+    return { error: 'Invalid: Email does not exist' };
+  }
+
+  const data: Data = getData();
+
+  const loggedInUser = data.users.find((current) => current.authUserId === authUserId);
+  if (loggedInUser.email === userEmail) {
+    return { error: 'Invalid: Email is current users' };
+  }
+
+  // Find the correct quiz based on input
+  const currentQuiz = data.quizzes.find((current) => current.quizId === quizId);
+  // Find the user to transfer the quiz to
+  const transferUser = data.users.find((current) => current.email === userEmail);
+
+  if (transferUser.name === currentQuiz.name) {
+    return { error: 'Invalid: User already has a Quiz with the same name' };
+  }
+
+  currentQuiz.creator = transferUser.authUserID;
+
+
   return { };
 }
