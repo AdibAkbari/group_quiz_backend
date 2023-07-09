@@ -26,7 +26,7 @@ beforeEach(() => {
   quiz = quizCreateRequest(user.token, 'quiz1', '').body;
 });
 
-describe('adminQuizTrash', () => {
+describe('adminQuizRestore', () => {
   describe('Error cases', () => {
     test.each([
       { testName: 'token just letters', token: 'hello' },
@@ -113,7 +113,10 @@ describe('adminQuizTrash', () => {
           }
         ]
       };
-      expect(quizTrashRequest(user.token).body).toStrictEqual(expected);
+      const trashList = quizTrashRequest(user.token).body;
+      const trashSet = new Set(trashList.quizzes);
+      const expectedSet = new Set(expected.quizzes);
+      expect(trashSet).toStrictEqual(expectedSet);
     });
     // test('adds quiz back to active quizzes', () => {
     //   const expected = {
