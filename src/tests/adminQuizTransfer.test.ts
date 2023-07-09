@@ -26,9 +26,6 @@ beforeEach(() => {
   user2 = authRegisterRequest('email2@gmail.com', 'password2', 'firsttwo', 'lasttwo').body;
 });
 
-
-
-
 // token not valid
 describe('Token invalid', () => {
   test.each([
@@ -88,9 +85,7 @@ describe('invalid quizId', () => {
     expect(transfer.body).toStrictEqual(ERROR);
     expect(transfer.statusCode).toStrictEqual(400);
   });
-
 });
-
 
 // userEmail wrong
 describe('invalid userEmail', () => {
@@ -105,10 +100,9 @@ describe('invalid userEmail', () => {
     expect(transfer.body).toStrictEqual(ERROR);
     expect(transfer.statusCode).toStrictEqual(400);
   });
-
 });
 
-// Success cases 
+// Success cases
 describe('Successful quiz transfer', () => {
   test('Successful transfer quiz empty object response', () => {
     const transfer = quizTransferRequest(user.token, quiz.quizId, 'email2@gmail.com');
@@ -116,24 +110,22 @@ describe('Successful quiz transfer', () => {
     expect(transfer.statusCode).toStrictEqual(200);
   });
 
+  //   test('Successful transfer quiz integrated test', () => {
+  //     const transfer = quizTransferRequest(user.token, quiz.quizId, 'email2@gmail.com');
+  //     expect(transfer.body).toStrictEqual({});
+  //     expect(transfer.statusCode).toStrictEqual(200);
 
-//   test('Successful transfer quiz integrated test', () => {
-//     const transfer = quizTransferRequest(user.token, quiz.quizId, 'email2@gmail.com');
-//     expect(transfer.body).toStrictEqual({});
-//     expect(transfer.statusCode).toStrictEqual(200);
+  //     expect(adminQuizListRequest(user2.token).body).toStrictEqual({
+  //       quizzes: [
+  //         {
+  //           quizId: quiz.quizId,
+  //           name: 'quiz1'
+  //         }
+  //       ]
+  //     });
 
-//     expect(adminQuizListRequest(user2.token).body).toStrictEqual({
-//       quizzes: [
-//         {
-//           quizId: quiz.quizId,
-//           name: 'quiz1'
-//         }
-//       ]
-//     });
-
-//     expect(adminQuizListRequest(user.token).body).toStrictEqual({
-//       quizzes: []
-//     });
-//   });
-
+  //     expect(adminQuizListRequest(user.token).body).toStrictEqual({
+  //       quizzes: []
+  //     });
+  //   });
 });

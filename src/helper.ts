@@ -150,19 +150,17 @@ export function isWhiteSpace (name: string): boolean {
 }
 
 /**
-   * Helper function to determine if the email exist 
+   * Helper function to determine if the email exist
    *
    * @param {string} userEmail
    * @returns {boolean} - returns true if does exist
    * @returns {boolean} - returns false if it dosn't exist
    */
 export function isValidEmail (userEmail: string): boolean {
-
   const data: Data = getData();
   for (const current of data.users) {
     if (current.email === userEmail) {
       return true;
-      console.log(current.email)
     }
   }
 

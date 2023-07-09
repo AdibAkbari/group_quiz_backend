@@ -272,7 +272,6 @@ export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, 
   return { };
 }
 
-
 /**
  * Transfer ownership of a quiz to a different user based on their email
  *
@@ -299,7 +298,6 @@ export function adminQuizTransfer (token: string, quizId: number, userEmail: str
     return { error: 'Invalid: You do not own this quiz' };
   }
 
-  console.log(userEmail)
   // Check if email exist
   if (!isValidEmail(userEmail)) {
     return { error: 'Invalid: Email does not exist' };
@@ -322,7 +320,6 @@ export function adminQuizTransfer (token: string, quizId: number, userEmail: str
   }
 
   currentQuiz.creator = transferUser.authUserID;
-
 
   return { };
 }
