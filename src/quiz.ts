@@ -319,6 +319,8 @@ export function adminQuizTransfer (token: string, quizId: number, userEmail: str
     return { error: 'Invalid: User already has a Quiz with the same name' };
   }
 
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  currentQuiz.timeLastEdited = timeNow;
   currentQuiz.creator = transferUser.authUserID;
 
   return { };

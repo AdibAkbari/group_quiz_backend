@@ -128,4 +128,19 @@ describe('Successful quiz transfer', () => {
   //       quizzes: []
   //     });
   //   });
+
+  //   test('Successful transfer quiz empty object response', () => {
+  //     const expectedTimeTransfered = Math.floor(Date.now() / 1000);
+  //     const transfer = quizTransferRequest(user.token, quiz.quizId, 'email2@gmail.com');
+  //     expect(transfer.body).toStrictEqual({});
+  //     expect(transfer.statusCode).toStrictEqual(200);
+
+  //     const quizInfo = adminQuizInfoRequest(quiz.quizId);
+
+  //     const timeSent = quizInfo.timeLastEdited;
+
+  //     expect(timeSent).toBeGreaterThanOrEqual(expectedTimeTransfered);
+  //     expect(timeSent).toBeLessThanOrEqual(expectedTimeTransfered + 2);
+
+//   });
 });
