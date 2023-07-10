@@ -62,9 +62,9 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
   const token = req.query.token as string;
   const response = adminUserDetails(token);
   if ('error' in response) {
-    if (response.error.includes("structure")) {
+    if (response.error.includes('structure')) {
       return res.status(401).json(response);
-    } else if (response.error.includes("logged")) {
+    } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
     }
   }
@@ -75,7 +75,7 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
 app.put('/v1/admin/user/details', (req: Request, res: Response) => {
   const { token, email, nameFirst, nameLast } = req.body;
   const response = updateUserDetails(token, email, nameFirst, nameLast);
-  if ('error' in response) { 
+  if ('error' in response) {
     if (response.error.includes('structure')) {
       return res.status(401).json(response);
     } else if (response.error.includes('logged')) {
@@ -83,7 +83,7 @@ app.put('/v1/admin/user/details', (req: Request, res: Response) => {
     } else if (response.error.includes('Email') || response.error.includes('name')) {
       return res.status(400).json(response);
     }
-  } 
+  }
   res.json(response);
 });
 

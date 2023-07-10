@@ -174,9 +174,9 @@ export function adminUserDetails(token: string): User | Error {
  * @param {string} email
  * @param {string} nameFirst
  * @param {string} nameLast
- * @returns {{ }}
+ * @returns {{ }} empty object
 */
-export function updateUserDetails(token: string, email: string, nameFirst: string, nameLast: string) {
+export function updateUserDetails(token: string, email: string, nameFirst: string, nameLast: string): Record<string, never> | Error {
   const data: Data = getData();
 
   if (!isValidTokenStructure(token)) {
@@ -190,8 +190,8 @@ export function updateUserDetails(token: string, email: string, nameFirst: strin
   const userId = findUserFromToken(token);
   const index = data.users.findIndex(id => id.authUserId === userId);
   if (data.users[index].email !== email && data.users.filter(mail => mail.email === email).length > 0) {
-    return {  error: 'Email is currently used by another user' };
-  };
+    return { error: 'Email is currently used by another user' };
+  }
 
   if (!validator.isEmail(email)) {
     return { error: 'Email is Invalid' };
@@ -209,7 +209,7 @@ export function updateUserDetails(token: string, email: string, nameFirst: strin
   if (!expressionName.test(nameLast)) {
     return { error: 'Last name must only contain letters, spaces, hyphens or apostrophes' };
   }
-  
+
   if (nameLast.length < 2 || nameLast.length > 20) {
     return { error: 'Last name must be 2 to 20 characters' };
   }

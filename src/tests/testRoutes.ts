@@ -44,17 +44,17 @@ export function quizCreateRequest(token: string, name: string, description: stri
 
 export function adminUserDetailsRequest(token: string) {
   const res = request(
-      'GET',
-      SERVER_URL + '/v1/admin/user/details',
-      {
-          qs: {
-              token: token,
-          }
+    'GET',
+    SERVER_URL + '/v1/admin/user/details',
+    {
+      qs: {
+        token: token,
       }
+    }
   );
   return {
-      body: JSON.parse(res.body.toString()),
-      statusCode: JSON.parse(res.statusCode.toString())
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
   };
 }
 
