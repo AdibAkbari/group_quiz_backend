@@ -1,4 +1,4 @@
-import { setData, getData, Error, Data, Users, Token, Password } from './dataStore';
+import { setData, getData, Error, Data, Users, Token } from './dataStore';
 import validator from 'validator';
 import { isValidTokenStructure, isTokenLoggedIn, findUserFromToken, isWhiteSpace } from './helper';
 
@@ -168,7 +168,7 @@ export function adminUserDetails(token: string): User | Error {
 }
 
 /**
- * Updates a logged in user's password 
+ * Updates a logged in user's password
  *
  * @param {string} token
  * @param {string} oldPassword
@@ -189,15 +189,15 @@ export function updateUserPassword(token: string, oldPassword: string, newPasswo
   const userId = findUserFromToken(token);
   const index = data.users.findIndex(id => id.authUserId === userId);
   if (data.users[index].password !== oldPassword) {
-    return { error: 'Old password is incorrect'};
+    return { error: 'Old password is incorrect' };
   }
 
   if (data.users[index].oldPasswords !== undefined) {
     if (data.users[index].oldPasswords.includes(newPassword)) {
-      return { error: 'New password has been used previously'};
+      return { error: 'New password has been used previously' };
     }
   }
-  
+
   if (newPassword.length < 8) {
     return { error: 'New password must be at least 8 characters' };
   }
@@ -216,7 +216,7 @@ export function updateUserPassword(token: string, oldPassword: string, newPasswo
   data.users[index].password = newPassword;
 
   console.log(data.users[index]);
-  
+
   setData(data);
   return ({ });
 }
