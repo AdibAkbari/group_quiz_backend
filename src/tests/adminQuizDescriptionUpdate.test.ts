@@ -1,60 +1,88 @@
-import { adminQuizCreate, adminQuizInfo, quizDescriptionUpdateRequest } from '../quiz';
-
-import { 
-  clearRequest, 
+// tests for authRegisterRequest function
+import {
+  clearRequest,
   authRegisterRequest,
-  quizDescriptionUpdateRequest, 
+  quizDescriptionUpdateRequest,
+  quizCreateRequest,
 } from './testRoutes';
 
+interface Token {
+  token: string
+}
+
+interface Quiz {
+  quizId: number
+}
+
 const ERROR = { error: expect.any(String) };
-let user;
-let quiz;
+let user: Token;
+let quiz: Quiz;
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
-  quiz = adminQuizCreate(user.authUserId, 'My Quiz', 'First Description');
+  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
+  quiz = quizCreateRequest(user.token, 'My Quiz', 'First Description').body;
 });
 
-describe('invalid edge cases', () => {
-  test('authUserId not valid user', () => {
-    expect(quizDescriptionUpdateRequest(user.authUserId + 1, quiz.quizId, 'New Description')).toStrictEqual(ERROR);
-  });
-
+describe('Error Cases', () => {
   test('quizId not valid', () => {
-    expect(quizDescriptionUpdateRequest(user.authUserId, quiz.quizId + 1, 'New Description')).toStrictEqual(ERROR);
+    const update = quizDescriptionUpdateRequest(quiz.quizId + 1, user.token, 'New Description');
+    expect(update.body).toStrictEqual(ERROR);
+    expect(update.statusCode).toStrictEqual(400);
   });
 
   test('user does not own quiz', () => {
-    const user2 = authRegister('email2@gmail.com', 'password1', 'first', 'last');
-    const quiz2 = adminQuizCreate(user2.authUserId, 'user2 quiz', '');
-    expect(quizDescriptionUpdateRequest(user.authUserId, quiz2.quizId, 'New Description')).toStrictEqual(ERROR);
+    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'first', 'last').body;
+    const quiz2 = quizCreateRequest(user2.token, 'User 2 Quiz', 'First Description').body;
+    const update = quizDescriptionUpdateRequest(quiz2.quizId, user.token, 'New Description');
+    expect(update.body).toStrictEqual(ERROR);
+    expect(update.statusCode).toStrictEqual(400);
   });
 
   test('description too long', () => {
-    expect(quizDescriptionUpdateRequest(user.authUserId, quiz.quizId,
-      '01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890'
-    )).toStrictEqual(ERROR);
-    expect(quizDescriptionUpdateRequest(user.authUserId, quiz.quizId,
-      '                                                                                                       '
-    )).toStrictEqual(ERROR);
+    const update = quizDescriptionUpdateRequest(quiz.quizId, user.token, '1'.repeat(101));
+    expect(update.body).toStrictEqual(ERROR);
+    expect(update.statusCode).toStrictEqual(400);
+  });
+
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+    { testName: 'token ends with letters', token: '54356s' },
+    { testName: 'token includes letter', token: '5436h86' },
+    { testName: 'token has space', token: '4324 757' },
+    { testName: 'token only whitespace', token: '  ' },
+    { testName: 'token has other characters', token: '6365,53' },
+    { testName: 'empty string', token: '' },
+    { testName: 'token has decimal point', token: '53.74' },
+    { testName: 'token has negative sign', token: '-37294' },
+    { testName: 'token has positive sign', token: '+38594' },
+  ])('invalid token: $testName', ({ token }) => {
+    const update = quizDescriptionUpdateRequest(quiz.quizId, token, 'New Description');
+    expect(update.statusCode).toBe(401);
+    expect(update.body).toStrictEqual(ERROR);
+  });
+
+  test('tokenId not logged in', () => {
+    const update = quizDescriptionUpdateRequest(quiz.quizId, '12345', 'New Description');
+    expect(update.statusCode).toBe(403);
+    expect(update.body).toStrictEqual(ERROR);
   });
 });
 
-// describe('valid input', () => {
-//   test('valid input', () => {
-//     expect(quizDescriptionUpdateRequest(user.authUserId, quiz.quizId, 'New Description')).toStrictEqual({ });
-//   });
-
-//   test('testing correct quiz description change', () => {
-//     quizDescriptionUpdateRequest(user.authUserId, quiz.quizId, 'New Description');
-//     expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual(
-//       {
-//         quizId: quiz.quizId,
-//         name: 'My Quiz',
-//         timeCreated: expect.any(Number),
-//         timeLastEdited: expect.any(Number),
-//         description: 'New Description',
-//       }
-//     );
-//   });
-// });
+test('valid input', () => {
+  const update = quizDescriptionUpdateRequest(quiz.quizId, user.token, 'New Description');
+  expect(update.body).toStrictEqual({ });
+  expect(update.statusCode).toBe(200);
+  // expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual(
+  //   {
+  //     quizId: quiz.quizId,
+  //     name: 'My Quiz',
+  //     timeCreated: expect.any(Number),
+  //     timeLastEdited: expect.any(Number),
+  //     description: 'New Description',
+  //     numQuestions: 0,
+  //     questions: [],
+  //     duration: 0
+  //   }
+  // );
+});

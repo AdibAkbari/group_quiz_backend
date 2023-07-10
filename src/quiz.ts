@@ -254,34 +254,35 @@ export function adminQuizNameUpdate(authUserId: number, quizId: number, name: st
 }
 
 /**
- * Update the description of the relevant quiz given the authUserId
+ * Update the description of the relevant quiz given the token
  * of the owner of the quiz, the quizId of the quiz to change and the
  * new description.
  *
  * @param {number} quizId
  * @param {string} token
  * @param {string} description
- * @returns {{ }}
+ * @returns {{ }} empty object
  */
 export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, description: string): Record<string, never> | Error {
+  if (!isValidTokenStructure(tokenId)) {
+    return { error: 'token is not a valid structure' };
+  }
+
+  if (!isTokenLoggedIn(tokenId)) {
+    return { error: 'token is not for a currently logged in session' };
+  }
+
   if (!isValidQuizId(quizId)) {
     return { error: 'quizId does not refer to valid quiz' };
   }
 
+  const authUserID = findUserFromToken(tokenId);
   if (!isValidCreator(quizId, authUserID)) {
     return { error: 'quizId does not refer to a quiz that this user owns' };
   }
 
   if (description.length > 100) {
     return { error: 'description must be less than 100 characters' };
-  }
-
-  if (!isValidTokenStructure(tokenId)) {
-    return { error: 'token is not a valid structure' };
-  }
-
-  if (!isTokenLoggedIn(tokenId)) {
-    return { error: 'token is not for a currently logged in session' }
   }
 
   const store: Data = getData();

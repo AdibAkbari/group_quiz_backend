@@ -6,14 +6,14 @@ import cors from 'cors';
 import YAML from 'yaml';
 import sui from 'swagger-ui-express';
 import fs from 'fs';
-import{
-  adminQuizDescriptionUpdate,
+import {
   adminAuthLogin,
   adminAuthRegister,
 } from './auth';
 import {
   adminQuizCreate,
-  adminQuizRemove
+  adminQuizRemove,
+  adminQuizDescriptionUpdate
 } from './quiz';
 import { clear } from './other';
 
@@ -51,22 +51,19 @@ app.get('/echo', (req: Request, res: Response) => {
 app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const { token, description } = req.body;
-  const result = adminQuizDescriptionUpdate(userId, quizId, description);
+  const response = adminQuizDescriptionUpdate(quizId, token, description);
 
-  if (
-    result === { error: 'quizId does not refer to valid quiz' } ||
-    result === { error: 'quizId does not refer to a quiz that this user owns' } ||
-    result === { error: 'description must be less than 100 characters' }
-  ) {
-    return res.status(400);
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('quizId') || response.error.includes('description')) {
+      return res.status(400).json(response);
+    }
   }
-  if (
-    result === { error: 'authUserId does not refer to valid user' }
-  ) {
-    return res.status(401);
-  }
-  res.json(result)
-}) 
+  res.json(response);
+});
 
 // adminAuthRegister //
 app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
