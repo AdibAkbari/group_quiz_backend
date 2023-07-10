@@ -3,6 +3,11 @@ import request from 'sync-request';
 import { port, url } from '../config.json';
 const SERVER_URL = `${url}:${port}`;
 
+interface Answer {
+  answer: string,
+  correct: boolean
+}
+
 export function authLoginRequest(email: string, password: string) {
   const res = request(
     'POST',
@@ -48,6 +53,44 @@ export function quizRemoveRequest(token: string, quizid: number) {
     SERVER_URL + `/v1/admin/quiz/${quizid}`,
     {
       qs: { token: token },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function createQuizQuestionRequest(quizId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
+  const res = request(
+    'POST',
+    SERVER_URL + `/v1/admin/quiz/${quizId}/question`,
+    {
+      json: {
+        token: token,
+        questionBody: {
+          question,
+          duration,
+          points,
+          answers
+        }
+      }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function quizQuestionDeleteRequest(token: string, quizId: number, questionId: number) {
+  const res = request(
+    'DELETE',
+    SERVER_URL + `/v1/admin/quiz/${quizId}/question/${questionId}`,
+    {
+      json: {
+        token: token,
+      }
     }
   );
   return {

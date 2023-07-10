@@ -1,9 +1,8 @@
-import { getData, setData, Data, Error } from './dataStore';
+import { getData, setData, Data, Error, Answer } from './dataStore';
 import {
   checkNameValidity,
   isValidCreator,
   isValidQuizId,
-  isValidUserId,
   isWhiteSpace,
   isValidTokenStructure,
   isTokenLoggedIn,
@@ -17,6 +16,11 @@ interface QuizList {
 
 interface QuizCreate {
     quizId: number,
+}
+
+interface Answers {
+  answer: string,
+  correct: boolean
 }
 
 /**
@@ -113,6 +117,7 @@ export function adminQuizCreate(token: string, name: string, description: string
       questions: [],
       creator: authUserId,
       duration: 0,
+      questionCount: 0
     }
   );
   setData(data);
@@ -178,15 +183,15 @@ export function adminQuizRemove(token: string, quizId: number): Record<string, n
 export function adminQuizInfo(authUserId: number, quizId: number): Error | {
     quizId: number, name: string, timeCreated: number, timeLastEdited: number, description: string
 } {
-  if (!isValidUserId(authUserId)) {
-    return { error: 'authUserId does not refer to valid user' };
-  }
+  // if (!isValidUserId(authUserId)) {
+  //   return { error: 'authUserId does not refer to valid user' };
+  // }
 
   if (!isValidQuizId(quizId)) {
     return { error: 'quizId does not refer to valid quiz' };
   }
 
-  if (!isValidCreator(quizId, authUserId)) {
+  if (!isValidCreator(quizId, '12345')) {
     return { error: 'quizId does not refer to quiz that this user owns' };
   }
 
@@ -220,15 +225,15 @@ export function adminQuizInfo(authUserId: number, quizId: number): Error | {
  */
 export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): Record<string, never> | Error {
   // Check inputted UserId is valid
-  if (isValidUserId(authUserId) === false) {
-    return { error: 'Please enter a valid user' };
-  }
+  // if (isValidUserId(authUserId) === false) {
+  //   return { error: 'Please enter a valid user' };
+  // }
   // Check inputted quizId is valid
   if (isValidQuizId(quizId) === false) {
     return { error: 'Please enter a valid quiz' };
   }
   // Check inputted Quiz ID does not refer to a quiz that this user owns
-  if (isValidCreator(quizId, authUserId) === false) {
+  if (isValidCreator(quizId, '12345') === false) {
     return { error: 'You do not own this quiz' };
   }
   // Check inputted name is valid
@@ -264,15 +269,15 @@ export function adminQuizNameUpdate(authUserId: number, quizId: number, name: st
  * @returns {{ }}
  */
 export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, description: string): Record<string, never> | Error {
-  if (!isValidUserId(authUserID)) {
-    return { error: 'authUserId does not refer to valid user' };
-  }
+  // if (!isValidUserId(authUserID)) {
+  //   return { error: 'authUserId does not refer to valid user' };
+  // }
 
   if (!isValidQuizId(quizId)) {
     return { error: 'quizId does not refer to valid quiz' };
   }
 
-  if (!isValidCreator(quizId, authUserID)) {
+  if (!isValidCreator(quizId, '12345')) {
     return { error: 'quizId does not refer to a quiz that this user owns' };
   }
 
@@ -288,4 +293,130 @@ export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, 
   setData(store);
 
   return { };
+}
+
+/**
+ * Create a new stub question for a particular quiz.
+ * When this route is called, and a question is created, the timeLastEdited for quiz is set as the time this question was created
+ * and the colours of a question are randomly generated.
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {string} question
+ * @param {number} duration
+ * @param {number} points
+ * @param {Answers[]} answers
+ * @returns {questionId: number}
+ */
+export function createQuizQuestion(quizId: number, token: string, question: string, duration: number, points: number, answers: Answers[]): {questionId: number} | Error {
+  // Error checking for token
+  if (!isValidTokenStructure(token)) {
+    return { error: 'invalid token structure' };
+  }
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'token is not logged in' };
+  }
+
+  // Error checking for quizId
+  if (!isValidQuizId(quizId)) {
+    return { error: 'invalid quiz Id' };
+  }
+
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'invalid quiz Id' };
+  }
+
+  // Error checking for quiz question inputs
+  if (question.length < 5 || question.length > 50) {
+    return { error: 'invalid input: question must be 5-50 characters long' };
+  }
+
+  // Note: assume question cannot be only whitespace
+  if (isWhiteSpace(question)) {
+    return { error: 'invalid input: question cannot be only whitespace' };
+  }
+
+  if (answers.length > 6 || answers.length < 2) {
+    return { error: 'invalid input: must have 2-6 answers' };
+  }
+
+  if (duration <= 0) {
+    return { error: 'invalid input: question duration must be a positive number' };
+  }
+
+  if (points < 1 || points > 10) {
+    return { error: 'invalid input: points must be between 1 and 10' };
+  }
+
+  if (answers.find(answer => (answer.answer.length > 30 || answer.answer.length < 1)) !== undefined) {
+    return { error: 'invalid input: answers must be 1-30 characters long' };
+  }
+
+  for (const current of answers) {
+    if ((answers.filter(answer => answer.answer === current.answer)).length > 1) {
+      return { error: 'invalid input: cannot have duplicate answer strings' };
+    }
+  }
+
+  if (answers.find(answer => answer.correct === true) === undefined) {
+    return { error: 'invalid input: must be at least one correct answer' };
+  }
+
+  const data = getData();
+  const index = data.quizzes.findIndex(id => id.quizId === quizId);
+
+  if (data.quizzes[index].duration + duration > 180) {
+    return { error: 'invalid input: question durations cannot exceed 3 minutes' };
+  }
+
+  // Creating new quiz question
+  data.quizzes[index].questionCount++;
+  const questionId: number = data.quizzes[index].questionCount;
+
+  const answerArray: Answer[] = [];
+  const colours = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink'];
+  let answerId = 0;
+
+  for (const current of answers) {
+    const colour = Math.floor(Math.random() * colours.length);
+    answerId++;
+    answerArray.push({
+      answerId: answerId,
+      answer: current.answer,
+      colour: colours[colour],
+      correct: current.correct
+    });
+    colours.splice(colour, 1);
+  }
+
+  data.quizzes[index].questions.push({
+    questionId: questionId,
+    question: question,
+    duration: duration,
+    points: points,
+    answers: answerArray
+  });
+
+  const timeNow: number = Math.floor(Date.now() / 1000);
+  data.quizzes[index].timeLastEdited = timeNow;
+  data.quizzes[index].duration += duration;
+  data.quizzes[index].numQuestions++;
+
+  setData(data);
+
+  return {
+    questionId: questionId
+  };
+}
+
+/**
+ * Delete a particular question from a quiz
+ * 
+ * @param {string} token
+ * @param {number} quizId
+ * @param {number} questionId
+ * @returns {questionId: number}
+ */
+export function quizQuestionDelete (token: string, quizId: number, questionId: number): Record<string, never> | Error {
+    return {};
 }
