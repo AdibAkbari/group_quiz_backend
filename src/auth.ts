@@ -77,13 +77,12 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
   const numFailedPasswordsSinceLastLogin = 0;
   const user: Users = { email, password, nameFirst, nameLast, authUserId: userId, numSuccessfulLogins, numFailedPasswordsSinceLastLogin };
   store.users.push(user);
-  
+
   const timeNow: number = Math.floor((new Date()).getTime() / 1000);
   const tokenId: string = (Math.floor(Math.random() * timeNow)).toString();
-  const token: Token = { tokenId, userId }; 
+  const token: Token = { tokenId, userId };
   store.tokens.push(token);
   setData(store);
-  
 
   return {
     token: tokenId
@@ -97,18 +96,11 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
  * @param {string} password
  * @returns {{authUserId: number}}
  */
-export function adminAuthLogin(email: string, password: string): Error | UserId {
-  let emailExists = false;
-  const newData: Data = getData();
-  let userIndex: number;
+export function adminAuthLogin(email: string, password: string): Error | TokenId {
+  const newData = getData();
+  const userIndex = newData.users.findIndex((user) => user.email === email);
 
-  for (const user of newData.users) {
-    if (user.email === email) {
-      emailExists = true;
-      userIndex = newData.users.indexOf(user);
-    }
-  }
-  if (emailExists === false) {
+  if (userIndex === -1) {
     return { error: 'email does not exist' };
   }
 
@@ -117,13 +109,17 @@ export function adminAuthLogin(email: string, password: string): Error | UserId 
     setData(newData);
     return { error: 'password does not match given email' };
   }
+
   newData.users[userIndex].numSuccessfulLogins++;
   newData.users[userIndex].numFailedPasswordsSinceLastLogin = 0;
 
   setData(newData);
 
+  const userId = newData.users[userIndex].authUserId;
+  const token = newData.tokens.find((token) => token.userId === userId);
+
   return {
-    authUserId: newData.users[userIndex].authUserId,
+    token: token.tokenId
   };
 }
 
@@ -149,7 +145,7 @@ export function adminUserDetails(token: string): User | Error {
     };
   }
 
-  if(!isTokenLoggedIn(token)) {
+  if (!isTokenLoggedIn(token)) {
     return {
       error: 'token is not logged in'
     };

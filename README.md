@@ -9,7 +9,10 @@
 ## Change Log
 
 * 16/06: `adminQuizDescriptionUpdate` has correct error conditions added.
-
+* 03/07: See commit for changes - mostly slight fixes to swagger and other tweaks. 4.10. "Error Returning" also has some clearer explanations of the order to throw errors in.
+* 04/07: Clarification of the order of errors to be thrown in. The docs automatically changed the ordering from how they're defined. See section 4.10.
+* 05/07: Correctly stated auth/logout is `POST` (previously it was `PUT`); GET `admin/quiz/{quizid}` no longer includes thumbnail; `trash/empty` route now correctly includes the `quizIds` in query.
+* 08/07: For people using a JSONified object as a token, we have added advice on encoding and decoding in section 4.9;  `/v1/admin/quiz/{quizid}/question` has clarification that the "answer" colour should be randomly generated, not the question. This is apparent when looking at the data types, but it was written incorrectly in the spec there
 ## 🫡 0. Aims:
 
 1. Demonstrate effective use of software development tools to build full-stack end-user applications.
@@ -913,7 +916,7 @@ npm start
 
 This will start the server on the port in the src/server.ts file, using `ts-node`.
 
-If you get an error stating that the address is already in use, you can change the port number in `config.json` to any number from `1024` to `49151`. Is it likely that another student may be using your original port number.
+If you get an error stating that the address is already in use, you can change the port number in `config.json` to any number from `49152` to `65535`. Is it likely that another student may be using your original port number.
 
 ### 🐝 4.3. Implementing and testing features
 
@@ -997,11 +1000,15 @@ token = {
 
 In this structure, this also means it's possible to "log out" a particular user's session without logging out other sessions. I.e. One user can log in on two different browser tabs, click logout on tab 1, but still functionally use the website on tab 2.
 
+If you pass a JSONified object (as opposed to just a string or a number) as a token, we recommend that you use [encodeURIComponent](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent) and [decodeURIComponent](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent) to encode it to be friendly for transfer over URLs.
+
 ### 🐝 4.10. Error returning
 
 Either a `400 (Bad Request)` or `401 (Unauthorized)` or `403 (Forbidden)` is thrown when something goes wrong. A `400` error refers to issues with user input; a `401` error refers to when someone does not attempt to authenticate properly, and a a `403` error refers to issues with authorisation. Most of the routes in the API interface provided through types of these errors under various conditions.
 
 To throw one of these errors, simply use the code `res.status(400).send(JSON.stringify({ error: 'specific error message here' }))` or `res.status(400).json({ error: 'specific error message here' })` in your server where 400 is the error.
+
+Errors are thrown in the order that they are defined in the swagger doc, which is typically 401, then 403, then 400.
 
 ### 🐝 4.11. Working with the frontend
 
@@ -1030,7 +1037,7 @@ development.
 
 Our recommendation with this iteration is that you start out trying to implement the new functions similarly to how you did in iteration 1.
 
-1. Write HTTP unit tests. These will fail as you have not yet implemented the feature.
+1. Write HTTP tests. These will fail as you have not yet implemented the feature.
     * Hint: It would be a good idea to consider good test design and the usage of helper functions for your HTTP tests. Is there a way so that you do not have to completely rewrite your tests from iteration 1?
 2. Implement the feature and write the Express route/endpoint for that feature too.
   * HINT: make sure GET and DELETE requests utilise query parameters, whereas POST and PUT requests utilise JSONified bodies.
