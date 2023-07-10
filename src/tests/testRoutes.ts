@@ -72,6 +72,20 @@ export function updateUserDetailsRequest(token: string, email: string, nameFirst
   };
 }
 
+export function quizRemoveRequest(token: string, quizid: number) {
+  const res = request(
+    'DELETE',
+    SERVER_URL + `/v1/admin/quiz/${quizid}`,
+    {
+      qs: { token: token },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function clearRequest() {
   const res = request(
     'DELETE',
