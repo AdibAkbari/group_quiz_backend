@@ -1,4 +1,5 @@
-import { setData, getData, Error, Data, Users, Token } from './dataStore';
+import { setData, getData } from './dataStore';
+import { Error, Data, Users, Token } from './interfaces'
 import validator from 'validator';
 import { isValidTokenStructure, isTokenLoggedIn, findUserFromToken, isWhiteSpace } from './helper';
 

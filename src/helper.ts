@@ -1,4 +1,5 @@
-import { getData, Data, Quizzes } from './dataStore';
+import { getData } from './dataStore';
+import { Data, Quizzes } from './interfaces';
 
 // HELPER FUNCTIONS
 

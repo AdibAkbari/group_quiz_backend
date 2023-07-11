@@ -1,4 +1,5 @@
-import { getData, setData, Data, Error } from './dataStore';
+import { getData, setData } from './dataStore';
+import { Data, Error } from './interfaces'
 import {
   checkNameValidity,
   isValidCreator,
