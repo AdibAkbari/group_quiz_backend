@@ -16,7 +16,10 @@ export function authLoginRequest(email: string, password: string) {
       json: { email: email, password: password },
     }
   );
-  return JSON.parse(res.body.toString());
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
 }
 
 export function authRegisterRequest(email: string, password: string, nameFirst: string, nameLast: string) {
