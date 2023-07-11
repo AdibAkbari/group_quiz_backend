@@ -70,7 +70,7 @@ export function isValidQuizId(quizId: number): boolean {
    * Helper function to determine if Quiz ID does not refer to a quiz that this user owns
    *
    * @param {number} quizId
-   * @param {number} token
+   * @param {string} token
    * @returns {boolean} - returns true if user does own quiz
    * @returns {boolean} - returns false if user does not own quiz
    */

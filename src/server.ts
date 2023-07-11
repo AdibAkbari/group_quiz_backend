@@ -15,7 +15,8 @@ import {
   createQuizQuestion,
   adminQuizTrash,
   adminQuizRemove,
-  adminQuizRestore
+  adminQuizRestore,
+  adminQuizInfo
 } from './quiz';
 import { clear } from './other';
 
@@ -95,6 +96,23 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
     } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
     } else if (response.error.includes('input') || response.error.includes('quiz Id')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
+// adminQuizInfo //
+app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const token = req.query.token as string;
+  const response = adminQuizInfo(token, quizId);
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('quizId')) {
       return res.status(400).json(response);
     }
   }
