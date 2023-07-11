@@ -8,23 +8,23 @@ export interface Users {
     numSuccessfulLogins: number;
     numFailedPasswordsSinceLastLogin: number;
   }
-  
-  export interface Answer {
+
+export interface Answer {
     answerId: number;
     answer: string;
     colour: string;
     correct: boolean;
   }
-  
-  export interface Question {
+
+export interface Question {
     questionId: number;
     question: string;
     duration: number;
     points: number;
     answers: Answer[];
   }
-  
-  export interface Quizzes {
+
+export interface Quizzes {
     quizId: number;
     name: string;
     timeCreated: number;
@@ -36,20 +36,20 @@ export interface Users {
     duration: number;
     questionCount: number;
   }
-  
-  export interface Token {
+
+export interface Token {
     tokenId: string;
     userId: number;
   }
-  
-  export interface Data {
+
+export interface Data {
     users: Users[];
     quizzes: Quizzes[];
     quizCount: number;
     tokens: Token[];
     trash: Quizzes[];
   }
-  
-  export interface Error {
+
+export interface Error {
     error: string
   }

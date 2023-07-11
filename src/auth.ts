@@ -1,5 +1,5 @@
 import { setData, getData } from './dataStore';
-import { Error, Data, Users, Token } from './interfaces'
+import { Error, Data, Users, Token } from './interfaces';
 import validator from 'validator';
 import { isValidTokenStructure, isTokenLoggedIn, findUserFromToken, isWhiteSpace } from './helper';
 

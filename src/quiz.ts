@@ -1,5 +1,5 @@
 import { getData, setData } from './dataStore';
-import { Data, Error, Answer } from './interfaces'
+import { Data, Error, Answer } from './interfaces';
 import {
   checkNameValidity,
   isValidCreator,

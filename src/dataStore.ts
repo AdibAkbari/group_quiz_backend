@@ -1,4 +1,4 @@
-import { Data } from './interfaces'
+import { Data } from './interfaces';
 import fs from 'fs';
 
 // data structure for storing user data and quiz data
@@ -40,6 +40,6 @@ function setData(newData: Data) {
   data = newData;
   const jsonstr = JSON.stringify(data);
   fs.writeFileSync('./database.json', jsonstr);
-};
+}
 
 export { getData, setData };
