@@ -3,6 +3,11 @@ import request from 'sync-request';
 import { port, url } from '../config.json';
 const SERVER_URL = `${url}:${port}`;
 
+interface Answer {
+  answer: string,
+  correct: boolean
+}
+
 export function authLoginRequest(email: string, password: string) {
   const res = request(
     'POST',
@@ -37,6 +42,28 @@ export function quizCreateRequest(token: string, name: string, description: stri
     SERVER_URL + '/v1/admin/quiz',
     {
       json: { token: token, name: name, description: description },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function createQuizQuestionRequest(quizId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
+  const res = request(
+    'POST',
+    SERVER_URL + `/v1/admin/quiz/${quizId}/question`,
+    {
+      json: {
+        token: token,
+        questionBody: {
+          question,
+          duration,
+          points,
+          answers
+        }
+      }
     }
   );
   return {
