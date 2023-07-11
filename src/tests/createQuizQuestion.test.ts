@@ -1,3 +1,4 @@
+import { resolveTypeReferenceDirective } from 'typescript';
 import {
   quizCreateRequest,
   authRegisterRequest,
@@ -151,6 +152,18 @@ describe('invalid answer inputs', () => {
 });
 
 describe('Token invalid', () => {
+  test('token structure is null or undefined', () => {
+    const result1 = createQuizQuestionRequest(quiz.quizId, null, 'How are you?', 5, 5, validAnswers);
+    expect(result1.body).toStrictEqual(ERROR);
+    expect(result1.statusCode).toStrictEqual(401);
+  
+    const result2 = createQuizQuestionRequest(quiz.quizId, undefined, 'How are you?', 5, 5, validAnswers);
+    expect(result2.body).toStrictEqual(ERROR);
+    expect(result2.statusCode).toStrictEqual(401);
+
+  }) 
+  
+  // Whitebox testing - token has to be a string of numbers
   test.each([
     { testName: 'token just letters', token: 'hello' },
     { testName: 'token starts with letters', token: 'a54364' },
