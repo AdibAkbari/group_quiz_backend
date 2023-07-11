@@ -20,7 +20,6 @@ export interface Users {
     questionId: number;
     question: string;
     duration: number;
-    thumbnailUrl: string;
     points: number;
     answers: Answer[];
   }
@@ -35,6 +34,7 @@ export interface Users {
     questions: Question[];
     creator: number;
     duration: number;
+    questionCount: number;
   }
   
   export interface Token {
