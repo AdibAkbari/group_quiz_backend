@@ -421,7 +421,7 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
 
 /**
  * Delete a particular question from a quiz
- * 
+ *
  * @param {string} token
  * @param {number} quizId
  * @param {number} questionId
@@ -434,7 +434,7 @@ export function deleteQuizQuestion (token: string, quizId: number, questionId: n
   }
   if (!isTokenLoggedIn(token)) {
     return { error: 'token is not logged in' };
-  }    
+  }
 
   // Error checking for quizId
   if (!isValidQuizId(quizId)) {
@@ -446,10 +446,9 @@ export function deleteQuizQuestion (token: string, quizId: number, questionId: n
   }
 
   if (!isValidQuestionId(quizId, questionId)) {
-    return {error: 'invalid param: questionId'};
+    return { error: 'invalid param: questionId' };
   }
 
-  
   const data: Data = getData();
 
   const quizToDelete = data.quizzes.find((quiz) => quiz.quizId === quizId);
@@ -462,6 +461,6 @@ export function deleteQuizQuestion (token: string, quizId: number, questionId: n
   quizToDelete.numQuestions--;
 
   setData(data);
-    
+
   return {};
 }

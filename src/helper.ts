@@ -87,9 +87,9 @@ export function isValidCreator(quizId: number, token: string): boolean {
 
 /**
  * Helper function to determine if question Id is a valid question within the given quiz
- * 
- * @param {number} quizId 
- * @param {number} questionId 
+ *
+ * @param {number} quizId
+ * @param {number} questionId
  * @returns {boolean} - returns true if questionId is a valid question within this quiz, false otherwise
  */
 export function isValidQuestionId(quizId: number, questionId: number): boolean {
@@ -100,7 +100,6 @@ export function isValidQuestionId(quizId: number, questionId: number): boolean {
   }
   return true;
 }
-
 
 /**
    * Helper function for adminQuizCreate to check if a quiz name is valid

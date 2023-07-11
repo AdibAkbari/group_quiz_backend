@@ -88,19 +88,19 @@ export function createQuizQuestionRequest(quizId: number, token: string, questio
 }
 
 export function quizRemoveRequest(token: string, quizid: number) {
-    const res = request(
-      'DELETE',
-      SERVER_URL + `/v1/admin/quiz/${quizid}`,
-      {
-        qs: { token: token },
-      }
-    );
-    return {
-      body: JSON.parse(res.body.toString()),
-      statusCode: JSON.parse(res.statusCode.toString())
-    };
-  }
-  
+  const res = request(
+    'DELETE',
+    SERVER_URL + `/v1/admin/quiz/${quizid}`,
+    {
+      qs: { token: token },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function deleteQuizQuestionRequest(token: string, quizId: number, questionId: number) {
   const res = request(
     'DELETE',
@@ -117,7 +117,6 @@ export function deleteQuizQuestionRequest(token: string, quizId: number, questio
   };
 }
 
-
 export function adminQuizListRequest(token: string) {
   const res = request(
     'GET',
@@ -133,7 +132,6 @@ export function adminQuizListRequest(token: string) {
     statusCode: JSON.parse(res.statusCode.toString())
   };
 }
-
 
 export function clearRequest() {
   const res = request(

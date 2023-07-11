@@ -1,12 +1,11 @@
 import {
-    quizCreateRequest,
-    authRegisterRequest,
-    clearRequest,
-    createQuizQuestionRequest,
-    deleteQuizQuestionRequest,
-    adminQuizInfoRequest
+  quizCreateRequest,
+  authRegisterRequest,
+  clearRequest,
+  createQuizQuestionRequest,
+  deleteQuizQuestionRequest,
+  adminQuizInfoRequest
 } from './testRoutes';
-
 
 interface Token {
     token: string
@@ -52,11 +51,11 @@ describe('Token invalid', () => {
     expect(result.statusCode).toStrictEqual(401);
   });
 
-//   test('Nobody logged in', () => {
-//     const removeQuiz = deleteQuizQuestionRequest('7', quiz.quizId);
-//     expect(removeQuiz.body).toStrictEqual(ERROR);
-//     expect(removeQuiz.statusCode).toStrictEqual(403);
-//   });
+  //   test('Nobody logged in', () => {
+  //     const removeQuiz = deleteQuizQuestionRequest('7', quiz.quizId);
+  //     expect(removeQuiz.body).toStrictEqual(ERROR);
+  //     expect(removeQuiz.statusCode).toStrictEqual(403);
+  //   });
 
   test('Unused tokenId', () => {
     const result = deleteQuizQuestionRequest(user.token + 1, quiz.quizId, question.questionId);
@@ -64,7 +63,6 @@ describe('Token invalid', () => {
     expect(result.statusCode).toStrictEqual(403);
   });
 });
-
 
 describe('Invalid QuizId', () => {
   // Testing quizID does not exist
@@ -83,9 +81,7 @@ describe('Invalid QuizId', () => {
     expect(deleteQuestion.body).toStrictEqual(ERROR);
     expect(deleteQuestion.statusCode).toStrictEqual(400);
   });
-
 });
-
 
 describe('Invalid Questionid', () => {
   // Testing QuestionId does not exist
@@ -97,13 +93,13 @@ describe('Invalid Questionid', () => {
 
   // The Quiz exist but the quiz has no questions
   test('No questions in this quiz with this questionId', () => {
-    const quiz2Id = quizCreateRequest(user.token, 'Quiz2', '').body.quizId;  
+    const quiz2Id = quizCreateRequest(user.token, 'Quiz2', '').body.quizId;
     const result = deleteQuizQuestionRequest(user.token, quiz2Id, question.questionId);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(400);
   });
 
-  // Testing the question id exist but the user does not have any questions 
+  // Testing the question id exist but the user does not have any questions
   test('QuestionId Exist but not in the users Quiz', () => {
     const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
     const quiz2 = quizCreateRequest(user2.token, 'quiz2', '').body;
@@ -114,7 +110,6 @@ describe('Invalid Questionid', () => {
   });
 });
 
-
 describe('Successfully removed quiz question', () => {
   // Sucessfully remove the quiz
   test('Sucessful quiz remove question empty return', () => {
@@ -123,50 +118,50 @@ describe('Successfully removed quiz question', () => {
     expect(deleteQuestion.statusCode).toStrictEqual(200);
   });
 
-    // Check that the quiz question is actually removed
-    test('Sucessful quiz remove question integrated check', () => {
-      const questionToRemove = createQuizQuestionRequest(quiz.quizId, user.token, 'Question Remove', 5, 5, validAnswers).body;
-      const question2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 5, 5, validAnswers).body;
+  // Check that the quiz question is actually removed
+  test('Sucessful quiz remove question integrated check', () => {
+    const questionToRemove = createQuizQuestionRequest(quiz.quizId, user.token, 'Question Remove', 5, 5, validAnswers).body;
+    const question2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 5, 5, validAnswers).body;
 
-      deleteQuizQuestionRequest(user.token, quiz.quizId, questionToRemove.questionId);
+    deleteQuizQuestionRequest(user.token, quiz.quizId, questionToRemove.questionId);
 
-      const received = adminQuizInfoRequest(user.token, quiz.quizId).body;
-      const expected = {
-        quizId: quiz.quizId,
-        name: 'Cats',
-        timeCreated: expect.any(Number),
-        timeLastEdited: expect.any(Number),
-        description: 'A quiz about cats',
-        numQuestions: 2,
-        questions: [
-            {
-                questionId: question.questionId,
-                question: 'Question 1',
-                duration: 5,
-                points: 5,
-                answers: [
-                    {answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true},
-                    {answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false},
-                ]
-            }, 
-            {
-                questionId: question2.questionId,
-                question: 'Question 2',
-                duration: 5,
-                points: 5,
-                answers: [
-                    {answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true},
-                    {answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false},
-                ]
-            }
-        ],
-        duration: 10
-      };
+    const received = adminQuizInfoRequest(user.token, quiz.quizId).body;
+    const expected = {
+      quizId: quiz.quizId,
+      name: 'Cats',
+      timeCreated: expect.any(Number),
+      timeLastEdited: expect.any(Number),
+      description: 'A quiz about cats',
+      numQuestions: 2,
+      questions: [
+        {
+          questionId: question.questionId,
+          question: 'Question 1',
+          duration: 5,
+          points: 5,
+          answers: [
+            { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
+            { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
+          ]
+        },
+        {
+          questionId: question2.questionId,
+          question: 'Question 2',
+          duration: 5,
+          points: 5,
+          answers: [
+            { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
+            { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
+          ]
+        }
+      ],
+      duration: 10
+    };
 
-      const receivedSet = new Set(received.questions);
-      const expectedSet = new Set(expected.questions);
-      expect(receivedSet).toStrictEqual(expectedSet);
-    });
+    const receivedSet = new Set(received.questions);
+    const expectedSet = new Set(expected.questions);
+    expect(receivedSet).toStrictEqual(expectedSet);
+  });
 
   // check that once a question is removed, the next question still has a unique quiz id
   test('Unique question Id once a question is removed', () => {
