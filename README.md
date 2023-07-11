@@ -12,7 +12,7 @@
 * 03/07: See commit for changes - mostly slight fixes to swagger and other tweaks. 4.10. "Error Returning" also has some clearer explanations of the order to throw errors in.
 * 04/07: Clarification of the order of errors to be thrown in. The docs automatically changed the ordering from how they're defined. See section 4.10.
 * 05/07: Correctly stated auth/logout is `POST` (previously it was `PUT`); GET `admin/quiz/{quizid}` no longer includes thumbnail; `trash/empty` route now correctly includes the `quizIds` in query.
-
+* 08/07: For people using a JSONified object as a token, we have added advice on encoding and decoding in section 4.9;  `/v1/admin/quiz/{quizid}/question` has clarification that the "answer" colour should be randomly generated, not the question. This is apparent when looking at the data types, but it was written incorrectly in the spec there
 ## 🫡 0. Aims:
 
 1. Demonstrate effective use of software development tools to build full-stack end-user applications.
@@ -999,6 +999,8 @@ token = {
 ```
 
 In this structure, this also means it's possible to "log out" a particular user's session without logging out other sessions. I.e. One user can log in on two different browser tabs, click logout on tab 1, but still functionally use the website on tab 2.
+
+If you pass a JSONified object (as opposed to just a string or a number) as a token, we recommend that you use [encodeURIComponent](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent) and [decodeURIComponent](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent) to encode it to be friendly for transfer over URLs.
 
 ### 🐝 4.10. Error returning
 

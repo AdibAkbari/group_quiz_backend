@@ -34,6 +34,7 @@ export interface Quizzes {
   questions: Question[];
   creator: number;
   duration: number;
+  questionCount: number;
 }
 
 export interface Token {

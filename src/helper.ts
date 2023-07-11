@@ -53,13 +53,17 @@ export function isValidQuizId(quizId: number): boolean {
   }
 
   const data: Data = getData();
-  for (const current of data.quizzes) {
-    if (current.quizId === quizId) {
-      return true;
-    }
-  }
+  // for (const current of data.quizzes) {
+  //   if (current.quizId === quizId) {
+  //     return true;
+  //   }
+  // }
+  // return false;
 
-  return false;
+  if (data.quizzes.find(id => id.quizId === quizId) === undefined) {
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -77,7 +81,6 @@ export function isValidCreator(quizId: number, token: string): boolean {
   if (data.quizzes[index].creator === userId) {
     return true;
   }
-
   return false;
 }
 

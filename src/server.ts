@@ -12,6 +12,8 @@ import {
 } from './auth';
 import {
   adminQuizCreate,
+  createQuizQuestion,
+  adminQuizRemove,
   adminQuizInfo
 } from './quiz';
 import { clear } from './other';
@@ -81,6 +83,23 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   res.json(response);
 });
 
+// createQuizQuestion
+app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
+  const { question, duration, points, answers } = req.body.questionBody;
+  const quizId = parseInt(req.params.quizid);
+  const response = createQuizQuestion(quizId, req.body.token, question, duration, points, answers);
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('input') || response.error.includes('quiz Id')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
 // adminQuizInfo //
 app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
@@ -92,6 +111,22 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
     } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
     } else if (response.error.includes('quizId')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
+// adminQuizRemove //
+app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = req.query.token as string;
+  const response = adminQuizRemove(token, parseInt(req.params.quizid));
+  if ('error' in response) {
+    if (response.error.includes('Structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('QuizId') || response.error.includes('own')) {
       return res.status(400).json(response);
     }
   }
