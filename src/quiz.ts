@@ -1,4 +1,4 @@
-import { getData, setData, Data, Error } from './dataStore';
+import { getData, setData, Data, Error, Quizzes } from './dataStore';
 import {
   checkNameValidity,
   isValidCreator,
@@ -184,13 +184,20 @@ export function adminQuizTrash(token: string): {quizzes: QuizList[]} | Error {
   }
 
   const data = getData();
+  // filters out quizzes not created by user
+  const authUserId = findUserFromToken(token);
+
+  const trashQuizzes = data.trash.filter((quiz: Quizzes) => {
+    return quiz.creator === authUserId;
+  });
+
   // maps list of quiz objects in trash to just have name and quizId
-  const trashQuizzes = data.trash.map((quiz) => {
+  const simpleTrashQuizzes = trashQuizzes.map((quiz) => {
     return { quizId: quiz.quizId, name: quiz.name };
   });
 
   return {
-    quizzes: trashQuizzes
+    quizzes: simpleTrashQuizzes
   };
 }
 
