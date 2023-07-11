@@ -2,7 +2,7 @@ import {
   clearRequest,
   authRegisterRequest,
   quizNameUpdateRequest,
-  // quizInfoRequest,
+  adminQuizInfoRequest,
   quizCreateRequest,
 } from './testRoutes';
 
@@ -140,12 +140,31 @@ describe('Valid adminQuizNameUpdate', () => {
     const newQuiz = quizNameUpdateRequest(user.token, quiz.quizId, name);
     expect(newQuiz.body).toStrictEqual({});
     expect(newQuiz.statusCode).toStrictEqual(200);
-    // expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual({
-    //   quizId: quiz.quizId,
-    //   name: name,
-    //   timeCreated: expect.any(Number),
-    //   timeLastEdited: expect.any(Number),
-    //   description: '',
-    // });
+
+    expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual({
+      quizId: quiz.quizId,
+      name: name,
+      timeCreated: expect.any(Number),
+      timeLastEdited: expect.any(Number),
+      description: '',
+      numQuestions: 0,
+      questions: [],
+      duration: 0,
+    });
+    expect(adminQuizInfoRequest(user.token, quiz.quizId).statusCode).toStrictEqual(200);
+  });
+
+  test('Correct time last edited', () => {
+    const expectedTimeTransfered = Math.floor(Date.now() / 1000);
+    const newQuiz = quizNameUpdateRequest(user.token, quiz.quizId, 'New Quiz Name');
+    expect(newQuiz.body).toStrictEqual({});
+    expect(newQuiz.statusCode).toStrictEqual(200);
+
+    const quizInfo = adminQuizInfoRequest(user.token, quiz.quizId).body;
+
+    const timeSent = quizInfo.timeLastEdited;
+
+    expect(timeSent).toBeGreaterThanOrEqual(expectedTimeTransfered);
+    expect(timeSent).toBeLessThanOrEqual(expectedTimeTransfered + 3);
   });
 });

@@ -1126,7 +1126,9 @@ paths:
   /v1/admin/quiz/{quizid}:
     delete:
       summary: Send a quiz to trash
-      description: Given a particular quiz, send it to the trash (can be recovered later)
+      description: |
+       - Given a particular quiz, send it to the trash (can be recovered later)
+       - When this route is called, the timeLastEdited is updated
       tags:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (Using Iteration 1)"
@@ -1369,7 +1371,7 @@ paths:
       summary: Create quiz question
       description: |
         Create a new stub question for a particular quiz.
-        When this route is called, and a question is created, the lastEdited time for quiz is set as the time this question was created, and the colours of a question are randomly generated.
+        When this route is called, and a question is created, the timeLastEdited for quiz is set as the time this question was created, and the colours of each answer are randomly generated again.
       tags:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (New)"
@@ -1409,7 +1411,7 @@ paths:
       summary: Update quiz question
       description: |
         Update the relevant details of a particular question within a quiz.
-        When this route is called, the last edited time is updated, and the colours of a question are randomly generated.
+        When this route is called, the timeLastEdited is updated, and the colours of a question are randomly generated.
       tags:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (New)"
@@ -1455,7 +1457,7 @@ paths:
       parameters:
         - $ref: '#/components/path/QuizId'
         - $ref: '#/components/path/QuestionId'
-        - $ref: '#/components/body/QuizQuestionDelete'
+        - $ref: '#/components/query/Token'
       responses:
         200:
           description: OK
@@ -1481,7 +1483,9 @@ paths:
   /v1/admin/quiz/{quizid}/question/{questionid}/move:
     put:
       summary: Move a quiz question
-      description: Move a question from one particular position in the quiz to another
+      description: | 
+       - Move a question from one particular position in the quiz to another
+       - When this route is called, the timeLastEdited is updated
       tags:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (New)"
@@ -1515,7 +1519,9 @@ paths:
   /v1/admin/quiz/{quizid}/question/{questionid}/duplicate:
     post:
       summary: Duplicate a quiz question
-      description: A particular question gets duplicated to immediately after where the source question is
+      description: | 
+       - A particular question gets duplicated to immediately after where the source question is
+       - When this route is called, the timeLastEdited is updated
       tags:
         # - "By Topic: Quiz Management"
         - "Iteration 2 (New)"

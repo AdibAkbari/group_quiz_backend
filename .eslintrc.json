@@ -27,17 +27,14 @@
     "window": "readonly"
   },
   "rules": {
-    "no-unused-vars": ["error", {
+    "@typescript-eslint/no-var-requires": 0,
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["error", {
       "args": "none",
       "caughtErrors": "none",
       "ignoreRestSiblings": true,
       "vars": "all"
     }],
-
-    // Everything below here is standard 1531
-
-    "@typescript-eslint/no-var-requires": 0,
-    "@typescript-eslint/no-unused-vars": 0,
     "@typescript-eslint/no-explicit-any": 0,
   
     "no-var": "warn",
