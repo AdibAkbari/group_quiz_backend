@@ -16,7 +16,10 @@ export function authLoginRequest(email: string, password: string) {
       json: { email: email, password: password },
     }
   );
-  return JSON.parse(res.body.toString());
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
 }
 
 export function authRegisterRequest(email: string, password: string, nameFirst: string, nameLast: string) {
@@ -47,14 +50,15 @@ export function quizCreateRequest(token: string, name: string, description: stri
   };
 }
 
-export function quizRemoveRequest(token: string, quizid: number) {
+export function adminQuizInfoRequest(token: string, quizId: number) {
   const res = request(
-    'DELETE',
-    SERVER_URL + `/v1/admin/quiz/${quizid}`,
+    'GET',
+    SERVER_URL + `/v1/admin/quiz/${quizId}`,
     {
-      qs: { token: token },
-    }
-  );
+      qs: {
+        token: token,
+      }
+    });
   return {
     body: JSON.parse(res.body.toString()),
     statusCode: JSON.parse(res.statusCode.toString())
@@ -83,7 +87,7 @@ export function createQuizQuestionRequest(quizId: number, token: string, questio
   };
 }
 
-export function quizQuestionDeleteRequest(token: string, quizId: number, questionId: number) {
+export function deleteQuizQuestionRequest(token: string, quizId: number, questionId: number) {
   const res = request(
     'DELETE',
     SERVER_URL + `/v1/admin/quiz/${quizId}/question/${questionId}`,

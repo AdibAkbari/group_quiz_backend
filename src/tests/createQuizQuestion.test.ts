@@ -48,7 +48,7 @@ describe('Valid answer inputs, invalid other input', () => {
 
   test.each([
     { testname: 'Question string <5 characters', question: 'abcd' },
-    { testname: 'Question string >50 characters', question: 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz' },
+    { testname: 'Question string >50 characters', question: 'abc'.repeat(20) },
     { testname: 'Question string empty', question: '' },
     { testname: 'Question string just whitespace', question: '       ' },
   ])('Incorrect question string: $testName', ({ question }) => {
@@ -116,7 +116,7 @@ describe('invalid answer inputs', () => {
       testname: 'length of an answer >30 character long',
       answers: [
         { answer: 'great', correct: true },
-        { answer: 'abcdefghijklmnopqrstuvwxyzabcdefghij', correct: false },
+        { answer: 'abc'.repeat(12), correct: false },
         { answer: 'bad', correct: false }
       ]
     },
@@ -151,6 +151,17 @@ describe('invalid answer inputs', () => {
 });
 
 describe('Token invalid', () => {
+  test('token structure is null or undefined', () => {
+    const result1 = createQuizQuestionRequest(quiz.quizId, null, 'How are you?', 5, 5, validAnswers);
+    expect(result1.body).toStrictEqual(ERROR);
+    expect(result1.statusCode).toStrictEqual(401);
+
+    const result2 = createQuizQuestionRequest(quiz.quizId, undefined, 'How are you?', 5, 5, validAnswers);
+    expect(result2.body).toStrictEqual(ERROR);
+    expect(result2.statusCode).toStrictEqual(401);
+  });
+
+  // Whitebox testing - token has to be a string of numbers
   test.each([
     { testName: 'token just letters', token: 'hello' },
     { testName: 'token starts with letters', token: 'a54364' },
@@ -192,7 +203,7 @@ describe('valid input', () => {
     expect(q1.questionId).not.toStrictEqual(q2.questionId);
   });
 
-  test.todo('unique quesiton Id after question is removed');
+  test.todo('unique question Id after question is removed');
   // test('unique quesiton Id after question is removed', () => {
   //     const q2 = createQuizQuestionRequest(quiz.quizId, user.token, "Question 2", 5, 5, validAnswers).body;
   //     const qRemove = createQuizQuestionRequest(quiz.quizId, user.token, "Question to remove", 5, 5, validAnswers).body;
@@ -300,7 +311,7 @@ describe('valid input', () => {
 describe('valid edge cases', () => {
   test.each([
     { testname: 'question string length 5', question: 'abcde', duration: 5, points: 5 },
-    { testname: 'question string length 50', question: 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvb', duration: 5, points: 5 },
+    { testname: 'question string length 50', question: 'a'.repeat(30), duration: 5, points: 5 },
     { testname: 'duration 3 minutes', question: 'valid question', duration: 180, points: 5 },
     { testname: 'points is 1', question: 'valid question', duration: 5, points: 1 },
     { testname: 'points is 10', question: 'valid question', duration: 5, points: 10 }
