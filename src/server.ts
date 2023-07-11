@@ -11,7 +11,7 @@ import {
   adminAuthRegister,
 } from './auth';
 import {
-  adminQuizCreate, 
+  adminQuizCreate,
   createQuizQuestion,
   adminQuizRemove
 } from './quiz';
@@ -99,7 +99,7 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   res.json(response);
 });
 
-      // adminQuizRemove //
+// adminQuizRemove //
 app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const token = req.query.token as string;
   const response = adminQuizRemove(token, parseInt(req.params.quizid));
