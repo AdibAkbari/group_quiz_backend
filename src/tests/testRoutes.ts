@@ -50,6 +50,22 @@ export function quizCreateRequest(token: string, name: string, description: stri
   };
 }
 
+export function adminQuizInfoRequest(token: string, quizId: number) {
+  const res = request(
+    'GET',
+    SERVER_URL + `/v1/admin/quiz/${quizId}`,
+    {
+      qs: {
+        token: token,
+      }
+    });
+
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function createQuizQuestionRequest(quizId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
   const res = request(
     'POST',
