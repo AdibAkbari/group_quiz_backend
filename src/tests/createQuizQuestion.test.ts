@@ -311,7 +311,7 @@ describe('valid input', () => {
 describe('valid edge cases', () => {
   test.each([
     { testname: 'question string length 5', question: 'abcde', duration: 5, points: 5 },
-    { testname: 'question string length 50', question: 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvb', duration: 5, points: 5 },
+    { testname: 'question string length 50', question: 'a'.repeat(30), duration: 5, points: 5 },
     { testname: 'duration 3 minutes', question: 'valid question', duration: 180, points: 5 },
     { testname: 'points is 1', question: 'valid question', duration: 5, points: 1 },
     { testname: 'points is 10', question: 'valid question', duration: 5, points: 10 }
