@@ -276,7 +276,7 @@ describe.skip('testing with other functions', () => {
       duration: 0
     });
 
-    // adminQuizDescriptionUpdateRequest(user.token, quiz.quizId, 'New description');
+    // adminQuizDescriptionUpdateRequest(quiz.quizId, user.token, 'New description');
     expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual({
       quizId: quiz.quizId,
       name: 'Cats',
