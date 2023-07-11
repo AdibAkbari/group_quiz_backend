@@ -3,6 +3,8 @@ import {
   authRegisterRequest,
   quizCreateRequest,
   quizRemoveRequest,
+  adminQuizListRequest,
+  adminQuizInfoRequest,
 } from './testRoutes';
 
 const ERROR = { error: expect.any(String) };
@@ -82,49 +84,49 @@ describe('Successfully removed quiz check', () => {
     expect(removeQuiz.statusCode).toStrictEqual(200);
   });
 
-  //   // Check that the quiz is actually removed
-  //   test('Sucessful quiz remove integrated check', () => {
-  //     const quiz2 = quizCreateRequest(user.token, 'quiz2', '').body;
-  //     const quizToRemove = quizCreateRequest(user.token, 'quizToRemove', '').body;
-  //     const quiz3 = quizCreateRequest(user.token, 'quiz3', '').body;
+  // Check that the quiz is actually removed
+  test('Sucessful quiz remove integrated check', () => {
+    const quiz2 = quizCreateRequest(user.token, 'quiz2', '').body;
+    const quizToRemove = quizCreateRequest(user.token, 'quizToRemove', '').body;
+    const quiz3 = quizCreateRequest(user.token, 'quiz3', '').body;
 
-  //     quizRemoveRequest(user.token, quizToRemove.quizId);
+    quizRemoveRequest(user.token, quizToRemove.quizId);
 
-  //     const received = adminQuizListRequest(user.token).body;
-  //     const expected = {
-  //       quizzes: [
-  //         {
-  //           quizId: quiz.quizId,
-  //           name: 'quiz1',
-  //         },
-  //         {
-  //           quizId: quiz2.quizId,
-  //           name: 'quiz2',
-  //         },
-  //         {
-  //           quizId: quiz3.quizId,
-  //           name: 'quiz3',
-  //         },
-  //       ]
-  //     };
+    const received = adminQuizListRequest(user.token).body;
+    const expected = {
+      quizzes: [
+        {
+          quizId: quiz.quizId,
+          name: 'quiz1',
+        },
+        {
+          quizId: quiz2.quizId,
+          name: 'quiz2',
+        },
+        {
+          quizId: quiz3.quizId,
+          name: 'quiz3',
+        },
+      ]
+    };
 
-  //     const receivedSet = new Set(received.quizzes);
-  //     const expectedSet = new Set(expected.quizzes);
-  //     expect(receivedSet).toStrictEqual(expectedSet);
-  //   });
+    const receivedSet = new Set(received.quizzes);
+    const expectedSet = new Set(expected.quizzes);
+    expect(receivedSet).toStrictEqual(expectedSet);
+  });
 
-  //   // check that once a quiz is removed, the quiz id no longer exists
-  //   test('No quiz Id once a quiz is removed', () => {
-  //     quizRemoveRequest(user.token, quiz.quizId);
-  //     const quizInfo = quizInfoRequest(user.token, quiz.quizId);
-  //     expect(quizInfo.body).toStrictEqual(ERROR);
-  //     expect(quizInfo.statusCode).toStrictEqual(400);
+  // check that once a quiz is removed, the quiz id no longer exists
+  test('No quiz Id once a quiz is removed', () => {
+    quizRemoveRequest(user.token, quiz.quizId);
+    const quizInfo = adminQuizInfoRequest(user.token, quiz.quizId);
+    expect(quizInfo.body).toStrictEqual(ERROR);
+    expect(quizInfo.statusCode).toStrictEqual(400);
 
-  //     quizCreateRequest(user.token, 'quiz2', '');
-  //     const quizInfo2 = quizInfoRequest(user.token, quiz.quizId);
-  //     expect(quizInfo2.body).toStrictEqual(ERROR);
-  //     expect(quizInfo2.statusCode).toStrictEqual(400);
-  //   });
+    quizCreateRequest(user.token, 'quiz2', '');
+    const quizInfo2 = adminQuizInfoRequest(user.token, quiz.quizId);
+    expect(quizInfo2.body).toStrictEqual(ERROR);
+    expect(quizInfo2.statusCode).toStrictEqual(400);
+  });
 
   // check that once a quiz is removed, the next quiz still has a unique quiz id
   test('Unique quiz Id once a quiz is removed', () => {
