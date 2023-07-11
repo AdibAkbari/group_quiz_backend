@@ -4,7 +4,7 @@ import {
     clearRequest,
     createQuizQuestionRequest,
     deleteQuizQuestionRequest,
-  //  adminQuizInfoRequest
+    adminQuizInfoRequest
 } from './testRoutes';
 
 
@@ -25,6 +25,7 @@ const ERROR = { error: expect.any(String) };
 
 let user: Token;
 let quiz: Quiz;
+let question: Question;
 beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
@@ -87,20 +88,27 @@ describe('Invalid QuizId', () => {
 
 
 describe('Invalid Questionid', () => {
-  // Testing quizID does not exist
-  test('Quiz ID does not refer to a valid quiz', () => {
+  // Testing QuestionId does not exist
+  test('Question ID does not exist', () => {
     const deleteQuestion = deleteQuizQuestionRequest(user.token, quiz.quizId, question.questionId + 1);
     expect(deleteQuestion.body).toStrictEqual(ERROR);
     expect(deleteQuestion.statusCode).toStrictEqual(400);
   });
 
-  // Testing the user does not own the quiz that is trying to be removed
-  test('QuestionId Exist but user does not own quiz', () => {
+  // The Quiz exist but the quiz has no questions
+  test('No questions in this quiz with this questionId', () => {
+    const quiz2Id = quizCreateRequest(user.token, 'Quiz2', '').body.quizId;  
+    const result = deleteQuizQuestionRequest(user.token, quiz2Id, question.questionId);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(400);
+  });
+
+  // Testing the question id exist but the user does not have any questions 
+  test('QuestionId Exist but not in the users Quiz', () => {
     const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
     const quiz2 = quizCreateRequest(user2.token, 'quiz2', '').body;
-    const question2 = createQuizQuestionRequest(quiz2.quizId, user2.token, 'Question 1', 5, 5, validAnswers).body;
 
-    const deleteQuestion = deleteQuizQuestionRequest(user.token, quiz.quizId, question2.questionId);
+    const deleteQuestion = deleteQuizQuestionRequest(user2.token, quiz2.quizId, question.questionId);
     expect(deleteQuestion.body).toStrictEqual(ERROR);
     expect(deleteQuestion.statusCode).toStrictEqual(400);
   });
@@ -115,50 +123,56 @@ describe('Successfully removed quiz question', () => {
     expect(deleteQuestion.statusCode).toStrictEqual(200);
   });
 
-    // // Check that the quiz question is actually removed
-    // test('Sucessful quiz remove question integrated check', () => {
-    //   const questionToRemove = createQuizQuestionRequest(quiz.quizId, user.token, 'Question Remove', 5, 5, validAnswers).body;
-    //   const question2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 5, 5, validAnswers).body;
+    // Check that the quiz question is actually removed
+    test('Sucessful quiz remove question integrated check', () => {
+      const questionToRemove = createQuizQuestionRequest(quiz.quizId, user.token, 'Question Remove', 5, 5, validAnswers).body;
+      const question2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 5, 5, validAnswers).body;
 
-    //   deleteQuizQuestionRequest(user.token, quiz.quizId, questionToRemove.questionId);
+      deleteQuizQuestionRequest(user.token, quiz.quizId, questionToRemove.questionId);
 
-    //   const received = adminQuizInfoRequest(user.token).body;
-    //   const expected = {
-    //     quizId: quiz.quizId,
-    //     name: quiz.name,
-    //     timeCreated: quiz.timeCreated,
-    //     timeLastEdited: quiz.timeLastEdited,//
-    //     description: quiz.description,
-    //     numQuestions: quiz.numQuestions,
-    //     questions: [
-    //         {
-    //             questionId: question.questionId,
-    //             question: question.question,
-    //             duration: question.duration,
-    //             points: question.points,
-    //             answers: validAnswers,
-    //         }, 
-    //         {
-    //             questionId: question2.questionId,
-    //             question: question2.question,
-    //             duration: question2.duration,
-    //             points: question2.points,
-    //             answers: validAnswers,
-    //         }
-    //     ],
-    //     duration: quiz.duration
-    //   };
+      const received = adminQuizInfoRequest(user.token, quiz.quizId).body;
+      const expected = {
+        quizId: quiz.quizId,
+        name: 'Cats',
+        timeCreated: expect.any(Number),
+        timeLastEdited: expect.any(Number),
+        description: 'A quiz about cats',
+        numQuestions: 2,
+        questions: [
+            {
+                questionId: question.questionId,
+                question: 'Question 1',
+                duration: 5,
+                points: 5,
+                answers: [
+                    {answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true},
+                    {answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false},
+                ]
+            }, 
+            {
+                questionId: question2.questionId,
+                question: 'Question 2',
+                duration: 5,
+                points: 5,
+                answers: [
+                    {answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true},
+                    {answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false},
+                ]
+            }
+        ],
+        duration: 10
+      };
 
-    //   const receivedSet = new Set(received.quizzes);
-    //   const expectedSet = new Set(expected.quizzes);
-    //   expect(receivedSet).toStrictEqual(expectedSet);
-    // });
+      const receivedSet = new Set(received.questions);
+      const expectedSet = new Set(expected.questions);
+      expect(receivedSet).toStrictEqual(expectedSet);
+    });
 
-  // check that once a quiz is removed, the next quiz still has a unique quiz id
-  test('Unique quiz Id once a quiz is removed', () => {
+  // check that once a question is removed, the next question still has a unique quiz id
+  test('Unique question Id once a question is removed', () => {
     const questionToRemove = createQuizQuestionRequest(quiz.quizId, user.token, 'questionToRemove', 5, 5, validAnswers).body;
     const question2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 5, 5, validAnswers).body;
-    deleteQuizQuestionRequest(user.token, quizToRemove.quizId);
+    deleteQuizQuestionRequest(user.token, quiz.quizId, questionToRemove.questionId);
     const question3 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3', 5, 5, validAnswers).body;
 
     expect(question3.questionId).not.toStrictEqual(question.questionId);

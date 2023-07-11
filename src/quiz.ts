@@ -8,6 +8,7 @@ import {
   isValidTokenStructure,
   isTokenLoggedIn,
   findUserFromToken,
+  isValidQuestionId,
 } from './helper';
 
 interface QuizList {
@@ -426,6 +427,41 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
  * @param {number} questionId
  * @returns {questionId: number}
  */
-export function quizQuestionDelete (token: string, quizId: number, questionId: number): Record<string, never> | Error {
-    return {};
+export function deleteQuizQuestion (token: string, quizId: number, questionId: number): Record<string, never> | Error {
+  // Error checking for token
+  if (!isValidTokenStructure(token)) {
+    return { error: 'invalid token structure' };
+  }
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'token is not logged in' };
+  }    
+
+  // Error checking for quizId
+  if (!isValidQuizId(quizId)) {
+    return { error: 'invalid quiz Id' };
+  }
+
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'invalid quiz Id' };
+  }
+
+  if (!isValidQuestionId(quizId, questionId)) {
+    return {error: 'invalid param: questionId'};
+  }
+
+  
+  const data: Data = getData();
+
+  const quizToDelete = data.quizzes.find((quiz) => quiz.quizId === quizId);
+  const questionToDelete = quizToDelete.questions.findIndex((question) => question.questionId === questionId);
+
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  quizToDelete.timeLastEdited = timeNow;
+
+  quizToDelete.questions.splice(questionToDelete, 1);
+  quizToDelete.numQuestions--;
+
+  setData(data);
+    
+  return {};
 }
