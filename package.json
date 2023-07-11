@@ -4,7 +4,7 @@
         "tsc": "tsc --project tsconfig.json",
         "lint": "eslint src/**/*.{ts,js}",
         "lint-fix": "eslint --fix src/**/*.{ts,js}",
-        "start": "nodemon -T src/server.ts",
+        "start": "ts-node -T src/server.ts",
         "ts-node-coverage": "nyc --reporter=text --reporter=lcov ts-node -T src/server.ts",
         "posttest": "pkill -f 'node_modules/sync-rpc/lib/worker.js' > /dev/null 2>&1"
     },
