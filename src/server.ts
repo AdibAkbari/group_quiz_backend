@@ -14,7 +14,8 @@ import {
   adminQuizCreate,
   createQuizQuestion,
   adminQuizRemove,
-  adminQuizInfo
+  adminQuizInfo,
+  adminQuizList
 } from './quiz';
 import { clear } from './other';
 
