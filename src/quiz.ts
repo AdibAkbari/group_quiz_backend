@@ -1,5 +1,5 @@
 import { getData, setData } from './dataStore';
-import { Data, Error, Answer } from './interfaces';
+import { Data, Error, Answer, Question } from './interfaces';
 import {
   checkNameValidity,
   isValidCreator,
@@ -416,3 +416,56 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
     questionId: questionId
   };
 }
+
+/**
+ * Duplicate a question for a quiz.
+ * the timeLastEdited for quiz is set as the time this question was created
+ *
+ * @param {number} quizId
+ * @param {number} questionId
+ * @param {string} token
+ * @returns {newQuestionId: number} 
+ */
+export function quizQuestionDuplicate (quizId: number, questionId: number, token: string): { newQuestionId: number } | Error {
+  if (!isValidTokenStructure(token)) {
+    return { error: 'invalid token structure' };
+  }
+ 
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'token is not logged in' };
+  }
+
+  if (!isValidQuizId(quizId)) {
+    return { error: 'invalid quiz Id' };
+  }
+
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'invalid quiz Id' };
+  }
+
+  let data: Data = getData();
+  const quizIndex: number = data.quizzes.findIndex(id => id.quizId === quizId);
+
+  if (data.quizzes[quizIndex].questions.filter(id => id.questionId === questionId).length === 0) {
+    return { error: 'invalid question id' };
+  }
+  
+  const newQuestionId: number = data.quizzes[quizIndex].questionCount;
+  const questionIndex: number = data.quizzes[quizIndex].questions.findIndex(id => id.questionId === questionId);
+  const timeNow: number = Math.floor(Date.now() / 1000);
+  data.quizzes[quizIndex].questionCount++;
+  data.quizzes[quizIndex].numQuestions++;
+  data.quizzes[quizIndex].duration += data.quizzes[quizIndex].questions[questionIndex].duration;
+  const newQuestion: Question = {
+    questionId: newQuestionId,
+    question: data.quizzes[quizIndex].questions[questionIndex].question,
+    duration: data.quizzes[quizIndex].questions[questionIndex].duration,
+    points: data.quizzes[quizIndex].questions[questionIndex].points,
+    answers: data.quizzes[quizIndex].questions[questionIndex].answers,
+  }
+  data.quizzes[quizIndex].questions.splice(questionIndex + 1, 0, newQuestion);
+
+  setData(data);
+  return ({ newQuestionId: newQuestionId });
+}
+
