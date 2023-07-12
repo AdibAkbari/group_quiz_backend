@@ -118,6 +118,23 @@ export function adminQuizListRequest(token: string) {
   };
 }
 
+export function moveQuizQuestionRequest(token: string, quizId: number, questionId: number, newPosition: number) {
+  const res = request(
+    'PUT',
+    SERVER_URL + `/v1/admin/quiz/${quizId}/question/${questionId}/move`,
+    {
+      json: {
+        token: token,
+        newPosition: newPosition,
+      }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function clearRequest() {
   const res = request(
     'DELETE',

@@ -416,3 +416,16 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
     questionId: questionId
   };
 }
+
+/**
+ * Move a question from one particular position in the quiz to another
+ *
+ * @param {string} token
+ * @param {number} quizId
+ * @param {number} questionId
+ * @param {number} newPosition
+ * @returns {}
+ */
+export function moveQuizQuestion(token: string, quizId: number, questionId: number, newPosition: number): Record<string, never> | Error {
+  return {};
+}
