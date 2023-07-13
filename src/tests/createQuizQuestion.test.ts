@@ -48,7 +48,7 @@ describe('Valid answer inputs, invalid other input', () => {
 
   test.each([
     { testname: 'Question string <5 characters', question: 'abcd' },
-    { testname: 'Question string >50 characters', question: 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz' },
+    { testname: 'Question string >50 characters', question: 'abc'.repeat(20) },
     { testname: 'Question string empty', question: '' },
     { testname: 'Question string just whitespace', question: '       ' },
   ])('Incorrect question string: $testName', ({ question }) => {
@@ -116,7 +116,7 @@ describe('invalid answer inputs', () => {
       testname: 'length of an answer >30 character long',
       answers: [
         { answer: 'great', correct: true },
-        { answer: 'abcdefghijklmnopqrstuvwxyzabcdefghij', correct: false },
+        { answer: 'abc'.repeat(12), correct: false },
         { answer: 'bad', correct: false }
       ]
     },
@@ -151,6 +151,17 @@ describe('invalid answer inputs', () => {
 });
 
 describe('Token invalid', () => {
+  test('token structure is null or undefined', () => {
+    const result1 = createQuizQuestionRequest(quiz.quizId, null, 'How are you?', 5, 5, validAnswers);
+    expect(result1.body).toStrictEqual(ERROR);
+    expect(result1.statusCode).toStrictEqual(401);
+
+    const result2 = createQuizQuestionRequest(quiz.quizId, undefined, 'How are you?', 5, 5, validAnswers);
+    expect(result2.body).toStrictEqual(ERROR);
+    expect(result2.statusCode).toStrictEqual(401);
+  });
+
+  // Whitebox testing - token has to be a string of numbers
   test.each([
     { testName: 'token just letters', token: 'hello' },
     { testName: 'token starts with letters', token: 'a54364' },
@@ -192,7 +203,7 @@ describe('valid input', () => {
     expect(q1.questionId).not.toStrictEqual(q2.questionId);
   });
 
-  test.todo('unique quesiton Id after question is removed');
+  test.todo('unique question Id after question is removed');
   // test('unique quesiton Id after question is removed', () => {
   //     const q2 = createQuizQuestionRequest(quiz.quizId, user.token, "Question 2", 5, 5, validAnswers).body;
   //     const qRemove = createQuizQuestionRequest(quiz.quizId, user.token, "Question to remove", 5, 5, validAnswers).body;
@@ -234,75 +245,73 @@ describe('valid input', () => {
   //     })
 
   test.todo('multiple questions successfully created');
-//   test('multiple questions successfully created', () => {
-//     const q2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).body;
-//     const q3 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).body;
+  //   test('multiple questions successfully created', () => {
+  //     const q2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).body;
+  //     const q3 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).body;
 
-//     const expected = {
-//         quizId: quiz.quizId,
-//         name: 'Cats',
-//         timeCreated: expect.any(Number),
-//         timeLastEdited: expect.any(Number),
-//         description: 'A quiz about cats',
-//         numQuestions: 3,
-//         questions: [
-//             {
-//                 questionId: q1.questionId,
-//                 question: "Question 1",
-//                 duration: 5,
-//                 points: 5,
-//                 answers: [
-//                   {answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true},
-//                   {answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false},
-//               ]
-//             }, 
-//             {
-//                 questionId: q2.questionId,
-//                 question: "Question 2?",
-//                 duration: 6,
-//                 points: 3,
-//                 answers: [
-//                   {answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true},
-//                   {answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false},
-//               ]
-//             }, 
-//             {
-//                 questionId: q3.questionId,
-//                 question: "Question 3?",
-//                 duration: 6,
-//                 points: 3,
-//                 answers: [
-//                     {answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true},
-//                     {answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false},
-//                 ]
-//             }, 
-//         ]
-//     };
+  //     const expected = {
+  //         quizId: quiz.quizId,
+  //         name: 'Cats',
+  //         timeCreated: expect.any(Number),
+  //         timeLastEdited: expect.any(Number),
+  //         description: 'A quiz about cats',
+  //         numQuestions: 3,
+  //         questions: [
+  //             {
+  //                 questionId: q1.questionId,
+  //                 question: "Question 1",
+  //                 duration: 5,
+  //                 points: 5,
+  //                 answers: [
+  //                   {answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true},
+  //                   {answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false},
+  //               ]
+  //             },
+  //             {
+  //                 questionId: q2.questionId,
+  //                 question: "Question 2?",
+  //                 duration: 6,
+  //                 points: 3,
+  //                 answers: [
+  //                   {answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true},
+  //                   {answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false},
+  //               ]
+  //             },
+  //             {
+  //                 questionId: q3.questionId,
+  //                 question: "Question 3?",
+  //                 duration: 6,
+  //                 points: 3,
+  //                 answers: [
+  //                     {answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true},
+  //                     {answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false},
+  //                 ]
+  //             },
+  //         ]
+  //     };
 
-//     const received = adminQuizInfoRequest(quizId, user.token).body;
-    
-//     const expectedQuestionsSet = new Set(expected.questions);
-//     const receivedQuestionsSet = new Set(received.questions);
+  //     const received = adminQuizInfoRequest(quizId, user.token).body;
 
+  //     const expectedQuestionsSet = new Set(expected.questions);
+  //     const receivedQuestionsSet = new Set(received.questions);
 
-//     expect(receivedQuestionsSet).toStrictEqual(expectedQuestionsSet);
-//     expect(received.numQuestions).toStrictEqual(3);
-// })
+  //     expect(receivedQuestionsSet).toStrictEqual(expectedQuestionsSet);
+  //     expect(received.numQuestions).toStrictEqual(3);
+  // })
 
-// test('timeLastEdited successfully updated', () => {
-//   createQuizQuestionRequest(quiz.quizId, user.token, 'How are you?', 5, 5, validAnswers).body;
-//   const timeNow = Math.floor(Date.now() /1000);
-//   const result = adminQuizInfoRequest(quiz.quizId, user.token).body;
-//   expect(result.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
-//   expect(result.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
-// });
-
+  // test('timeLastEdited successfully updated', () => {
+  //   createQuizQuestionRequest(quiz.quizId, user.token, 'How are you?', 5, 5, validAnswers).body;
+  //   const timeNow = Math.floor(Date.now() /1000);
+  //   const result = adminQuizInfoRequest(quiz.quizId, user.token).body;
+  //   expect(result.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
+  //   expect(result.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
+  // });
 });
 
 describe('valid edge cases', () => {
   test.each([
     { testname: 'question string length 5', question: 'abcde', duration: 5, points: 5 },
-    { testname: 'question string length 50', question: 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvb', duration: 5, points: 5 },
+    { testname: 'question string length 50', question: 'a'.repeat(30), duration: 5, points: 5 },
     { testname: 'duration 3 minutes', question: 'valid question', duration: 180, points: 5 },
     { testname: 'points is 1', question: 'valid question', duration: 5, points: 1 },
     { testname: 'points is 10', question: 'valid question', duration: 5, points: 10 }

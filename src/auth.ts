@@ -1,4 +1,5 @@
-import { setData, getData, Error, Data, Users, Token } from './dataStore';
+import { setData, getData } from './dataStore';
+import { Error, Data, Users, Token } from './interfaces';
 import validator from 'validator';
 import { isValidTokenStructure, isTokenLoggedIn, findUserFromToken, isWhiteSpace } from './helper';
 
@@ -22,13 +23,13 @@ export interface User {
 
 /**
  * Register a user with an email, password, and names, then returns their
- * authUserId value.
+ * token value.
  *
  * @param {string} email
  * @param {string} password
  * @param {string} nameFirst
  * @param {string} nameLast
- * @returns {{authUserId: number}}
+ * @returns {{token: number}}
  */
 export function adminAuthRegister (email: string, password: string, nameFirst: string, nameLast: string): Error | TokenId {
   const store = getData();
@@ -165,4 +166,113 @@ export function adminUserDetails(token: string): User | Error {
           numFailedPasswordsSinceLastLogin: data.users[index].numFailedPasswordsSinceLastLogin,
         }
   };
+}
+
+/**
+ * Updates a logged in user's password
+ *
+ * @param {string} token
+ * @param {string} oldPassword
+ * @param {string} newPassword
+ * @returns {{ }} empty object
+ */
+export function updateUserPassword(token: string, oldPassword: string, newPassword: string): Error | Record<string, never> {
+  const data: Data = getData();
+
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Token is an invalid structure' };
+  }
+
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token is not logged in' };
+  }
+
+  const userId = findUserFromToken(token);
+  const index = data.users.findIndex(id => id.authUserId === userId);
+  if (data.users[index].password !== oldPassword) {
+    return { error: 'Old password is incorrect' };
+  }
+
+  if (data.users[index].oldPasswords !== undefined) {
+    if (data.users[index].oldPasswords.includes(newPassword)) {
+      return { error: 'New password has been used previously' };
+    }
+  } else {
+    data.users[index].oldPasswords = [];
+  }
+
+  if (newPassword.length < 8) {
+    return { error: 'New password must be at least 8 characters' };
+  }
+
+  const letters = /[a-zA-Z]/;
+  const numbers = /\d/;
+  if (!letters.test(newPassword) || !numbers.test(newPassword)) {
+    return { error: 'New password must contain at least one letter and one number' };
+  }
+
+  data.users[index].oldPasswords.push(oldPassword);
+  data.users[index].password = newPassword;
+
+  setData(data);
+  return ({ });
+}
+
+/**
+ * Update the email, first name and last name of a logged in user
+ *
+ * @param {string} token
+ * @param {string} email
+ * @param {string} nameFirst
+ * @param {string} nameLast
+ * @returns {{ }} empty object
+*/
+export function updateUserDetails(token: string, email: string, nameFirst: string, nameLast: string): Record<string, never> | Error {
+  const data: Data = getData();
+
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Token is an invalid structure' };
+  }
+
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token is not logged in' };
+  }
+
+  const userId = findUserFromToken(token);
+  const index = data.users.findIndex(id => id.authUserId === userId);
+  if (data.users[index].email !== email && data.users.filter(mail => mail.email === email).length > 0) {
+    return { error: 'Email is currently used by another user' };
+  }
+
+  if (!validator.isEmail(email)) {
+    return { error: 'Email is Invalid' };
+  }
+
+  const expressionName = /^[A-Za-z\s'-]+$/;
+  if (!expressionName.test(nameFirst)) {
+    return { error: 'First name must only contain letters, spaces, hyphens or apostrophes' };
+  }
+
+  if (nameFirst.length < 2 || nameFirst.length > 20) {
+    return { error: 'First name must be 2 to 20 characters' };
+  }
+
+  if (!expressionName.test(nameLast)) {
+    return { error: 'Last name must only contain letters, spaces, hyphens or apostrophes' };
+  }
+
+  if (nameLast.length < 2 || nameLast.length > 20) {
+    return { error: 'Last name must be 2 to 20 characters' };
+  }
+
+  if (isWhiteSpace(nameFirst) || isWhiteSpace(nameLast)) {
+    return { error: 'First name and Last name cannot be solely white space' };
+  }
+
+  data.users[index].email = email;
+  data.users[index].nameFirst = nameFirst;
+  data.users[index].nameLast = nameLast;
+
+  setData(data);
+  return ({ });
 }

@@ -1,4 +1,5 @@
-import { getData, setData, Data, Error, Answer } from './dataStore';
+import { getData, setData } from './dataStore';
+import { Data, Error, Answer, Quizzes } from './interfaces';
 import {
   checkNameValidity,
   isValidCreator,
@@ -10,13 +11,32 @@ import {
   isValidQuestionId,
 } from './helper';
 
-interface QuizList {
-    quizId: number,
-    name: string
+  interface QuizList {
+      quizId: number,
+      name: string
+  }
+
+  interface QuizCreate {
+      quizId: number,
+  }
+
+interface QuizInfoQuestions {
+  questionId: number,
+  question: string,
+  duration: number,
+  points: number,
+  answers: {answerId: number, answer: string, colour: string, correct: boolean}[],
 }
 
-interface QuizCreate {
-    quizId: number,
+interface QuizInfo {
+  quizId: number,
+  name: string,
+  timeCreated: number,
+  timeLastEdited: number,
+  description: string,
+  numQuestions: number,
+  questions: QuizInfoQuestions[],
+  duration: number
 }
 
 interface Answers {
@@ -25,33 +45,34 @@ interface Answers {
 }
 
 /**
- * Provide a list of all quizzes that are owned by the currently logged in user.
- *
- * @param {number} authUserId
- * @returns {{quizzes: Array<{
- *                  quizId: number,
- *                  name: string
- *              }>
- *          }}
- */
-export function adminQuizList (authUserId: number): {quizzes: QuizList[]} | Error {
+   * Provide a list of all quizzes that are owned by the currently logged in user.
+   *
+   * @param {number} token
+   * @returns {{quizzes: Array<{
+   *                  quizId: number,
+   *                  name: string
+   *              }>
+   *          }}
+   */
+export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
   const data: Data = getData();
 
-  // if (!isValidUserId(authUserId)) {
-  //   return {
-  //     error: 'AuthUserId is not a valid user'
-  //   };
-  // }
-
-  const quizzes: QuizList[] = [];
-
-  for (const quiz of data.quizzes) {
-    if (quiz.creator === authUserId) {
-      const quizId: number = quiz.quizId;
-      const name: string = quiz.name;
-      quizzes.push({ quizId, name });
-    }
+  if (!isValidTokenStructure(token)) {
+    return {
+      error: 'token is an invalid structure'
+    };
   }
+
+  if (!isTokenLoggedIn(token)) {
+    return {
+      error: 'token is not logged in'
+    };
+  }
+
+  const authUserId = findUserFromToken(token);
+
+  const newList = data.quizzes.filter(id => id.creator === authUserId);
+  const quizzes: QuizList[] = newList.map((quiz) => { return { quizId: quiz.quizId, name: quiz.name }; });
 
   return {
     quizzes: quizzes
@@ -117,35 +138,124 @@ export function adminQuizCreate(token: string, name: string, description: string
     quizId: id,
   };
 }
-
 /**
  * Given a particular quizId, permanently remove the quiz.
  *
- * @param {number} authUserId
+ * @param {string} token
  * @param {number} quizId
  * @returns {{ }} empty object
  */
-export function adminQuizRemove(authUserId: number, quizId: number): Record<string, never> | Error {
-  // if (isValidUserId(authUserId) === false) {
-  //   return { error: 'AuthUserId is not a valid user' };
-  // }
-
-  if (isValidQuizId(quizId) === false) {
-    return { error: 'Quiz ID does not refer to valid quiz' };
+export function adminQuizRemove(token: string, quizId: number): Record<string, never> | Error {
+  // invalid token structure
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
   }
 
-  if (isValidCreator(quizId, '12345') === false) {
-    return { error: 'Quiz ID does not refer to a quiz that this user owns' };
+  // token is not logged in
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
+  if (!isValidQuizId(quizId)) {
+    return { error: 'Invalid: QuizId' };
+  }
+
+  // get authUserId from token
+
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'Invalid: user does not own quiz' };
   }
 
   const data: Data = getData();
-  for (const i in data.quizzes) {
-    if (data.quizzes[i].quizId === quizId) {
-      data.quizzes.splice(parseInt(i), 1);
-      setData(data);
-    }
+  const index = data.quizzes.findIndex((quiz) => quiz.quizId === quizId);
+
+  if (index !== -1) {
+    data.trash.push(data.quizzes[index]);
+    data.quizzes.splice(index, 1);
+    setData(data);
   }
 
+  return { };
+}
+
+/**
+ * View the quizzes that are currently in the trash
+ *
+ * @param token
+ * @returns {{quizzes: Array<{
+ *                  quizId: number,
+ *                  name: string
+ *              }>
+ *          }}
+ */
+export function adminQuizTrash(token: string): {quizzes: QuizList[]} | Error {
+  // invalid token structure
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+
+  // token is not logged in
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
+  const data = getData();
+  // filters out quizzes not created by user
+  const authUserId = findUserFromToken(token);
+
+  const trashQuizzes = data.trash.filter((quiz: Quizzes) => {
+    return quiz.creator === authUserId;
+  });
+
+  // maps list of quiz objects in trash to just have name and quizId
+  const simpleTrashQuizzes = trashQuizzes.map((quiz) => {
+    return { quizId: quiz.quizId, name: quiz.name };
+  });
+
+  return {
+    quizzes: simpleTrashQuizzes
+  };
+}
+
+/**
+   * Given quizId restore the quiz from the trash back to an active quiz
+   *
+   * @param {string} token
+   * @param {number} quizId
+   * @returns { } empty object
+   */
+export function adminQuizRestore(token: string, quizId: number): Record<string, never> | Error {
+  // invalid token structure
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+
+  // token is not logged in
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
+  const data = getData();
+  const quizIndex = data.trash.findIndex((quiz) => quiz.quizId === quizId);
+  if (quizIndex === -1) {
+    return { error: 'Invalid: quiz is not currently in trash or does not exist' };
+  }
+
+  // get authUserId from token
+  const authUserId = findUserFromToken(token);
+
+  if (data.trash[quizIndex].creator !== authUserId) {
+    return { error: 'Invalid: user does not own quiz' };
+  }
+
+  // get time in seconds
+  const timeNow = Math.floor((new Date()).getTime() / 1000);
+  data.trash[quizIndex].timeLastEdited = timeNow;
+  // add the quiz to restore to list of quizzes
+  data.quizzes.push(data.trash[quizIndex]);
+  // remove quiz to restore from trash
+  data.trash.splice(quizIndex, 1);
+  setData(data);
   return { };
 }
 
@@ -155,43 +265,42 @@ export function adminQuizRemove(authUserId: number, quizId: number): Record<stri
  * @param {number} authUserId
  * @param {number} quizId
  * @returns {{
- *           quizId: number,
- *           name: string,
- *           timeCreated: number,
- *           timeLastEdited: number,
- *           description: string,
- *          }}
- */
-export function adminQuizInfo(authUserId: number, quizId: number): Error | {
-    quizId: number, name: string, timeCreated: number, timeLastEdited: number, description: string
-} {
-  // if (!isValidUserId(authUserId)) {
-  //   return { error: 'authUserId does not refer to valid user' };
-  // }
-
-  if (!isValidQuizId(quizId)) {
-    return { error: 'quizId does not refer to valid quiz' };
+*           quizId: number,
+*           name: string,
+*           timeCreated: number,
+*           timeLastEdited: number,
+*           description: string,
+*          }}
+*/
+export function adminQuizInfo(token: string, quizId: number): Error | QuizInfo {
+  // Error checking for token
+  if (!isValidTokenStructure(token)) {
+    return { error: 'invalid token structure' };
+  }
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'token is not logged in' };
   }
 
-  if (!isValidCreator(quizId, '12345')) {
-    return { error: 'quizId does not refer to quiz that this user owns' };
+  // Error checking for quizId
+  if (!isValidQuizId(quizId)) {
+    return { error: 'invalid quizId' };
+  }
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'invalid quizId' };
   }
 
   const data: Data = getData();
-  for (const quiz of data.quizzes) {
-    if (quiz.quizId === quizId) {
-      return {
-        quizId: quiz.quizId,
-        name: quiz.name,
-        timeCreated: quiz.timeCreated,
-        timeLastEdited: quiz.timeLastEdited,
-        description: quiz.description,
-      };
-    }
-  }
+  const quiz = data.quizzes.find(id => id.quizId === quizId);
 
   return {
-    error: 'Quiz could not be found'
+    quizId: quizId,
+    name: quiz.name,
+    timeCreated: quiz.timeCreated,
+    timeLastEdited: quiz.timeLastEdited,
+    description: quiz.description,
+    numQuestions: quiz.numQuestions,
+    questions: quiz.questions,
+    duration: quiz.duration
   };
 }
 
@@ -200,66 +309,79 @@ export function adminQuizInfo(authUserId: number, quizId: number): Error | {
  * of the owner of the quiz, the quizId of the quiz to change and the
  * new name.
  *
- * @param {number} authUserId
+ * @param {string} token
  * @param {number} quizId
  * @param {string} name
  * @returns {{ }} empty object
  */
-export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): Record<string, never> | Error {
-  // Check inputted UserId is valid
-  // if (isValidUserId(authUserId) === false) {
-  //   return { error: 'Please enter a valid user' };
-  // }
+export function adminQuizNameUpdate(token: string, quizId: number, name: string): Record<string, never> | Error {
+  // Check if token structure is invalid
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+  // Check if token is not logged in
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
   // Check inputted quizId is valid
-  if (isValidQuizId(quizId) === false) {
-    return { error: 'Please enter a valid quiz' };
+  if (!isValidQuizId(quizId)) {
+    return { error: 'Invalid: QuizId' };
   }
   // Check inputted Quiz ID does not refer to a quiz that this user owns
-  if (isValidCreator(quizId, '12345') === false) {
-    return { error: 'You do not own this quiz' };
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'Invalid: You do not own this quiz' };
   }
-  // Check inputted name is valid
+
+  // Get authUserId from token
+  const authUserId = findUserFromToken(token);
+  // Check if the name is valid
   if (!checkNameValidity(name, authUserId)) {
-    return { error: 'Name not valid' };
+    return { error: 'Invalid: Name' };
   }
   // Check name isn't just whitespace
   if (isWhiteSpace(name)) {
-    return { error: 'Quiz name cannot be solely white space' };
+    return { error: 'Invalid: Quiz name cannot be solely white space' };
   }
 
   const data: Data = getData();
-  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
-  for (const current of data.quizzes) {
-    if (current.quizId === quizId) {
-      current.name = name;
-      current.timeLastEdited = timeNow;
-      setData(data);
-    }
+  const timeNow = Math.floor(Date.now() / 1000);
+
+  const quizToUpdate = data.quizzes.find((current) => current.quizId === quizId);
+
+  if (quizToUpdate) {
+    quizToUpdate.name = name;
+    quizToUpdate.timeLastEdited = timeNow;
+    setData(data);
   }
 
   return { };
 }
 
 /**
- * Update the description of the relevant quiz given the authUserId
+ * Update the description of the relevant quiz given the token
  * of the owner of the quiz, the quizId of the quiz to change and the
  * new description.
  *
- * @param {number} authUserId
  * @param {number} quizId
+ * @param {string} token
  * @param {string} description
- * @returns {{ }}
+ * @returns {{ }} empty object
  */
-export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, description: string): Record<string, never> | Error {
-  // if (!isValidUserId(authUserID)) {
-  //   return { error: 'authUserId does not refer to valid user' };
-  // }
+export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, description: string): Record<string, never> | Error {
+  if (!isValidTokenStructure(tokenId)) {
+    return { error: 'token is not a valid structure' };
+  }
+
+  if (!isTokenLoggedIn(tokenId)) {
+    return { error: 'token is not for a currently logged in session' };
+  }
 
   if (!isValidQuizId(quizId)) {
     return { error: 'quizId does not refer to valid quiz' };
   }
 
-  if (!isValidCreator(quizId, '12345')) {
+  if (!isValidCreator(quizId, tokenId)) {
     return { error: 'quizId does not refer to a quiz that this user owns' };
   }
 
@@ -281,13 +403,13 @@ export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, 
  * Create a new stub question for a particular quiz.
  * When this route is called, and a question is created, the timeLastEdited for quiz is set as the time this question was created
  * and the colours of a question are randomly generated.
- * 
- * @param {number} quizId 
- * @param {string} token 
- * @param {string} question 
- * @param {number} duration 
- * @param {number} points 
- * @param {Answers[]} answers 
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {string} question
+ * @param {number} duration
+ * @param {number} points
+ * @param {Answers[]} answers
  * @returns {questionId: number}
  */
 export function createQuizQuestion(quizId: number, token: string, question: string, duration: number, points: number, answers: Answers[]): {questionId: number} | Error {
