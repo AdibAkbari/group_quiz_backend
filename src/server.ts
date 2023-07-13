@@ -18,7 +18,6 @@ import {
   adminQuizDescriptionUpdate,
   createQuizQuestion,
   adminQuizTrash,
-  adminQuizRemove,
   adminQuizRestore,
   adminQuizInfo,
   adminQuizList,

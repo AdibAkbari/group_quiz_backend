@@ -4,6 +4,7 @@ import {
   authRegisterRequest,
   quizDescriptionUpdateRequest,
   quizCreateRequest,
+  adminQuizInfoRequest,
 } from './testRoutes';
 
 interface Token {
@@ -73,16 +74,20 @@ test('valid input', () => {
   const update = quizDescriptionUpdateRequest(quiz.quizId, user.token, 'New Description');
   expect(update.body).toStrictEqual({ });
   expect(update.statusCode).toBe(200);
-  // expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual(
-  //   {
-  //     quizId: quiz.quizId,
-  //     name: 'My Quiz',
-  //     timeCreated: expect.any(Number),
-  //     timeLastEdited: expect.any(Number),
-  //     description: 'New Description',
-  //     numQuestions: 0,
-  //     questions: [],
-  //     duration: 0
-  //   }
-  // );
+  expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual(
+    {
+      quizId: quiz.quizId,
+      name: 'My Quiz',
+      timeCreated: expect.any(Number),
+      timeLastEdited: expect.any(Number),
+      description: 'New Description',
+      numQuestions: 0,
+      questions: [],
+      duration: 0
+    }
+  );
+  const timeNow = Math.floor(Date.now() / 1000);
+  const result = adminQuizInfoRequest(user.token, quiz.quizId).body;
+  expect(result.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
+  expect(result.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
 });

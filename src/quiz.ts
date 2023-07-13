@@ -380,8 +380,7 @@ export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, des
     return { error: 'quizId does not refer to valid quiz' };
   }
 
-  const authUserID = findUserFromToken(tokenId);
-  if (!isValidCreator(quizId, authUserID)) {
+  if (!isValidCreator(quizId, tokenId)) {
     return { error: 'quizId does not refer to a quiz that this user owns' };
   }
 
