@@ -394,25 +394,29 @@ export function adminQuizNameUpdate(token: string, quizId: number, name: string)
 }
 
 /**
-   * Update the description of the relevant quiz given the authUserId
-   * of the owner of the quiz, the quizId of the quiz to change and the
-   * new description.
-   *
-   * @param {number} authUserId
-   * @param {number} quizId
-   * @param {string} description
-   * @returns {{ }}
-   */
-export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, description: string): Record<string, never> | Error {
-  // if (!isValidUserId(authUserID)) {
-  //   return { error: 'authUserId does not refer to valid user' };
-  // }
+ * Update the description of the relevant quiz given the token
+ * of the owner of the quiz, the quizId of the quiz to change and the
+ * new description.
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {string} description
+ * @returns {{ }} empty object
+ */
+export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, description: string): Record<string, never> | Error {
+  if (!isValidTokenStructure(tokenId)) {
+    return { error: 'token is not a valid structure' };
+  }
+
+  if (!isTokenLoggedIn(tokenId)) {
+    return { error: 'token is not for a currently logged in session' };
+  }
 
   if (!isValidQuizId(quizId)) {
     return { error: 'quizId does not refer to valid quiz' };
   }
 
-  if (!isValidCreator(quizId, '123')) {
+  if (!isValidCreator(quizId, tokenId)) {
     return { error: 'quizId does not refer to a quiz that this user owns' };
   }
 
