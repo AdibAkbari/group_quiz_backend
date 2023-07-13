@@ -102,6 +102,20 @@ export function quizRemoveRequest(token: string, quizid: number) {
   };
 }
 
+export function quizNameUpdateRequest(token: string, quizid: number, name: string) {
+  const res = request(
+    'PUT',
+    SERVER_URL + `/v1/admin/quiz/${quizid}/name`,
+    {
+      json: { token: token, name: name },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function adminQuizListRequest(token: string) {
   const res = request(
     'GET',
