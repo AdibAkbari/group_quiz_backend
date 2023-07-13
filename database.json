@@ -1,1 +1,1 @@
-{"users":[],"quizzes":[],"quizCount":0,"tokens":[],"trash":[]}
+{"users":[{"email":"email@gmail.com","password":"password1","nameFirst":"first","nameLast":"last","authUserId":1,"numSuccessfulLogins":1,"numFailedPasswordsSinceLastLogin":0}],"quizzes":[{"quizId":1,"name":"New Quiz Name","timeCreated":1689090097,"timeLastEdited":1689090097,"description":"","numQuestions":0,"questions":[],"creator":1,"duration":0,"questionCount":0}],"quizCount":1,"tokens":[{"tokenId":"1230349711","userId":1}],"trash":[]}
