@@ -364,7 +364,7 @@ export function adminQuizNameUpdate(token: string, quizId: number, name: string)
  * new description.
  *
  * @param {number} quizId
- * @param {string} token
+ * @param {string} tokenId
  * @param {string} description
  * @returns {{ }} empty object
  */
