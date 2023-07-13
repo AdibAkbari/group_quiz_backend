@@ -1,5 +1,5 @@
 import { getData, setData } from './dataStore';
-import { Data, Error, Answer } from './interfaces';
+import { Data, Error, Answer, Quizzes } from './interfaces';
 import {
   checkNameValidity,
   isValidCreator,
@@ -10,14 +10,14 @@ import {
   findUserFromToken,
 } from './helper';
 
-interface QuizList {
-    quizId: number,
-    name: string
-}
+  interface QuizList {
+      quizId: number,
+      name: string
+  }
 
-interface QuizCreate {
-    quizId: number,
-}
+  interface QuizCreate {
+      quizId: number,
+  }
 
 interface QuizInfoQuestions {
   questionId: number,
@@ -44,15 +44,15 @@ interface Answers {
 }
 
 /**
- * Provide a list of all quizzes that are owned by the currently logged in user.
- *
- * @param {number} token
- * @returns {{quizzes: Array<{
- *                  quizId: number,
- *                  name: string
- *              }>
- *          }}
- */
+   * Provide a list of all quizzes that are owned by the currently logged in user.
+   *
+   * @param {number} token
+   * @returns {{quizzes: Array<{
+   *                  quizId: number,
+   *                  name: string
+   *              }>
+   *          }}
+   */
 export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
   const data: Data = getData();
 
@@ -178,18 +178,99 @@ export function adminQuizRemove(token: string, quizId: number): Record<string, n
 }
 
 /**
+ * View the quizzes that are currently in the trash
+ *
+ * @param token
+ * @returns {{quizzes: Array<{
+ *                  quizId: number,
+ *                  name: string
+ *              }>
+ *          }}
+ */
+export function adminQuizTrash(token: string): {quizzes: QuizList[]} | Error {
+  // invalid token structure
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+
+  // token is not logged in
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
+  const data = getData();
+  // filters out quizzes not created by user
+  const authUserId = findUserFromToken(token);
+
+  const trashQuizzes = data.trash.filter((quiz: Quizzes) => {
+    return quiz.creator === authUserId;
+  });
+
+  // maps list of quiz objects in trash to just have name and quizId
+  const simpleTrashQuizzes = trashQuizzes.map((quiz) => {
+    return { quizId: quiz.quizId, name: quiz.name };
+  });
+
+  return {
+    quizzes: simpleTrashQuizzes
+  };
+}
+
+/**
+   * Given quizId restore the quiz from the trash back to an active quiz
+   *
+   * @param {string} token
+   * @param {number} quizId
+   * @returns { } empty object
+   */
+export function adminQuizRestore(token: string, quizId: number): Record<string, never> | Error {
+  // invalid token structure
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+
+  // token is not logged in
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
+  const data = getData();
+  const quizIndex = data.trash.findIndex((quiz) => quiz.quizId === quizId);
+  if (quizIndex === -1) {
+    return { error: 'Invalid: quiz is not currently in trash or does not exist' };
+  }
+
+  // get authUserId from token
+  const authUserId = findUserFromToken(token);
+
+  if (data.trash[quizIndex].creator !== authUserId) {
+    return { error: 'Invalid: user does not own quiz' };
+  }
+
+  // get time in seconds
+  const timeNow = Math.floor((new Date()).getTime() / 1000);
+  data.trash[quizIndex].timeLastEdited = timeNow;
+  // add the quiz to restore to list of quizzes
+  data.quizzes.push(data.trash[quizIndex]);
+  // remove quiz to restore from trash
+  data.trash.splice(quizIndex, 1);
+  setData(data);
+  return { };
+}
+
+/**
  * Get all of the relevant information about the current quiz.
  *
  * @param {number} authUserId
  * @param {number} quizId
  * @returns {{
- *           quizId: number,
- *           name: string,
- *           timeCreated: number,
- *           timeLastEdited: number,
- *           description: string,
- *          }}
- */
+*           quizId: number,
+*           name: string,
+*           timeCreated: number,
+*           timeLastEdited: number,
+*           description: string,
+*          }}
+*/
 export function adminQuizInfo(token: string, quizId: number): Error | QuizInfo {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
@@ -227,56 +308,65 @@ export function adminQuizInfo(token: string, quizId: number): Error | QuizInfo {
  * of the owner of the quiz, the quizId of the quiz to change and the
  * new name.
  *
- * @param {number} authUserId
+ * @param {string} token
  * @param {number} quizId
  * @param {string} name
  * @returns {{ }} empty object
  */
-export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): Record<string, never> | Error {
-  // Check inputted UserId is valid
-  // if (isValidUserId(authUserId) === false) {
-  //   return { error: 'Please enter a valid user' };
-  // }
+export function adminQuizNameUpdate(token: string, quizId: number, name: string): Record<string, never> | Error {
+  // Check if token structure is invalid
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+  // Check if token is not logged in
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
   // Check inputted quizId is valid
-  if (isValidQuizId(quizId) === false) {
-    return { error: 'Please enter a valid quiz' };
+  if (!isValidQuizId(quizId)) {
+    return { error: 'Invalid: QuizId' };
   }
   // Check inputted Quiz ID does not refer to a quiz that this user owns
-  if (isValidCreator(quizId, '123') === false) {
-    return { error: 'You do not own this quiz' };
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'Invalid: You do not own this quiz' };
   }
-  // Check inputted name is valid
+
+  // Get authUserId from token
+  const authUserId = findUserFromToken(token);
+  // Check if the name is valid
   if (!checkNameValidity(name, authUserId)) {
-    return { error: 'Name not valid' };
+    return { error: 'Invalid: Name' };
   }
   // Check name isn't just whitespace
   if (isWhiteSpace(name)) {
-    return { error: 'Quiz name cannot be solely white space' };
+    return { error: 'Invalid: Quiz name cannot be solely white space' };
   }
 
   const data: Data = getData();
-  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
-  for (const current of data.quizzes) {
-    if (current.quizId === quizId) {
-      current.name = name;
-      current.timeLastEdited = timeNow;
-      setData(data);
-    }
+  const timeNow = Math.floor(Date.now() / 1000);
+
+  const quizToUpdate = data.quizzes.find((current) => current.quizId === quizId);
+
+  if (quizToUpdate) {
+    quizToUpdate.name = name;
+    quizToUpdate.timeLastEdited = timeNow;
+    setData(data);
   }
 
   return { };
 }
 
 /**
- * Update the description of the relevant quiz given the authUserId
- * of the owner of the quiz, the quizId of the quiz to change and the
- * new description.
- *
- * @param {number} authUserId
- * @param {number} quizId
- * @param {string} description
- * @returns {{ }}
- */
+   * Update the description of the relevant quiz given the authUserId
+   * of the owner of the quiz, the quizId of the quiz to change and the
+   * new description.
+   *
+   * @param {number} authUserId
+   * @param {number} quizId
+   * @param {string} description
+   * @returns {{ }}
+   */
 export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, description: string): Record<string, never> | Error {
   // if (!isValidUserId(authUserID)) {
   //   return { error: 'authUserId does not refer to valid user' };
