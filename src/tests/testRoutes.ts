@@ -50,6 +50,21 @@ export function quizCreateRequest(token: string, name: string, description: stri
   };
 }
 
+export function adminUserDetailsRequest(token: string) {
+  const res = request(
+    'GET',
+    SERVER_URL + '/v1/admin/user/details',
+    {
+      qs: {
+        token: token,
+      }
+    });
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function adminQuizInfoRequest(token: string, quizId: number) {
   const res = request(
     'GET',
@@ -59,7 +74,20 @@ export function adminQuizInfoRequest(token: string, quizId: number) {
         token: token,
       }
     });
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
 
+export function updateUserDetailsRequest(token: string, email: string, nameFirst: string, nameLast: string) {
+  const res = request(
+    'PUT',
+    SERVER_URL + '/v1/admin/user/details',
+    {
+      json: { token: token, email: email, nameFirst: nameFirst, nameLast: nameLast },
+    }
+  );
   return {
     body: JSON.parse(res.body.toString()),
     statusCode: JSON.parse(res.statusCode.toString())
