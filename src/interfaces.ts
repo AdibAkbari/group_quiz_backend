@@ -58,3 +58,7 @@ export interface Error {
 export interface TokenId {
   token: string
 }
+
+export interface QuizId {
+  quizId: number
+}
