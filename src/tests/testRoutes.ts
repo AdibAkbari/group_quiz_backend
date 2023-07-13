@@ -224,7 +224,6 @@ export function updateQuizQuestionRequest(quizId: number, questionId: number, to
   };
 }
 
-
 export function clearRequest() {
   const res = request(
     'DELETE',

@@ -324,7 +324,7 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Respo
     }
   }
   res.json(response);
-})
+});
 
 // clear //
 app.delete('/v1/clear', (req: Request, res: Response) => {

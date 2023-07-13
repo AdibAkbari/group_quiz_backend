@@ -512,10 +512,9 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
   };
 }
 
-
-export function updateQuizQuestion(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answers[]): {} | Error {
-   // Error checking for token
-   if (!isValidTokenStructure(token)) {
+export function updateQuizQuestion(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answers[]): Record<string, never> | Error {
+  // Error checking for token
+  if (!isValidTokenStructure(token)) {
     return { error: 'invalid token structure' };
   }
   if (!isTokenLoggedIn(token)) {
@@ -530,7 +529,7 @@ export function updateQuizQuestion(quizId: number, questionId: number, token: st
     return { error: 'invalid param: quiz Id' };
   }
   if (!isValidQuestionId(quizId, questionId)) {
-    return {error: 'invalid param: questionId'};
+    return { error: 'invalid param: questionId' };
   }
 
   // Error checking for quiz question inputs
@@ -570,15 +569,15 @@ export function updateQuizQuestion(quizId: number, questionId: number, token: st
   }
 
   const data = getData();
-  let currentQuiz = data.quizzes.find(id => id.quizId === quizId);
-  let qIndex = currentQuiz.questions.findIndex(id => id.questionId === questionId);
-  let newDuration = currentQuiz.duration + duration - currentQuiz.questions[qIndex].duration;
+  const currentQuiz = data.quizzes.find(id => id.quizId === quizId);
+  const qIndex = currentQuiz.questions.findIndex(id => id.questionId === questionId);
+  const newDuration = currentQuiz.duration + duration - currentQuiz.questions[qIndex].duration;
 
   if (newDuration > 180) {
     return { error: 'invalid input: question durations cannot exceed 3 minutes' };
   }
 
-  //Updating quiz question
+  // Updating quiz question
   const answerArray: Answer[] = [];
   const colours = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink'];
   let answerId = 0;
@@ -595,18 +594,18 @@ export function updateQuizQuestion(quizId: number, questionId: number, token: st
     colours.splice(colour, 1);
   }
 
-    currentQuiz.questions[qIndex] = {
+  currentQuiz.questions[qIndex] = {
     questionId: questionId,
     question: question,
     duration: duration,
     points: points,
     answers: answerArray
-  }
+  };
 
   const timeNow: number = Math.floor(Date.now() / 1000);
   currentQuiz.timeLastEdited = timeNow;
   currentQuiz.duration = newDuration;
   setData(data);
 
-  return {}
+  return {};
 }
