@@ -456,6 +456,7 @@ export function quizQuestionDuplicate (quizId: number, questionId: number, token
   data.quizzes[quizIndex].questionCount++;
   data.quizzes[quizIndex].numQuestions++;
   data.quizzes[quizIndex].duration += data.quizzes[quizIndex].questions[questionIndex].duration;
+  data.quizzes[quizIndex].timeLastEdited = timeNow;
   const newQuestion: Question = {
     questionId: newQuestionId,
     question: data.quizzes[quizIndex].questions[questionIndex].question,
