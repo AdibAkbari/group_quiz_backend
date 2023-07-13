@@ -8,11 +8,9 @@ import {
 
 const ERROR = { error: expect.any(String) };
 
-interface Token {
-  token: string;
-}
+import { TokenId } from '../interfaces';
 
-let user: Token;
+let user: TokenId;
 
 beforeEach(() => {
   clearRequest();
