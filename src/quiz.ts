@@ -1,5 +1,5 @@
 import { getData, setData } from './dataStore';
-import { Data, Error, Answer, Quizzes } from './interfaces';
+import { Data, Error, Answer, Quizzes, Question } from './interfaces';
 import {
   checkNameValidity,
   isValidCreator,
@@ -518,13 +518,13 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
  * @param {number} quizId
  * @param {number} questionId
  * @param {string} token
- * @returns {newQuestionId: number} 
+ * @returns {newQuestionId: number}
  */
 export function quizQuestionDuplicate (quizId: number, questionId: number, token: string): { newQuestionId: number } | Error {
   if (!isValidTokenStructure(token)) {
     return { error: 'invalid token structure' };
   }
- 
+
   if (!isTokenLoggedIn(token)) {
     return { error: 'token is not logged in' };
   }
@@ -537,13 +537,13 @@ export function quizQuestionDuplicate (quizId: number, questionId: number, token
     return { error: 'invalid quiz Id' };
   }
 
-  let data: Data = getData();
+  const data: Data = getData();
   const quizIndex: number = data.quizzes.findIndex(id => id.quizId === quizId);
 
   if (data.quizzes[quizIndex].questions.filter(id => id.questionId === questionId).length === 0) {
     return { error: 'invalid question id' };
   }
-  
+
   const newQuestionId: number = data.quizzes[quizIndex].questionCount;
   const questionIndex: number = data.quizzes[quizIndex].questions.findIndex(id => id.questionId === questionId);
   const timeNow: number = Math.floor(Date.now() / 1000);
@@ -557,10 +557,9 @@ export function quizQuestionDuplicate (quizId: number, questionId: number, token
     duration: data.quizzes[quizIndex].questions[questionIndex].duration,
     points: data.quizzes[quizIndex].questions[questionIndex].points,
     answers: data.quizzes[quizIndex].questions[questionIndex].answers,
-  }
+  };
   data.quizzes[quizIndex].questions.splice(questionIndex + 1, 0, newQuestion);
 
   setData(data);
   return ({ newQuestionId: newQuestionId });
 }
-

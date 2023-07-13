@@ -212,7 +212,7 @@ export function clearRequest() {
 
 export function quizQuestionDuplicateRequest(quizid: number, questionid: number, token: string) {
   const res = request(
-    'PUT', 
+    'PUT',
     SERVER_URL + `/v1/admin/quiz/${quizid}/question/${questionid}/duplicate`,
     {
       json: { token: token },
