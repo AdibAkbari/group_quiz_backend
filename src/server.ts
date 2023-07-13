@@ -14,13 +14,14 @@ import {
 } from './auth';
 import {
   adminQuizCreate,
+  adminQuizRemove,
+  adminQuizDescriptionUpdate,
   createQuizQuestion,
   adminQuizTrash,
-  adminQuizRemove,
   adminQuizRestore,
   adminQuizInfo,
   adminQuizList,
-  adminQuizNameUpdate
+  adminQuizNameUpdate,
 } from './quiz';
 import { clear } from './other';
 
@@ -52,6 +53,24 @@ app.get('/echo', (req: Request, res: Response) => {
     res.status(400);
   }
   return res.json(ret);
+});
+
+// adminQuizDescriptionUpdate //
+app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const { token, description } = req.body;
+  const response = adminQuizDescriptionUpdate(quizId, token, description);
+
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('quizId') || response.error.includes('description')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
 });
 
 // adminAuthRegister //
