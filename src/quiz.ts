@@ -177,15 +177,15 @@ export function adminQuizRemove(token: string, quizId: number): Record<string, n
 }
 
 /**
-   * View the quizzes that are currently in the trash
-   *
-   * @param token
-   * @returns {{quizzes: Array<{
-  *                  quizId: number,
-  *                  name: string
-  *              }>
-  *          }}
-  */
+ * View the quizzes that are currently in the trash
+ *
+ * @param token
+ * @returns {{quizzes: Array<{
+ *                  quizId: number,
+ *                  name: string
+ *              }>
+ *          }}
+ */
 export function adminQuizTrash(token: string): {quizzes: QuizList[]} | Error {
   // invalid token structure
   if (!isValidTokenStructure(token)) {
@@ -260,13 +260,13 @@ export function adminQuizRestore(token: string, quizId: number): Record<string, 
  * @param {number} authUserId
  * @param {number} quizId
  * @returns {{
- *           quizId: number,
- *           name: string,
- *           timeCreated: number,
- *           timeLastEdited: number,
- *           description: string,
- *          }}
- */
+*           quizId: number,
+*           name: string,
+*           timeCreated: number,
+*           timeLastEdited: number,
+*           description: string,
+*          }}
+*/
 export function adminQuizInfo(token: string, quizId: number): Error | QuizInfo {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
