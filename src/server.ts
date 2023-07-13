@@ -17,7 +17,8 @@ import {
   adminQuizRemove,
   adminQuizRestore,
   adminQuizInfo,
-  adminQuizList
+  adminQuizList,
+  adminQuizNameUpdate
 } from './quiz';
 import { clear } from './other';
 
@@ -97,6 +98,27 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
       return res.status(400).json(response);
     }
   }
+  res.json(response);
+});
+
+// adminQuizNameUpdate //
+app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
+  const token = req.body.token as string;
+  const name = req.body.name as string;
+
+  const response = adminQuizNameUpdate(token, parseInt(req.params.quizid), name);
+
+  if ('error' in response) {
+    if (response.error.includes('Structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('Name') || response.error.includes('QuizId') ||
+                 response.error.includes('own') || response.error.includes('white space')) {
+      return res.status(400).json(response);
+    }
+  }
+
   res.json(response);
 });
 
