@@ -9,6 +9,7 @@ import fs from 'fs';
 import {
   adminAuthLogin,
   adminAuthRegister,
+  updateUserPassword,
   adminUserDetails,
   updateUserDetails,
 } from './auth';
@@ -146,6 +147,22 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
     } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
     } else if (response.error.includes('Name') || response.error.includes('Description')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
+// updateUserPassword //
+app.put('/v1/admin/user/password', (req: Request, res: Response) => {
+  const { token, oldPassword, newPassword } = req.body;
+  const response = updateUserPassword(token, oldPassword, newPassword);
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('password')) {
       return res.status(400).json(response);
     }
   }
