@@ -6,6 +6,7 @@ import {
   quizCreateRequest,
   quizRemoveRequest,
   adminQuizListRequest,
+  adminQuizInfoRequest,
 } from './testRoutes';
 
 const ERROR = { error: expect.any(String) };
@@ -118,6 +119,7 @@ describe('adminQuizRestore', () => {
       const expectedSet = new Set(expected.quizzes);
       expect(trashSet).toStrictEqual(expectedSet);
     });
+
     test('adds quiz back to active quizzes', () => {
       const expected = {
         quizzes: [
@@ -127,7 +129,14 @@ describe('adminQuizRestore', () => {
           }
         ]
       };
-      expect(adminQuizListRequest(user.token)).toStrictEqual(expected);
+      expect(adminQuizListRequest(user.token).body).toStrictEqual(expected);
+    });
+
+    test('timeLastEdited successfully updated', () => {
+      const timeNow = Math.floor(Date.now() / 1000);
+      const result = adminQuizInfoRequest(user.token, quiz.quizId).body;
+      expect(result.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
+      expect(result.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
     });
   });
 });
