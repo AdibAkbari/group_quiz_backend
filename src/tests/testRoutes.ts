@@ -132,6 +132,34 @@ export function adminQuizListRequest(token: string) {
   };
 }
 
+export function quizTrashRequest(token: string) {
+  const res = request(
+    'GET',
+    SERVER_URL + '/v1/admin/quiz/trash',
+    {
+      qs: { token: token }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function quizRestoreRequest(token: string, quizId: number) {
+  const res = request(
+    'POST',
+    SERVER_URL + `/v1/admin/quiz/${quizId}/restore`,
+    {
+      json: { token: token }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function clearRequest() {
   const res = request(
     'DELETE',

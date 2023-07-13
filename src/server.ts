@@ -13,7 +13,9 @@ import {
 import {
   adminQuizCreate,
   createQuizQuestion,
+  adminQuizTrash,
   adminQuizRemove,
+  adminQuizRestore,
   adminQuizInfo,
   adminQuizList,
   adminQuizNameUpdate
@@ -137,6 +139,20 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   res.json(response);
 });
 
+// adminQuizTrash //
+app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
+  const token = req.query.token as string;
+  const response = adminQuizTrash(token);
+  if ('error' in response) {
+    if (response.error.includes('Structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    }
+  }
+  res.json(response);
+});
+
 // adminQuizInfo //
 app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
@@ -164,6 +180,22 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
     } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
     } else if (response.error.includes('QuizId') || response.error.includes('own')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
+// adminQuizRestore //
+app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizRestore(req.body.token, quizId);
+  if ('error' in response) {
+    if (response.error.includes('Structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('quiz')) {
       return res.status(400).json(response);
     }
   }
