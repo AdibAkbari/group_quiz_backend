@@ -50,6 +50,21 @@ export function quizCreateRequest(token: string, name: string, description: stri
   };
 }
 
+export function adminUserDetailsRequest(token: string) {
+  const res = request(
+    'GET',
+    SERVER_URL + '/v1/admin/user/details',
+    {
+      qs: {
+        token: token,
+      }
+    });
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function adminQuizInfoRequest(token: string, quizId: number) {
   const res = request(
     'GET',
@@ -59,7 +74,20 @@ export function adminQuizInfoRequest(token: string, quizId: number) {
         token: token,
       }
     });
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
 
+export function updateUserDetailsRequest(token: string, email: string, nameFirst: string, nameLast: string) {
+  const res = request(
+    'PUT',
+    SERVER_URL + '/v1/admin/user/details',
+    {
+      json: { token: token, email: email, nameFirst: nameFirst, nameLast: nameLast },
+    }
+  );
   return {
     body: JSON.parse(res.body.toString()),
     statusCode: JSON.parse(res.statusCode.toString())
@@ -102,6 +130,20 @@ export function quizRemoveRequest(token: string, quizid: number) {
   };
 }
 
+export function quizNameUpdateRequest(token: string, quizid: number, name: string) {
+  const res = request(
+    'PUT',
+    SERVER_URL + `/v1/admin/quiz/${quizid}/name`,
+    {
+      json: { token: token, name: name },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function adminQuizListRequest(token: string) {
   const res = request(
     'GET',
@@ -110,6 +152,34 @@ export function adminQuizListRequest(token: string) {
       qs: {
         token: token,
       }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function quizTrashRequest(token: string) {
+  const res = request(
+    'GET',
+    SERVER_URL + '/v1/admin/quiz/trash',
+    {
+      qs: { token: token }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function quizRestoreRequest(token: string, quizId: number) {
+  const res = request(
+    'POST',
+    SERVER_URL + `/v1/admin/quiz/${quizId}/restore`,
+    {
+      json: { token: token }
     }
   );
   return {

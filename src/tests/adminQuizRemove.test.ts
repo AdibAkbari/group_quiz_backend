@@ -138,15 +138,4 @@ describe('Successfully removed quiz check', () => {
     expect(quiz3.quizId).not.toStrictEqual(quiz.quizId);
     expect(quiz3.quizId).not.toStrictEqual(quiz2.quizId);
   });
-
-  //   test('Time Last Edited is updated when a quiz is sent to trash', () => {
-  //     const expectedTimeEdited = Math.floor(Date.now() / 1000);
-  //     quizRemoveRequest(user.token, quiz.quizId);
-
-  //     const viewTrash = quizTrashRequest(user.token);
-  //     const timeLastEdited = viewTrash.quizzes.timeLastEdited;
-
-//     expect(timeLastEdited).toBeGreaterThanOrEqual(expectedTimeEdited);
-//     expect(timeLastEdited).toBeLessThanOrEqual(expectedTimeEdited + 2);
-//   });
 });

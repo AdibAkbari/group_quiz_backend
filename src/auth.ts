@@ -167,3 +167,62 @@ export function adminUserDetails(token: string): User | Error {
         }
   };
 }
+
+/**
+ * Update the email, first name and last name of a logged in user
+ *
+ * @param {string} token
+ * @param {string} email
+ * @param {string} nameFirst
+ * @param {string} nameLast
+ * @returns {{ }} empty object
+*/
+export function updateUserDetails(token: string, email: string, nameFirst: string, nameLast: string): Record<string, never> | Error {
+  const data: Data = getData();
+
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Token is an invalid structure' };
+  }
+
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token is not logged in' };
+  }
+
+  const userId = findUserFromToken(token);
+  const index = data.users.findIndex(id => id.authUserId === userId);
+  if (data.users[index].email !== email && data.users.filter(mail => mail.email === email).length > 0) {
+    return { error: 'Email is currently used by another user' };
+  }
+
+  if (!validator.isEmail(email)) {
+    return { error: 'Email is Invalid' };
+  }
+
+  const expressionName = /^[A-Za-z\s'-]+$/;
+  if (!expressionName.test(nameFirst)) {
+    return { error: 'First name must only contain letters, spaces, hyphens or apostrophes' };
+  }
+
+  if (nameFirst.length < 2 || nameFirst.length > 20) {
+    return { error: 'First name must be 2 to 20 characters' };
+  }
+
+  if (!expressionName.test(nameLast)) {
+    return { error: 'Last name must only contain letters, spaces, hyphens or apostrophes' };
+  }
+
+  if (nameLast.length < 2 || nameLast.length > 20) {
+    return { error: 'Last name must be 2 to 20 characters' };
+  }
+
+  if (isWhiteSpace(nameFirst) || isWhiteSpace(nameLast)) {
+    return { error: 'First name and Last name cannot be solely white space' };
+  }
+
+  data.users[index].email = email;
+  data.users[index].nameFirst = nameFirst;
+  data.users[index].nameLast = nameLast;
+
+  setData(data);
+  return ({ });
+}
