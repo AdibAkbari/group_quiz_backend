@@ -3,7 +3,7 @@ import {
   authRegisterRequest,
   clearRequest,
   createQuizQuestionRequest,
-  moveQuesQuestionRequest,
+  moveQuizQuestionRequest,
   adminQuizInfoRequest
 } from './testRoutes';
 
@@ -19,6 +19,9 @@ let user: Token;
 let quizId: number;
 let question1Id: number;
 let question2Id: number;
+let question3Id: number;
+let question4Id: number;
+let question5Id: number;
 beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
@@ -41,13 +44,13 @@ describe('Token invalid', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('token is not a valid structure: $testName', ({ token }) => {
-    const result = moveQuesQuestionRequest(token, quizId, question1Id, 1);
+    const result = moveQuizQuestionRequest(token, quizId, question1Id, 1);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(401);
   });
 
   test('Unused tokenId', () => {
-    const result = moveQuesQuestionRequest(user.token + 1, quizId, question1Id, 1);
+    const result = moveQuizQuestionRequest(user.token + 1, quizId, question1Id, 1);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(403);
   });
@@ -55,27 +58,27 @@ describe('Token invalid', () => {
 
 describe('Invalid params', () => {
   test('QuizId does not refer to a valid quiz', () => {
-    const result = moveQuesQuestionRequest(user.token, quizId + 1, question1Id, 1);
+    const result = moveQuizQuestionRequest(user.token, quizId + 1, question1Id, 1);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(400);
   });
 
   test('QuizId does not refer to a quiz that this user owns', () => {
     const user2 = authRegisterRequest('email1@gmail.com', 'password2', 'FirstnameB', 'LastnameB').body;
-    const result = moveQuesQuestionRequest(user2.token, quizId, question1Id, 1);
+    const result = moveQuizQuestionRequest(user2.token, quizId, question1Id, 1);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(400);
   });
 
   test('No questions in any quiz with this questionId', () => {
-    const result = moveQuesQuestionRequest(user.token, quizId, question1Id + 2, 1);
+    const result = moveQuizQuestionRequest(user.token, quizId, question1Id + 2, 1);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(400);
   });
 
   test('No questions in this quiz with this questionId', () => {
     const quiz2Id = quizCreateRequest(user.token, 'Quiz2', '').body.quizId;
-    const result = moveQuesQuestionRequest(user.token, quiz2Id, question1Id, 1);
+    const result = moveQuizQuestionRequest(user.token, quiz2Id, question1Id, 1);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(400);
   });
@@ -83,19 +86,19 @@ describe('Invalid params', () => {
 
 describe('Invalid newPosition test', () => {
   test('newPosition < 0', () => {
-    const result = moveQuesQuestionRequest(user.token, quizId, question1Id, -1);
+    const result = moveQuizQuestionRequest(user.token, quizId, question1Id, -1);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(400);
   });
 
   test('newPosition > n-1, where n is the number of questions', () => {
-    const result = moveQuesQuestionRequest(user.token, quizId, question1Id, 2);
+    const result = moveQuizQuestionRequest(user.token, quizId, question1Id, 2);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(400);
   });
 
   test('NewPosition is the position of the current question', () => {
-    const result = moveQuesQuestionRequest(user.token, quizId, question1Id, 0);
+    const result = moveQuizQuestionRequest(user.token, quizId, question1Id, 0);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(400);
   });
@@ -103,13 +106,13 @@ describe('Invalid newPosition test', () => {
 
 describe('Successful Move Question', () => {
   test('correct return', () => {
-    const result = moveQuesQuestionRequest(user.token, quizId, question1Id, 1);
+    const result = moveQuizQuestionRequest(user.token, quizId, question1Id, 1);
     expect(result.body).toStrictEqual({});
     expect(result.statusCode).toStrictEqual(200);
   });
 
   test('correct QuizInfo output', () => {
-    const result = moveQuesQuestionRequest(user.token, quizId, question1Id, 1);
+    const result = moveQuizQuestionRequest(user.token, quizId, question1Id, 1);
     expect(result.body).toStrictEqual({});
     expect(result.statusCode).toStrictEqual(200);
 
@@ -149,9 +152,84 @@ describe('Successful Move Question', () => {
     expect(received).toStrictEqual(expected);
   });
 
+  test('correct QuizInfo output: multiple questions', () => {
+    question3Id = createQuizQuestionRequest(quizId, user.token, 'Question 3?', 6, 3, validAnswers).body.questionId;
+    question4Id = createQuizQuestionRequest(quizId, user.token, 'Question 4?', 6, 3, validAnswers).body.questionId;
+    question5Id = createQuizQuestionRequest(quizId, user.token, 'Question 5?', 6, 3, validAnswers).body.questionId;
+
+    const result = moveQuizQuestionRequest(user.token, quizId, question1Id, 1);
+    expect(result.body).toStrictEqual({});
+    expect(result.statusCode).toStrictEqual(200);
+
+    const received = adminQuizInfoRequest(user.token, quizId).body;
+    const expected = {
+      quizId: quizId,
+      name: 'Cats',
+      timeCreated: expect.any(Number),
+      timeLastEdited: expect.any(Number),
+      description: 'A quiz about cats',
+      numQuestions: 5,
+      questions: [
+        {
+          questionId: question2Id,
+          question: 'Question 2?',
+          duration: 6,
+          points: 3,
+          answers: [
+            { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
+            { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
+          ]
+        },
+        {
+          questionId: question1Id,
+          question: 'Question 1?',
+          duration: 6,
+          points: 3,
+          answers: [
+            { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
+            { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
+          ]
+        },
+        {
+          questionId: question3Id,
+          question: 'Question 3?',
+          duration: 6,
+          points: 3,
+          answers: [
+            { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
+            { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
+          ]
+        },
+        {
+          questionId: question4Id,
+          question: 'Question 4?',
+          duration: 6,
+          points: 3,
+          answers: [
+            { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
+            { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
+          ]
+        },
+        {
+          questionId: question5Id,
+          question: 'Question 5?',
+          duration: 6,
+          points: 3,
+          answers: [
+            { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
+            { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
+          ]
+        },
+      ],
+      duration: 30
+    };
+
+    expect(received).toStrictEqual(expected);
+  });
+
   test('Correct time last edited', () => {
     const expectedTimeTransfered = Math.floor(Date.now() / 1000);
-    const move = moveQuesQuestionRequest(user.token, quizId, question1Id, 1);
+    const move = moveQuizQuestionRequest(user.token, quizId, question1Id, 1);
     expect(move.body).toStrictEqual({});
     expect(move.statusCode).toStrictEqual(200);
 
