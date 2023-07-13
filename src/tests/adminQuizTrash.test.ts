@@ -1,3 +1,4 @@
+import { TokenId } from '../interfaces';
 import {
   quizTrashRequest,
   clearRequest,
@@ -7,10 +8,6 @@ import {
 } from './testRoutes';
 
 const ERROR = { error: expect.any(String) };
-
-interface TokenId {
-  token: string
-}
 
 beforeEach(() => {
   clearRequest();
