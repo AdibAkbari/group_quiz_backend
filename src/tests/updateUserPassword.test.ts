@@ -5,6 +5,7 @@ import {
   clearRequest,
   updateUserPasswordRequest,
 } from './testRoutes';
+import { TokenId } from '../interfaces';
 
 const ERROR = { error: expect.any(String) };
 
@@ -14,7 +15,7 @@ beforeEach(() => {
 
 describe('Error Cases: updateUserDetails', () => {
   test('Old Password Incorrect', () => {
-    const user = authRegisterRequest('email@gmail.com', 'password1', 'NameFirst', 'NameLast').body;
+    const user: TokenId = authRegisterRequest('email@gmail.com', 'password1', 'NameFirst', 'NameLast').body;
     const update = updateUserPasswordRequest(user.token, 'password2', 'password3');
     expect(update.body).toStrictEqual(ERROR);
     expect(update.statusCode).toStrictEqual(400);

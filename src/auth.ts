@@ -197,6 +197,8 @@ export function updateUserPassword(token: string, oldPassword: string, newPasswo
     if (data.users[index].oldPasswords.includes(newPassword)) {
       return { error: 'New password has been used previously' };
     }
+  } else {
+    data.users[index].oldPasswords = [];
   }
 
   if (newPassword.length < 8) {
@@ -207,10 +209,6 @@ export function updateUserPassword(token: string, oldPassword: string, newPasswo
   const numbers = /\d/;
   if (!letters.test(newPassword) || !numbers.test(newPassword)) {
     return { error: 'New password must contain at least one letter and one number' };
-  }
-
-  if (data.users[index].oldPasswords === undefined) {
-    data.users[index].oldPasswords = [];
   }
 
   data.users[index].oldPasswords.push(oldPassword);
