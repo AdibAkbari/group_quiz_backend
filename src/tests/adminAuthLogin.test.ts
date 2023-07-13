@@ -19,7 +19,9 @@ beforeEach(() => {
 describe('adminAuthLogin', () => {
   describe('error cases', () => {
     test('Email address does not exist', () => {
-      expect(authLoginRequest('emailFail@gmail.com', 'password1')).toStrictEqual(ERROR);
+      const authLogin = authLoginRequest('emailFail@gmail.com', 'password1');
+      expect(authLogin.body).toStrictEqual(ERROR);
+      expect(authLogin.statusCode).toStrictEqual(400);
     });
 
     describe('Password not correct for given email (but correct for another email)', () => {
@@ -28,7 +30,9 @@ describe('adminAuthLogin', () => {
       });
 
       test('Error output for incorrect password', () => {
-        expect(authLoginRequest('email@gmail.com', 'password2')).toStrictEqual(ERROR);
+        const authLogin = authLoginRequest('email@gmail.com', 'password2');
+        expect(authLogin.body).toStrictEqual(ERROR);
+        expect(authLogin.statusCode).toStrictEqual(400);
       });
       // skipped until adminUserDetails merged
       // test('Correct incrementation of numFailedPasswordsSinceLastLogin', () => {
@@ -42,8 +46,9 @@ describe('adminAuthLogin', () => {
 
   describe('success cases', () => {
     test('Testing authUserId output', () => {
-      expect(authLoginRequest('email@gmail.com', 'password1')).toStrictEqual(
-        { token: expect.any(String) });
+      const authLogin = authLoginRequest('email@gmail.com', 'password1');
+      expect(authLogin.body).toStrictEqual({ token: expect.any(String) });
+      expect(authLogin.statusCode).toStrictEqual(200);
     });
     // skipped until adminUserDetails merged
     // test('Correct incrementation of numSuccessfulLogins', () => {

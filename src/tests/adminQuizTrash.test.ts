@@ -49,12 +49,14 @@ describe('adminQuizTrash', () => {
     beforeEach(() => {
       user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
     });
+
     test('empty quiz trash', () => {
       const trash = quizTrashRequest(user.token);
       expect(trash.body).toStrictEqual({ quizzes: [] });
       expect(trash.statusCode).toStrictEqual(200);
     });
-    test('non-empty quiz trash', () => {
+
+    test('one quiz creator in trash quizzes', () => {
       // create quizzes
       const quiz1 = quizCreateRequest(user.token, 'quiz1', '').body;
       const quiz2 = quizCreateRequest(user.token, 'quiz2', '').body;
@@ -80,8 +82,48 @@ describe('adminQuizTrash', () => {
           }
         ]
       };
-      const trash = quizTrashRequest(user.token);
-      expect(trash.body).toStrictEqual(expected);
+      const trashList = quizTrashRequest(user.token).body;
+      const trashSet = new Set(trashList.quizzes);
+      const expectedSet = new Set(expected.quizzes);
+      expect(trashSet).toStrictEqual(expectedSet);
+    });
+
+    test('multiple quiz creators in trash quizzes', () => {
+      const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
+      // create quizzes of user
+      const quiz1 = quizCreateRequest(user.token, 'quiz1', '').body;
+      const quiz2 = quizCreateRequest(user.token, 'quiz2', '').body;
+      const quiz3 = quizCreateRequest(user.token, 'quiz3', '').body;
+      // create quiz of user2
+      const user2Quiz = quizCreateRequest(user2.token, 'user2Quiz', '').body;
+
+      // remove quizzes
+      quizRemoveRequest(user.token, quiz1.quizId);
+      quizRemoveRequest(user.token, quiz2.quizId);
+      quizRemoveRequest(user.token, quiz3.quizId);
+      quizRemoveRequest(user2.token, user2Quiz.quizId);
+
+      // test that only quizzes created by user are displayed
+      const expected = {
+        quizzes: [
+          {
+            quizId: quiz1.quizId,
+            name: 'quiz1'
+          },
+          {
+            quizId: quiz2.quizId,
+            name: 'quiz2'
+          },
+          {
+            quizId: quiz3.quizId,
+            name: 'quiz3'
+          }
+        ]
+      };
+      const trashList = quizTrashRequest(user.token).body;
+      const trashSet = new Set(trashList.quizzes);
+      const expectedSet = new Set(expected.quizzes);
+      expect(trashSet).toStrictEqual(expectedSet);
     });
   });
 });
