@@ -247,6 +247,9 @@ export function adminQuizRestore(token: string, quizId: number): Record<string, 
     return { error: 'Invalid: user does not own quiz' };
   }
 
+  // get time in seconds
+  const timeNow = Math.floor((new Date()).getTime() / 1000);
+  data.trash[quizIndex].timeLastEdited = timeNow;
   // add the quiz to restore to list of quizzes
   data.quizzes.push(data.trash[quizIndex]);
   // remove quiz to restore from trash
