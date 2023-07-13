@@ -151,7 +151,7 @@ export function quizTrashEmptyRequest(token: string, quizIds: number[]) {
     'DELETE',
     SERVER_URL + '/v1/admin/quiz/trash/empty',
     {
-      qs: { token: token, quizIds: quizIds }
+      qs: { token: token, quizIds: JSON.stringify(quizIds) }
     }
   );
   return {

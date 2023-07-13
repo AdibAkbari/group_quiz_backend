@@ -49,7 +49,7 @@ describe('adminQuizTrash', () => {
       { testName: 'token has positive sign', token: '+38594' },
     ])('token is not a valid structure: $testName', ({ token }) => {
       const quizIds = [quiz1.quizId, quiz2.quizId, quiz3.quizId];
-      
+
       const emptyTrash = quizTrashEmptyRequest(token, quizIds);
       expect(emptyTrash.body).toStrictEqual(ERROR);
       expect(emptyTrash.statusCode).toStrictEqual(401);
@@ -100,7 +100,7 @@ describe('adminQuizTrash', () => {
     let trashEmptyStatusCode: number;
     // empties trash
     beforeEach(() => {
-      const quizIds = [quiz1.quizId, quiz2.quizId, quiz3.quizId];
+      const quizIds = [quiz1.quizId, quiz3.quizId];
       const trashEmpty = quizTrashEmptyRequest(user.token, quizIds);
       trashEmptyBody = trashEmpty.body;
       trashEmptyStatusCode = trashEmpty.statusCode;
@@ -111,8 +111,17 @@ describe('adminQuizTrash', () => {
       expect(trashEmptyStatusCode).toStrictEqual(200);
     });
 
-    test('test trash empty', () => {
-      expect(quizTrashRequest(user.token).body).toStrictEqual({ quizzes: [] });
+    test('test specified quizzes in trash emptied', () => {
+      // only quiz2 remaining
+      const expected = {
+        quizzes: [
+          {
+            quizId: quiz2.quizId,
+            name: 'quiz2'
+          }
+        ]
+      };
+      expect(quizTrashRequest(user.token).body).toStrictEqual(expected);
     });
   });
 });
