@@ -58,7 +58,6 @@ export interface Error {
 export interface TokenId {
   token: string
 }
-<<<<<<< HEAD
 
 export interface QuizId {
   quizId: number
@@ -71,5 +70,4 @@ export interface QuestionId {
 export interface NewQuestionId {
   newQuestionId: number;
 }
-=======
->>>>>>> master
+
