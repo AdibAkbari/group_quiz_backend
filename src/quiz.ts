@@ -247,6 +247,9 @@ export function adminQuizRestore(token: string, quizId: number): Record<string, 
     return { error: 'Invalid: user does not own quiz' };
   }
 
+  // get time in seconds
+  const timeNow = Math.floor((new Date()).getTime() / 1000);
+  data.trash[quizIndex].timeLastEdited = timeNow;
   // add the quiz to restore to list of quizzes
   data.quizzes.push(data.trash[quizIndex]);
   // remove quiz to restore from trash
@@ -337,45 +340,54 @@ export function adminQuizInfo(token: string, quizId: number): Error | QuizInfo {
 }
 
 /**
-   * Update the name of the relevant quiz given the authUserId
-   * of the owner of the quiz, the quizId of the quiz to change and the
-   * new name.
-   *
-   * @param {number} authUserId
-   * @param {number} quizId
-   * @param {string} name
-   * @returns {{ }} empty object
-   */
-export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): Record<string, never> | Error {
-  // Check inputted UserId is valid
-  // if (isValidUserId(authUserId) === false) {
-  //   return { error: 'Please enter a valid user' };
-  // }
+ * Update the name of the relevant quiz given the authUserId
+ * of the owner of the quiz, the quizId of the quiz to change and the
+ * new name.
+ *
+ * @param {string} token
+ * @param {number} quizId
+ * @param {string} name
+ * @returns {{ }} empty object
+ */
+export function adminQuizNameUpdate(token: string, quizId: number, name: string): Record<string, never> | Error {
+  // Check if token structure is invalid
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+  // Check if token is not logged in
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
   // Check inputted quizId is valid
-  if (isValidQuizId(quizId) === false) {
-    return { error: 'Please enter a valid quiz' };
+  if (!isValidQuizId(quizId)) {
+    return { error: 'Invalid: QuizId' };
   }
   // Check inputted Quiz ID does not refer to a quiz that this user owns
-  if (isValidCreator(quizId, '123') === false) {
-    return { error: 'You do not own this quiz' };
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'Invalid: You do not own this quiz' };
   }
-  // Check inputted name is valid
+
+  // Get authUserId from token
+  const authUserId = findUserFromToken(token);
+  // Check if the name is valid
   if (!checkNameValidity(name, authUserId)) {
-    return { error: 'Name not valid' };
+    return { error: 'Invalid: Name' };
   }
   // Check name isn't just whitespace
   if (isWhiteSpace(name)) {
-    return { error: 'Quiz name cannot be solely white space' };
+    return { error: 'Invalid: Quiz name cannot be solely white space' };
   }
 
   const data: Data = getData();
-  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
-  for (const current of data.quizzes) {
-    if (current.quizId === quizId) {
-      current.name = name;
-      current.timeLastEdited = timeNow;
-      setData(data);
-    }
+  const timeNow = Math.floor(Date.now() / 1000);
+
+  const quizToUpdate = data.quizzes.find((current) => current.quizId === quizId);
+
+  if (quizToUpdate) {
+    quizToUpdate.name = name;
+    quizToUpdate.timeLastEdited = timeNow;
+    setData(data);
   }
 
   return { };

@@ -5,7 +5,8 @@ import {
   quizRestoreRequest,
   quizCreateRequest,
   quizRemoveRequest,
-  // adminQuizListRequest,
+  adminQuizListRequest,
+  adminQuizInfoRequest,
 } from './testRoutes';
 
 const ERROR = { error: expect.any(String) };
@@ -118,16 +119,24 @@ describe('adminQuizRestore', () => {
       const expectedSet = new Set(expected.quizzes);
       expect(trashSet).toStrictEqual(expectedSet);
     });
-    // test('adds quiz back to active quizzes', () => {
-    //   const expected = {
-    //     quizzes: [
-    //       {
-    //         quizId: quiz.quizId,
-    //         name: 'quiz1'
-    //       }
-    //     ]
-    //   };
-    //   expect(adminQuizListRequest(user.token)).toStrictEqual(expected);
-    // });
+
+    test('adds quiz back to active quizzes', () => {
+      const expected = {
+        quizzes: [
+          {
+            quizId: quiz.quizId,
+            name: 'quiz1'
+          }
+        ]
+      };
+      expect(adminQuizListRequest(user.token).body).toStrictEqual(expected);
+    });
+
+    test('timeLastEdited successfully updated', () => {
+      const timeNow = Math.floor(Date.now() / 1000);
+      const result = adminQuizInfoRequest(user.token, quiz.quizId).body;
+      expect(result.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
+      expect(result.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
+    });
   });
 });
