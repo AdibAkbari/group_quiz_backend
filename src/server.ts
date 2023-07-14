@@ -430,8 +430,8 @@ app.delete('/v1/clear', (req: Request, res: Response) => {
 });
 
 // adminAuthLogout //
-app.put('/v1/admin/auth/logout', (req: Request, res: Response) => {
-  const response = adminAuthLogout(req.body.tokenId);
+app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
+  const response = adminAuthLogout(req.body.token);
   if ('error' in response) {
     if (response.error.includes('structure')) {
       return res.status(401).json(response);
@@ -443,7 +443,7 @@ app.put('/v1/admin/auth/logout', (req: Request, res: Response) => {
 });
 
 // quizQuestionDuplicate //
-app.put('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {
+app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const questionId = parseInt(req.params.questionid);
   const token = req.body.token;

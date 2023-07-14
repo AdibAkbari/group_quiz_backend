@@ -294,7 +294,7 @@ export function clearRequest() {
 
 export function quizQuestionDuplicateRequest(quizid: number, questionid: number, token: string) {
   const res = request(
-    'PUT',
+    'POST',
     SERVER_URL + `/v1/admin/quiz/${quizid}/question/${questionid}/duplicate`,
     {
       json: { token: token },
@@ -322,10 +322,10 @@ export function quizDescriptionUpdateRequest(quizid: number, token: string, desc
 
 export function authLogoutRequest(tokenId: string) {
   const res = request(
-    'PUT',
+    'POST',
     SERVER_URL + '/v1/admin/auth/logout',
     {
-      json: { tokenId: tokenId },
+      json: { token: tokenId },
     }
   );
   return {
