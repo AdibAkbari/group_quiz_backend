@@ -7,18 +7,16 @@ import {
   adminQuizListRequest
 } from './testRoutes';
 
+import {
+  TokenId,
+  QuizCreate
+} from '../interfaces';
+
 const ERROR = { error: expect.any(String) };
 
-interface Token {
-  token: string
-}
-
-interface QuizCreate {
-  quizId: number
-}
 // Before each test, clear data and then create a new user and new quiz
-let user: Token;
-let user2: Token;
+let user: TokenId;
+let user2: TokenId;
 let quiz: QuizCreate;
 beforeEach(() => {
   clearRequest();
