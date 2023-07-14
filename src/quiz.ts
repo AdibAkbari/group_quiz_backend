@@ -8,6 +8,7 @@ import {
   isValidTokenStructure,
   isTokenLoggedIn,
   findUserFromToken,
+  isValidEmail
 } from './helper';
 
   interface QuizList {
@@ -430,6 +431,66 @@ export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, des
   store.quizzes[quizIndex].description = description;
   store.quizzes[quizIndex].timeLastEdited = timeNow;
   setData(store);
+
+  return { };
+}
+
+/**
+ * Transfer ownership of a quiz to a different user based on their email
+ *
+ * @param {string} token
+ * @param {number} quizId
+ * @param {string} userEmail
+ * @returns {{ }}
+ */
+export function adminQuizTransfer (token: string, quizId: number, userEmail: string): Record<string, never> | Error {
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
+  if (!isValidQuizId(quizId)) {
+    return { error: 'Invalid: QuizId' };
+  }
+
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'Invalid: You do not own this quiz' };
+  }
+
+  // Check if email exist
+  if (!isValidEmail(userEmail)) {
+    return { error: 'Invalid: Email does not exist' };
+  }
+
+  const data: Data = getData();
+  const authUserId = findUserFromToken(token);
+
+  const loggedInUser = data.users.find((current) => current.authUserId === authUserId);
+  if (loggedInUser.email === userEmail) {
+    return { error: 'Invalid: Email is current users' };
+  }
+
+  // Find the correct quiz based on input
+  const currentQuiz = data.quizzes.find((current) => current.quizId === quizId);
+  // Find the user to transfer the quiz to
+  const transferUser = data.users.find((current) => current.email === userEmail);
+  // Flter all the quizzes that the user to transfer to owns
+  const transferUserQuizzes = data.quizzes.filter((current) => current.creator === transferUser.authUserId);
+  // Check if the user owns a quiz with the same name
+  const sameName = transferUserQuizzes.find((current) => current.name === currentQuiz.name);
+  if (sameName) {
+    return { error: 'Invalid: User already has a Quiz with the same name' };
+  }
+
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  currentQuiz.timeLastEdited = timeNow;
+
+  currentQuiz.creator = transferUser.authUserId;
+
+  setData(data);
 
   return { };
 }

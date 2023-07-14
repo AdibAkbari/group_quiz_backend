@@ -174,6 +174,20 @@ export function adminQuizListRequest(token: string) {
   };
 }
 
+export function quizTransferRequest (token: string, quizid: number, userEmail: string) {
+  const res = request(
+    'POST',
+    SERVER_URL + `/v1/admin/quiz/${quizid}/transfer`,
+    {
+      json: { token: token, userEmail: userEmail },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function quizTrashRequest(token: string) {
   const res = request(
     'GET',
