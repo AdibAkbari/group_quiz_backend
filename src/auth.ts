@@ -11,7 +11,7 @@ import { isValidTokenStructure, isTokenLoggedIn, findUserFromToken, isWhiteSpace
  * @param {string} password
  * @param {string} nameFirst
  * @param {string} nameLast
- * @returns {{token: number}}
+ * @returns {{token: string}}
  */
 export function adminAuthRegister (email: string, password: string, nameFirst: string, nameLast: string): Error | TokenId {
   const store = getData();
@@ -73,11 +73,11 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
 }
 
 /**
- * Given a registered user's email and password returns their authUserId value.
+ * Given a registered user's email and password returns their token
  *
  * @param {string} email
  * @param {string} password
- * @returns {{authUserId: number}}
+ * @returns {{token: string}}
  */
 export function adminAuthLogin(email: string, password: string): Error | TokenId {
   const newData = getData();
@@ -110,14 +110,14 @@ export function adminAuthLogin(email: string, password: string): Error | TokenId
  * Given an admin user's token, return details about the user.
  * "name" is the first and last name concatenated with a single space between them.
  *
- * @param {number} token
+ * @param {string} token
  * @returns {{user: {
  *              userId: number,
  *              name: string,
  *              email: string,
  *              numSuccessfulLogins: number,
  *              numFailedPasswordsSinceLastLogin: number
- *              }}}
+ *           }}}
  */
 export function adminUserDetails(token: string): User | Error {
   const data: Data = getData();

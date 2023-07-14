@@ -15,7 +15,7 @@ import {
 /**
    * Provide a list of all quizzes that are owned by the currently logged in user.
    *
-   * @param {number} token
+   * @param {string} token
    * @returns {{quizzes: Array<{
    *                  quizId: number,
    *                  name: string
@@ -149,7 +149,7 @@ export function adminQuizRemove(token: string, quizId: number): Record<string, n
 /**
  * View the quizzes that are currently in the trash
  *
- * @param token
+ * @param {string} token
  * @returns {{quizzes: Array<{
  *                  quizId: number,
  *                  name: string
@@ -230,9 +230,9 @@ export function adminQuizRestore(token: string, quizId: number): Record<string, 
 /**
  * Permanently deletes the specific quizzes currently in trash
  *
- * @param token
- * @param quizIds
- * @returns
+ * @param {string} token
+ * @param {number[]} quizIds
+ * @returns {{}} empty object
  */
 export function adminQuizTrashEmpty(token: string, quizIds: number[]): Record<string, never> | Error {
   if (!isValidTokenStructure(token)) {
@@ -266,7 +266,7 @@ export function adminQuizTrashEmpty(token: string, quizIds: number[]): Record<st
 /**
  * Get all of the relevant information about the current quiz.
  *
- * @param {number} authUserId
+ * @param {string} token
  * @param {number} quizId
  * @returns {{
 *           quizId: number,
@@ -309,7 +309,7 @@ export function adminQuizInfo(token: string, quizId: number): Error | QuizInfo {
 }
 
 /**
- * Update the name of the relevant quiz given the authUserId
+ * Update the name of the relevant quiz given the token
  * of the owner of the quiz, the quizId of the quiz to change and the
  * new name.
  *
@@ -409,7 +409,7 @@ export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, des
  * @param {string} token
  * @param {number} quizId
  * @param {string} userEmail
- * @returns {{ }}
+ * @returns {{ }} empty object
  */
 export function adminQuizTransfer (token: string, quizId: number, userEmail: string): Record<string, never> | Error {
   if (!isValidTokenStructure(token)) {
