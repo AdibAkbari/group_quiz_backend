@@ -8,6 +8,8 @@ import {
   isValidTokenStructure,
   isTokenLoggedIn,
   findUserFromToken,
+  isValidQuestionId,
+  isValidEmail
 } from './helper';
 
   interface QuizList {
@@ -168,11 +170,11 @@ export function adminQuizRemove(token: string, quizId: number): Record<string, n
   const data: Data = getData();
   const index = data.quizzes.findIndex((quiz) => quiz.quizId === quizId);
 
-  if (index !== -1) {
-    data.trash.push(data.quizzes[index]);
-    data.quizzes.splice(index, 1);
-    setData(data);
-  }
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  data.quizzes[index].timeLastEdited = timeNow;
+  data.trash.push(data.quizzes[index]);
+  data.quizzes.splice(index, 1);
+  setData(data);
 
   return { };
 }
@@ -255,6 +257,42 @@ export function adminQuizRestore(token: string, quizId: number): Record<string, 
   // remove quiz to restore from trash
   data.trash.splice(quizIndex, 1);
   setData(data);
+  return { };
+}
+
+/**
+ * Permanently deletes the specific quizzes currently in trash
+ *
+ * @param token
+ * @param quizIds
+ * @returns
+ */
+export function adminQuizTrashEmpty(token: string, quizIds: number[]): Record<string, never> | Error {
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
+  const data = getData();
+  const authUserId = findUserFromToken(token);
+
+  for (const quizId of quizIds) {
+    const quiz = data.trash.find((quiz) => quiz.quizId === quizId);
+    if (quiz === undefined) {
+      return { error: 'one or more quizIds not currently in trash or do not exist' };
+    }
+    if (quiz.creator !== authUserId) {
+      return { error: 'one or more quizIds refer to a quiz that user does not own' };
+    }
+  }
+
+  // filters trash and keeps quizzes if they are not in the list of quizIds
+  data.trash = data.trash.filter((quiz) => !quizIds.includes(quiz.quizId));
+  setData(data);
+
   return { };
 }
 
@@ -399,6 +437,66 @@ export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, des
 }
 
 /**
+ * Transfer ownership of a quiz to a different user based on their email
+ *
+ * @param {string} token
+ * @param {number} quizId
+ * @param {string} userEmail
+ * @returns {{ }}
+ */
+export function adminQuizTransfer (token: string, quizId: number, userEmail: string): Record<string, never> | Error {
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
+  if (!isValidQuizId(quizId)) {
+    return { error: 'Invalid: QuizId' };
+  }
+
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'Invalid: You do not own this quiz' };
+  }
+
+  // Check if email exist
+  if (!isValidEmail(userEmail)) {
+    return { error: 'Invalid: Email does not exist' };
+  }
+
+  const data: Data = getData();
+  const authUserId = findUserFromToken(token);
+
+  const loggedInUser = data.users.find((current) => current.authUserId === authUserId);
+  if (loggedInUser.email === userEmail) {
+    return { error: 'Invalid: Email is current users' };
+  }
+
+  // Find the correct quiz based on input
+  const currentQuiz = data.quizzes.find((current) => current.quizId === quizId);
+  // Find the user to transfer the quiz to
+  const transferUser = data.users.find((current) => current.email === userEmail);
+  // Flter all the quizzes that the user to transfer to owns
+  const transferUserQuizzes = data.quizzes.filter((current) => current.creator === transferUser.authUserId);
+  // Check if the user owns a quiz with the same name
+  const sameName = transferUserQuizzes.find((current) => current.name === currentQuiz.name);
+  if (sameName) {
+    return { error: 'Invalid: User already has a Quiz with the same name' };
+  }
+
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  currentQuiz.timeLastEdited = timeNow;
+
+  currentQuiz.creator = transferUser.authUserId;
+
+  setData(data);
+
+  return { };
+}
+
+/**
  * Create a new stub question for a particular quiz.
  * When this route is called, and a question is created, the timeLastEdited for quiz is set as the time this question was created
  * and the colours of a question are randomly generated.
@@ -424,6 +522,7 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
   if (!isValidQuizId(quizId)) {
     return { error: 'invalid quiz Id' };
   }
+
   if (!isValidCreator(quizId, token)) {
     return { error: 'invalid quiz Id' };
   }
@@ -509,4 +608,53 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
   return {
     questionId: questionId
   };
+}
+
+/**
+ * Delete a particular question from a quiz
+ *
+ * @param {string} token
+ * @param {number} quizId
+ * @param {number} questionId
+ * @returns {questionId: number}
+ */
+export function deleteQuizQuestion (token: string, quizId: number, questionId: number): Record<string, never> | Error {
+  // Error checking for token
+  if (!isValidTokenStructure(token)) {
+    return { error: 'invalid token structure' };
+  }
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'token is not logged in' };
+  }
+
+  // Error checking for quizId
+  if (!isValidQuizId(quizId)) {
+    return { error: 'invalid quiz Id' };
+  }
+
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'invalid quiz Id' };
+  }
+
+  if (!isValidQuestionId(quizId, questionId)) {
+    return { error: 'invalid param: questionId' };
+  }
+
+  const data: Data = getData();
+
+  const quizToDelete = data.quizzes.find((quiz) => quiz.quizId === quizId);
+  const questionToDelete = quizToDelete.questions.find((question) => question.questionId === questionId);
+  const questionToDeleteIndex = quizToDelete.questions.findIndex((question) => question.questionId === questionId);
+
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  quizToDelete.timeLastEdited = timeNow;
+
+  quizToDelete.questions.splice(questionToDeleteIndex, 1);
+
+  quizToDelete.numQuestions--;
+  quizToDelete.duration = quizToDelete.duration - questionToDelete.duration;
+
+  setData(data);
+
+  return {};
 }

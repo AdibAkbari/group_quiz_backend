@@ -62,3 +62,7 @@ export interface TokenId {
 export interface QuizId {
   quizId: number
 }
+
+export interface QuestionCreate {
+  questionId: number
+}
