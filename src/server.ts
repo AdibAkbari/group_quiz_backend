@@ -25,7 +25,8 @@ import {
   adminQuizTrashEmpty,
   adminQuizNameUpdate,
   adminQuizTransfer,
-  moveQuizQuestion
+  moveQuizQuestion,
+  deleteQuizQuestion,
 } from './quiz';
 import { clear } from './other';
 
@@ -242,6 +243,24 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: 
       return res.status(403).json(response);
     } else if (response.error.includes('quiz Id') || response.error.includes('questionId') ||
                  response.error.includes('newPosition')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
+// deleteQuizQuestion //
+app.delete('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Response) => {
+  const token = req.query.token as string;
+  const quizId = parseInt(req.params.quizid);
+  const questionid = parseInt(req.params.questionid);
+  const response = deleteQuizQuestion(token, quizId, questionid);
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('param:') || response.error.includes('quiz Id')) {
       return res.status(400).json(response);
     }
   }

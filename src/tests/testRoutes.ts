@@ -147,6 +147,22 @@ export function moveQuizQuestionRequest(token: string, quizId: number, questionI
   };
 }
 
+export function deleteQuizQuestionRequest(token: string, quizId: number, questionId: number) {
+  const res = request(
+    'DELETE',
+    SERVER_URL + `/v1/admin/quiz/${quizId}/question/${questionId}`,
+    {
+      qs: {
+        token: token,
+      }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function quizRemoveRequest(token: string, quizid: number) {
   const res = request(
     'DELETE',
