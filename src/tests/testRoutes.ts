@@ -319,3 +319,17 @@ export function quizDescriptionUpdateRequest(quizid: number, token: string, desc
     statusCode: JSON.parse(res.statusCode.toString())
   };
 }
+
+export function authLogoutRequest(tokenId: string) {
+  const res = request(
+      'PUT',
+      SERVER_URL + '/v1/admin/auth/logout',
+      {
+          json: { tokenId: tokenId},
+      }
+  );
+  return {
+      body: JSON.parse(res.body.toString()),
+      statusCode: JSON.parse(res.statusCode.toString())
+  };
+}

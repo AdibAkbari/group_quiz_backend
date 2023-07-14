@@ -9,6 +9,7 @@ import fs from 'fs';
 import {
   adminAuthLogin,
   adminAuthRegister,
+  adminAuthLogout,
   updateUserPassword,
   adminUserDetails,
   updateUserDetails,
@@ -26,13 +27,10 @@ import {
   adminQuizTrashEmpty,
   adminQuizNameUpdate,
   adminQuizTransfer,
-<<<<<<< HEAD
   deleteQuizQuestion,
-  updateQuizQuestion
-=======
-  moveQuizQuestion,
-  deleteQuizQuestion,
->>>>>>> 02f02ffd587be70daf9803481bce7d29d98a5d27
+  updateQuizQuestion,
+  moveQuizQuestion
+  ,
 } from './quiz';
 import { clear } from './other';
 
@@ -409,31 +407,36 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
   res.json(response);
 });
 
-<<<<<<< HEAD
 // Update quiz question //
 app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Response) => {
   const { question, duration, points, answers } = req.body.questionBody;
   const quizId = parseInt(req.params.quizid);
   const questionId = parseInt(req.params.questionid);
   const response = updateQuizQuestion(quizId, questionId, req.body.token, question, duration, points, answers);
-=======
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('input') || response.error.includes('param')) {  
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
 // quizQuestionDuplicate //
 app.put('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const questionId = parseInt(req.params.questionid);
   const token = req.body.token;
   const response = quizQuestionDuplicate(quizId, questionId, token);
->>>>>>> 02f02ffd587be70daf9803481bce7d29d98a5d27
   if ('error' in response) {
     if (response.error.includes('structure')) {
       return res.status(401).json(response);
     } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
-<<<<<<< HEAD
-    } else if (response.error.includes('input') || response.error.includes('param')) {
-=======
     } else if (response.error.includes('invalid')) {
->>>>>>> 02f02ffd587be70daf9803481bce7d29d98a5d27
       return res.status(400).json(response);
     }
   }
@@ -443,6 +446,19 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, 
 // clear //
 app.delete('/v1/clear', (req: Request, res: Response) => {
   res.json(clear());
+});
+
+// adminAuthLogout //
+app.put('/v1/admin/auth/logout', (req: Request, res: Response) => {
+  const response = adminAuthLogout(req.body.tokenId);
+  if ('error' in response) {
+    if (response.error.includes("structure")) {
+      return res.status(401).json(response);
+    } else if (response.error.includes("logged")) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
 });
 
 // ====================================================================

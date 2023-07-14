@@ -3,6 +3,9 @@ import { Data, Quizzes } from './interfaces';
 
 // HELPER FUNCTIONS
 
+
+// SHOULD BE ABLE TO DELETE THIS //
+// since we only check token validity now //
 /**
    * Helper function to determine whether token is a valid structure
    *
