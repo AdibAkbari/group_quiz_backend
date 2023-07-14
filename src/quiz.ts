@@ -1,5 +1,5 @@
 import { getData, setData } from './dataStore';
-import { Data, Error, Answer } from './interfaces';
+import { Data, Error, Answer, Quizzes } from './interfaces';
 import {
   checkNameValidity,
   isValidCreator,
@@ -11,14 +11,14 @@ import {
   isValidEmail
 } from './helper';
 
-interface QuizList {
-    quizId: number,
-    name: string
-}
+  interface QuizList {
+      quizId: number,
+      name: string
+  }
 
-interface QuizCreate {
-    quizId: number,
-}
+  interface QuizCreate {
+      quizId: number,
+  }
 
 interface QuizInfoQuestions {
   questionId: number,
@@ -45,15 +45,15 @@ interface Answers {
 }
 
 /**
- * Provide a list of all quizzes that are owned by the currently logged in user.
- *
- * @param {number} token
- * @returns {{quizzes: Array<{
- *                  quizId: number,
- *                  name: string
- *              }>
- *          }}
- */
+   * Provide a list of all quizzes that are owned by the currently logged in user.
+   *
+   * @param {number} token
+   * @returns {{quizzes: Array<{
+   *                  quizId: number,
+   *                  name: string
+   *              }>
+   *          }}
+   */
 export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
   const data: Data = getData();
 
@@ -169,11 +169,128 @@ export function adminQuizRemove(token: string, quizId: number): Record<string, n
   const data: Data = getData();
   const index = data.quizzes.findIndex((quiz) => quiz.quizId === quizId);
 
-  if (index !== -1) {
-    data.trash.push(data.quizzes[index]);
-    data.quizzes.splice(index, 1);
-    setData(data);
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  data.quizzes[index].timeLastEdited = timeNow;
+  data.trash.push(data.quizzes[index]);
+  data.quizzes.splice(index, 1);
+  setData(data);
+
+  return { };
+}
+
+/**
+ * View the quizzes that are currently in the trash
+ *
+ * @param token
+ * @returns {{quizzes: Array<{
+ *                  quizId: number,
+ *                  name: string
+ *              }>
+ *          }}
+ */
+export function adminQuizTrash(token: string): {quizzes: QuizList[]} | Error {
+  // invalid token structure
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
   }
+
+  // token is not logged in
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
+  const data = getData();
+  // filters out quizzes not created by user
+  const authUserId = findUserFromToken(token);
+
+  const trashQuizzes = data.trash.filter((quiz: Quizzes) => {
+    return quiz.creator === authUserId;
+  });
+
+  // maps list of quiz objects in trash to just have name and quizId
+  const simpleTrashQuizzes = trashQuizzes.map((quiz) => {
+    return { quizId: quiz.quizId, name: quiz.name };
+  });
+
+  return {
+    quizzes: simpleTrashQuizzes
+  };
+}
+
+/**
+   * Given quizId restore the quiz from the trash back to an active quiz
+   *
+   * @param {string} token
+   * @param {number} quizId
+   * @returns { } empty object
+   */
+export function adminQuizRestore(token: string, quizId: number): Record<string, never> | Error {
+  // invalid token structure
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+
+  // token is not logged in
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
+  const data = getData();
+  const quizIndex = data.trash.findIndex((quiz) => quiz.quizId === quizId);
+  if (quizIndex === -1) {
+    return { error: 'Invalid: quiz is not currently in trash or does not exist' };
+  }
+
+  // get authUserId from token
+  const authUserId = findUserFromToken(token);
+
+  if (data.trash[quizIndex].creator !== authUserId) {
+    return { error: 'Invalid: user does not own quiz' };
+  }
+
+  // get time in seconds
+  const timeNow = Math.floor((new Date()).getTime() / 1000);
+  data.trash[quizIndex].timeLastEdited = timeNow;
+  // add the quiz to restore to list of quizzes
+  data.quizzes.push(data.trash[quizIndex]);
+  // remove quiz to restore from trash
+  data.trash.splice(quizIndex, 1);
+  setData(data);
+  return { };
+}
+
+/**
+ * Permanently deletes the specific quizzes currently in trash
+ *
+ * @param token
+ * @param quizIds
+ * @returns
+ */
+export function adminQuizTrashEmpty(token: string, quizIds: number[]): Record<string, never> | Error {
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
+  const data = getData();
+  const authUserId = findUserFromToken(token);
+
+  for (const quizId of quizIds) {
+    const quiz = data.trash.find((quiz) => quiz.quizId === quizId);
+    if (quiz === undefined) {
+      return { error: 'one or more quizIds not currently in trash or do not exist' };
+    }
+    if (quiz.creator !== authUserId) {
+      return { error: 'one or more quizIds refer to a quiz that user does not own' };
+    }
+  }
+
+  // filters trash and keeps quizzes if they are not in the list of quizIds
+  data.trash = data.trash.filter((quiz) => !quizIds.includes(quiz.quizId));
+  setData(data);
 
   return { };
 }
@@ -184,13 +301,13 @@ export function adminQuizRemove(token: string, quizId: number): Record<string, n
  * @param {number} authUserId
  * @param {number} quizId
  * @returns {{
- *           quizId: number,
- *           name: string,
- *           timeCreated: number,
- *           timeLastEdited: number,
- *           description: string,
- *          }}
- */
+*           quizId: number,
+*           name: string,
+*           timeCreated: number,
+*           timeLastEdited: number,
+*           description: string,
+*          }}
+*/
 export function adminQuizInfo(token: string, quizId: number): Error | QuizInfo {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
@@ -228,66 +345,79 @@ export function adminQuizInfo(token: string, quizId: number): Error | QuizInfo {
  * of the owner of the quiz, the quizId of the quiz to change and the
  * new name.
  *
- * @param {number} authUserId
+ * @param {string} token
  * @param {number} quizId
  * @param {string} name
  * @returns {{ }} empty object
  */
-export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): Record<string, never> | Error {
-  // Check inputted UserId is valid
-  // if (isValidUserId(authUserId) === false) {
-  //   return { error: 'Please enter a valid user' };
-  // }
+export function adminQuizNameUpdate(token: string, quizId: number, name: string): Record<string, never> | Error {
+  // Check if token structure is invalid
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+  // Check if token is not logged in
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
   // Check inputted quizId is valid
-  if (isValidQuizId(quizId) === false) {
-    return { error: 'Please enter a valid quiz' };
+  if (!isValidQuizId(quizId)) {
+    return { error: 'Invalid: QuizId' };
   }
   // Check inputted Quiz ID does not refer to a quiz that this user owns
-  if (isValidCreator(quizId, '123') === false) {
-    return { error: 'You do not own this quiz' };
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'Invalid: You do not own this quiz' };
   }
-  // Check inputted name is valid
+
+  // Get authUserId from token
+  const authUserId = findUserFromToken(token);
+  // Check if the name is valid
   if (!checkNameValidity(name, authUserId)) {
-    return { error: 'Name not valid' };
+    return { error: 'Invalid: Name' };
   }
   // Check name isn't just whitespace
   if (isWhiteSpace(name)) {
-    return { error: 'Quiz name cannot be solely white space' };
+    return { error: 'Invalid: Quiz name cannot be solely white space' };
   }
 
   const data: Data = getData();
-  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
-  for (const current of data.quizzes) {
-    if (current.quizId === quizId) {
-      current.name = name;
-      current.timeLastEdited = timeNow;
-      setData(data);
-    }
+  const timeNow = Math.floor(Date.now() / 1000);
+
+  const quizToUpdate = data.quizzes.find((current) => current.quizId === quizId);
+
+  if (quizToUpdate) {
+    quizToUpdate.name = name;
+    quizToUpdate.timeLastEdited = timeNow;
+    setData(data);
   }
 
   return { };
 }
 
 /**
- * Update the description of the relevant quiz given the authUserId
+ * Update the description of the relevant quiz given the token
  * of the owner of the quiz, the quizId of the quiz to change and the
  * new description.
  *
- * @param {number} authUserId
  * @param {number} quizId
+ * @param {string} token
  * @param {string} description
- * @returns {{ }}
+ * @returns {{ }} empty object
  */
-export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, description: string): Record<string, never> | Error {
-  // if (!isValidUserId(authUserID)) {
-  //   return { error: 'authUserId does not refer to valid user' };
-  // }
+export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, description: string): Record<string, never> | Error {
+  if (!isValidTokenStructure(tokenId)) {
+    return { error: 'token is not a valid structure' };
+  }
+
+  if (!isTokenLoggedIn(tokenId)) {
+    return { error: 'token is not for a currently logged in session' };
+  }
 
   if (!isValidQuizId(quizId)) {
     return { error: 'quizId does not refer to valid quiz' };
   }
 
-  if (!isValidCreator(quizId, '123')) {
+  if (!isValidCreator(quizId, tokenId)) {
     return { error: 'quizId does not refer to a quiz that this user owns' };
   }
 
@@ -348,7 +478,7 @@ export function adminQuizTransfer (token: string, quizId: number, userEmail: str
   // Find the user to transfer the quiz to
   const transferUser = data.users.find((current) => current.email === userEmail);
   // Flter all the quizzes that the user to transfer to owns
-  const transferUserQuizzes = data.quizzes.filter((current) => current.creator === transferUser.authUserID);
+  const transferUserQuizzes = data.quizzes.filter((current) => current.creator === transferUser.authUserId);
   // Check if the user owns a quiz with the same name
   const sameName = transferUserQuizzes.find((current) => current.name === currentQuiz.name);
   if (sameName) {

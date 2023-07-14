@@ -144,10 +144,10 @@ export function isWhiteSpace (name: string): boolean {
    */
 export function isValidEmail (userEmail: string): boolean {
   const data: Data = getData();
-  for (const current of data.users) {
-    if (current.email === userEmail) {
-      return true;
-    }
+
+  const validEmail = data.users.find(current => current.email === userEmail);
+  if (validEmail) {
+    return true;
   }
 
   return false;
