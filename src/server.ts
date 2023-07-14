@@ -315,24 +315,6 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   res.json(response);
 });
 
-// quizQuestionDuplicate //
-app.put('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {
-  const quizId = parseInt(req.params.quizid);
-  const questionId = parseInt(req.params.questionid);
-  const token = req.body.token;
-  const response = quizQuestionDuplicate(quizId, questionId, token);
-  if ('error' in response) {
-    if (response.error.includes('structure')) {
-      return res.status(401).json(response);
-    } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
-    } else if (response.error.includes('invalid')) {
-      return res.status(400).json(response);
-    }
-  }
-  res.json(response);
-});
-
 // adminQuizRestore //
 app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
@@ -361,6 +343,24 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
     } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
     } else if (response.error.includes('quizIds')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
+// quizQuestionDuplicate //
+app.put('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const token = req.body.token;
+  const response = quizQuestionDuplicate(quizId, questionId, token);
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('invalid')) {
       return res.status(400).json(response);
     }
   }
