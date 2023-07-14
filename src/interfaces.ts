@@ -7,6 +7,7 @@ export interface Users {
   authUserId: number;
   numSuccessfulLogins: number;
   numFailedPasswordsSinceLastLogin: number;
+  oldPasswords?: string[];
 }
 
 export interface Answer {

@@ -259,6 +259,42 @@ export function adminQuizRestore(token: string, quizId: number): Record<string, 
 }
 
 /**
+ * Permanently deletes the specific quizzes currently in trash
+ *
+ * @param token
+ * @param quizIds
+ * @returns
+ */
+export function adminQuizTrashEmpty(token: string, quizIds: number[]): Record<string, never> | Error {
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
+  const data = getData();
+  const authUserId = findUserFromToken(token);
+
+  for (const quizId of quizIds) {
+    const quiz = data.trash.find((quiz) => quiz.quizId === quizId);
+    if (quiz === undefined) {
+      return { error: 'one or more quizIds not currently in trash or do not exist' };
+    }
+    if (quiz.creator !== authUserId) {
+      return { error: 'one or more quizIds refer to a quiz that user does not own' };
+    }
+  }
+
+  // filters trash and keeps quizzes if they are not in the list of quizIds
+  data.trash = data.trash.filter((quiz) => !quizIds.includes(quiz.quizId));
+  setData(data);
+
+  return { };
+}
+
+/**
  * Get all of the relevant information about the current quiz.
  *
  * @param {number} authUserId
@@ -358,25 +394,29 @@ export function adminQuizNameUpdate(token: string, quizId: number, name: string)
 }
 
 /**
-   * Update the description of the relevant quiz given the authUserId
-   * of the owner of the quiz, the quizId of the quiz to change and the
-   * new description.
-   *
-   * @param {number} authUserId
-   * @param {number} quizId
-   * @param {string} description
-   * @returns {{ }}
-   */
-export function adminQuizDescriptionUpdate (authUserID: number, quizId: number, description: string): Record<string, never> | Error {
-  // if (!isValidUserId(authUserID)) {
-  //   return { error: 'authUserId does not refer to valid user' };
-  // }
+ * Update the description of the relevant quiz given the token
+ * of the owner of the quiz, the quizId of the quiz to change and the
+ * new description.
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {string} description
+ * @returns {{ }} empty object
+ */
+export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, description: string): Record<string, never> | Error {
+  if (!isValidTokenStructure(tokenId)) {
+    return { error: 'token is not a valid structure' };
+  }
+
+  if (!isTokenLoggedIn(tokenId)) {
+    return { error: 'token is not for a currently logged in session' };
+  }
 
   if (!isValidQuizId(quizId)) {
     return { error: 'quizId does not refer to valid quiz' };
   }
 
-  if (!isValidCreator(quizId, '123')) {
+  if (!isValidCreator(quizId, tokenId)) {
     return { error: 'quizId does not refer to a quiz that this user owns' };
   }
 

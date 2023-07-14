@@ -9,18 +9,21 @@ import fs from 'fs';
 import {
   adminAuthLogin,
   adminAuthRegister,
+  updateUserPassword,
   adminUserDetails,
   updateUserDetails,
 } from './auth';
 import {
   adminQuizCreate,
+  adminQuizRemove,
+  adminQuizDescriptionUpdate,
   createQuizQuestion,
   adminQuizTrash,
-  adminQuizRemove,
   adminQuizRestore,
   adminQuizInfo,
   adminQuizList,
-  adminQuizNameUpdate
+  adminQuizTrashEmpty,
+  adminQuizNameUpdate,
 } from './quiz';
 import { clear } from './other';
 
@@ -52,6 +55,24 @@ app.get('/echo', (req: Request, res: Response) => {
     res.status(400);
   }
   return res.json(ret);
+});
+
+// adminQuizDescriptionUpdate //
+app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const { token, description } = req.body;
+  const response = adminQuizDescriptionUpdate(quizId, token, description);
+
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('quizId') || response.error.includes('description')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
 });
 
 // adminAuthRegister //
@@ -127,6 +148,22 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
     } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
     } else if (response.error.includes('Name') || response.error.includes('Description')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
+// updateUserPassword //
+app.put('/v1/admin/user/password', (req: Request, res: Response) => {
+  const { token, oldPassword, newPassword } = req.body;
+  const response = updateUserPassword(token, oldPassword, newPassword);
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('password')) {
       return res.status(400).json(response);
     }
   }
@@ -228,6 +265,24 @@ app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
     } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
     } else if (response.error.includes('quiz')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
+// adminQuizTrashEmpty //
+app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
+  const token = req.query.token as string;
+  const quizIds = JSON.parse(req.query.quizIds as string);
+
+  const response = adminQuizTrashEmpty(token, quizIds);
+  if ('error' in response) {
+    if (response.error.includes('Structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('quizIds')) {
       return res.status(400).json(response);
     }
   }
