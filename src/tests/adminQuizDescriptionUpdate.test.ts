@@ -7,17 +7,12 @@ import {
   adminQuizInfoRequest,
 } from './testRoutes';
 
-interface Token {
-  token: string
-}
+import {TokenId, QuizId} from '../interfaces'
 
-interface Quiz {
-  quizId: number
-}
 
 const ERROR = { error: expect.any(String) };
-let user: Token;
-let quiz: Quiz;
+let user: TokenId;
+let quiz: QuizId;
 beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;

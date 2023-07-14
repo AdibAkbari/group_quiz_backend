@@ -4,7 +4,7 @@ import {
   clearRequest,
   createQuizQuestionRequest,
   updateQuizQuestionRequest,
-  //  deleteQuizQuestionRequest,
+  deleteQuizQuestionRequest,
   adminQuizInfoRequest
 } from './testRoutes';
 import { TokenId } from '../interfaces';
@@ -50,12 +50,12 @@ describe('Invalid params', () => {
     expect(result.statusCode).toStrictEqual(400);
   });
 
-  // test('question with given questionId has been removed', () => {
-  //     deleteQuizQuestionRequest(quizId, questionId, user.token);
-  //     const result = updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 5, 5, validAnswers);
-  //     expect(result.body).toStrictEqual(ERROR);
-  //     expect(result.statusCode).toStrictEqual(400);
-  // });
+  test('question with given questionId has been removed', () => {
+      deleteQuizQuestionRequest(user.token, quizId, questionId);
+      const result = updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 5, 5, validAnswers);
+      expect(result.body).toStrictEqual(ERROR);
+      expect(result.statusCode).toStrictEqual(400);
+  });
 });
 
 describe('invalid question body - question, duration, points', () => {

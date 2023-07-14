@@ -4,12 +4,11 @@ import {
   authLoginRequest,
   clearRequest
 } from './testRoutes';
+import {
+  TokenId
+} from '../interfaces';
 
 const ERROR = { error: expect.any(String) };
-
-  interface Token {
-    token: string
-  }
 
 beforeEach(() => {
   clearRequest();
@@ -49,7 +48,7 @@ describe('Token invalid', () => {
 });
 
 describe('Only one user registered', () => {
-  let user: Token;
+  let user: TokenId;
   beforeEach(() => {
     user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
   });
@@ -100,9 +99,9 @@ describe('Only one user registered', () => {
 });
 
 describe('multiple users registered', () => {
-  let user1: Token;
-  let user2: Token;
-  let user3: Token;
+  let user1: TokenId;
+  let user2: TokenId;
+  let user3: TokenId;
   beforeEach(() => {
     user1 = authRegisterRequest('email1@gmail.com', 'password1', 'FirstnameA', 'LastnameA').body;
     user2 = authRegisterRequest('email2@gmail.com', 'password2', 'FirstnameB', 'LastnameB').body;

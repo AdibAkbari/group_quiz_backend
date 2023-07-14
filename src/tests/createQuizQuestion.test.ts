@@ -3,7 +3,6 @@ import {
   authRegisterRequest,
   clearRequest,
   createQuizQuestionRequest,
-  //  quizQuestionDeleteRequest,
   adminQuizInfoRequest
 } from './testRoutes';
 import { TokenId, QuizId, QuestionId } from '../interfaces';
