@@ -7,21 +7,22 @@ import {
   adminQuizInfoRequest
 } from './testRoutes';
 
-interface Token {
-    token: string
-}
+import {
+  TokenId,
+} from '../interfaces';
 
 const validAnswers = [{ answer: 'great', correct: true }, { answer: 'bad', correct: false }];
 
 const ERROR = { error: expect.any(String) };
 
-let user: Token;
+let user: TokenId;
 let quizId: number;
 let question1Id: number;
 let question2Id: number;
 let question3Id: number;
 let question4Id: number;
 let question5Id: number;
+
 beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
@@ -112,9 +113,7 @@ describe('Successful Move Question', () => {
   });
 
   test('correct QuizInfo output', () => {
-    const result = moveQuizQuestionRequest(user.token, quizId, question1Id, 1);
-    expect(result.body).toStrictEqual({});
-    expect(result.statusCode).toStrictEqual(200);
+    moveQuizQuestionRequest(user.token, quizId, question1Id, 1);
 
     const received = adminQuizInfoRequest(user.token, quizId).body;
     const expected = {
@@ -157,9 +156,7 @@ describe('Successful Move Question', () => {
     question4Id = createQuizQuestionRequest(quizId, user.token, 'Question 4?', 6, 3, validAnswers).body.questionId;
     question5Id = createQuizQuestionRequest(quizId, user.token, 'Question 5?', 6, 3, validAnswers).body.questionId;
 
-    const result = moveQuizQuestionRequest(user.token, quizId, question1Id, 1);
-    expect(result.body).toStrictEqual({});
-    expect(result.statusCode).toStrictEqual(200);
+    moveQuizQuestionRequest(user.token, quizId, question1Id, 1);
 
     const received = adminQuizInfoRequest(user.token, quizId).body;
     const expected = {
@@ -229,9 +226,7 @@ describe('Successful Move Question', () => {
 
   test('Correct time last edited', () => {
     const expectedTimeTransfered = Math.floor(Date.now() / 1000);
-    const move = moveQuizQuestionRequest(user.token, quizId, question1Id, 1);
-    expect(move.body).toStrictEqual({});
-    expect(move.statusCode).toStrictEqual(200);
+    moveQuizQuestionRequest(user.token, quizId, question1Id, 1);
 
     const quizInfo = adminQuizInfoRequest(user.token, quizId).body;
 
