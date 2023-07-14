@@ -6,18 +6,12 @@ import {
   clearRequest
 } from './testRoutes';
 
+import { TokenId, QuizId } from '../interfaces';
+
 const ERROR = { error: expect.any(String) };
 
-interface Token {
-  token: string
-}
-
-interface Quiz {
-  quizId: number
-}
-
-let user: Token;
-let user2: Token;
+let user: TokenId;
+let user2: TokenId;
 beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
@@ -79,7 +73,7 @@ describe('User owns no quizzes', () => {
 });
 
 describe('User does own quizzes', () => {
-  let quiz: Quiz;
+  let quiz: QuizId;
   beforeEach(() => {
     quiz = quizCreateRequest(user.token, 'Cats', 'A quiz about cats').body;
   });
