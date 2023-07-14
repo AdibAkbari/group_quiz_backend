@@ -637,13 +637,12 @@ export function quizQuestionDuplicate (quizId: number, questionId: number, token
     return { error: 'invalid quiz Id' };
   }
 
-  const data: Data = getData();
-  const quizIndex: number = data.quizzes.findIndex(id => id.quizId === quizId);
-
-  if (data.quizzes[quizIndex].questions.filter(id => id.questionId === questionId).length === 0) {
+  if (!isValidQuestionId(quizId, questionId)) {
     return { error: 'invalid question id' };
   }
 
+  const data: Data = getData();
+  const quizIndex: number = data.quizzes.findIndex(id => id.quizId === quizId);
   data.quizzes[quizIndex].questionCount++;
   const newQuestionId: number = data.quizzes[quizIndex].questionCount;
   const questionIndex: number = data.quizzes[quizIndex].questions.findIndex(id => id.questionId === questionId);
@@ -651,6 +650,7 @@ export function quizQuestionDuplicate (quizId: number, questionId: number, token
   data.quizzes[quizIndex].numQuestions++;
   data.quizzes[quizIndex].duration += data.quizzes[quizIndex].questions[questionIndex].duration;
   data.quizzes[quizIndex].timeLastEdited = timeNow;
+
   const newQuestion: Question = {
     questionId: newQuestionId,
     question: data.quizzes[quizIndex].questions[questionIndex].question,
@@ -659,8 +659,8 @@ export function quizQuestionDuplicate (quizId: number, questionId: number, token
     answers: data.quizzes[quizIndex].questions[questionIndex].answers,
   };
   data.quizzes[quizIndex].questions.splice(questionIndex + 1, 0, newQuestion);
-
   setData(data);
+
   return ({ newQuestionId: newQuestionId });
 }
 
