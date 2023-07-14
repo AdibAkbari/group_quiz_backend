@@ -51,12 +51,6 @@ describe('Token invalid', () => {
     expect(result.statusCode).toStrictEqual(401);
   });
 
-  //   test('Nobody logged in', () => {
-  //     const removeQuiz = deleteQuizQuestionRequest('7', quiz.quizId);
-  //     expect(removeQuiz.body).toStrictEqual(ERROR);
-  //     expect(removeQuiz.statusCode).toStrictEqual(403);
-  //   });
-
   test('Unused tokenId', () => {
     const result = deleteQuizQuestionRequest(user.token + 1, quiz.quizId, question.questionId);
     expect(result.body).toStrictEqual(ERROR);
@@ -158,9 +152,7 @@ describe('Successfully removed quiz question', () => {
       duration: 10
     };
 
-    const receivedSet = new Set(received.questions);
-    const expectedSet = new Set(expected.questions);
-    expect(receivedSet).toStrictEqual(expectedSet);
+    expect(received).toStrictEqual(expected);
   });
 
   // check that once a question is removed, the next question still has a unique quiz id

@@ -452,13 +452,16 @@ export function deleteQuizQuestion (token: string, quizId: number, questionId: n
   const data: Data = getData();
 
   const quizToDelete = data.quizzes.find((quiz) => quiz.quizId === quizId);
-  const questionToDelete = quizToDelete.questions.findIndex((question) => question.questionId === questionId);
+  const questionToDelete = quizToDelete.questions.find((question) => question.questionId === questionId);
+  const questionToDeleteIndex = quizToDelete.questions.findIndex((question) => question.questionId === questionId);
 
   const timeNow: number = Math.floor((new Date()).getTime() / 1000);
   quizToDelete.timeLastEdited = timeNow;
 
-  quizToDelete.questions.splice(questionToDelete, 1);
+  quizToDelete.questions.splice(questionToDeleteIndex, 1);
+
   quizToDelete.numQuestions--;
+  quizToDelete.duration = quizToDelete.duration - questionToDelete.duration;
 
   setData(data);
 
