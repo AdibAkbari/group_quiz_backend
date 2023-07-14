@@ -192,16 +192,6 @@ describe('valid input', () => {
     expect(q1.questionId).not.toStrictEqual(q2.questionId);
   });
 
-  // test('unique quesiton Id after question is removed', () => {
-  //     const q2 = createQuizQuestionRequest(quiz.quizId, user.token, "Question 2", 5, 5, validAnswers).body;
-  //     const qRemove = createQuizQuestionRequest(quiz.quizId, user.token, "Question to remove", 5, 5, validAnswers).body;
-  //     quizQuestionDeleteRequest(quiz.quizId, qRemove.questionId, user.token);
-  //     const q3 = createQuizQuestionRequest(quiz.quizId, user.token, "Question 3", 5, 5, validAnswers).body;
-  //     expect(q3.questionId).not.toStrictEqual(q1.questionId);
-  //     expect(q3.questionId).not.toStrictEqual(q2.questionId);
-
-  // })
-
   test('correct status code', () => {
     const result = createQuizQuestionRequest(quiz.quizId, user.token, 'How are you?', 5, 5, validAnswers);
     expect(result.body.questionId).toStrictEqual(expect.any(Number));
