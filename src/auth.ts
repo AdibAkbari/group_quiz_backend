@@ -1,25 +1,7 @@
 import { setData, getData } from './dataStore';
-import { Error, Data, Users, Token } from './interfaces';
+import { Error, Data, Users, Token, TokenId, User } from './interfaces';
 import validator from 'validator';
 import { isValidTokenStructure, isTokenLoggedIn, findUserFromToken, isWhiteSpace } from './helper';
-
-export interface UserId {
-    authUserId: number;
-}
-
-export interface TokenId {
-  token: string;
-}
-
-export interface User {
-    user: {
-        userId: number;
-        name: string;
-        email: string;
-        numSuccessfulLogins: number;
-        numFailedPasswordsSinceLastLogin: number;
-    }
-}
 
 /**
  * Register a user with an email, password, and names, then returns their

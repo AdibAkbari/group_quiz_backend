@@ -1,5 +1,5 @@
 import { getData, setData } from './dataStore';
-import { Data, Error, Answer, Quizzes, Question } from './interfaces';
+import { Data, Error, Answer, Quizzes, Question, QuizList, QuizId, QuizInfo, Answers } from './interfaces';
 import {
   checkNameValidity,
   isValidCreator,
@@ -11,39 +11,6 @@ import {
   isValidQuestionId,
   isValidEmail
 } from './helper';
-
-  interface QuizList {
-      quizId: number,
-      name: string
-  }
-
-  interface QuizCreate {
-      quizId: number,
-  }
-
-interface QuizInfoQuestions {
-  questionId: number,
-  question: string,
-  duration: number,
-  points: number,
-  answers: {answerId: number, answer: string, colour: string, correct: boolean}[],
-}
-
-interface QuizInfo {
-  quizId: number,
-  name: string,
-  timeCreated: number,
-  timeLastEdited: number,
-  description: string,
-  numQuestions: number,
-  questions: QuizInfoQuestions[],
-  duration: number
-}
-
-interface Answers {
-  answer: string,
-  correct: boolean
-}
 
 /**
    * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -88,7 +55,7 @@ export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
  * @param {string} description
  * @returns {{quizId: number}} quizId
  */
-export function adminQuizCreate(token: string, name: string, description: string): QuizCreate | Error {
+export function adminQuizCreate(token: string, name: string, description: string): QuizId | Error {
   // invalid token structure
   if (!isValidTokenStructure(token)) {
     return { error: 'Invalid Token Structure' };
