@@ -59,6 +59,10 @@ export interface TokenId {
   token: string
 }
 
-export interface QuizId {
+export interface QuizCreate {
   quizId: number
+}
+
+export interface QuestionCreate {
+  questionId: number
 }

@@ -86,6 +86,22 @@ export function isValidCreator(quizId: number, token: string): boolean {
 }
 
 /**
+ * Helper function to determine if question Id is a valid question within the given quiz
+ *
+ * @param {number} quizId
+ * @param {number} questionId
+ * @returns {boolean} - returns true if questionId is a valid question within this quiz, false otherwise
+ */
+export function isValidQuestionId(quizId: number, questionId: number): boolean {
+  const data: Data = getData();
+  const index = data.quizzes.findIndex(id => id.quizId === quizId);
+  if (data.quizzes[index].questions.find(id => id.questionId === questionId) === undefined) {
+    return false;
+  }
+  return true;
+}
+
+/**
    * Helper function for adminQuizCreate to check if a quiz name is valid
    *
    * @param {number} authUserId
@@ -129,6 +145,24 @@ export function isWhiteSpace (name: string): boolean {
   const expression = /^[\s]+$/;
 
   if (expression.test(name)) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+   * Helper function to determine if the email exist
+   *
+   * @param {string} userEmail
+   * @returns {boolean} - returns true if does exist
+   * @returns {boolean} - returns false if it dosn't exist
+   */
+export function isValidEmail (userEmail: string): boolean {
+  const data: Data = getData();
+
+  const validEmail = data.users.find(current => current.email === userEmail);
+  if (validEmail) {
     return true;
   }
 
