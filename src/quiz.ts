@@ -259,6 +259,42 @@ export function adminQuizRestore(token: string, quizId: number): Record<string, 
 }
 
 /**
+ * Permanently deletes the specific quizzes currently in trash
+ *
+ * @param token
+ * @param quizIds
+ * @returns
+ */
+export function adminQuizTrashEmpty(token: string, quizIds: number[]): Record<string, never> | Error {
+  if (!isValidTokenStructure(token)) {
+    return { error: 'Invalid Token Structure' };
+  }
+
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'Token not logged in' };
+  }
+
+  const data = getData();
+  const authUserId = findUserFromToken(token);
+
+  for (const quizId of quizIds) {
+    const quiz = data.trash.find((quiz) => quiz.quizId === quizId);
+    if (quiz === undefined) {
+      return { error: 'one or more quizIds not currently in trash or do not exist' };
+    }
+    if (quiz.creator !== authUserId) {
+      return { error: 'one or more quizIds refer to a quiz that user does not own' };
+    }
+  }
+
+  // filters trash and keeps quizzes if they are not in the list of quizIds
+  data.trash = data.trash.filter((quiz) => !quizIds.includes(quiz.quizId));
+  setData(data);
+
+  return { };
+}
+
+/**
  * Get all of the relevant information about the current quiz.
  *
  * @param {number} authUserId

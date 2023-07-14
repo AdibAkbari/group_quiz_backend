@@ -22,6 +22,7 @@ import {
   adminQuizRestore,
   adminQuizInfo,
   adminQuizList,
+  adminQuizTrashEmpty,
   adminQuizNameUpdate,
 } from './quiz';
 import { clear } from './other';
@@ -264,6 +265,24 @@ app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
     } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
     } else if (response.error.includes('quiz')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
+// adminQuizTrashEmpty //
+app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
+  const token = req.query.token as string;
+  const quizIds = JSON.parse(req.query.quizIds as string);
+
+  const response = adminQuizTrashEmpty(token, quizIds);
+  if ('error' in response) {
+    if (response.error.includes('Structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('quizIds')) {
       return res.status(400).json(response);
     }
   }
