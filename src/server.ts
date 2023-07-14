@@ -24,7 +24,8 @@ import {
   adminQuizList,
   adminQuizTrashEmpty,
   adminQuizNameUpdate,
-  moveQuizQuestion,
+  adminQuizTransfer,
+  moveQuizQuestion
 } from './quiz';
 import { clear } from './other';
 
@@ -192,6 +193,24 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   res.json(response);
 });
 
+// adminQuizTransfer //
+app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
+  const token = req.body.token as string;
+  const userEmail = req.body.userEmail as string;
+  const response = adminQuizTransfer(token, parseInt(req.params.quizid), userEmail);
+  if ('error' in response) {
+    if (response.error.includes('Structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('QuizId') || response.error.includes('own') ||
+                 response.error.includes('name') || response.error.includes('Email')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
 // createQuizQuestion
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const { question, duration, points, answers } = req.body.questionBody;
@@ -222,7 +241,7 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: 
     } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
     } else if (response.error.includes('quiz Id') || response.error.includes('questionId') ||
-               response.error.includes('newPosition')) {
+                 response.error.includes('newPosition')) {
       return res.status(400).json(response);
     }
   }
