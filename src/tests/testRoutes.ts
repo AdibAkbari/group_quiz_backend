@@ -130,6 +130,23 @@ export function createQuizQuestionRequest(quizId: number, token: string, questio
   };
 }
 
+export function moveQuizQuestionRequest(token: string, quizId: number, questionId: number, newPosition: number) {
+  const res = request(
+    'PUT',
+    SERVER_URL + `/v1/admin/quiz/${quizId}/question/${questionId}/move`,
+    {
+      json: {
+        token: token,
+        newPosition: newPosition,
+      }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function deleteQuizQuestionRequest(token: string, quizId: number, questionId: number) {
   const res = request(
     'DELETE',
@@ -273,6 +290,20 @@ export function clearRequest() {
     SERVER_URL + '/v1/clear'
   );
   return JSON.parse(res.body.toString());
+}
+
+export function quizQuestionDuplicateRequest(quizid: number, questionid: number, token: string) {
+  const res = request(
+    'PUT',
+    SERVER_URL + `/v1/admin/quiz/${quizid}/question/${questionid}/duplicate`,
+    {
+      json: { token: token },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
 }
 
 export function quizDescriptionUpdateRequest(quizid: number, token: string, description: string) {

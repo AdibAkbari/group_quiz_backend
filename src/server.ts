@@ -22,11 +22,17 @@ import {
   adminQuizRestore,
   adminQuizInfo,
   adminQuizList,
+  quizQuestionDuplicate,
   adminQuizTrashEmpty,
   adminQuizNameUpdate,
   adminQuizTransfer,
+<<<<<<< HEAD
   deleteQuizQuestion,
   updateQuizQuestion
+=======
+  moveQuizQuestion,
+  deleteQuizQuestion,
+>>>>>>> 02f02ffd587be70daf9803481bce7d29d98a5d27
 } from './quiz';
 import { clear } from './other';
 
@@ -284,6 +290,26 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   res.json(response);
 });
 
+// moveQuizQuestion //
+app.put('/v1/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: Response) => {
+  const token = req.body.token as string;
+  const newPosition = parseInt(req.body.newPosition);
+  const quizid = parseInt(req.params.quizid);
+  const questionid = parseInt(req.params.questionid);
+  const response = moveQuizQuestion(token, quizid, questionid, newPosition);
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('quiz Id') || response.error.includes('questionId') ||
+                 response.error.includes('newPosition')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
 // deleteQuizQuestion //
 app.delete('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Response) => {
   const token = req.query.token as string;
@@ -383,18 +409,31 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
   res.json(response);
 });
 
+<<<<<<< HEAD
 // Update quiz question //
 app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Response) => {
   const { question, duration, points, answers } = req.body.questionBody;
   const quizId = parseInt(req.params.quizid);
   const questionId = parseInt(req.params.questionid);
   const response = updateQuizQuestion(quizId, questionId, req.body.token, question, duration, points, answers);
+=======
+// quizQuestionDuplicate //
+app.put('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const token = req.body.token;
+  const response = quizQuestionDuplicate(quizId, questionId, token);
+>>>>>>> 02f02ffd587be70daf9803481bce7d29d98a5d27
   if ('error' in response) {
     if (response.error.includes('structure')) {
       return res.status(401).json(response);
     } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
+<<<<<<< HEAD
     } else if (response.error.includes('input') || response.error.includes('param')) {
+=======
+    } else if (response.error.includes('invalid')) {
+>>>>>>> 02f02ffd587be70daf9803481bce7d29d98a5d27
       return res.status(400).json(response);
     }
   }

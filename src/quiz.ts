@@ -1,5 +1,5 @@
 import { getData, setData } from './dataStore';
-import { Data, Error, Answer, Quizzes } from './interfaces';
+import { Data, Error, Answer, Quizzes, Question } from './interfaces';
 import {
   checkNameValidity,
   isValidCreator,
@@ -709,6 +709,60 @@ export function updateQuizQuestion(quizId: number, questionId: number, token: st
 }
 
 /**
+ * Duplicate a question for a quiz.
+ * the timeLastEdited for quiz is set as the time this question was created
+ *
+ * @param {number} quizId
+ * @param {number} questionId
+ * @param {string} token
+ * @returns {newQuestionId: number}
+ */
+export function quizQuestionDuplicate (quizId: number, questionId: number, token: string): { newQuestionId: number } | Error {
+  if (!isValidTokenStructure(token)) {
+    return { error: 'invalid token structure' };
+  }
+
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'token is not logged in' };
+  }
+
+  // Error checking for quizId
+  if (!isValidQuizId(quizId)) {
+    return { error: 'invalid quiz Id' };
+  }
+
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'invalid quiz Id' };
+  }
+
+  if (!isValidQuestionId(quizId, questionId)) {
+    return { error: 'invalid question id' };
+  }
+
+  const data: Data = getData();
+  const quizIndex: number = data.quizzes.findIndex(id => id.quizId === quizId);
+  data.quizzes[quizIndex].questionCount++;
+  const newQuestionId: number = data.quizzes[quizIndex].questionCount;
+  const questionIndex: number = data.quizzes[quizIndex].questions.findIndex(id => id.questionId === questionId);
+  const timeNow: number = Math.floor(Date.now() / 1000);
+  data.quizzes[quizIndex].numQuestions++;
+  data.quizzes[quizIndex].duration += data.quizzes[quizIndex].questions[questionIndex].duration;
+  data.quizzes[quizIndex].timeLastEdited = timeNow;
+
+  const newQuestion: Question = {
+    questionId: newQuestionId,
+    question: data.quizzes[quizIndex].questions[questionIndex].question,
+    duration: data.quizzes[quizIndex].questions[questionIndex].duration,
+    points: data.quizzes[quizIndex].questions[questionIndex].points,
+    answers: data.quizzes[quizIndex].questions[questionIndex].answers,
+  };
+  data.quizzes[quizIndex].questions.splice(questionIndex + 1, 0, newQuestion);
+  setData(data);
+
+  return ({ newQuestionId: newQuestionId });
+}
+
+/**
  * Delete a particular question from a quiz
  *
  * @param {string} token
@@ -721,11 +775,11 @@ export function deleteQuizQuestion (token: string, quizId: number, questionId: n
   if (!isValidTokenStructure(token)) {
     return { error: 'invalid token structure' };
   }
+
   if (!isTokenLoggedIn(token)) {
     return { error: 'token is not logged in' };
   }
 
-  // Error checking for quizId
   if (!isValidQuizId(quizId)) {
     return { error: 'invalid quiz Id' };
   }
@@ -751,6 +805,65 @@ export function deleteQuizQuestion (token: string, quizId: number, questionId: n
 
   quizToDelete.numQuestions--;
   quizToDelete.duration = quizToDelete.duration - questionToDelete.duration;
+
+  setData(data);
+
+  return {};
+}
+
+/**
+ * Move a question from one particular position in the quiz to another
+ *
+ * @param {string} token
+ * @param {number} quizId
+ * @param {number} questionId
+ * @param {number} newPosition
+ * @returns {}
+ */
+export function moveQuizQuestion(token: string, quizId: number, questionId: number, newPosition: number): Record<string, never> | Error {
+  // Error checking for token
+  if (!isValidTokenStructure(token)) {
+    return { error: 'invalid token structure' };
+  }
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'token is not logged in' };
+  }
+
+  // Error checking for quizId and questionId
+  if (!isValidQuizId(quizId)) {
+    return { error: 'invalid param: quiz Id' };
+  }
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'invalid param: quiz Id' };
+  }
+  if (!isValidQuestionId(quizId, questionId)) {
+    return { error: 'invalid param: questionId' };
+  }
+
+  // Error checking for New Position
+  if (newPosition < 0) {
+    return { error: 'invalid input: newPosition has to be greater then 0' };
+  }
+
+  const data = getData();
+  const currentQuiz = data.quizzes.find(id => id.quizId === quizId);
+
+  if (newPosition > (currentQuiz.numQuestions - 1)) {
+    return { error: 'invalid input:  newPosition must be less than the number of questions' };
+  }
+
+  const questionIndex = currentQuiz.questions.findIndex(id => id.questionId === questionId);
+  if (newPosition === questionIndex) {
+    return { error: 'invalid input: newPosition is current position' };
+  }
+
+  // Remove question from current position
+  const questionToMove = currentQuiz.questions.splice(questionIndex, 1)[0];
+  // Add question to new position
+  currentQuiz.questions.splice(newPosition, 0, questionToMove);
+
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  currentQuiz.timeLastEdited = timeNow;
 
   setData(data);
 
