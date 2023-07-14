@@ -168,11 +168,11 @@ export function adminQuizRemove(token: string, quizId: number): Record<string, n
   const data: Data = getData();
   const index = data.quizzes.findIndex((quiz) => quiz.quizId === quizId);
 
-  if (index !== -1) {
-    data.trash.push(data.quizzes[index]);
-    data.quizzes.splice(index, 1);
-    setData(data);
-  }
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  data.quizzes[index].timeLastEdited = timeNow;
+  data.trash.push(data.quizzes[index]);
+  data.quizzes.splice(index, 1);
+  setData(data);
 
   return { };
 }
