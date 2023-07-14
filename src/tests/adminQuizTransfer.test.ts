@@ -9,7 +9,7 @@ import {
 
 import {
   TokenId,
-  QuizCreate
+  QuizId
 } from '../interfaces';
 
 const ERROR = { error: expect.any(String) };
@@ -17,7 +17,7 @@ const ERROR = { error: expect.any(String) };
 // Before each test, clear data and then create a new user and new quiz
 let user: TokenId;
 let user2: TokenId;
-let quiz: QuizCreate;
+let quiz: QuizId;
 beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;

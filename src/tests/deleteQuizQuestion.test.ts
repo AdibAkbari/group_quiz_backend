@@ -9,7 +9,7 @@ import {
 
 import {
   TokenId,
-  QuizCreate,
+  QuizId,
   QuestionCreate
 } from '../interfaces';
 
@@ -18,7 +18,7 @@ const validAnswers = [{ answer: 'great', correct: true }, { answer: 'bad', corre
 const ERROR = { error: expect.any(String) };
 
 let user: TokenId;
-let quiz: QuizCreate;
+let quiz: QuizId;
 let question: QuestionCreate;
 beforeEach(() => {
   clearRequest();
