@@ -5,9 +5,8 @@ import {
   adminQuizInfoRequest,
   quizCreateRequest,
 } from './testRoutes';
-import {TokenId, QuizId} from '../interfaces'
+import { TokenId, QuizId } from '../interfaces';
 const ERROR = { error: expect.any(String) };
-
 
 // Before each test, clear data and then create a new user and new quiz
 let user: TokenId;

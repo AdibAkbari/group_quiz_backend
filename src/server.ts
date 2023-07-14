@@ -30,7 +30,6 @@ import {
   deleteQuizQuestion,
   updateQuizQuestion,
   moveQuizQuestion
-  ,
 } from './quiz';
 import { clear } from './other';
 
@@ -418,7 +417,25 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Respo
       return res.status(401).json(response);
     } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
-    } else if (response.error.includes('input') || response.error.includes('param')) {  
+    } else if (response.error.includes('input') || response.error.includes('param')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
+// clear //
+app.delete('/v1/clear', (req: Request, res: Response) => {
+  res.json(clear());
+});
+
+// adminAuthLogout //
+app.put('/v1/admin/auth/logout', (req: Request, res: Response) => {
+  const response = adminAuthLogout(req.body.tokenId);
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
       return res.status(400).json(response);
     }
   }
@@ -437,24 +454,6 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, 
     } else if (response.error.includes('logged')) {
       return res.status(403).json(response);
     } else if (response.error.includes('invalid')) {
-      return res.status(400).json(response);
-    }
-  }
-  res.json(response);
-});
-
-// clear //
-app.delete('/v1/clear', (req: Request, res: Response) => {
-  res.json(clear());
-});
-
-// adminAuthLogout //
-app.put('/v1/admin/auth/logout', (req: Request, res: Response) => {
-  const response = adminAuthLogout(req.body.tokenId);
-  if ('error' in response) {
-    if (response.error.includes("structure")) {
-      return res.status(401).json(response);
-    } else if (response.error.includes("logged")) {
       return res.status(400).json(response);
     }
   }

@@ -70,4 +70,3 @@ export interface QuestionId {
 export interface NewQuestionId {
   newQuestionId: number;
 }
-

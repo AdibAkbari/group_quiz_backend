@@ -51,10 +51,10 @@ describe('Invalid params', () => {
   });
 
   test('question with given questionId has been removed', () => {
-      deleteQuizQuestionRequest(user.token, quizId, questionId);
-      const result = updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 5, 5, validAnswers);
-      expect(result.body).toStrictEqual(ERROR);
-      expect(result.statusCode).toStrictEqual(400);
+    deleteQuizQuestionRequest(user.token, quizId, questionId);
+    const result = updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 5, 5, validAnswers);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(400);
   });
 });
 

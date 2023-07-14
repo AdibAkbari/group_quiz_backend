@@ -3,7 +3,6 @@ import { Data, Quizzes } from './interfaces';
 
 // HELPER FUNCTIONS
 
-
 // SHOULD BE ABLE TO DELETE THIS //
 // since we only check token validity now //
 /**

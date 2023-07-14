@@ -279,8 +279,8 @@ export function updateUserDetails(token: string, email: string, nameFirst: strin
 
 /**
  * Given a session token, log out the user
- * 
- * @param {string} tokenId 
+ *
+ * @param {string} tokenId
  * @returns {{}} Empty Object
  */
 export function adminAuthLogout (tokenId: string): Record<string, never> | Error {
@@ -298,5 +298,4 @@ export function adminAuthLogout (tokenId: string): Record<string, never> | Error
   data.tokens.splice(index, 1);
   setData(data);
   return { };
-
 }

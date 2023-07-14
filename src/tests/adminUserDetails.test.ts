@@ -1,7 +1,6 @@
 import {
   adminUserDetailsRequest,
   authRegisterRequest,
-  authLoginRequest,
   clearRequest
 } from './testRoutes';
 import {
@@ -61,36 +60,6 @@ describe('Only one user registered', () => {
         name: 'Firstname Lastname',
         email: 'email@gmail.com',
         numSuccessfulLogins: 1,
-        numFailedPasswordsSinceLastLogin: 0
-      }
-    });
-    expect(userDetails.statusCode).toStrictEqual(200);
-  });
-
-  test.skip('Registered and logged in', () => {
-    authLoginRequest('email@gmail.com', 'password1');
-    const userDetails = adminUserDetailsRequest(user.token);
-    expect(adminUserDetailsRequest(userDetails.body)).toStrictEqual({
-      user: {
-        userId: expect.any(Number),
-        name: 'Firstname Lastname',
-        email: 'email@gmail.com',
-        numSuccessfulLogins: 2,
-        numFailedPasswordsSinceLastLogin: 0
-      }
-    });
-    expect(userDetails.statusCode).toStrictEqual(200);
-  });
-
-  test.skip('Failed password attempt', () => {
-    authLoginRequest('email@gmail.com', 'password2');
-    const userDetails = adminUserDetailsRequest(user.token);
-    expect(adminUserDetailsRequest(userDetails.body)).toStrictEqual({
-      user: {
-        userId: expect.any(Number),
-        name: 'Firstname Lastname',
-        email: 'email@gmail.com',
-        numSuccessfulLogins: 2,
         numFailedPasswordsSinceLastLogin: 0
       }
     });

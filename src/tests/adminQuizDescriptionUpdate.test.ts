@@ -7,8 +7,7 @@ import {
   adminQuizInfoRequest,
 } from './testRoutes';
 
-import {TokenId, QuizId} from '../interfaces'
-
+import { TokenId, QuizId } from '../interfaces';
 
 const ERROR = { error: expect.any(String) };
 let user: TokenId;

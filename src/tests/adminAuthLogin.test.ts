@@ -6,15 +6,15 @@ import {
 } from './testRoutes';
 import {
   TokenId
-} from '../interfaces'
-
+} from '../interfaces';
 
 const ERROR = { error: expect.any(String) };
- let user: TokenId;
+
+let user: TokenId;
 
 beforeEach(() => {
   clearRequest();
-  let user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
+  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
   authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
 });
 describe('adminAuthLogin', () => {
