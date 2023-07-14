@@ -63,6 +63,10 @@ export interface QuizId {
   quizId: number
 }
 
+<<<<<<< HEAD
 export interface QuestionId {
+=======
+export interface QuestionCreate {
+>>>>>>> d41539202b190b972422478bf28bab0163278022
   questionId: number
 }

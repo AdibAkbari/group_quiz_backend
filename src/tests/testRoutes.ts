@@ -130,6 +130,22 @@ export function createQuizQuestionRequest(quizId: number, token: string, questio
   };
 }
 
+export function deleteQuizQuestionRequest(token: string, quizId: number, questionId: number) {
+  const res = request(
+    'DELETE',
+    SERVER_URL + `/v1/admin/quiz/${quizId}/question/${questionId}`,
+    {
+      qs: {
+        token: token,
+      }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function quizRemoveRequest(token: string, quizid: number) {
   const res = request(
     'DELETE',
@@ -174,6 +190,20 @@ export function adminQuizListRequest(token: string) {
   };
 }
 
+export function quizTransferRequest (token: string, quizid: number, userEmail: string) {
+  const res = request(
+    'POST',
+    SERVER_URL + `/v1/admin/quiz/${quizid}/transfer`,
+    {
+      json: { token: token, userEmail: userEmail },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function quizTrashRequest(token: string) {
   const res = request(
     'GET',
@@ -202,6 +232,7 @@ export function quizRestoreRequest(token: string, quizId: number) {
   };
 }
 
+<<<<<<< HEAD
 export function updateQuizQuestionRequest(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
   const res = request(
     'PUT',
@@ -216,6 +247,14 @@ export function updateQuizQuestionRequest(quizId: number, questionId: number, to
           answers
         }
       }
+=======
+export function quizTrashEmptyRequest(token: string, quizIds: number[]) {
+  const res = request(
+    'DELETE',
+    SERVER_URL + '/v1/admin/quiz/trash/empty',
+    {
+      qs: { token: token, quizIds: JSON.stringify(quizIds) }
+>>>>>>> d41539202b190b972422478bf28bab0163278022
     }
   );
   return {

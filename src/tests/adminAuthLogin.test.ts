@@ -1,19 +1,20 @@
 import {
   authRegisterRequest,
   authLoginRequest,
-  // adminUserDetailsRequest,
+  adminUserDetailsRequest,
   clearRequest
 } from './testRoutes';
+import {
+  TokenId
+} from '../interfaces'
 
-// interface TokenId {
-//   token: string
-// }
+
 const ERROR = { error: expect.any(String) };
-// let user: TokenId;
+ let user: TokenId;
 
 beforeEach(() => {
   clearRequest();
-  // let user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
+  let user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
   authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
 });
 describe('adminAuthLogin', () => {
@@ -34,13 +35,13 @@ describe('adminAuthLogin', () => {
         expect(authLogin.body).toStrictEqual(ERROR);
         expect(authLogin.statusCode).toStrictEqual(400);
       });
-      // skipped until adminUserDetails merged
-      // test('Correct incrementation of numFailedPasswordsSinceLastLogin', () => {
-      //   authLoginRequest('email@gmail.com', 'password2');
-      //   expect(
-      //     adminUserDetailsRequest(user.token).body.user.numFailedPasswordsSinceLastLogin
-      //   ).toBe(1);
-      // });
+
+      test('Correct incrementation of numFailedPasswordsSinceLastLogin', () => {
+        authLoginRequest('email@gmail.com', 'password2');
+        expect(
+          adminUserDetailsRequest(user.token).body.user.numFailedPasswordsSinceLastLogin
+        ).toBe(1);
+      });
     });
   });
 
@@ -50,18 +51,17 @@ describe('adminAuthLogin', () => {
       expect(authLogin.body).toStrictEqual({ token: expect.any(String) });
       expect(authLogin.statusCode).toStrictEqual(200);
     });
-    // skipped until adminUserDetails merged
-    // test('Correct incrementation of numSuccessfulLogins', () => {
-    //   authLoginRequest('email@gmail.com', 'password1');
-    //   expect(
-    //     adminUserDetailsRequest(user.token).body.user.numSuccessfulLogins
-    //   ).toBe(2);
-    // });
-    // test('Correct reset of numFailedPasswordsSinceLastLogin', () => {
-    //   authLoginRequest('email@gmail.com', 'password1');
-    //   expect(
-    //     adminUserDetailsRequest(user.token).body.user.numFailedPasswordsSinceLastLogin
-    //   ).toBe(0);
-    // });
+    test('Correct incrementation of numSuccessfulLogins', () => {
+      authLoginRequest('email@gmail.com', 'password1');
+      expect(
+        adminUserDetailsRequest(user.token).body.user.numSuccessfulLogins
+      ).toBe(2);
+    });
+    test('Correct reset of numFailedPasswordsSinceLastLogin', () => {
+      authLoginRequest('email@gmail.com', 'password1');
+      expect(
+        adminUserDetailsRequest(user.token).body.user.numFailedPasswordsSinceLastLogin
+      ).toBe(0);
+    });
   });
 });
