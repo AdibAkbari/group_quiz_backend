@@ -5,19 +5,12 @@ import {
   adminQuizInfoRequest,
   quizCreateRequest,
 } from './testRoutes';
-
+import { TokenId, QuizId } from '../interfaces';
 const ERROR = { error: expect.any(String) };
 
-interface Token {
-  token: string
-}
-
-interface QuizCreate {
-  quizId: number
-}
 // Before each test, clear data and then create a new user and new quiz
-let user: Token;
-let quiz: QuizCreate;
+let user: TokenId;
+let quiz: QuizId;
 beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;

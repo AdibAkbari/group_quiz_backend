@@ -9,6 +9,7 @@ import fs from 'fs';
 import {
   adminAuthLogin,
   adminAuthRegister,
+  adminAuthLogout,
   updateUserPassword,
   adminUserDetails,
   updateUserDetails,
@@ -26,8 +27,9 @@ import {
   adminQuizTrashEmpty,
   adminQuizNameUpdate,
   adminQuizTransfer,
-  moveQuizQuestion,
   deleteQuizQuestion,
+  updateQuizQuestion,
+  moveQuizQuestion
 } from './quiz';
 import { clear } from './other';
 
@@ -213,7 +215,62 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   res.json(response);
 });
 
-// createQuizQuestion
+// adminQuizTransfer //
+app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
+  const token = req.body.token as string;
+  const userEmail = req.body.userEmail as string;
+  const response = adminQuizTransfer(token, parseInt(req.params.quizid), userEmail);
+  if ('error' in response) {
+    if (response.error.includes('Structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('QuizId') || response.error.includes('own') ||
+                 response.error.includes('name') || response.error.includes('Email')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
+// updateUserPassword //
+app.put('/v1/admin/user/password', (req: Request, res: Response) => {
+  const { token, oldPassword, newPassword } = req.body;
+  const response = updateUserPassword(token, oldPassword, newPassword);
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('password')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
+// adminQuizNameUpdate //
+app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
+  const token = req.body.token as string;
+  const name = req.body.name as string;
+
+  const response = adminQuizNameUpdate(token, parseInt(req.params.quizid), name);
+
+  if ('error' in response) {
+    if (response.error.includes('Structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('Name') || response.error.includes('QuizId') ||
+                 response.error.includes('own') || response.error.includes('white space')) {
+      return res.status(400).json(response);
+    }
+  }
+
+  res.json(response);
+});
+
+// createQuizQuestion //
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const { question, duration, points, answers } = req.body.questionBody;
   const quizId = parseInt(req.params.quizid);
@@ -349,6 +406,42 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
   res.json(response);
 });
 
+// Update quiz question //
+app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Response) => {
+  const { question, duration, points, answers } = req.body.questionBody;
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const response = updateQuizQuestion(quizId, questionId, req.body.token, question, duration, points, answers);
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('input') || response.error.includes('param')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
+// clear //
+app.delete('/v1/clear', (req: Request, res: Response) => {
+  res.json(clear());
+});
+
+// adminAuthLogout //
+app.put('/v1/admin/auth/logout', (req: Request, res: Response) => {
+  const response = adminAuthLogout(req.body.tokenId);
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
 // quizQuestionDuplicate //
 app.put('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
@@ -365,11 +458,6 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, 
     }
   }
   res.json(response);
-});
-
-// clear //
-app.delete('/v1/clear', (req: Request, res: Response) => {
-  res.json(clear());
 });
 
 // ====================================================================

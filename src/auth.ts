@@ -1,25 +1,7 @@
 import { setData, getData } from './dataStore';
-import { Error, Data, Users, Token } from './interfaces';
+import { Error, Data, Users, Token, TokenId, User } from './interfaces';
 import validator from 'validator';
 import { isValidTokenStructure, isTokenLoggedIn, findUserFromToken, isWhiteSpace } from './helper';
-
-export interface UserId {
-    authUserId: number;
-}
-
-export interface TokenId {
-  token: string;
-}
-
-export interface User {
-    user: {
-        userId: number;
-        name: string;
-        email: string;
-        numSuccessfulLogins: number;
-        numFailedPasswordsSinceLastLogin: number;
-    }
-}
 
 /**
  * Register a user with an email, password, and names, then returns their
@@ -29,7 +11,7 @@ export interface User {
  * @param {string} password
  * @param {string} nameFirst
  * @param {string} nameLast
- * @returns {{token: number}}
+ * @returns {{token: string}}
  */
 export function adminAuthRegister (email: string, password: string, nameFirst: string, nameLast: string): Error | TokenId {
   const store = getData();
@@ -91,11 +73,11 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
 }
 
 /**
- * Given a registered user's email and password returns their authUserId value.
+ * Given a registered user's email and password returns their token
  *
  * @param {string} email
  * @param {string} password
- * @returns {{authUserId: number}}
+ * @returns {{token: string}}
  */
 export function adminAuthLogin(email: string, password: string): Error | TokenId {
   const newData = getData();
@@ -128,14 +110,14 @@ export function adminAuthLogin(email: string, password: string): Error | TokenId
  * Given an admin user's token, return details about the user.
  * "name" is the first and last name concatenated with a single space between them.
  *
- * @param {number} token
+ * @param {string} token
  * @returns {{user: {
  *              userId: number,
  *              name: string,
  *              email: string,
  *              numSuccessfulLogins: number,
  *              numFailedPasswordsSinceLastLogin: number
- *              }}}
+ *           }}}
  */
 export function adminUserDetails(token: string): User | Error {
   const data: Data = getData();
@@ -275,4 +257,27 @@ export function updateUserDetails(token: string, email: string, nameFirst: strin
 
   setData(data);
   return ({ });
+}
+
+/**
+ * Given a session token, log out the user
+ *
+ * @param {string} tokenId
+ * @returns {{}} Empty Object
+ */
+export function adminAuthLogout (tokenId: string): Record<string, never> | Error {
+  const data: Data = getData();
+
+  if (!isValidTokenStructure(tokenId)) {
+    return { error: 'Token is not a valid structure' };
+  }
+
+  if (!isTokenLoggedIn(tokenId)) {
+    return { error: 'This token is for a user who has already logged out' };
+  }
+
+  const index: number = data.tokens.findIndex(token => token.tokenId === tokenId);
+  data.tokens.splice(index, 1);
+  setData(data);
+  return { };
 }

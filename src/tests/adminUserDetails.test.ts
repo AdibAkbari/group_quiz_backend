@@ -1,15 +1,13 @@
 import {
   adminUserDetailsRequest,
   authRegisterRequest,
-  authLoginRequest,
   clearRequest
 } from './testRoutes';
+import {
+  TokenId
+} from '../interfaces';
 
 const ERROR = { error: expect.any(String) };
-
-  interface Token {
-    token: string
-  }
 
 beforeEach(() => {
   clearRequest();
@@ -49,7 +47,7 @@ describe('Token invalid', () => {
 });
 
 describe('Only one user registered', () => {
-  let user: Token;
+  let user: TokenId;
   beforeEach(() => {
     user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
   });
@@ -67,42 +65,12 @@ describe('Only one user registered', () => {
     });
     expect(userDetails.statusCode).toStrictEqual(200);
   });
-
-  test.skip('Registered and logged in', () => {
-    authLoginRequest('email@gmail.com', 'password1');
-    const userDetails = adminUserDetailsRequest(user.token);
-    expect(adminUserDetailsRequest(userDetails.body)).toStrictEqual({
-      user: {
-        userId: expect.any(Number),
-        name: 'Firstname Lastname',
-        email: 'email@gmail.com',
-        numSuccessfulLogins: 2,
-        numFailedPasswordsSinceLastLogin: 0
-      }
-    });
-    expect(userDetails.statusCode).toStrictEqual(200);
-  });
-
-  test.skip('Failed password attempt', () => {
-    authLoginRequest('email@gmail.com', 'password2');
-    const userDetails = adminUserDetailsRequest(user.token);
-    expect(adminUserDetailsRequest(userDetails.body)).toStrictEqual({
-      user: {
-        userId: expect.any(Number),
-        name: 'Firstname Lastname',
-        email: 'email@gmail.com',
-        numSuccessfulLogins: 2,
-        numFailedPasswordsSinceLastLogin: 0
-      }
-    });
-    expect(userDetails.statusCode).toStrictEqual(200);
-  });
 });
 
 describe('multiple users registered', () => {
-  let user1: Token;
-  let user2: Token;
-  let user3: Token;
+  let user1: TokenId;
+  let user2: TokenId;
+  let user3: TokenId;
   beforeEach(() => {
     user1 = authRegisterRequest('email1@gmail.com', 'password1', 'FirstnameA', 'LastnameA').body;
     user2 = authRegisterRequest('email2@gmail.com', 'password2', 'FirstnameB', 'LastnameB').body;

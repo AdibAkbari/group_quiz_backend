@@ -249,6 +249,27 @@ export function quizRestoreRequest(token: string, quizId: number) {
   };
 }
 
+export function updateQuizQuestionRequest(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
+  const res = request(
+    'PUT',
+    SERVER_URL + `/v1/admin/quiz/${quizId}/question/${questionId}`,
+    {
+      json: {
+        token: token,
+        questionBody: {
+          question,
+          duration,
+          points,
+          answers
+        }
+      }
+    });
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function quizTrashEmptyRequest(token: string, quizIds: number[]) {
   const res = request(
     'DELETE',
@@ -291,6 +312,20 @@ export function quizDescriptionUpdateRequest(quizid: number, token: string, desc
     SERVER_URL + `/v1/admin/quiz/${quizid}/description`,
     {
       json: { token: token, description: description },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function authLogoutRequest(tokenId: string) {
+  const res = request(
+    'PUT',
+    SERVER_URL + '/v1/admin/auth/logout',
+    {
+      json: { tokenId: tokenId },
     }
   );
   return {

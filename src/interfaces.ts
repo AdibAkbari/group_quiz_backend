@@ -10,6 +10,16 @@ export interface Users {
   oldPasswords?: string[];
 }
 
+export interface User {
+  user: {
+      userId: number;
+      name: string;
+      email: string;
+      numSuccessfulLogins: number;
+      numFailedPasswordsSinceLastLogin: number;
+  }
+}
+
 export interface Answer {
   answerId: number;
   answer: string;
@@ -36,6 +46,17 @@ export interface Quizzes {
   creator: number;
   duration: number;
   questionCount: number;
+}
+
+export interface QuizInfo {
+  quizId: number,
+  name: string,
+  timeCreated: number,
+  timeLastEdited: number,
+  description: string,
+  numQuestions: number,
+  questions: Question[],
+  duration: number
 }
 
 export interface Token {
@@ -71,6 +92,12 @@ export interface NewQuestionId {
   newQuestionId: number;
 }
 
-export interface QuestionCreate {
-  questionId: number
+export interface QuizList {
+  quizId: number,
+  name: string
+}
+
+export interface Answers {
+  answer: string,
+  correct: boolean
 }

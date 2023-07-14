@@ -2,7 +2,6 @@ import { getData } from './dataStore';
 import { Data, Quizzes } from './interfaces';
 
 // HELPER FUNCTIONS
-
 /**
    * Helper function to determine whether token is a valid structure
    *
@@ -52,15 +51,7 @@ export function isValidQuizId(quizId: number): boolean {
   if (isNaN(quizId)) {
     return false;
   }
-
   const data: Data = getData();
-  // for (const current of data.quizzes) {
-  //   if (current.quizId === quizId) {
-  //     return true;
-  //   }
-  // }
-  // return false;
-
   if (data.quizzes.find(id => id.quizId === quizId) === undefined) {
     return false;
   }

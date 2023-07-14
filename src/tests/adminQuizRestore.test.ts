@@ -8,18 +8,12 @@ import {
   adminQuizListRequest,
   adminQuizInfoRequest,
 } from './testRoutes';
+import { TokenId, QuizId } from '../interfaces';
 
 const ERROR = { error: expect.any(String) };
 
-interface TokenId {
-  token: string
-}
-interface QuizCreate {
-  quizId: number
-}
-
 let user: TokenId;
-let quiz: QuizCreate;
+let quiz: QuizId;
 // creates a user and a quiz for the user.
 beforeEach(() => {
   clearRequest();
@@ -82,8 +76,8 @@ describe('adminQuizRestore', () => {
   describe('Success cases', () => {
     let restoreQuizBody: Record<string, never>;
     let restoreQuizStatusCode: number;
-    let quiz2: QuizCreate;
-    let quiz3: QuizCreate;
+    let quiz2: QuizId;
+    let quiz3: QuizId;
     // creates 2 more quizzes and removes all quizzes to trash
     beforeEach(() => {
       quiz2 = quizCreateRequest(user.token, 'quiz2', '').body;

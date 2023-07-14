@@ -10,7 +10,7 @@ import {
 import {
   TokenId,
   QuizId,
-  QuestionCreate
+  QuestionId
 } from '../interfaces';
 
 const validAnswers = [{ answer: 'great', correct: true }, { answer: 'bad', correct: false }];
@@ -19,7 +19,7 @@ const ERROR = { error: expect.any(String) };
 
 let user: TokenId;
 let quiz: QuizId;
-let question: QuestionCreate;
+let question: QuestionId;
 beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
