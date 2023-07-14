@@ -75,9 +75,11 @@ describe('error cases', () => {
 describe('valid input', () => {
   test('one question duplicate', () => {
     const result = quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user.token);
+    const timeNow = Math.floor(Date.now() / 1000);
+    const info = adminQuizInfoRequest(user.token, quiz.quizId).body;
     expect(result.body).toStrictEqual({ newQuestionId: expect.any(Number) });
     expect(result.statusCode).toStrictEqual(200);
-    expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual({
+    expect(info).toStrictEqual({
       quizId: quiz.quizId,
       name: 'My Quiz',
       timeCreated: expect.any(Number),
@@ -108,8 +110,6 @@ describe('valid input', () => {
       ],
       duration: 10,
     });
-    const timeNow = Math.floor(Date.now() / 1000);
-    const info = adminQuizInfoRequest(user.token, quiz.quizId).body;
     expect(info.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
     expect(info.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
   });
@@ -119,9 +119,11 @@ describe('valid input', () => {
     const answersQuestion2 = [{ answer: 'yum', correct: true }, { answer: 'ew', correct: false }];
     const questionTwo = createQuizQuestionRequest(quiz.quizId, user.token, 'Pineapples on pizza?', 3, 3, answersQuestion2).body;
     const result = quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user.token);
+    const timeNow = Math.floor(Date.now() / 1000);
+    const info = adminQuizInfoRequest(user.token, quiz.quizId).body;
     expect(result.body).toStrictEqual({ newQuestionId: expect.any(Number) });
     expect(result.statusCode).toStrictEqual(200);
-    expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual({
+    expect(info).toStrictEqual({
       quizId: quiz.quizId,
       name: 'My Quiz',
       timeCreated: expect.any(Number),
@@ -162,8 +164,6 @@ describe('valid input', () => {
       ],
       duration: 13,
     });
-    const timeNow = Math.floor(Date.now() / 1000);
-    const info = adminQuizInfoRequest(user.token, quiz.quizId).body;
     expect(info.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
     expect(info.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
   });

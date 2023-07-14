@@ -544,10 +544,10 @@ export function quizQuestionDuplicate (quizId: number, questionId: number, token
     return { error: 'invalid question id' };
   }
 
+  data.quizzes[quizIndex].questionCount++;
   const newQuestionId: number = data.quizzes[quizIndex].questionCount;
   const questionIndex: number = data.quizzes[quizIndex].questions.findIndex(id => id.questionId === questionId);
   const timeNow: number = Math.floor(Date.now() / 1000);
-  data.quizzes[quizIndex].questionCount++;
   data.quizzes[quizIndex].numQuestions++;
   data.quizzes[quizIndex].duration += data.quizzes[quizIndex].questions[questionIndex].duration;
   data.quizzes[quizIndex].timeLastEdited = timeNow;
