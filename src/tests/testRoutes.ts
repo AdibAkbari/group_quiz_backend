@@ -271,6 +271,20 @@ export function clearRequest() {
   return JSON.parse(res.body.toString());
 }
 
+export function quizQuestionDuplicateRequest(quizid: number, questionid: number, token: string) {
+  const res = request(
+    'PUT',
+    SERVER_URL + `/v1/admin/quiz/${quizid}/question/${questionid}/duplicate`,
+    {
+      json: { token: token },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
 export function quizDescriptionUpdateRequest(quizid: number, token: string, description: string) {
   const res = request(
     'PUT',

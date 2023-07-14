@@ -63,6 +63,14 @@ export interface QuizId {
   quizId: number
 }
 
+export interface QuestionId {
+  questionId: number
+}
+
+export interface NewQuestionId {
+  newQuestionId: number;
+}
+
 export interface QuestionCreate {
   questionId: number
 }
