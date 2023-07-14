@@ -96,13 +96,17 @@ export function adminAuthLogin(email: string, password: string): Error | TokenId
   newData.users[userIndex].numSuccessfulLogins++;
   newData.users[userIndex].numFailedPasswordsSinceLastLogin = 0;
 
+  const userId = newData.users[userIndex].authUserId;
+
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  const tokenId: string = (Math.floor(Math.random() * timeNow)).toString();
+  const token: Token = { tokenId, userId };
+  newData.tokens.push(token);
+
   setData(newData);
 
-  const userId = newData.users[userIndex].authUserId;
-  const token = newData.tokens.find((token) => token.userId === userId);
-
   return {
-    token: token.tokenId
+    token: tokenId
   };
 }
 
