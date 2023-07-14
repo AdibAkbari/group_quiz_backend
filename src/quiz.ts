@@ -8,6 +8,7 @@ import {
   isValidTokenStructure,
   isTokenLoggedIn,
   findUserFromToken,
+  isValidQuestionId,
   isValidEmail
 } from './helper';
 
@@ -521,6 +522,7 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
   if (!isValidQuizId(quizId)) {
     return { error: 'invalid quiz Id' };
   }
+
   if (!isValidCreator(quizId, token)) {
     return { error: 'invalid quiz Id' };
   }
@@ -606,4 +608,53 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
   return {
     questionId: questionId
   };
+}
+
+/**
+ * Delete a particular question from a quiz
+ *
+ * @param {string} token
+ * @param {number} quizId
+ * @param {number} questionId
+ * @returns {questionId: number}
+ */
+export function deleteQuizQuestion (token: string, quizId: number, questionId: number): Record<string, never> | Error {
+  // Error checking for token
+  if (!isValidTokenStructure(token)) {
+    return { error: 'invalid token structure' };
+  }
+  if (!isTokenLoggedIn(token)) {
+    return { error: 'token is not logged in' };
+  }
+
+  // Error checking for quizId
+  if (!isValidQuizId(quizId)) {
+    return { error: 'invalid quiz Id' };
+  }
+
+  if (!isValidCreator(quizId, token)) {
+    return { error: 'invalid quiz Id' };
+  }
+
+  if (!isValidQuestionId(quizId, questionId)) {
+    return { error: 'invalid param: questionId' };
+  }
+
+  const data: Data = getData();
+
+  const quizToDelete = data.quizzes.find((quiz) => quiz.quizId === quizId);
+  const questionToDelete = quizToDelete.questions.find((question) => question.questionId === questionId);
+  const questionToDeleteIndex = quizToDelete.questions.findIndex((question) => question.questionId === questionId);
+
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  quizToDelete.timeLastEdited = timeNow;
+
+  quizToDelete.questions.splice(questionToDeleteIndex, 1);
+
+  quizToDelete.numQuestions--;
+  quizToDelete.duration = quizToDelete.duration - questionToDelete.duration;
+
+  setData(data);
+
+  return {};
 }
