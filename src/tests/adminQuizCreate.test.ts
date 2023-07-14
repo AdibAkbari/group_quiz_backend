@@ -2,7 +2,7 @@ import {
   clearRequest,
   authRegisterRequest,
   quizCreateRequest,
-  // QuizInfoRequest,
+  adminQuizInfoRequest,
 } from './testRoutes';
 
 const ERROR = { error: expect.any(String) };
@@ -116,17 +116,19 @@ describe('valid input tests', () => {
     expect(quiz.statusCode).toStrictEqual(200);
   });
 
-  // test that the quiz is correctly added to the array of quizzes
-//   test.skip('testing correct quiz object creation', () => {
-//     const quiz = quizCreateRequest(user.authUserId, 'TestQuiz', 'Test');
-//     expect(adminQuizInfo(user.authUserId, quiz.quizId)).toStrictEqual(
-//       {
-//         quizId: quiz.quizId,
-//         name: 'TestQuiz',
-//         timeCreated: expect.any(Number),
-//         timeLastEdited: expect.any(Number),
-//         description: 'Test',
-//       }
-//     );
-//   });
+  test('testing correct quiz object creation', () => {
+    const quiz = quizCreateRequest(user.token, 'TestQuiz', 'Test').body;
+    expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual(
+      {
+        quizId: quiz.quizId,
+        name: 'TestQuiz',
+        timeCreated: expect.any(Number),
+        timeLastEdited: expect.any(Number),
+        description: 'Test',
+        numQuestions: 0,
+        questions: [],
+        duration: 0,
+      }
+    );
+  });
 });
