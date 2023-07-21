@@ -2,6 +2,7 @@ import { setData, getData } from './dataStore';
 import { Error, Data, Users, Token, TokenId, User } from './interfaces';
 import validator from 'validator';
 import { isValidTokenStructure, isTokenLoggedIn, findUserFromToken, isWhiteSpace } from './helper';
+import { createHash } from 'crypto';
 
 /**
  * Register a user with an email, password, and names, then returns their
@@ -55,10 +56,12 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
     return { error: 'Password must contain at least one letter and one number' };
   }
 
+  const hashedPassword: string = createHash('sha256').update(password).digest('hex');
+
   const userId: number = store.users.length + 1;
   const numSuccessfulLogins = 1;
   const numFailedPasswordsSinceLastLogin = 0;
-  const user: Users = { email, password, nameFirst, nameLast, authUserId: userId, numSuccessfulLogins, numFailedPasswordsSinceLastLogin };
+  const user: Users = { email, password: hashedPassword, nameFirst, nameLast, authUserId: userId, numSuccessfulLogins, numFailedPasswordsSinceLastLogin };
   store.users.push(user);
 
   const timeNow: number = Math.floor((new Date()).getTime() / 1000);
@@ -87,7 +90,8 @@ export function adminAuthLogin(email: string, password: string): Error | TokenId
     return { error: 'email does not exist' };
   }
 
-  if (newData.users[userIndex].password !== password) {
+  const hashedPassword: string = createHash('sha256').update(password).digest('hex');
+  if (newData.users[userIndex].password !== hashedPassword) {
     newData.users[userIndex].numFailedPasswordsSinceLastLogin++;
     setData(newData);
     return { error: 'password does not match given email' };
@@ -173,14 +177,17 @@ export function updateUserPassword(token: string, oldPassword: string, newPasswo
     return { error: 'Token is not logged in' };
   }
 
+  const hashedOldPassword: string = createHash('sha256').update(oldPassword).digest('hex');
+  const hashedNewPassword: string = createHash('sha256').update(newPassword).digest('hex');
+
   const userId = findUserFromToken(token);
   const index = data.users.findIndex(id => id.authUserId === userId);
-  if (data.users[index].password !== oldPassword) {
+  if (data.users[index].password !== hashedOldPassword) {
     return { error: 'Old password is incorrect' };
   }
 
   if (data.users[index].oldPasswords !== undefined) {
-    if (data.users[index].oldPasswords.includes(newPassword)) {
+    if (data.users[index].oldPasswords.includes(hashedNewPassword)) {
       return { error: 'New password has been used previously' };
     }
   } else {
@@ -197,8 +204,8 @@ export function updateUserPassword(token: string, oldPassword: string, newPasswo
     return { error: 'New password must contain at least one letter and one number' };
   }
 
-  data.users[index].oldPasswords.push(oldPassword);
-  data.users[index].password = newPassword;
+  data.users[index].oldPasswords.push(hashedOldPassword);
+  data.users[index].password = hashedNewPassword;
 
   setData(data);
   return ({ });
