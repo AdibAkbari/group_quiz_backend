@@ -410,6 +410,14 @@ components:
       required: true
       schema:
         type: string
+    QuizTrashEmptyIter3:
+      in: query
+      name: quizIds
+      required: true
+      schema:
+        type: string
+        example: "[3,4,5,6,7]"
+        description: A JSONified array of quiz id numbers
   body:
     Token:
       in: body
@@ -648,15 +656,6 @@ components:
             type: string
             example: "[3,4,5,6,7]"
             description: A JSONified array of quiz id numbers
-    QuizTrashEmptyIter3:
-      in: query
-      name: token
-      required: true
-      schema:
-        quizIds:
-          type: string
-          example: "[3,4,5,6,7]"
-          description: A JSONified array of quiz id numbers
     QuizRestore:
       in: body
       name: body
@@ -1772,7 +1771,7 @@ paths:
         - "Iteration 3 (Modified)"
       parameters:
         - $ref: '#/components/header/Token'
-        - $ref: '#/components/body/QuizTrashEmptyIter3'
+        - $ref: '#/components/query/QuizTrashEmptyIter3'
       responses:
         200:
           description: OK
