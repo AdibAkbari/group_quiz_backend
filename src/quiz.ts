@@ -11,6 +11,7 @@ import {
   isValidQuestionId,
   isValidEmail
 } from './helper';
+import HTTPError from 'http-errors';
 
 /**
    * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -114,24 +115,20 @@ export function adminQuizCreate(token: string, name: string, description: string
  * @returns {{ }} empty object
  */
 export function adminQuizRemove(token: string, quizId: number): Record<string, never> | Error {
-  // invalid token structure
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    throw HTTPError(401, 'Token is not a valid structure');
   }
 
-  // token is not logged in
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    throw HTTPError(403, 'Token is not logged in');
   }
 
   if (!isValidQuizId(quizId)) {
-    return { error: 'Invalid: QuizId' };
+    throw HTTPError(400, 'Invalid: QuizId');
   }
 
-  // get authUserId from token
-
   if (!isValidCreator(quizId, token)) {
-    return { error: 'Invalid: user does not own quiz' };
+    throw HTTPError(400, 'Invalid: user does not own quiz');
   }
 
   const data: Data = getData();

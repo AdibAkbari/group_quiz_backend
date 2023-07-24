@@ -13,7 +13,7 @@
         "cors": "^2.8.5",
         "express": "^4.18.0",
         "http-errors": "^2.0.0",
-        "middleware-http-errors": "^0.1.1",
+        "middleware-http-errors": "^0.1.2",
         "morgan": "^1.10.0",
         "rewire": "^6.0.0",
         "ts-node": "^10.7.0",

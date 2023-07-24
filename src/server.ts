@@ -356,18 +356,13 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
 
 // adminQuizRemove //
 app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
-  const token = req.query.token as string;
-  const response = adminQuizRemove(token, parseInt(req.params.quizid));
-  if ('error' in response) {
-    if (response.error.includes('Structure')) {
-      return res.status(401).json(response);
-    } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
-    } else if (response.error.includes('QuizId') || response.error.includes('own')) {
-      return res.status(400).json(response);
-    }
+  try {
+    const token = req.headers.token as string;
+    const response = adminQuizRemove(token, parseInt(req.params.quizid));
+    res.json(response);
+  } catch (err) {
+    console.log(err.message);
   }
-  res.json(response);
 });
 
 // adminQuizRestore //
