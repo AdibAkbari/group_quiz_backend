@@ -1,0 +1,178 @@
+
+> test
+> jest httpTests/
+
+FAIL httpTests/adminQuiz/adminQuizQUestionEdit.test.ts (14.267 s)
+  ● Test successful question edit - multiple correct
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected value: "pink"
+    Received array: ["red", "blue", "yellow", "green", "brown", "purple", "orange"]
+
+      105 |   const quiz = adminQuizInfo(token, quizId);
+      106 |   for (let answer of quiz.questions[0].answers) {
+    > 107 |     expect(colours).toContain(answer.colour);
+          |                     ^
+      108 |     expect(answer.answerId).toEqual(expect.any(Number));
+      109 |     expect(answerNames).toContain(answer.answer);
+      110 |     if (answer.answer === "King Charles" || answer.answer === "Empress Yuchao") {
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQUestionEdit.test.ts:107:21)
+
+  ● Test unsuccessful question edit - question duration too long with another questin
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: 400
+    Received: {}
+
+      223 |   adminQuizQuestionEdit(token, quizId, questionId, { question, duration: 100, points, answers } );
+      224 |   const res = adminQuizQuestionEdit(token, quizId, questionId, { question, duration: 81, points, answers } );
+    > 225 |   expect(res).toStrictEqual(400);
+          |               ^
+      226 | });
+      227 |
+      228 | test('Test unsuccessful question edit - question answer less than 1', () => {
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQUestionEdit.test.ts:225:15)
+
+FAIL httpTests/adminQuiz/adminQuizQuestionAdd.test.ts (6.119 s)
+  ● Test successful question add - all details are correctly stored and retrieved by quiz info
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected value: "pink"
+    Received array: ["red", "blue", "yellow", "green", "brown", "purple", "orange"]
+
+      46 |   expect(quiz.questions[0].points).toEqual(points);
+      47 |   for (let answer of quiz.questions[0].answers) {
+    > 48 |     expect(colours).toContain(answer.colour);
+         |                     ^
+      49 |     expect(answer.answerId).toEqual(expect.any(Number));
+      50 |     expect(answerNames).toContain(answer.answer);
+      51 |     if (answer.answer === "Prince Charles") {
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQuestionAdd.test.ts:48:21)
+
+PASS httpTests/adminUser/adminUserDetailsPut.test.ts
+PASS httpTests/adminQuiz/adminQuizTrashEmpty.test.ts
+FAIL httpTests/adminQuiz/adminQuizQuestionDuplicate.test.ts
+  ● Successful quiz question duplicate
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected value: "pink"
+    Received array: ["red", "blue", "yellow", "green", "brown", "purple", "orange"]
+
+      50 |   expect(quiz.questions[1].points).toEqual(question.points);
+      51 |   for (let answer of quiz.questions[0].answers) {
+    > 52 |     expect(colours).toContain(answer.colour);
+         |                     ^
+      53 |     expect(answer.answerId).toEqual(expect.any(Number));
+      54 |     expect(answerNames).toContain(answer.answer);
+      55 |     if (answer.answer === "Prince Charles") {
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQuestionDuplicate.test.ts:52:21)
+
+PASS httpTests/adminQuiz/adminQuizTrash.test.ts
+PASS httpTests/adminQuiz/adminQuizNameUpdate.test.ts
+PASS httpTests/adminQuiz/adminQuizTransfer.test.ts
+PASS httpTests/adminUser/adminUserPassword.test.ts
+PASS httpTests/adminQuiz/adminQuizQuestionMove.test.ts
+PASS httpTests/adminAuth/adminAuthRegister.test.ts
+PASS httpTests/adminQuiz/adminQuizRestore.test.ts
+PASS httpTests/adminQuiz/adminQuizDescriptionUpdate.test.ts
+PASS httpTests/adminQuiz/adminQuizList.test.ts
+PASS httpTests/adminQuiz/adminQuizQuestionDelete.test.ts
+PASS httpTests/adminQuiz/adminQuizNew.test.ts
+PASS httpTests/adminQuiz/adminQuizInfo.test.ts
+PASS httpTests/adminAuth/adminAuthLogout.test.ts
+PASS httpTests/adminQuiz/adminQuizDelete.test.ts
+PASS httpTests/adminUser/adminUserDetails.test.ts
+PASS httpTests/adminAuth/adminAuthLogin.test.ts
+PASS httpTests/other/clear.test.ts
+
+Summary of all failing tests
+FAIL httpTests/adminQuiz/adminQuizQUestionEdit.test.ts (14.267 s)
+  ● Test successful question edit - multiple correct
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected value: "pink"
+    Received array: ["red", "blue", "yellow", "green", "brown", "purple", "orange"]
+
+      105 |   const quiz = adminQuizInfo(token, quizId);
+      106 |   for (let answer of quiz.questions[0].answers) {
+    > 107 |     expect(colours).toContain(answer.colour);
+          |                     ^
+      108 |     expect(answer.answerId).toEqual(expect.any(Number));
+      109 |     expect(answerNames).toContain(answer.answer);
+      110 |     if (answer.answer === "King Charles" || answer.answer === "Empress Yuchao") {
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQUestionEdit.test.ts:107:21)
+
+  ● Test unsuccessful question edit - question duration too long with another questin
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: 400
+    Received: {}
+
+      223 |   adminQuizQuestionEdit(token, quizId, questionId, { question, duration: 100, points, answers } );
+      224 |   const res = adminQuizQuestionEdit(token, quizId, questionId, { question, duration: 81, points, answers } );
+    > 225 |   expect(res).toStrictEqual(400);
+          |               ^
+      226 | });
+      227 |
+      228 | test('Test unsuccessful question edit - question answer less than 1', () => {
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQUestionEdit.test.ts:225:15)
+
+FAIL httpTests/adminQuiz/adminQuizQuestionAdd.test.ts (6.119 s)
+  ● Test successful question add - all details are correctly stored and retrieved by quiz info
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected value: "pink"
+    Received array: ["red", "blue", "yellow", "green", "brown", "purple", "orange"]
+
+      46 |   expect(quiz.questions[0].points).toEqual(points);
+      47 |   for (let answer of quiz.questions[0].answers) {
+    > 48 |     expect(colours).toContain(answer.colour);
+         |                     ^
+      49 |     expect(answer.answerId).toEqual(expect.any(Number));
+      50 |     expect(answerNames).toContain(answer.answer);
+      51 |     if (answer.answer === "Prince Charles") {
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQuestionAdd.test.ts:48:21)
+
+FAIL httpTests/adminQuiz/adminQuizQuestionDuplicate.test.ts
+  ● Successful quiz question duplicate
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected value: "pink"
+    Received array: ["red", "blue", "yellow", "green", "brown", "purple", "orange"]
+
+      50 |   expect(quiz.questions[1].points).toEqual(question.points);
+      51 |   for (let answer of quiz.questions[0].answers) {
+    > 52 |     expect(colours).toContain(answer.colour);
+         |                     ^
+      53 |     expect(answer.answerId).toEqual(expect.any(Number));
+      54 |     expect(answerNames).toContain(answer.answer);
+      55 |     if (answer.answer === "Prince Charles") {
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQuestionDuplicate.test.ts:52:21)
+
+
+Test Suites: 3 failed, 19 passed, 22 total
+Tests:       4 failed, 155 passed, 159 total
+Snapshots:   0 total
+Time:        79.327 s, estimated 89 s
+Ran all test suites matching /httpTests\//i.
+npm notice 
+npm notice New minor version of npm available! 9.5.1 -> 9.8.1
+npm notice Changelog: <https://github.com/npm/cli/releases/tag/v9.8.1>
+npm notice Run `npm install -g npm@9.8.1` to update!
+npm notice 

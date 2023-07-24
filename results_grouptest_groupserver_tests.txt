@@ -1,0 +1,40 @@
+
+> test
+> jest **/?(*.)+(test).ts
+
+  Invalid testPattern **/?(*.)+(test).ts supplied. Running all tests instead.
+  Invalid testPattern **/?(*.)+(test).ts supplied. Running all tests instead.
+PASS src/tests/updateQuizQuestion.test.ts (26.363 s)
+PASS src/tests/createQuizQuestion.test.ts (15.906 s)
+PASS src/tests/adminQuizInfo.test.ts (9.892 s)
+PASS src/tests/moveQuizQuestion.test.ts (12.727 s)
+PASS src/tests/deleteQuizQuestion.test.ts (8.19 s)
+PASS src/tests/quizQuestionDuplicate.test.ts (6.734 s)
+PASS src/tests/adminQuizNameUpdate.test.ts (11.163 s)
+PASS src/tests/adminQuizTransfer.test.ts (8.126 s)
+PASS src/tests/adminQuizRemove.test.ts (6.764 s)
+PASS src/tests/adminQuizRestore.test.ts (7.862 s)
+PASS src/tests/updateUserDetails.test.ts (8.677 s)
+PASS src/tests/adminQuizTrashEmpty.test.ts (11.582 s)
+PASS src/tests/adminQuizList.test.ts (7.93 s)
+PASS src/tests/adminQuizTrash.test.ts (6.212 s)
+PASS src/tests/adminQuizCreate.test.ts (5.183 s)
+PASS src/tests/adminUserDetails.test.ts
+PASS src/tests/updateUserPassword.test.ts (5.876 s)
+PASS src/tests/adminAuthRegister.test.ts
+PASS src/tests/adminQuizDescriptionUpdate.test.ts (7.97 s)
+PASS src/tests/adminAuthLogout.test.ts
+PASS src/tests/adminAuthLogin.test.ts
+PASS src/echo.test.ts
+PASS src/tests/other.test.ts
+
+Test Suites: 23 passed, 23 total
+Tests:       467 passed, 467 total
+Snapshots:   0 total
+Time:        184.622 s
+Ran all test suites.
+npm notice 
+npm notice New minor version of npm available! 9.5.1 -> 9.8.1
+npm notice Changelog: <https://github.com/npm/cli/releases/tag/v9.8.1>
+npm notice Run `npm install -g npm@9.8.1` to update!
+npm notice 
