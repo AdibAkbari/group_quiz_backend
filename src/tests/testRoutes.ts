@@ -306,12 +306,26 @@ export function quizQuestionDuplicateRequest(quizid: number, questionid: number,
   };
 }
 
+// export function quizDescriptionUpdateRequest(quizid: number, token: string, description: string) {
+//   const res = request(
+//     'PUT',
+//     SERVER_URL + `/v1/admin/quiz/${quizid}/description`,
+//     {
+//       json: { token: token, description: description },
+//     }
+//   );
+//   return {
+//     body: JSON.parse(res.body.toString()),
+//     statusCode: JSON.parse(res.statusCode.toString())
+//   };
+// }
+
 export function quizDescriptionUpdateRequest(quizid: number, token: string, description: string) {
   const res = request(
     'PUT',
-    SERVER_URL + `/v1/admin/quiz/${quizid}/description`,
+    SERVER_URL + `/v2/admin/quiz/${quizid}/description`,
     {
-      json: { token: token, description: description },
+      json: { description: description },
     }
   );
   return {

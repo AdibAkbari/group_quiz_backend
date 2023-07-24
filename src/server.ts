@@ -79,6 +79,25 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   res.json(response);
 });
 
+// adminQuizDescriptionUpdatev2 //
+app.put('/v2/admin/quiz/:quizid/description', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const description = req.body;
+  const token = req.header('token');
+  const response = adminQuizDescriptionUpdate(quizId, token, description);
+
+  if ('error' in response) {
+    if (response.error.includes('structure')) {
+      return res.status(401).json(response);
+    } else if (response.error.includes('logged')) {
+      return res.status(403).json(response);
+    } else if (response.error.includes('quizId') || response.error.includes('description')) {
+      return res.status(400).json(response);
+    }
+  }
+  res.json(response);
+});
+
 // adminAuthRegister //
 app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   // const { email, password, nameFirst, nameLast } = req.body;

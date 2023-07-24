@@ -373,6 +373,7 @@ export function adminQuizNameUpdate(token: string, quizId: number, name: string)
  * @returns {{ }} empty object
  */
 export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, description: string): Record<string, never> | Error {
+  console.log(tokenId);
   if (!isValidTokenStructure(tokenId)) {
     return { error: 'token is not a valid structure' };
   }
