@@ -3,6 +3,7 @@ import {
   authRegisterRequest,
   authLoginRequest
 } from './testRoutes';
+import HTTPError from 'http-errors';
 
 describe('clearV1 Tests', () => {
   // Check that clear returns the correct object
@@ -20,6 +21,6 @@ describe('clearV1 Tests', () => {
 
     // attempt to login and error code 400 recieved since data does not exist
     const res = authLoginRequest('email@gmail.com', 'password1');
-    expect(res.statusCode).toBe(400);
+    expect(() => authLoginRequest('email@gmail.com', 'password1')).toThrow(HTTPError[400])
   });
 });

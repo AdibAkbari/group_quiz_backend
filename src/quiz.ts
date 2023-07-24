@@ -27,15 +27,11 @@ export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
   const data: Data = getData();
 
   if (!isValidTokenStructure(token)) {
-    return {
-      error: 'token is an invalid structure'
-    };
+    throw HTTPError(401, 'Token is not a valid structure');
   }
 
   if (!isTokenLoggedIn(token)) {
-    return {
-      error: 'token is not logged in'
-    };
+    throw HTTPError(403, 'Token is not logged in');
   }
 
   const authUserId = findUserFromToken(token);
@@ -59,12 +55,12 @@ export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
 export function adminQuizCreate(token: string, name: string, description: string): QuizId | Error {
   // invalid token structure
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    throw HTTPError(401, 'Token is not a valid structure');
   }
 
   // token is not logged in
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    throw HTTPError(403, 'Token is not logged in');
   }
 
   // get authUserId from token
@@ -72,12 +68,12 @@ export function adminQuizCreate(token: string, name: string, description: string
 
   // invalid name
   if (!checkNameValidity(name, authUserId)) {
-    return { error: 'Invalid Name' };
+    throw HTTPError(400, 'Invalid: Name');
   }
 
   // invalid description
   if (description.length > 100) {
-    return { error: 'Invalid Description' };
+    throw HTTPError(400, 'Invalid: Description');
   }
 
   // get time in seconds
@@ -156,12 +152,12 @@ export function adminQuizRemove(token: string, quizId: number): Record<string, n
 export function adminQuizTrash(token: string): {quizzes: QuizList[]} | Error {
   // invalid token structure
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    throw HTTPError(401, 'Token is not a valid structure');
   }
 
   // token is not logged in
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    throw HTTPError(403, 'Token is not logged in');
   }
 
   const data = getData();
@@ -192,25 +188,25 @@ export function adminQuizTrash(token: string): {quizzes: QuizList[]} | Error {
 export function adminQuizRestore(token: string, quizId: number): Record<string, never> | Error {
   // invalid token structure
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    throw HTTPError(401, 'Token is not a valid structure');
   }
 
   // token is not logged in
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    throw HTTPError(403, 'Token is not logged in');
   }
 
   const data = getData();
   const quizIndex = data.trash.findIndex((quiz) => quiz.quizId === quizId);
   if (quizIndex === -1) {
-    return { error: 'Invalid: quiz is not currently in trash or does not exist' };
+    throw HTTPError(400, 'Invalid: quiz is not currently in trash or does not exist');
   }
 
   // get authUserId from token
   const authUserId = findUserFromToken(token);
 
   if (data.trash[quizIndex].creator !== authUserId) {
-    return { error: 'Invalid: user does not own quiz' };
+    throw HTTPError(400, 'Invalid: user does not own quiz');
   }
 
   // get time in seconds
@@ -233,11 +229,11 @@ export function adminQuizRestore(token: string, quizId: number): Record<string, 
  */
 export function adminQuizTrashEmpty(token: string, quizIds: number[]): Record<string, never> | Error {
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    throw HTTPError(401, 'Token is not a valid structure');
   }
 
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    throw HTTPError(403, 'Token is not logged in');
   }
 
   const data = getData();
@@ -246,10 +242,10 @@ export function adminQuizTrashEmpty(token: string, quizIds: number[]): Record<st
   for (const quizId of quizIds) {
     const quiz = data.trash.find((quiz) => quiz.quizId === quizId);
     if (quiz === undefined) {
-      return { error: 'one or more quizIds not currently in trash or do not exist' };
+      throw HTTPError(400, 'Invalid: one or more quizIds not currently in trash or do not exist');
     }
     if (quiz.creator !== authUserId) {
-      return { error: 'one or more quizIds refer to a quiz that user does not own' };
+      throw HTTPError(400, 'Invalid: one or more quizIds refer to a quiz that user does not own');
     }
   }
 
@@ -276,18 +272,18 @@ export function adminQuizTrashEmpty(token: string, quizIds: number[]): Record<st
 export function adminQuizInfo(token: string, quizId: number): Error | QuizInfo {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
-    return { error: 'invalid token structure' };
+    throw HTTPError(401, 'Token is not a valid structure');
   }
   if (!isTokenLoggedIn(token)) {
-    return { error: 'token is not logged in' };
+    throw HTTPError(403, 'Token is not logged in');
   }
 
   // Error checking for quizId
   if (!isValidQuizId(quizId)) {
-    return { error: 'invalid quizId' };
+    throw HTTPError(400, 'Invalid: QuizId');
   }
   if (!isValidCreator(quizId, token)) {
-    return { error: 'invalid quizId' };
+    throw HTTPError(400, 'Invalid: user does not own quiz');
   }
 
   const data: Data = getData();
@@ -318,31 +314,31 @@ export function adminQuizInfo(token: string, quizId: number): Error | QuizInfo {
 export function adminQuizNameUpdate(token: string, quizId: number, name: string): Record<string, never> | Error {
   // Check if token structure is invalid
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    throw HTTPError(401, 'Token is not a valid structure');
   }
   // Check if token is not logged in
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    throw HTTPError(403, 'Token is not logged in');
   }
 
   // Check inputted quizId is valid
   if (!isValidQuizId(quizId)) {
-    return { error: 'Invalid: QuizId' };
+    throw HTTPError(400, 'Invalid: QuizId');
   }
   // Check inputted Quiz ID does not refer to a quiz that this user owns
   if (!isValidCreator(quizId, token)) {
-    return { error: 'Invalid: You do not own this quiz' };
+    throw HTTPError(400, 'Invalid: user does not own quiz');
   }
 
   // Get authUserId from token
   const authUserId = findUserFromToken(token);
   // Check if the name is valid
   if (!checkNameValidity(name, authUserId)) {
-    return { error: 'Invalid: Name' };
+    throw HTTPError(400, 'Invalid: Name');
   }
   // Check name isn't just whitespace
   if (isWhiteSpace(name)) {
-    return { error: 'Invalid: Quiz name cannot be solely white space' };
+    throw HTTPError(400, 'Invalid: Quiz name cannot be solely white space');
   }
 
   const data: Data = getData();
@@ -371,23 +367,23 @@ export function adminQuizNameUpdate(token: string, quizId: number, name: string)
  */
 export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, description: string): Record<string, never> | Error {
   if (!isValidTokenStructure(tokenId)) {
-    return { error: 'token is not a valid structure' };
+    throw HTTPError(401, 'Token is not a valid structure');
   }
 
   if (!isTokenLoggedIn(tokenId)) {
-    return { error: 'token is not for a currently logged in session' };
+    throw HTTPError(403, 'Token is not logged in');
   }
 
   if (!isValidQuizId(quizId)) {
-    return { error: 'quizId does not refer to valid quiz' };
+    throw HTTPError(400, 'Invalid: QuizId');
   }
 
   if (!isValidCreator(quizId, tokenId)) {
-    return { error: 'quizId does not refer to a quiz that this user owns' };
+    throw HTTPError(400, 'Invalid: user does not own quiz');
   }
 
   if (description.length > 100) {
-    return { error: 'description must be less than 100 characters' };
+    throw HTTPError(400, 'Invalid: Description');
   }
 
   const store: Data = getData();
@@ -410,24 +406,24 @@ export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, des
  */
 export function adminQuizTransfer (token: string, quizId: number, userEmail: string): Record<string, never> | Error {
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    throw HTTPError(401, 'Token is not a valid structure');
   }
 
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    throw HTTPError(403, 'Token is not logged in');
   }
 
   if (!isValidQuizId(quizId)) {
-    return { error: 'Invalid: QuizId' };
+    throw HTTPError(400, 'Invalid: QuizId');
   }
 
   if (!isValidCreator(quizId, token)) {
-    return { error: 'Invalid: You do not own this quiz' };
+    throw HTTPError(400, 'Invalid: user does not own quiz');
   }
 
   // Check if email exist
   if (!isValidEmail(userEmail)) {
-    return { error: 'Invalid: Email does not exist' };
+    throw HTTPError(400, 'Invalid: Email does not exist');
   }
 
   const data: Data = getData();
@@ -435,7 +431,7 @@ export function adminQuizTransfer (token: string, quizId: number, userEmail: str
 
   const loggedInUser = data.users.find((current) => current.authUserId === authUserId);
   if (loggedInUser.email === userEmail) {
-    return { error: 'Invalid: Email is current users' };
+    throw HTTPError(400, 'Invalid: Email is current users');
   }
 
   // Find the correct quiz based on input
@@ -447,7 +443,7 @@ export function adminQuizTransfer (token: string, quizId: number, userEmail: str
   // Check if the user owns a quiz with the same name
   const sameName = transferUserQuizzes.find((current) => current.name === currentQuiz.name);
   if (sameName) {
-    return { error: 'Invalid: User already has a Quiz with the same name' };
+    throw HTTPError(400, 'Invalid: User already has a Quiz with the same name');
   }
 
   const timeNow: number = Math.floor((new Date()).getTime() / 1000);
@@ -476,62 +472,62 @@ export function adminQuizTransfer (token: string, quizId: number, userEmail: str
 export function createQuizQuestion(quizId: number, token: string, question: string, duration: number, points: number, answers: Answers[]): {questionId: number} | Error {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
-    return { error: 'invalid token structure' };
+    throw HTTPError(401, 'Token is not a valid structure');
   }
   if (!isTokenLoggedIn(token)) {
-    return { error: 'token is not logged in' };
+    throw HTTPError(403, 'Token is not logged in');
   }
 
   // Error checking for quizId
   if (!isValidQuizId(quizId)) {
-    return { error: 'invalid quiz Id' };
+    throw HTTPError(400, 'Invalid: QuizId');
   }
 
   if (!isValidCreator(quizId, token)) {
-    return { error: 'invalid quiz Id' };
+    throw HTTPError(400, 'Invalid: user does not own quiz');
   }
 
   // Error checking for quiz question inputs
   if (question.length < 5 || question.length > 50) {
-    return { error: 'invalid input: question must be 5-50 characters long' };
+    throw HTTPError(400, 'Invalid: question must be 5-50 characters long');
   }
 
   // Note: assume question cannot be only whitespace
   if (isWhiteSpace(question)) {
-    return { error: 'invalid input: question cannot be only whitespace' };
+    throw HTTPError(400, 'Invalid: Quiz name cannot be solely white space');
   }
 
   if (answers.length > 6 || answers.length < 2) {
-    return { error: 'invalid input: must have 2-6 answers' };
+    throw HTTPError(400, 'Invalid: must have 2-6 answers');
   }
 
   if (duration <= 0) {
-    return { error: 'invalid input: question duration must be a positive number' };
+    throw HTTPError(400, 'Invalid: question duration must be a positive number');
   }
 
   if (points < 1 || points > 10) {
-    return { error: 'invalid input: points must be between 1 and 10' };
+    throw HTTPError(400, 'Invalid: points must be between 1 and 10');
   }
 
   if (answers.find(answer => (answer.answer.length > 30 || answer.answer.length < 1)) !== undefined) {
-    return { error: 'invalid input: answers must be 1-30 characters long' };
+    throw HTTPError(400, 'Invalid: answers must be 1-30 characters long');
   }
 
   for (const current of answers) {
     if ((answers.filter(answer => answer.answer === current.answer)).length > 1) {
-      return { error: 'invalid input: cannot have duplicate answer strings' };
+      throw HTTPError(400, 'Invalid: cannot have duplicate answer strings');
     }
   }
 
   if (answers.find(answer => answer.correct === true) === undefined) {
-    return { error: 'invalid input: must be at least one correct answer' };
+    throw HTTPError(400, 'Invalid: must be at least one correct answer');
   }
 
   const data = getData();
   const index = data.quizzes.findIndex(id => id.quizId === quizId);
 
   if (data.quizzes[index].duration + duration > 180) {
-    return { error: 'invalid input: question durations cannot exceed 3 minutes' };
+    throw HTTPError(400, 'Invalid: question durations cannot exceed 3 minutes');
   }
 
   // Creating new quiz question
@@ -577,57 +573,57 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
 export function updateQuizQuestion(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answers[]): Record<string, never> | Error {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
-    return { error: 'invalid token structure' };
+    throw HTTPError(401, 'Token is not a valid structure');
   }
   if (!isTokenLoggedIn(token)) {
-    return { error: 'token is not logged in' };
+    throw HTTPError(403, 'Token is not logged in');
   }
 
   // Error checking for quizId and questionId
   if (!isValidQuizId(quizId)) {
-    return { error: 'invalid param: quiz Id' };
+    throw HTTPError(400, 'Invalid: QuizId');
   }
   if (!isValidCreator(quizId, token)) {
-    return { error: 'invalid param: quiz Id' };
+    throw HTTPError(400, 'Invalid: user does not own quiz');
   }
   if (!isValidQuestionId(quizId, questionId)) {
-    return { error: 'invalid param: questionId' };
+    throw HTTPError(400, 'Invalid: questionId');
   }
 
   // Error checking for quiz question inputs
   if (question.length < 5 || question.length > 50) {
-    return { error: 'invalid input: question must be 5-50 characters long' };
+    throw HTTPError(400, 'Invalid: question must be 5-50 characters long');
   }
 
   // Note: assume question cannot be only whitespace
   if (isWhiteSpace(question)) {
-    return { error: 'invalid input: question cannot be only whitespace' };
+    throw HTTPError(400, 'Invalid: Quiz name cannot be solely white space');
   }
 
   if (answers.length > 6 || answers.length < 2) {
-    return { error: 'invalid input: must have 2-6 answers' };
+    throw HTTPError(400, 'Invalid: must have 2-6 answers');
   }
 
   if (duration <= 0) {
-    return { error: 'invalid input: question duration must be a positive number' };
+    throw HTTPError(400, 'Invalid: question duration must be a positive number');
   }
 
   if (points < 1 || points > 10) {
-    return { error: 'invalid input: points must be between 1 and 10' };
+    throw HTTPError(400, 'Invalid: points must be between 1 and 10');
   }
 
   if (answers.find(answer => (answer.answer.length > 30 || answer.answer.length < 1)) !== undefined) {
-    return { error: 'invalid input: answers must be 1-30 characters long' };
+    throw HTTPError(400, 'Invalid: answers must be 1-30 characters long');
   }
 
   for (const current of answers) {
     if ((answers.filter(answer => answer.answer === current.answer)).length > 1) {
-      return { error: 'invalid input: cannot have duplicate answer strings' };
+      throw HTTPError(400, 'Invalid: cannot have duplicate answer strings');
     }
   }
 
   if (answers.find(answer => answer.correct === true) === undefined) {
-    return { error: 'invalid input: must be at least one correct answer' };
+    throw HTTPError(400, 'Invalid: must be at least one correct answer');
   }
 
   const data = getData();
@@ -636,7 +632,7 @@ export function updateQuizQuestion(quizId: number, questionId: number, token: st
   const newDuration = currentQuiz.duration + duration - currentQuiz.questions[qIndex].duration;
 
   if (newDuration > 180) {
-    return { error: 'invalid input: question durations cannot exceed 3 minutes' };
+    throw HTTPError(400, 'Invalid: question durations cannot exceed 3 minutes');
   }
 
   // Updating quiz question
@@ -683,24 +679,24 @@ export function updateQuizQuestion(quizId: number, questionId: number, token: st
  */
 export function quizQuestionDuplicate (quizId: number, questionId: number, token: string): { newQuestionId: number } | Error {
   if (!isValidTokenStructure(token)) {
-    return { error: 'invalid token structure' };
+    throw HTTPError(401, 'Token is not a valid structure');
   }
 
   if (!isTokenLoggedIn(token)) {
-    return { error: 'token is not logged in' };
+    throw HTTPError(403, 'Token is not logged in');
   }
 
   // Error checking for quizId
   if (!isValidQuizId(quizId)) {
-    return { error: 'invalid quiz Id' };
+    throw HTTPError(400, 'Invalid: QuizId');
   }
 
   if (!isValidCreator(quizId, token)) {
-    return { error: 'invalid quiz Id' };
+    throw HTTPError(400, 'Invalid: user does not own quiz');
   }
 
   if (!isValidQuestionId(quizId, questionId)) {
-    return { error: 'invalid question id' };
+    throw HTTPError(400, 'Invalid: questionId');
   }
 
   const data: Data = getData();
@@ -737,23 +733,23 @@ export function quizQuestionDuplicate (quizId: number, questionId: number, token
 export function deleteQuizQuestion (token: string, quizId: number, questionId: number): Record<string, never> | Error {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
-    return { error: 'invalid token structure' };
+    throw HTTPError(401, 'Token is not a valid structure');
   }
 
   if (!isTokenLoggedIn(token)) {
-    return { error: 'token is not logged in' };
+    throw HTTPError(403, 'Token is not logged in');
   }
 
   if (!isValidQuizId(quizId)) {
-    return { error: 'invalid quiz Id' };
+    throw HTTPError(400, 'Invalid: QuizId');
   }
 
   if (!isValidCreator(quizId, token)) {
-    return { error: 'invalid quiz Id' };
+    throw HTTPError(400, 'Invalid: user does not own quiz');
   }
 
   if (!isValidQuestionId(quizId, questionId)) {
-    return { error: 'invalid param: questionId' };
+    throw HTTPError(400, 'Invalid: questionId');
   }
 
   const data: Data = getData();
@@ -787,38 +783,38 @@ export function deleteQuizQuestion (token: string, quizId: number, questionId: n
 export function moveQuizQuestion(token: string, quizId: number, questionId: number, newPosition: number): Record<string, never> | Error {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
-    return { error: 'invalid token structure' };
+    throw HTTPError(401, 'Token is not a valid structure');
   }
   if (!isTokenLoggedIn(token)) {
-    return { error: 'token is not logged in' };
+    throw HTTPError(403, 'Token is not logged in');
   }
 
   // Error checking for quizId and questionId
   if (!isValidQuizId(quizId)) {
-    return { error: 'invalid param: quiz Id' };
+    throw HTTPError(400, 'Invalid: QuizId');
   }
   if (!isValidCreator(quizId, token)) {
-    return { error: 'invalid param: quiz Id' };
+    throw HTTPError(400, 'Invalid: user does not own quiz');
   }
   if (!isValidQuestionId(quizId, questionId)) {
-    return { error: 'invalid param: questionId' };
+    throw HTTPError(400, 'Invalid: questionId');
   }
 
   // Error checking for New Position
   if (newPosition < 0) {
-    return { error: 'invalid input: newPosition has to be greater then 0' };
+    throw HTTPError(400, 'Invalid: newPosition has to be greater then 0');
   }
 
   const data = getData();
   const currentQuiz = data.quizzes.find(id => id.quizId === quizId);
 
   if (newPosition > (currentQuiz.numQuestions - 1)) {
-    return { error: 'invalid input:  newPosition must be less than the number of questions' };
+    throw HTTPError(400, 'Invalid: newPosition must be less than the number of questions');
   }
 
   const questionIndex = currentQuiz.questions.findIndex(id => id.questionId === questionId);
   if (newPosition === questionIndex) {
-    return { error: 'invalid input: newPosition is current position' };
+    throw HTTPError(400, 'Invalid: newPosition is current position');
   }
 
   // Remove question from current position

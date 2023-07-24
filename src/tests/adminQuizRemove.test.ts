@@ -5,7 +5,7 @@ import {
   quizRemoveRequest,
   adminQuizListRequest,
   adminQuizInfoRequest,
-} from './testRoutes';
+} from './it3_testRoutes';
 import { TokenId, QuizId } from '../interfaces';
 import HTTPError from 'http-errors';
 
@@ -16,8 +16,8 @@ let user: TokenId;
 let quiz: QuizId;
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
-  quiz = quizCreateRequest(user.token, 'quiz1', '').body;
+  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
+  quiz = quizCreateRequest(user.token, 'quiz1', '');
 });
 
 describe('Token invalid', () => {
@@ -54,8 +54,8 @@ describe('Failed to remove', () => {
 
   // Testing the user does not own the quiz that is trying to be removed
   test('Quiz ID does not refer to a quiz that this user owns', () => {
-    const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
-    const quiz2 = quizCreateRequest(user2.token, 'quiz2', '').body;
+    const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast');
+    const quiz2 = quizCreateRequest(user2.token, 'quiz2', '');
 
     expect(() => quizRemoveRequest(user.token, quiz2.quizId)).toThrow(HTTPError[400]);
   });
@@ -69,13 +69,13 @@ describe('Successfully removed quiz check', () => {
 
   // Check that the quiz is actually removed
   test('Sucessful quiz remove integrated check', () => {
-    const quiz2 = quizCreateRequest(user.token, 'quiz2', '').body;
-    const quizToRemove = quizCreateRequest(user.token, 'quizToRemove', '').body;
-    const quiz3 = quizCreateRequest(user.token, 'quiz3', '').body;
+    const quiz2 = quizCreateRequest(user.token, 'quiz2', '');
+    const quizToRemove = quizCreateRequest(user.token, 'quizToRemove', '');
+    const quiz3 = quizCreateRequest(user.token, 'quiz3', '');
 
     quizRemoveRequest(user.token, quizToRemove.quizId);
 
-    const received = adminQuizListRequest(user.token).body;
+    const received = adminQuizListRequest(user.token);
     const expected = {
       quizzes: [
         {
@@ -109,10 +109,10 @@ describe('Successfully removed quiz check', () => {
 
   // check that once a quiz is removed, the next quiz still has a unique quiz id
   test('Unique quiz Id once a quiz is removed', () => {
-    const quizToRemove = quizCreateRequest(user.token, 'quizToRemove', '').body;
-    const quiz2 = quizCreateRequest(user.token, 'quiz2', '').body;
+    const quizToRemove = quizCreateRequest(user.token, 'quizToRemove', '');
+    const quiz2 = quizCreateRequest(user.token, 'quiz2', '');
     quizRemoveRequest(user.token, quizToRemove.quizId);
-    const quiz3 = quizCreateRequest(user.token, 'quiz3', '').body;
+    const quiz3 = quizCreateRequest(user.token, 'quiz3', '');
 
     expect(quiz3.quizId).not.toStrictEqual(quiz.quizId);
     expect(quiz3.quizId).not.toStrictEqual(quiz2.quizId);

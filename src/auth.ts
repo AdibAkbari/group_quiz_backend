@@ -2,6 +2,7 @@ import { setData, getData } from './dataStore';
 import { Error, Data, Users, Token, TokenId, User } from './interfaces';
 import validator from 'validator';
 import { isValidTokenStructure, isTokenLoggedIn, findUserFromToken, isWhiteSpace } from './helper';
+import HTTPError from 'http-errors';
 
 /**
  * Register a user with an email, password, and names, then returns their
@@ -17,42 +18,43 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
   const store = getData();
 
   if (!validator.isEmail(email)) {
-    return { error: 'Email is Invalid' };
+    throw HTTPError(400, 'Invalid: Email');
   }
 
   if (store.users.filter(mail => mail.email === email).length > 0) {
-    return { error: 'Email already in use' };
+    throw HTTPError(400, 'Invalid: Email already in use');
   }
 
   if (nameFirst.length < 2 || nameFirst.length > 20) {
-    return { error: 'First name must be 2 to 20 characters' };
+    throw HTTPError(400, 'Invalid: First name length');
   }
 
   const expressionName = /^[A-Za-z\s'-]+$/;
   if (!expressionName.test(nameFirst)) {
-    return { error: 'First name must only contain letters, spaces, hyphens or apostrophes' };
+    throw HTTPError(400, 'Invalid: First name');
   }
 
   if (nameLast.length < 2 || nameLast.length > 20) {
-    return { error: 'Last name must be 2 to 20 characters' };
+    throw HTTPError(400, 'Invalid: Last name length');
   }
 
   if (!expressionName.test(nameLast)) {
     return { error: 'Last name must only contain letters, spaces, hyphens or apostrophes' };
+    throw HTTPError(400, 'Invalid: Last name');
   }
 
   if (isWhiteSpace(nameFirst) || isWhiteSpace(nameLast)) {
-    return { error: 'First name and Last name cannot be solely white space' };
+    throw HTTPError(400, 'Invalid: First name and Last name cannot be solely white space');
   }
 
   if (password.length < 8) {
-    return { error: 'Password must be at least 8 characters' };
+    throw HTTPError(400, 'Invalid: Password must be at least 8 characters');
   }
 
   const letters = /[a-zA-Z]/;
   const numbers = /\d/;
   if (!letters.test(password) || !numbers.test(password)) {
-    return { error: 'Password must contain at least one letter and one number' };
+    throw HTTPError(400, 'Invalid: Password must contain at least one letter and one number');
   }
 
   const userId: number = store.users.length + 1;
@@ -84,13 +86,13 @@ export function adminAuthLogin(email: string, password: string): Error | TokenId
   const userIndex = newData.users.findIndex((user) => user.email === email);
 
   if (userIndex === -1) {
-    return { error: 'email does not exist' };
+    throw HTTPError(400, 'Invalid: email does not exist');
   }
 
   if (newData.users[userIndex].password !== password) {
     newData.users[userIndex].numFailedPasswordsSinceLastLogin++;
     setData(newData);
-    return { error: 'password does not match given email' };
+    throw HTTPError(400, 'Invalid: password does not match given email');
   }
 
   newData.users[userIndex].numSuccessfulLogins++;
@@ -127,15 +129,11 @@ export function adminUserDetails(token: string): User | Error {
   const data: Data = getData();
 
   if (!isValidTokenStructure(token)) {
-    return {
-      error: 'token is an invalid structure'
-    };
+    throw HTTPError(400, 'Invalid: Token is an invalid structure');
   }
 
   if (!isTokenLoggedIn(token)) {
-    return {
-      error: 'token is not logged in'
-    };
+    throw HTTPError(400, 'Invalid: token is not logged in');
   }
 
   const userId = findUserFromToken(token);
@@ -166,35 +164,35 @@ export function updateUserPassword(token: string, oldPassword: string, newPasswo
   const data: Data = getData();
 
   if (!isValidTokenStructure(token)) {
-    return { error: 'Token is an invalid structure' };
+    throw HTTPError(400, 'Invalid: Token is an invalid structure');
   }
 
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token is not logged in' };
+    throw HTTPError(400, 'Invalid: Token is not logged in');
   }
 
   const userId = findUserFromToken(token);
   const index = data.users.findIndex(id => id.authUserId === userId);
   if (data.users[index].password !== oldPassword) {
-    return { error: 'Old password is incorrect' };
+    throw HTTPError(400, 'Invalid: Old password is incorrect');
   }
 
   if (data.users[index].oldPasswords !== undefined) {
     if (data.users[index].oldPasswords.includes(newPassword)) {
-      return { error: 'New password has been used previously' };
+      throw HTTPError(400, 'Invalid: New password has been used previously');
     }
   } else {
     data.users[index].oldPasswords = [];
   }
 
   if (newPassword.length < 8) {
-    return { error: 'New password must be at least 8 characters' };
+    throw HTTPError(400, 'Invalid: New password must be at least 8 characters');
   }
 
   const letters = /[a-zA-Z]/;
   const numbers = /\d/;
   if (!letters.test(newPassword) || !numbers.test(newPassword)) {
-    return { error: 'New password must contain at least one letter and one number' };
+    throw HTTPError(400, 'Invalid: New password must contain at least one letter and one number');
   }
 
   data.users[index].oldPasswords.push(oldPassword);
@@ -217,42 +215,42 @@ export function updateUserDetails(token: string, email: string, nameFirst: strin
   const data: Data = getData();
 
   if (!isValidTokenStructure(token)) {
-    return { error: 'Token is an invalid structure' };
+    throw HTTPError(400, 'Invalid: Token is an invalid structure');
   }
 
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token is not logged in' };
+    throw HTTPError(400, 'Invalid: Token is not logged in');
   }
 
   const userId = findUserFromToken(token);
   const index = data.users.findIndex(id => id.authUserId === userId);
   if (data.users[index].email !== email && data.users.filter(mail => mail.email === email).length > 0) {
-    return { error: 'Email is currently used by another user' };
+    throw HTTPError(400, 'Invalid: Email is currently used by another user');
   }
 
   if (!validator.isEmail(email)) {
-    return { error: 'Email is Invalid' };
+    throw HTTPError(400, 'Invalid: Email is Invalid');
   }
 
   const expressionName = /^[A-Za-z\s'-]+$/;
   if (!expressionName.test(nameFirst)) {
-    return { error: 'First name must only contain letters, spaces, hyphens or apostrophes' };
+    throw HTTPError(400, 'Invalid: First name must only contain letters, spaces, hyphens or apostrophes');
   }
 
   if (nameFirst.length < 2 || nameFirst.length > 20) {
-    return { error: 'First name must be 2 to 20 characters' };
+    throw HTTPError(400, 'Invalid: First name must be 2 to 20 characters');
   }
 
   if (!expressionName.test(nameLast)) {
-    return { error: 'Last name must only contain letters, spaces, hyphens or apostrophes' };
+    throw HTTPError(400, 'Invalid: Last name must only contain letters, spaces, hyphens or apostrophes');
   }
 
   if (nameLast.length < 2 || nameLast.length > 20) {
-    return { error: 'Last name must be 2 to 20 characters' };
+    throw HTTPError(400, 'Invalid: Last name must be 2 to 20 characters');
   }
 
   if (isWhiteSpace(nameFirst) || isWhiteSpace(nameLast)) {
-    return { error: 'First name and Last name cannot be solely white space' };
+    throw HTTPError(400, 'Invalid: First name and Last name cannot be solely white space');
   }
 
   data.users[index].email = email;
@@ -273,11 +271,11 @@ export function adminAuthLogout (tokenId: string): Record<string, never> | Error
   const data: Data = getData();
 
   if (!isValidTokenStructure(tokenId)) {
-    return { error: 'Token is not a valid structure' };
+    throw HTTPError(400, 'Invalid: Token is not a valid structure');
   }
 
   if (!isTokenLoggedIn(tokenId)) {
-    return { error: 'This token is for a user who has already logged out' };
+    throw HTTPError(400, 'Invalid: This token is for a user who has already logged out');
   }
 
   const index: number = data.tokens.findIndex(token => token.tokenId === tokenId);
