@@ -138,92 +138,32 @@ export function quizTrashEmptyRequest(token: string, quizIds: number[]) {
 // QUESTION ROUTES // 
 
 export function createQuizQuestionRequest(quizId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
-  const res = request(
-    'POST',
-    SERVER_URL + `/v1/admin/quiz/${quizId}/question`,
-    {
-      json: {
-        token: token,
-        questionBody: {
-          question,
-          duration,
-          points,
-          answers
-        }
-      }
-    }
-  );
-  return {
-    body: JSON.parse(res.body.toString()),
-    statusCode: JSON.parse(res.statusCode.toString())
-  };
+  return requestHelper('POST', `/v1/admin/quiz/${quizId}/question`, { questionBody: {
+                                                                                        question,
+                                                                                        duration,
+                                                                                        points,
+                                                                                        answers
+                                                                                    } }, { token })
 }
 
 export function moveQuizQuestionRequest(token: string, quizId: number, questionId: number, newPosition: number) {
-  const res = request(
-    'PUT',
-    SERVER_URL + `/v1/admin/quiz/${quizId}/question/${questionId}/move`,
-    {
-      json: {
-        token: token,
-        newPosition: newPosition,
-      }
-    }
-  );
-  return {
-    body: JSON.parse(res.body.toString()),
-    statusCode: JSON.parse(res.statusCode.toString())
-  };
+  return requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}/move`, { newPosition: newPosition }, { token })
 }
 
 export function deleteQuizQuestionRequest(token: string, quizId: number, questionId: number) {
-  const res = request(
-    'DELETE',
-    SERVER_URL + `/v1/admin/quiz/${quizId}/question/${questionId}`,
-    {
-      qs: {
-        token: token,
-      }
-    }
-  );
-  return {
-    body: JSON.parse(res.body.toString()),
-    statusCode: JSON.parse(res.statusCode.toString())
-  };
+  return requestHelper('DELETE', `/v1/admin/quiz/${quizId}/question/${questionId}`, {}, { token })
 }
 
-
 export function quizQuestionDuplicateRequest(quizid: number, questionid: number, token: string) {
-  const res = request(
-    'POST',
-    SERVER_URL + `/v1/admin/quiz/${quizid}/question/${questionid}/duplicate`,
-    {
-      json: { token: token },
-    }
-  );
-  return {
-    body: JSON.parse(res.body.toString()),
-    statusCode: JSON.parse(res.statusCode.toString())
-  };
+  return requestHelper('POST', `/v1/admin/quiz/${quizid}/question/${questionid}/duplicate`, {}, { token })
 }
 
 export function updateQuizQuestionRequest(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
-  const res = request(
-    'PUT',
-    SERVER_URL + `/v1/admin/quiz/${quizId}/question/${questionId}`,
-    {
-      json: {
-        token: token,
-        questionBody: {
-          question,
-          duration,
-          points,
-          answers
-        }
-      }
-    });
-  return {
-    body: JSON.parse(res.body.toString()),
-    statusCode: JSON.parse(res.statusCode.toString())
-  };
+  return requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { questionBody: {
+                                                                                                    question,
+                                                                                                    duration,
+                                                                                                    points,
+                                                                                                    answers
+                                                                                                 }}, { token })
 }
+

@@ -64,7 +64,7 @@ describe('Failed to remove', () => {
 describe('Successfully removed quiz check', () => {
   // Sucessfully remove the quiz
   test('Sucessful quiz remove return', () => {
-    expect( quizRemoveRequest(user.token, quiz.quizId)).toStrictEqual({});
+    expect(quizRemoveRequest(user.token, quiz.quizId)).toStrictEqual({});
   });
 
   // Check that the quiz is actually removed
