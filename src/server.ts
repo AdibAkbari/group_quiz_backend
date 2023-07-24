@@ -55,6 +55,17 @@ app.use(morgan('dev'));
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
 
+app.get('/v2/admin/user/details', (req: Request, res: Response) => {
+  const token = req.headers.token;
+  if (typeof token === 'string') {
+    res.json(adminUserDetails(token));
+  }
+});
+
+// ====================================================================
+//  ================= IT 2 TEST ROUTES (OLD) ==========================
+// ====================================================================
+
 // Example get request
 app.get('/echo', (req: Request, res: Response) => {
   const data = req.query.echo as string;
