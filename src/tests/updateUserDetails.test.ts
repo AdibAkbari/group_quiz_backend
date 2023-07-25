@@ -4,7 +4,8 @@ import {
   authRegisterRequest,
   clearRequest,
   updateUserDetailsRequest,
-} from './testRoutes';
+} from './it3_testRoutes';
+import HTTPError from 'http-errors';
 
 const ERROR = { error: expect.any(String) };
 
@@ -20,15 +21,11 @@ beforeEach(() => {
 describe('Error Cases: updateUserDetails', () => {
   test('Email used by another user', () => {
     const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'NameFirst', 'NameLast').body;
-    const update = updateUserDetailsRequest(user2.token, 'email@gmail.com', 'NameFirst', 'NameLast');
-    expect(update.body).toStrictEqual(ERROR);
-    expect(update.statusCode).toStrictEqual(400);
+    expect(() => updateUserDetailsRequest(user2.token, 'email@gmail.com', 'NameFirst', 'NameLast')).toThrow(HTTPError[400]);
   });
 
   test('Email invalid', () => {
-    const update = updateUserDetailsRequest(user.token, 'email', 'NameFirst', 'NameLast');
-    expect(update.body).toStrictEqual(ERROR);
-    expect(update.statusCode).toStrictEqual(400);
+    expect(() => updateUserDetailsRequest(user.token, 'email', 'NameFirst', 'NameLast')).toThrow(HTTPError[400]);
   });
 
   test.each([
@@ -39,9 +36,7 @@ describe('Error Cases: updateUserDetails', () => {
     { testName: 'nameFirst too long', first: 'nameFirstIsMoreThanTwenty' },
     { testName: 'nameFirst whitespace', first: '    ' },
   ])('$testName: $first', ({ first }) => {
-    const update = updateUserDetailsRequest(user.token, 'email123@gmail.com', first, 'NameLast');
-    expect(update.statusCode).toBe(400);
-    expect(update.body).toStrictEqual(ERROR);
+    expect(() => updateUserDetailsRequest(user.token, 'email123@gmail.com', first, 'NameLast')).toThrow(HTTPError[400]);
   });
 
   test.each([
@@ -52,9 +47,7 @@ describe('Error Cases: updateUserDetails', () => {
     { testName: 'nameLast too long', last: 'nameLastIsMoreThanTwenty' },
     { testName: 'nameLast whitespace', last: '    ' },
   ])('$testName: $last', ({ last }) => {
-    const update = updateUserDetailsRequest(user.token, 'email123@gmail.com', 'nameFirst', last);
-    expect(update.statusCode).toBe(400);
-    expect(update.body).toStrictEqual(ERROR);
+    expect(() => updateUserDetailsRequest(user.token, 'email123@gmail.com', 'nameFirst', last)).toThrow(HTTPError[400]);
   });
 
   test.each([
@@ -70,26 +63,20 @@ describe('Error Cases: updateUserDetails', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('invalid token: $testName', ({ token }) => {
-    const update = updateUserDetailsRequest(token, 'email123@gmail.com', 'nameFirst', 'nameLast');
-    expect(update.statusCode).toBe(401);
-    expect(update.body).toStrictEqual(ERROR);
+    expect(() => updateUserDetailsRequest(token, 'email123@gmail.com', 'nameFirst', 'nameLast')).toThrow(HTTPError[401]);
   });
 
   test('tokenId not logged in', () => {
-    const update = updateUserDetailsRequest('12345', 'email123@gmail.com', 'nameFirst', 'nameLast');
-    expect(update.statusCode).toBe(403);
-    expect(update.body).toStrictEqual(ERROR);
+    expect(() => updateUserDetailsRequest('12345', 'email123@gmail.com', 'nameFirst', 'nameLast')).toThrow(HTTPError[403]);
   });
 });
 
 describe('Valid Inputs', () => {
   test('update all fields', () => {
     const update = updateUserDetailsRequest(user.token, 'newEmail@gmail.com', 'newFirst', 'newLast');
-    expect(update.statusCode).toBe(200);
-    expect(update.body).toStrictEqual({ });
+    expect(update).toStrictEqual({ });
     const userDetails = adminUserDetailsRequest(user.token);
-    expect(userDetails.statusCode).toStrictEqual(200);
-    expect(userDetails.body).toStrictEqual({
+    expect(userDetails).toStrictEqual({
       user: {
         userId: expect.any(Number),
         name: 'newFirst newLast',
@@ -102,11 +89,9 @@ describe('Valid Inputs', () => {
 
   test('keep all same', () => {
     const update = updateUserDetailsRequest(user.token, 'email@gmail.com', 'nameFirst', 'nameLast');
-    expect(update.statusCode).toBe(200);
-    expect(update.body).toStrictEqual({ });
+    expect(update).toStrictEqual({ });
     const userDetails = adminUserDetailsRequest(user.token);
-    expect(userDetails.statusCode).toStrictEqual(200);
-    expect(userDetails.body).toStrictEqual({
+    expect(userDetails).toStrictEqual({
       user: {
         userId: expect.any(Number),
         name: 'nameFirst nameLast',
