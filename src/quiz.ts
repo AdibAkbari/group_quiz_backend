@@ -11,6 +11,7 @@ import {
   isValidQuestionId,
   isValidEmail
 } from './helper';
+import HTTPError from 'http-errors';
 
 /**
    * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -58,12 +59,14 @@ export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
 export function adminQuizCreate(token: string, name: string, description: string): QuizId | Error {
   // invalid token structure
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    // return { error: 'Invalid Token Structure' };
+    throw HTTPError(401, 'Invalid Token Structure');
   }
 
   // token is not logged in
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    // return { error: 'Token not logged in' };
+    throw HTTPError(403, 'Token not logged in');
   }
 
   // get authUserId from token
@@ -71,12 +74,14 @@ export function adminQuizCreate(token: string, name: string, description: string
 
   // invalid name
   if (!checkNameValidity(name, authUserId)) {
-    return { error: 'Invalid Name' };
+    // return { error: 'Invalid Name' };
+    throw HTTPError(400, 'Invalid Name');
   }
 
   // invalid description
   if (description.length > 100) {
-    return { error: 'Invalid Description' };
+    // return { error: 'Invalid Description' };
+    throw HTTPError(400, 'Invalid Description');
   }
 
   // get time in seconds

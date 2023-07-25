@@ -91,17 +91,7 @@ export function authRegisterRequest(email: string, password: string, nameFirst: 
 }
 
 export function quizCreateRequest(token: string, name: string, description: string) {
-  const res = request(
-    'POST',
-    SERVER_URL + '/v1/admin/quiz',
-    {
-      json: { token: token, name: name, description: description },
-    }
-  );
-  return {
-    body: JSON.parse(res.body.toString()),
-    statusCode: JSON.parse(res.statusCode.toString())
-  };
+  return requestHelper('POST', '/v2/admin/quiz', { name, description }, { token });
 }
 
 export function updateUserPasswordRequest(token: string, oldPassword: string, newPassword: string) {
