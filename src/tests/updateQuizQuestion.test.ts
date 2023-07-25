@@ -6,8 +6,9 @@ import {
   updateQuizQuestionRequest,
   deleteQuizQuestionRequest,
   adminQuizInfoRequest
-} from './testRoutes';
+} from './it3_testRoutes';
 import { TokenId } from '../interfaces';
+import HTTPError from 'http-errors';
 
 const validAnswers = [{ answer: 'great', correct: true }, { answer: 'bad', correct: false }];
 
@@ -25,36 +26,26 @@ beforeEach(() => {
 
 describe('Invalid params', () => {
   test('QuizId does not refer to a valid quiz', () => {
-    const result = updateQuizQuestionRequest(quizId + 1, questionId, user.token, 'How are you?', 5, 5, validAnswers);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => updateQuizQuestionRequest(quizId + 1, questionId, user.token, 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[400]);
   });
 
   test('QuizId does not refer to a quiz that this user owns', () => {
     const user2 = authRegisterRequest('email1@gmail.com', 'password2', 'FirstnameB', 'LastnameB').body;
-    const result = updateQuizQuestionRequest(quizId, questionId, user2.token, 'How are you?', 5, 5, validAnswers);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user2.token, 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[400]);
   });
 
   test('No questions in any quiz with this questionId', () => {
-    const result = updateQuizQuestionRequest(quizId, questionId + 1, user.token, 'How are you?', 5, 5, validAnswers);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => updateQuizQuestionRequest(quizId, questionId + 1, user.token, 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[400]);
   });
 
   test('No questions in this quiz with this questionId', () => {
     const quiz2Id = quizCreateRequest(user.token, 'Quiz2', '').body.quizId;
-    const result = updateQuizQuestionRequest(quiz2Id, questionId, user.token, 'How are you?', 5, 5, validAnswers);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => updateQuizQuestionRequest(quiz2Id, questionId, user.token, 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[400]);
   });
 
   test('question with given questionId has been removed', () => {
     deleteQuizQuestionRequest(user.token, quizId, questionId);
-    const result = updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 5, 5, validAnswers);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[400]);
   });
 });
 
@@ -65,9 +56,7 @@ describe('invalid question body - question, duration, points', () => {
     { testname: 'Question string empty', question: '' },
     { testname: 'Question string just whitespace', question: '       ' },
   ])('Incorrect question string: $testName', ({ question }) => {
-    const result = updateQuizQuestionRequest(quizId, questionId, user.token, question, 5, 5, validAnswers);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, question, 5, 5, validAnswers)).toThrow(HTTPError[400]);
   });
 
   test.each([
@@ -78,18 +67,14 @@ describe('invalid question body - question, duration, points', () => {
     { testname: 'Question points 0', duration: 5, points: 0 },
     { testname: 'Question points >10', duration: 5, points: 15 },
   ])('Invalid question points or duration: $testName', ({ duration, points }) => {
-    const result = updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', duration, points, validAnswers);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', duration, points, validAnswers)).toThrow(HTTPError[400]);
   });
 
   test('if this quiz were to be updated, sum of question durations exceed 3 minutes', () => {
     createQuizQuestionRequest(quizId, user.token, 'Question 2', 50, 5, validAnswers);
     createQuizQuestionRequest(quizId, user.token, 'Question 3', 50, 5, validAnswers);
     createQuizQuestionRequest(quizId, user.token, 'Question 4', 50, 5, validAnswers);
-    const result = updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 40, 5, validAnswers);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 40, 5, validAnswers)).toThrow(HTTPError[400]);
   });
 });
 
@@ -157,9 +142,7 @@ describe('invalid question body - answers', () => {
       ]
     },
   ])('invalid answers: $testname', ({ answers }) => {
-    const result = updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 5, 5, answers);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 5, 5, answers)).toThrow(HTTPError[400]);
   });
 });
 
@@ -177,28 +160,23 @@ describe('Token invalid', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('token is not a valid structure: $testName', ({ token }) => {
-    const result = updateQuizQuestionRequest(quizId, questionId, token, 'How are you?', 5, 5, validAnswers);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(401);
+    expect(() => updateQuizQuestionRequest(quizId, questionId, token, 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[401]);
   });
 
   test('Unused tokenId', () => {
-    const result = updateQuizQuestionRequest(quizId, questionId, user.token + 1, 'How are you?', 5, 5, validAnswers);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(403);
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token + 1, 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[403]);
   });
 });
 
 describe('valid input', () => {
   test('correct return type and status code', () => {
     const result = updateQuizQuestionRequest(quizId, questionId, user.token, 'New Question', 5, 4, validAnswers);
-    expect(result.body).toStrictEqual({});
-    expect(result.statusCode).toStrictEqual(200);
+    expect(result).toStrictEqual({});
   });
 
   test('quiz with one question successfully updated', () => {
     updateQuizQuestionRequest(quizId, questionId, user.token, 'New Question', 5, 4, validAnswers);
-    expect(adminQuizInfoRequest(user.token, quizId).body).toStrictEqual({
+    expect(adminQuizInfoRequest(user.token, quizId)).toStrictEqual({
       quizId: quizId,
       name: 'Cats',
       timeCreated: expect.any(Number),
@@ -267,7 +245,7 @@ describe('valid input', () => {
       ],
       duration: 17
     };
-    expect(adminQuizInfoRequest(user.token, quizId).body).toStrictEqual(expected);
+    expect(adminQuizInfoRequest(user.token, quizId)).toStrictEqual(expected);
   });
   test('timeLastEdited successfully updated', () => {
     const timeNow = Math.floor(Date.now() / 1000);
@@ -282,8 +260,7 @@ describe('valid input', () => {
     createQuizQuestionRequest(quizId, user.token, 'Question 3', 50, 5, validAnswers);
     createQuizQuestionRequest(quizId, user.token, 'Question 4', 50, 5, validAnswers);
     const result = updateQuizQuestionRequest(quizId, q2Id, user.token, 'How are you?', 55, 5, validAnswers);
-    expect(result.body).toStrictEqual({});
-    expect(result.statusCode).toStrictEqual(200);
+    expect(result).toStrictEqual({});
   });
 });
 
@@ -296,15 +273,13 @@ describe('valid edge cases', () => {
     { testname: 'points is 10', question: 'valid question', duration: 5, points: 10 }
   ])('valid edge cases for question, duration and points: $testname', ({ question, duration, points }) => {
     const result = updateQuizQuestionRequest(quizId, questionId, user.token, question, duration, points, validAnswers);
-    expect(result.body).toStrictEqual({});
-    expect(result.statusCode).toStrictEqual(200);
+    expect(result).toStrictEqual({});
   });
 
   test('sum of new duration equals 3 minutes', () => {
     createQuizQuestionRequest(quizId, user.token, 'Question 1', 60, 5, validAnswers);
     createQuizQuestionRequest(quizId, user.token, 'Question 2', 60, 5, validAnswers);
     const result = updateQuizQuestionRequest(quizId, questionId, user.token, 'New Question 1', 60, 5, validAnswers);
-    expect(result.body).toStrictEqual({});
-    expect(result.statusCode).toStrictEqual(200);
+    expect(result).toStrictEqual({});
   });
 });
