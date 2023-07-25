@@ -1,0 +1,40 @@
+
+> test
+> jest **/?(*.)+(test).ts
+
+  Invalid testPattern **/?(*.)+(test).ts supplied. Running all tests instead.
+  Invalid testPattern **/?(*.)+(test).ts supplied. Running all tests instead.
+PASS src/tests/updateQuizQuestion.test.ts (10.415 s)
+PASS src/tests/moveQuizQuestion.test.ts
+PASS src/tests/createQuizQuestion.test.ts (6.405 s)
+PASS src/tests/adminQuizCreate.test.ts
+PASS src/tests/deleteQuizQuestion.test.ts
+PASS src/tests/adminQuizTransfer.test.ts
+PASS src/tests/adminQuizTrashEmpty.test.ts (5.842 s)
+PASS src/tests/adminUserDetails.test.ts
+PASS src/tests/adminQuizRestore.test.ts
+PASS src/tests/adminQuizNameUpdate.test.ts (5.098 s)
+PASS src/tests/updateUserDetails.test.ts
+PASS src/tests/adminAuthRegister.test.ts
+PASS src/tests/quizQuestionDuplicate.test.ts
+PASS src/tests/adminQuizDescriptionUpdate.test.ts
+PASS src/tests/updateUserPassword.test.ts
+PASS src/tests/adminQuizInfo.test.ts
+PASS src/tests/adminQuizRemove.test.ts
+PASS src/tests/adminQuizTrash.test.ts
+PASS src/tests/adminAuthLogin.test.ts
+PASS src/tests/adminAuthLogout.test.ts
+PASS src/tests/adminQuizList.test.ts
+PASS src/tests/other.test.ts
+PASS src/echo.test.ts
+
+Test Suites: 23 passed, 23 total
+Tests:       467 passed, 467 total
+Snapshots:   0 total
+Time:        85.276 s
+Ran all test suites.
+npm notice 
+npm notice New minor version of npm available! 9.5.1 -> 9.8.0
+npm notice Changelog: <https://github.com/npm/cli/releases/tag/v9.8.0>
+npm notice Run `npm install -g npm@9.8.0` to update!
+npm notice 
