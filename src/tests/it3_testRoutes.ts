@@ -284,17 +284,7 @@ export function updateQuizQuestionRequest(quizId: number, questionId: number, to
 }
 
 export function quizTrashEmptyRequest(token: string, quizIds: number[]) {
-  const res = request(
-    'DELETE',
-    SERVER_URL + '/v1/admin/quiz/trash/empty',
-    {
-      qs: { token: token, quizIds: JSON.stringify(quizIds) }
-    }
-  );
-  return {
-    body: JSON.parse(res.body.toString()),
-    statusCode: JSON.parse(res.statusCode.toString())
-  };
+  return requestHelper('DELETE', '/v2/admin/quiz/trash/empty', { quizIds: JSON.stringify(quizIds) }, { token });
 }
 
 export function clearRequest() {

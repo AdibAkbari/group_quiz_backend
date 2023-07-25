@@ -247,11 +247,13 @@ export function adminQuizRestore(token: string, quizId: number): Record<string, 
  */
 export function adminQuizTrashEmpty(token: string, quizIds: number[]): Record<string, never> | Error {
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    // return { error: 'Invalid Token Structure' };
+    throw HTTPError(401, 'Invalid Token Structure');
   }
 
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    // return { error: 'Token not logged in' };
+    throw HTTPError(403, 'Token not logged in');
   }
 
   const data = getData();
@@ -260,10 +262,12 @@ export function adminQuizTrashEmpty(token: string, quizIds: number[]): Record<st
   for (const quizId of quizIds) {
     const quiz = data.trash.find((quiz) => quiz.quizId === quizId);
     if (quiz === undefined) {
-      return { error: 'one or more quizIds not currently in trash or do not exist' };
+      // return { error: 'one or more quizIds not currently in trash or do not exist' };
+      throw HTTPError(400, 'one or more quizIds not currently in trash or do not exist');
     }
     if (quiz.creator !== authUserId) {
-      return { error: 'one or more quizIds refer to a quiz that user does not own' };
+      // return { error: 'one or more quizIds refer to a quiz that user does not own' };
+      throw HTTPError(400, 'one or more quizIds refer to a quiz that user does not own');
     }
   }
 
