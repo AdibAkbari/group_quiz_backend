@@ -6,6 +6,7 @@ import {
   adminQuizInfoRequest,
   adminQuizListRequest
 } from './it3_testRoutes';
+import HTTPError from 'http-errors';
 
 import {
   TokenId,

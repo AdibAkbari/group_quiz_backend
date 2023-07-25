@@ -5,38 +5,33 @@ import {
   quizDescriptionUpdateRequest,
   quizCreateRequest,
   adminQuizInfoRequest,
-} from './testRoutes';
+} from './it3_testRoutes';
+import HTTPError from 'http-errors';
 
 import { TokenId, QuizId } from '../interfaces';
 
-const ERROR = { error: expect.any(String) };
 let user: TokenId;
 let quiz: QuizId;
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
-  quiz = quizCreateRequest(user.token, 'My Quiz', 'First Description').body;
+  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
+  quiz = quizCreateRequest(user.token, 'My Quiz', 'First Description');
 });
 
 describe('Error Cases', () => {
   test('quizId not valid', () => {
-    const update = quizDescriptionUpdateRequest(quiz.quizId + 1, user.token, 'New Description');
-    expect(update.body).toStrictEqual(ERROR);
-    expect(update.statusCode).toStrictEqual(400);
+    expect(() => quizDescriptionUpdateRequest(quiz.quizId + 1, user.token, 'New Description')).toThrow(HTTPError[400])
   });
 
   test('user does not own quiz', () => {
-    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'first', 'last').body;
-    const quiz2 = quizCreateRequest(user2.token, 'User 2 Quiz', 'First Description').body;
-    const update = quizDescriptionUpdateRequest(quiz2.quizId, user.token, 'New Description');
-    expect(update.body).toStrictEqual(ERROR);
-    expect(update.statusCode).toStrictEqual(400);
+    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'first', 'last');
+    const quiz2 = quizCreateRequest(user2.token, 'User 2 Quiz', 'First Description');
+
+    expect(() => quizDescriptionUpdateRequest(quiz2.quizId, user.token, 'New Description')).toThrow(HTTPError[400])
   });
 
   test('description too long', () => {
-    const update = quizDescriptionUpdateRequest(quiz.quizId, user.token, '1'.repeat(101));
-    expect(update.body).toStrictEqual(ERROR);
-    expect(update.statusCode).toStrictEqual(400);
+    expect(() => quizDescriptionUpdateRequest(quiz.quizId, user.token, '1'.repeat(101))).toThrow(HTTPError[400])
   });
 
   test.each([
@@ -52,22 +47,17 @@ describe('Error Cases', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('invalid token: $testName', ({ token }) => {
-    const update = quizDescriptionUpdateRequest(quiz.quizId, token, 'New Description');
-    expect(update.statusCode).toBe(401);
-    expect(update.body).toStrictEqual(ERROR);
+    expect(() => quizDescriptionUpdateRequest(quiz.quizId, token, 'New Description')).toThrow(HTTPError[401])
   });
 
   test('tokenId not logged in', () => {
-    const update = quizDescriptionUpdateRequest(quiz.quizId, '12345', 'New Description');
-    expect(update.statusCode).toBe(403);
-    expect(update.body).toStrictEqual(ERROR);
+    expect(() => quizDescriptionUpdateRequest(quiz.quizId, '12345', 'New Description')).toThrow(HTTPError[403])
   });
 });
 
 test('valid input', () => {
-  const update = quizDescriptionUpdateRequest(quiz.quizId, user.token, 'New Description');
-  expect(update.body).toStrictEqual({ });
-  expect(update.statusCode).toBe(200);
+  expect(quizDescriptionUpdateRequest(quiz.quizId, user.token, 'New Description')).toStrictEqual({ });
+
   expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual(
     {
       quizId: quiz.quizId,

@@ -7,34 +7,29 @@ import {
   quizRemoveRequest,
   quizNameUpdateRequest,
   quizDescriptionUpdateRequest
-} from './testRoutes';
+} from './it3_testRoutes';
+import HTTPError from 'http-errors';
 
 import { TokenId, QuizId } from '../interfaces';
-
-const ERROR = { error: expect.any(String) };
 
 let user: TokenId;
 let quiz: QuizId;
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
-  quiz = quizCreateRequest(user.token, 'Cats', 'A quiz about cats').body;
+  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname');
+  quiz = quizCreateRequest(user.token, 'Cats', 'A quiz about cats');
 });
 
 describe('QuizId invalid', () => {
   test('Quiz Id does not refer to a valid quiz', () => {
-    const result = adminQuizInfoRequest(user.token, quiz.quizId + 1);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => adminQuizInfoRequest(user.token, quiz.quizId + 1)).toThrow(HTTPError[400])
   });
 
   test('Quiz Id does not refer to a quiz that this user owns', () => {
-    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB').body;
-    const result = adminQuizInfoRequest(user2.token, quiz.quizId);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
-    const quiz2 = quizCreateRequest(user2.token, 'Dogs', 'A quiz about dogs').body;
-    expect(adminQuizInfoRequest(user.token, quiz2.quizId).body).toStrictEqual(ERROR);
+    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB');
+    expect(() => adminQuizInfoRequest(user2.token, quiz.quizId)).toThrow(HTTPError[400])
+    const quiz2 = quizCreateRequest(user2.token, 'Dogs', 'A quiz about dogs');
+    expect(() => adminQuizInfoRequest(user.token, quiz2.quizId)).toThrow(HTTPError[400])
   });
 });
 
@@ -52,22 +47,17 @@ describe('Token invalid', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('token is not a valid structure: $testName', ({ token }) => {
-    const list = adminQuizInfoRequest(token, quiz.quizId);
-    expect(list.body).toStrictEqual(ERROR);
-    expect(list.statusCode).toStrictEqual(401);
+    expect(() => adminQuizInfoRequest(token, quiz.quizId)).toThrow(HTTPError[401])
   });
 
   test('Unused tokenId', () => {
-    const list = adminQuizInfoRequest(user.token + 1, quiz.quizId);
-    expect(list.body).toStrictEqual(ERROR);
-    expect(list.statusCode).toStrictEqual(403);
+    expect(() => adminQuizInfoRequest(user.token + 1, quiz.quizId)).toThrow(HTTPError[403])
   });
 });
 
 describe('Valid inputs', () => {
   test('only one quiz created', () => {
-    const result = adminQuizInfoRequest(user.token, quiz.quizId);
-    expect(result.body).toStrictEqual({
+    expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual({
       quizId: quiz.quizId,
       name: 'Cats',
       timeCreated: expect.any(Number),
@@ -77,13 +67,12 @@ describe('Valid inputs', () => {
       questions: [],
       duration: 0
     });
-    expect(result.statusCode).toStrictEqual(200);
   });
 
   test('more than one quiz stored', () => {
-    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB').body;
-    const quiz2 = quizCreateRequest(user2.token, 'Dogs', 'A quiz about dogs').body;
-    expect(adminQuizInfoRequest(user2.token, quiz2.quizId).body).toStrictEqual({
+    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB');
+    const quiz2 = quizCreateRequest(user2.token, 'Dogs', 'A quiz about dogs');
+    expect(adminQuizInfoRequest(user2.token, quiz2.quizId)).toStrictEqual({
       quizId: quiz2.quizId,
       name: 'Dogs',
       timeCreated: expect.any(Number),
@@ -96,10 +85,10 @@ describe('Valid inputs', () => {
   });
 
   test('more than one quiz created by user', () => {
-    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB').body;
+    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB');
     quizCreateRequest(user2.token, 'Dogs', 'A quiz about dogs');
-    const quiz3 = quizCreateRequest(user.token, 'Birds', 'A quiz about birds').body;
-    expect(adminQuizInfoRequest(user.token, quiz3.quizId).body).toStrictEqual({
+    const quiz3 = quizCreateRequest(user.token, 'Birds', 'A quiz about birds');
+    expect(adminQuizInfoRequest(user.token, quiz3.quizId)).toStrictEqual({
       quizId: quiz3.quizId,
       name: 'Birds',
       timeCreated: expect.any(Number),
@@ -115,11 +104,11 @@ describe('Valid inputs', () => {
 describe('quizzes with questions created', () => {
   let questionId: number;
   beforeEach(() => {
-    questionId = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).body.questionId;
+    questionId = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).questionId;
   });
 
   test('one question created', () => {
-    expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual({
+    expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual({
       quizId: quiz.quizId,
       name: 'Cats',
       timeCreated: expect.any(Number),
@@ -153,8 +142,8 @@ describe('quizzes with questions created', () => {
   });
 
   test('multiple questions created', () => {
-    const q2Id = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).body.questionId;
-    const q3Id = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).body.questionId;
+    const q2Id = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).questionId;
+    const q3Id = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).questionId;
     const timeNow = Math.floor(Date.now() / 1000);
 
     const expectedQuestions = [
@@ -190,7 +179,7 @@ describe('quizzes with questions created', () => {
       }
     ];
 
-    const result = adminQuizInfoRequest(user.token, quiz.quizId).body;
+    const result = adminQuizInfoRequest(user.token, quiz.quizId);
     expect(result).toStrictEqual({
       quizId: quiz.quizId,
       name: 'Cats',
@@ -209,7 +198,7 @@ describe('quizzes with questions created', () => {
 
 describe('testing with other functions', () => {
   test('removing quiz', () => {
-    expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual({
+    expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual({
       quizId: quiz.quizId,
       name: 'Cats',
       timeCreated: expect.any(Number),
@@ -221,11 +210,11 @@ describe('testing with other functions', () => {
     });
 
     quizRemoveRequest(user.token, quiz.quizId);
-    expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual(ERROR);
+    expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual(ERROR);
   });
 
   test('name update', () => {
-    expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual({
+    expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual({
       quizId: quiz.quizId,
       name: 'Cats',
       timeCreated: expect.any(Number),
@@ -237,7 +226,7 @@ describe('testing with other functions', () => {
     });
 
     quizNameUpdateRequest(user.token, quiz.quizId, 'NewName');
-    expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual({
+    expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual({
       quizId: quiz.quizId,
       name: 'NewName',
       timeCreated: expect.any(Number),
@@ -250,7 +239,7 @@ describe('testing with other functions', () => {
   });
 
   test('description update', () => {
-    expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual({
+    expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual({
       quizId: quiz.quizId,
       name: 'Cats',
       timeCreated: expect.any(Number),
@@ -262,7 +251,7 @@ describe('testing with other functions', () => {
     });
 
     quizDescriptionUpdateRequest(quiz.quizId, user.token, 'New description');
-    expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual({
+    expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual({
       quizId: quiz.quizId,
       name: 'Cats',
       timeCreated: expect.any(Number),
