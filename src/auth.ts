@@ -1,7 +1,7 @@
 import { setData, getData } from './dataStore';
 import { Error, Data, Users, Token, TokenId, User } from './interfaces';
 import validator from 'validator';
-import { isValidTokenStructure, isTokenLoggedIn, findUserFromToken, isWhiteSpace } from './helper';
+import { isValidTokenStructure, isTokenLoggedIn, findUserFromToken, isWhiteSpace, giveError } from './helper';
 
 /**
  * Register a user with an email, password, and names, then returns their
@@ -123,19 +123,15 @@ export function adminAuthLogin(email: string, password: string): Error | TokenId
  *              numFailedPasswordsSinceLastLogin: number
  *           }}}
  */
-export function adminUserDetails(token: string): User | Error {
+export function adminUserDetails(token: string, isv2: boolean ): User | Error {
   const data: Data = getData();
 
   if (!isValidTokenStructure(token)) {
-    return {
-      error: 'token is an invalid structure'
-    };
+    return giveError(isv2, 'token is an invalid structure', 401);
   }
 
   if (!isTokenLoggedIn(token)) {
-    return {
-      error: 'token is not logged in'
-    };
+    return giveError(isv2 ,'token is not logged in' , 403);
   }
 
   const userId = findUserFromToken(token);
@@ -162,39 +158,39 @@ export function adminUserDetails(token: string): User | Error {
  * @param {string} newPassword
  * @returns {{ }} empty object
  */
-export function updateUserPassword(token: string, oldPassword: string, newPassword: string): Error | Record<string, never> {
+export function updateUserPassword(token: string, oldPassword: string, newPassword: string, isv2: boolean ): Error | Record<string, never> {
   const data: Data = getData();
 
   if (!isValidTokenStructure(token)) {
-    return { error: 'Token is an invalid structure' };
+    return giveError(isv2, 'Token is an invalid structure', 401);
   }
 
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token is not logged in' };
+    return giveError(isv2 ,'Token is not logged in' , 403);
   }
 
   const userId = findUserFromToken(token);
   const index = data.users.findIndex(id => id.authUserId === userId);
   if (data.users[index].password !== oldPassword) {
-    return { error: 'Old password is incorrect' };
+    return giveError(isv2, 'Old password is incorrect', 400);
   }
 
   if (data.users[index].oldPasswords !== undefined) {
     if (data.users[index].oldPasswords.includes(newPassword)) {
-      return { error: 'New password has been used previously' };
+      return giveError(isv2, 'New password has been used previously', 400);
     }
   } else {
     data.users[index].oldPasswords = [];
   }
 
   if (newPassword.length < 8) {
-    return { error: 'New password must be at least 8 characters' };
+    return giveError(isv2, 'New password must be at least 8 characters', 400);
   }
 
   const letters = /[a-zA-Z]/;
   const numbers = /\d/;
   if (!letters.test(newPassword) || !numbers.test(newPassword)) {
-    return { error: 'New password must contain at least one letter and one number' };
+    return giveError(isv2, 'New password must contain at least one letter and one number', 400);
   }
 
   data.users[index].oldPasswords.push(oldPassword);
@@ -213,46 +209,46 @@ export function updateUserPassword(token: string, oldPassword: string, newPasswo
  * @param {string} nameLast
  * @returns {{ }} empty object
 */
-export function updateUserDetails(token: string, email: string, nameFirst: string, nameLast: string): Record<string, never> | Error {
+export function updateUserDetails(token: string, email: string, nameFirst: string, nameLast: string, isv2: boolean): Record<string, never> | Error {
   const data: Data = getData();
 
   if (!isValidTokenStructure(token)) {
-    return { error: 'Token is an invalid structure' };
+    return giveError(isv2, 'Token is an invalid structure', 401);
   }
 
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token is not logged in' };
+    return giveError(isv2, 'Token is not logged in', 403);
   }
 
   const userId = findUserFromToken(token);
   const index = data.users.findIndex(id => id.authUserId === userId);
   if (data.users[index].email !== email && data.users.filter(mail => mail.email === email).length > 0) {
-    return { error: 'Email is currently used by another user' };
+    return giveError(isv2, 'Email is currently used by another user', 400);
   }
 
   if (!validator.isEmail(email)) {
-    return { error: 'Email is Invalid' };
+    return giveError(isv2, 'Email is Invalid', 400);
   }
 
   const expressionName = /^[A-Za-z\s'-]+$/;
   if (!expressionName.test(nameFirst)) {
-    return { error: 'First name must only contain letters, spaces, hyphens or apostrophes' };
+    return giveError(isv2, 'First name must only contain letters, spaces, hyphens or apostrophes', 400);
   }
 
   if (nameFirst.length < 2 || nameFirst.length > 20) {
-    return { error: 'First name must be 2 to 20 characters' };
+    return giveError(isv2, 'First name must be 2 to 20 characters', 400);
   }
 
   if (!expressionName.test(nameLast)) {
-    return { error: 'Last name must only contain letters, spaces, hyphens or apostrophes' };
+    return giveError(isv2, 'Last name must only contain letters, spaces, hyphens or apostrophes', 400);
   }
 
   if (nameLast.length < 2 || nameLast.length > 20) {
-    return { error: 'Last name must be 2 to 20 characters' };
+    return giveError(isv2, 'Last name must be 2 to 20 characters', 400);
   }
 
   if (isWhiteSpace(nameFirst) || isWhiteSpace(nameLast)) {
-    return { error: 'First name and Last name cannot be solely white space' };
+    return giveError(isv2, 'First name and Last name cannot be solely white space', 400);
   }
 
   data.users[index].email = email;
@@ -269,15 +265,15 @@ export function updateUserDetails(token: string, email: string, nameFirst: strin
  * @param {string} tokenId
  * @returns {{}} Empty Object
  */
-export function adminAuthLogout (tokenId: string): Record<string, never> | Error {
+export function adminAuthLogout (tokenId: string, isv2: boolean): Record<string, never> | Error {
   const data: Data = getData();
 
   if (!isValidTokenStructure(tokenId)) {
-    return { error: 'Token is not a valid structure' };
+    return giveError(isv2, 'Token is not a valid structure', 401);
   }
 
   if (!isTokenLoggedIn(tokenId)) {
-    return { error: 'This token is for a user who has already logged out' };
+    return giveError(isv2, 'This token is for a user who has already logged out', 403);
   }
 
   const index: number = data.tokens.findIndex(token => token.tokenId === tokenId);

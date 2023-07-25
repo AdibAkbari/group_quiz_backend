@@ -167,4 +167,3 @@ export function giveError(isv2: boolean, errorMessage: string, statusCode: numbe
   }
   return { error: errorMessage };
 }
-
