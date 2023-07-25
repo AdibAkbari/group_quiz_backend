@@ -5,15 +5,14 @@ import {
   createQuizQuestionRequest,
   moveQuizQuestionRequest,
   adminQuizInfoRequest
-} from './testRoutes';
+} from './it3_testRoutes';
+import HTTPError from 'http-errors';
 
 import {
   TokenId,
 } from '../interfaces';
 
 const validAnswers = [{ answer: 'great', correct: true }, { answer: 'bad', correct: false }];
-
-const ERROR = { error: expect.any(String) };
 
 let user: TokenId;
 let quizId: number;
@@ -25,10 +24,10 @@ let question5Id: number;
 
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
-  quizId = quizCreateRequest(user.token, 'Cats', 'A quiz about cats').body.quizId;
-  question1Id = createQuizQuestionRequest(quizId, user.token, 'Question 1?', 6, 3, validAnswers).body.questionId;
-  question2Id = createQuizQuestionRequest(quizId, user.token, 'Question 2?', 6, 3, validAnswers).body.questionId;
+  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname');
+  quizId = quizCreateRequest(user.token, 'Cats', 'A quiz about cats').quizId;
+  question1Id = createQuizQuestionRequest(quizId, user.token, 'Question 1?', 6, 3, validAnswers).questionId;
+  question2Id = createQuizQuestionRequest(quizId, user.token, 'Question 2?', 6, 3, validAnswers).questionId;
 });
 
 describe('Token invalid', () => {
@@ -45,77 +44,57 @@ describe('Token invalid', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('token is not a valid structure: $testName', ({ token }) => {
-    const result = moveQuizQuestionRequest(token, quizId, question1Id, 1);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(401);
+    expect(() => moveQuizQuestionRequest(token, quizId, question1Id, 1)).toThrow(HTTPError[401]);
   });
 
   test('Unused tokenId', () => {
-    const result = moveQuizQuestionRequest(user.token + 1, quizId, question1Id, 1);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(403);
+    expect(() => moveQuizQuestionRequest(user.token + 1, quizId, question1Id, 1)).toThrow(HTTPError[403]);
   });
 });
 
 describe('Invalid params', () => {
   test('QuizId does not refer to a valid quiz', () => {
-    const result = moveQuizQuestionRequest(user.token, quizId + 1, question1Id, 1);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => moveQuizQuestionRequest(user.token, quizId + 1, question1Id, 1)).toThrow(HTTPError[400]);
   });
 
   test('QuizId does not refer to a quiz that this user owns', () => {
-    const user2 = authRegisterRequest('email1@gmail.com', 'password2', 'FirstnameB', 'LastnameB').body;
-    const result = moveQuizQuestionRequest(user2.token, quizId, question1Id, 1);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    const user2 = authRegisterRequest('email1@gmail.com', 'password2', 'FirstnameB', 'LastnameB');
+    expect(() => moveQuizQuestionRequest(user2.token, quizId, question1Id, 1)).toThrow(HTTPError[400]);
   });
 
   test('No questions in any quiz with this questionId', () => {
-    const result = moveQuizQuestionRequest(user.token, quizId, question1Id + 2, 1);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => moveQuizQuestionRequest(user.token, quizId, question1Id + 2, 1)).toThrow(HTTPError[400]);
   });
 
   test('No questions in this quiz with this questionId', () => {
-    const quiz2Id = quizCreateRequest(user.token, 'Quiz2', '').body.quizId;
-    const result = moveQuizQuestionRequest(user.token, quiz2Id, question1Id, 1);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    const quiz2Id = quizCreateRequest(user.token, 'Quiz2', '').quizId;
+    expect(() => moveQuizQuestionRequest(user.token, quiz2Id, question1Id, 1)).toThrow(HTTPError[400]);
   });
 });
 
 describe('Invalid newPosition test', () => {
   test('newPosition < 0', () => {
-    const result = moveQuizQuestionRequest(user.token, quizId, question1Id, -1);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => moveQuizQuestionRequest(user.token, quizId, question1Id, -1)).toThrow(HTTPError[400]);
   });
 
   test('newPosition > n-1, where n is the number of questions', () => {
-    const result = moveQuizQuestionRequest(user.token, quizId, question1Id, 2);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => moveQuizQuestionRequest(user.token, quizId, question1Id, 2)).toThrow(HTTPError[400]);
   });
 
   test('NewPosition is the position of the current question', () => {
-    const result = moveQuizQuestionRequest(user.token, quizId, question1Id, 0);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => moveQuizQuestionRequest(user.token, quizId, question1Id, 0)).toThrow(HTTPError[400]);
   });
 });
 
 describe('Successful Move Question', () => {
   test('correct return', () => {
-    const result = moveQuizQuestionRequest(user.token, quizId, question1Id, 1);
-    expect(result.body).toStrictEqual({});
-    expect(result.statusCode).toStrictEqual(200);
+    expect(moveQuizQuestionRequest(user.token, quizId, question1Id, 1)).toStrictEqual({});
   });
 
   test('correct QuizInfo output', () => {
     moveQuizQuestionRequest(user.token, quizId, question1Id, 1);
 
-    const received = adminQuizInfoRequest(user.token, quizId).body;
+    const received = adminQuizInfoRequest(user.token, quizId);
     const expected = {
       quizId: quizId,
       name: 'Cats',
@@ -152,13 +131,13 @@ describe('Successful Move Question', () => {
   });
 
   test('correct QuizInfo output: multiple questions', () => {
-    question3Id = createQuizQuestionRequest(quizId, user.token, 'Question 3?', 6, 3, validAnswers).body.questionId;
-    question4Id = createQuizQuestionRequest(quizId, user.token, 'Question 4?', 6, 3, validAnswers).body.questionId;
-    question5Id = createQuizQuestionRequest(quizId, user.token, 'Question 5?', 6, 3, validAnswers).body.questionId;
+    question3Id = createQuizQuestionRequest(quizId, user.token, 'Question 3?', 6, 3, validAnswers).questionId;
+    question4Id = createQuizQuestionRequest(quizId, user.token, 'Question 4?', 6, 3, validAnswers).questionId;
+    question5Id = createQuizQuestionRequest(quizId, user.token, 'Question 5?', 6, 3, validAnswers).questionId;
 
     moveQuizQuestionRequest(user.token, quizId, question1Id, 1);
 
-    const received = adminQuizInfoRequest(user.token, quizId).body;
+    const received = adminQuizInfoRequest(user.token, quizId);
     const expected = {
       quizId: quizId,
       name: 'Cats',
@@ -228,7 +207,7 @@ describe('Successful Move Question', () => {
     const expectedTimeTransfered = Math.floor(Date.now() / 1000);
     moveQuizQuestionRequest(user.token, quizId, question1Id, 1);
 
-    const quizInfo = adminQuizInfoRequest(user.token, quizId).body;
+    const quizInfo = adminQuizInfoRequest(user.token, quizId);
 
     const timeSent = quizInfo.timeLastEdited;
 
