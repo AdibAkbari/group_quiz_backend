@@ -55,6 +55,18 @@ app.use(morgan('dev'));
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
 
+// adminQuizCreate //
+app.post('/v2/admin/quiz', (req: Request, res: Response) => {
+  const token = req.headers.token as string;
+  const { name, description } = req.body;
+  res.json(adminQuizCreate(token, name, description, true));
+});
+
+
+// ====================================================================
+//  ================= IT 2 TEST ROUTES (OLD) ==========================
+// ====================================================================
+
 // Example get request
 app.get('/echo', (req: Request, res: Response) => {
   const data = req.query.echo as string;
@@ -145,7 +157,7 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
 
 // adminQuizCreate //
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
-  const response = adminQuizCreate(req.body.token, req.body.name, req.body.description);
+  const response = adminQuizCreate(req.body.token, req.body.name, req.body.description, false);
   if ('error' in response) {
     if (response.error.includes('Structure')) {
       return res.status(401).json(response);

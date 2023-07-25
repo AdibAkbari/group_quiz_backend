@@ -9,8 +9,10 @@ import {
   isTokenLoggedIn,
   findUserFromToken,
   isValidQuestionId,
-  isValidEmail
+  isValidEmail,
+  giveError
 } from './helper';
+import HTTPError from 'http-errors';
 
 /**
    * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -55,15 +57,15 @@ export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
  * @param {string} description
  * @returns {{quizId: number}} quizId
  */
-export function adminQuizCreate(token: string, name: string, description: string): QuizId | Error {
+export function adminQuizCreate(token: string, name: string, description: string, isv2: boolean): QuizId | Error {
   // invalid token structure
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    return giveError(isv2, 'Invalid Token Structure', 401);
   }
 
   // token is not logged in
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    return giveError(isv2, 'Token not logged in', 403);
   }
 
   // get authUserId from token
@@ -71,12 +73,12 @@ export function adminQuizCreate(token: string, name: string, description: string
 
   // invalid name
   if (!checkNameValidity(name, authUserId)) {
-    return { error: 'Invalid Name' };
+    return giveError(isv2, 'Invalid Name', 400);
   }
 
   // invalid description
   if (description.length > 100) {
-    return { error: 'Invalid Description' };
+    return giveError(isv2, 'Invalid Description', 400);
   }
 
   // get time in seconds
