@@ -7,18 +7,16 @@ import {
   quizRemoveRequest,
   quizNameUpdateRequest,
   quizDescriptionUpdateRequest
-} from './testRoutes';
+} from './it3_testRoutes';
 
 import { TokenId, QuizId } from '../interfaces';
-
-const ERROR = { error: expect.any(String) };
 
 let user: TokenId;
 let quiz: QuizId;
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
-  quiz = quizCreateRequest(user.token, 'Cats', 'A quiz about cats').body;
+  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname');
+  quiz = quizCreateRequest(user.token, 'Cats', 'A quiz about cats');
 });
 
 describe('QuizId invalid', () => {

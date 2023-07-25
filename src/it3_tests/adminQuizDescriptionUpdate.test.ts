@@ -55,7 +55,7 @@ describe('Error Cases', () => {
 });
 
 test('valid input', () => {
-  expect(() => quizDescriptionUpdateRequest(quiz.quizId, user.token, 'New Description')).toStrictEqual({ });
+  expect(quizDescriptionUpdateRequest(quiz.quizId, user.token, 'New Description')).toStrictEqual({ });
 
   expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual(
     {
