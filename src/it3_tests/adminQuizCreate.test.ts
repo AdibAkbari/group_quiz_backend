@@ -44,19 +44,19 @@ describe('invalid name/description edge cases', () => {
       test: '>30 chars'
     },
   ])("'$name' is invalid: '$test'", ({ name, test }) => {
-    expect(() => quizCreateRequest(user.token, name, '')).toThrow(HTTPError[400])
+    expect(() => quizCreateRequest(user.token, name, '')).toThrow(HTTPError[400]);
   });
 
   test('name already used by user for another quiz', () => {
     quizCreateRequest(user.token, 'TestQuiz', '');
-    expect(() =>quizCreateRequest(user.token, 'TestQuiz', '')).toThrow(HTTPError[400])
+    expect(() => quizCreateRequest(user.token, 'TestQuiz', '')).toThrow(HTTPError[400]);
   });
 
   // description more than 100 character error
   test('invalid description (>100 characters)', () => {
     // string of length 101
     const longString = '0'.repeat(101);
-    expect(() => quizCreateRequest(user.token, 'TestQuiz', longString)).toThrow(HTTPError[400])
+    expect(() => quizCreateRequest(user.token, 'TestQuiz', longString)).toThrow(HTTPError[400]);
   });
 });
 
@@ -75,16 +75,16 @@ describe('Token invalid', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => quizCreateRequest(token, 'TestQuiz', '')).toThrow(HTTPError[401])
+    expect(() => quizCreateRequest(token, 'TestQuiz', '')).toThrow(HTTPError[401]);
   });
 
   test('Nobody logged in', () => {
-    expect(() => quizCreateRequest('7', 'TestQuiz', '')).toThrow(HTTPError[403])
+    expect(() => quizCreateRequest('7', 'TestQuiz', '')).toThrow(HTTPError[403]);
   });
 
   test('TokenId not logged in', () => {
     const user = authRegisterRequest('email@gmail.com', 'password1', 'NameFirst', 'NameLast');
-    expect(() => quizCreateRequest(user.token + 1, 'TestQuiz', '')).toThrow(HTTPError[403])
+    expect(() => quizCreateRequest(user.token + 1, 'TestQuiz', '')).toThrow(HTTPError[403]);
   });
 });
 
@@ -103,7 +103,7 @@ describe('valid input tests', () => {
 
   test('testing correct quiz object creation', () => {
     const quiz = quizCreateRequest(user.token, 'TestQuiz', 'Test');
-    expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual(
+    expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual(
       {
         quizId: quiz.quizId,
         name: 'TestQuiz',

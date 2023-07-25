@@ -13,8 +13,6 @@ import {
   QuizId
 } from '../interfaces';
 
-const ERROR = { error: expect.any(String) };
-
 // Before each test, clear data and then create a new user and new quiz
 let user: TokenId;
 let user2: TokenId;
@@ -41,15 +39,15 @@ describe('Token invalid', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => quizTransferRequest(token, quiz.quizId, 'email2@gmail.com')).toThrow(HTTPError[401])
+    expect(() => quizTransferRequest(token, quiz.quizId, 'email2@gmail.com')).toThrow(HTTPError[401]);
   });
 
   test('Nobody logged in', () => {
-    expect(() => quizTransferRequest('7', quiz.quizId, 'email2@gmail.com')).toThrow(HTTPError[403])
+    expect(() => quizTransferRequest('7', quiz.quizId, 'email2@gmail.com')).toThrow(HTTPError[403]);
   });
 
   test('TokenId not logged in', () => {
-    expect(() => quizTransferRequest(user.token + 1, quiz.quizId, 'email2@gmail.com')).toThrow(HTTPError[403])
+    expect(() => quizTransferRequest(user.token + 1, quiz.quizId, 'email2@gmail.com')).toThrow(HTTPError[403]);
   });
 });
 
@@ -57,32 +55,32 @@ describe('Token invalid', () => {
 describe('invalid quizId', () => {
   // Testing quizID does not exist
   test('Quiz ID does not refer to a valid quiz', () => {
-    expect(() => quizTransferRequest(user.token, quiz.quizId + 1, 'email2@gmail.com')).toThrow(HTTPError[400])
+    expect(() => quizTransferRequest(user.token, quiz.quizId + 1, 'email2@gmail.com')).toThrow(HTTPError[400]);
   });
 
   // Testing the user does not own the quiz that is trying to be removed
   test('Quiz ID does not refer to a quiz that this user owns', () => {
     const quiz2 = quizCreateRequest(user2.token, 'quiz2', '');
 
-    expect(() => quizTransferRequest(user.token, quiz2.quizId, 'email2@gmail.com')).toThrow(HTTPError[400])
+    expect(() => quizTransferRequest(user.token, quiz2.quizId, 'email2@gmail.com')).toThrow(HTTPError[400]);
   });
 
   // Quiz ID refers to a quiz that has a name that is already used by the target user
   test('User already has a quiz named', () => {
-    const quiz2 = quizCreateRequest(user.token, 'quiz1', '');
+    const quiz2 = quizCreateRequest(user2.token, 'quiz1', '');
 
-    expect(() => quizTransferRequest(user.token, quiz2.quizId, 'email2@gmail.com')).toThrow(HTTPError[400])
+    expect(() => quizTransferRequest(user.token, quiz2.quizId, 'email2@gmail.com')).toThrow(HTTPError[400]);
   });
 });
 
 // userEmail wrong
 describe('invalid userEmail', () => {
   test('userEmail is not a real user', () => {
-    expect(() => quizTransferRequest(user.token, quiz.quizId, 'fakeemail@gmail.com')).toThrow(HTTPError[400])
+    expect(() => quizTransferRequest(user.token, quiz.quizId, 'fakeemail@gmail.com')).toThrow(HTTPError[400]);
   });
 
   test('userEmail is the current logged in user', () => {
-    expect(() => quizTransferRequest(user.token, quiz.quizId, 'email@gmail.com')).toThrow(HTTPError[400])
+    expect(() => quizTransferRequest(user.token, quiz.quizId, 'email@gmail.com')).toThrow(HTTPError[400]);
   });
 });
 

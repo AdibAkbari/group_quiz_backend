@@ -36,13 +36,13 @@ describe('error cases tests', () => {
     authLogoutRequest(userToken);
     const logout = authLogoutRequest(userToken);
     expect(logout.body).toStrictEqual(ERROR);
-    expect(logout.statusCode).toStrictEqual(400);
+    expect(logout.statusCode).toStrictEqual(403);
   });
 
   test('token never created', () => {
     const logout = authLogoutRequest('12345');
     expect(logout.body).toStrictEqual(ERROR);
-    expect(logout.statusCode).toStrictEqual(400);
+    expect(logout.statusCode).toStrictEqual(403);
   });
 });
 

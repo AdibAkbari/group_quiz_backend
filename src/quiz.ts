@@ -12,7 +12,6 @@ import {
   isValidEmail,
   giveError
 } from './helper';
-import HTTPError from 'http-errors';
 
 /**
    * Provide a list of all quizzes that are owned by the currently logged in user.

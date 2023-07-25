@@ -24,18 +24,18 @@ describe('error cases tests', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('invalid token structure: $testName', ({ token }) => {
-    expect(() => authLogoutRequest(token)).toThrow(HTTPError[401])
+    expect(() => authLogoutRequest(token)).toThrow(HTTPError[401]);
   });
 
   test('user created then logged out', () => {
-    const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
+    const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
     const userToken = user.token;
     authLogoutRequest(userToken);
-    expect(() => authLogoutRequest(token)).toThrow(HTTPError[400])
+    expect(() => authLogoutRequest(userToken)).toThrow(HTTPError[403]);
   });
 
   test('token never created', () => {
-    expect(() => authLogoutRequest('12345')).toThrow(HTTPError[400])
+    expect(() => authLogoutRequest('12345')).toThrow(HTTPError[403]);
   });
 });
 

@@ -31,7 +31,7 @@ describe('Token invalid', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => quizNameUpdateRequest(token, quiz.quizId, 'TestQuizUpdate')).toThrow(HTTPError[401])
+    expect(() => quizNameUpdateRequest(token, quiz.quizId, 'TestQuizUpdate')).toThrow(HTTPError[401]);
   });
 
   test('Nobody logged in', () => {
@@ -138,4 +138,3 @@ describe('Valid adminQuizNameUpdate', () => {
     expect(timeSent).toBeLessThanOrEqual(expectedTimeTransfered + 3);
   });
 });
-

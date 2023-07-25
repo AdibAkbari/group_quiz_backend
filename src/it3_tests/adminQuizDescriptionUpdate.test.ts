@@ -20,18 +20,18 @@ beforeEach(() => {
 
 describe('Error Cases', () => {
   test('quizId not valid', () => {
-    expect(() => quizDescriptionUpdateRequest(quiz.quizId + 1, user.token, 'New Description')).toThrow(HTTPError[400])
+    expect(() => quizDescriptionUpdateRequest(quiz.quizId + 1, user.token, 'New Description')).toThrow(HTTPError[400]);
   });
 
   test('user does not own quiz', () => {
     const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'first', 'last');
     const quiz2 = quizCreateRequest(user2.token, 'User 2 Quiz', 'First Description');
 
-    expect(() => quizDescriptionUpdateRequest(quiz2.quizId, user.token, 'New Description')).toThrow(HTTPError[400])
+    expect(() => quizDescriptionUpdateRequest(quiz2.quizId, user.token, 'New Description')).toThrow(HTTPError[400]);
   });
 
   test('description too long', () => {
-    expect(() => quizDescriptionUpdateRequest(quiz.quizId, user.token, '1'.repeat(101))).toThrow(HTTPError[400])
+    expect(() => quizDescriptionUpdateRequest(quiz.quizId, user.token, '1'.repeat(101))).toThrow(HTTPError[400]);
   });
 
   test.each([
@@ -47,18 +47,18 @@ describe('Error Cases', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('invalid token: $testName', ({ token }) => {
-    expect(() => quizDescriptionUpdateRequest(quiz.quizId, token, 'New Description')).toThrow(HTTPError[401])
+    expect(() => quizDescriptionUpdateRequest(quiz.quizId, token, 'New Description')).toThrow(HTTPError[401]);
   });
 
   test('tokenId not logged in', () => {
-    expect(() => quizDescriptionUpdateRequest(quiz.quizId, '12345', 'New Description')).toThrow(HTTPError[403])
+    expect(() => quizDescriptionUpdateRequest(quiz.quizId, '12345', 'New Description')).toThrow(HTTPError[403]);
   });
 });
 
 test('valid input', () => {
   expect(quizDescriptionUpdateRequest(quiz.quizId, user.token, 'New Description')).toStrictEqual({ });
 
-  expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual(
+  expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual(
     {
       quizId: quiz.quizId,
       name: 'My Quiz',
@@ -71,7 +71,7 @@ test('valid input', () => {
     }
   );
   const timeNow = Math.floor(Date.now() / 1000);
-  const result = adminQuizInfoRequest(user.token, quiz.quizId).body;
+  const result = adminQuizInfoRequest(user.token, quiz.quizId);
   expect(result.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
   expect(result.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
 });

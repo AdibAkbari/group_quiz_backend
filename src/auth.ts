@@ -123,7 +123,7 @@ export function adminAuthLogin(email: string, password: string): Error | TokenId
  *              numFailedPasswordsSinceLastLogin: number
  *           }}}
  */
-export function adminUserDetails(token: string, isv2: boolean ): User | Error {
+export function adminUserDetails(token: string, isv2: boolean): User | Error {
   const data: Data = getData();
 
   if (!isValidTokenStructure(token)) {
@@ -131,7 +131,7 @@ export function adminUserDetails(token: string, isv2: boolean ): User | Error {
   }
 
   if (!isTokenLoggedIn(token)) {
-    return giveError(isv2 ,'token is not logged in' , 403);
+    return giveError(isv2, 'token is not logged in', 403);
   }
 
   const userId = findUserFromToken(token);
@@ -158,7 +158,7 @@ export function adminUserDetails(token: string, isv2: boolean ): User | Error {
  * @param {string} newPassword
  * @returns {{ }} empty object
  */
-export function updateUserPassword(token: string, oldPassword: string, newPassword: string, isv2: boolean ): Error | Record<string, never> {
+export function updateUserPassword(token: string, oldPassword: string, newPassword: string, isv2: boolean): Error | Record<string, never> {
   const data: Data = getData();
 
   if (!isValidTokenStructure(token)) {
@@ -166,7 +166,7 @@ export function updateUserPassword(token: string, oldPassword: string, newPasswo
   }
 
   if (!isTokenLoggedIn(token)) {
-    return giveError(isv2 ,'Token is not logged in' , 403);
+    return giveError(isv2, 'Token is not logged in', 403);
   }
 
   const userId = findUserFromToken(token);

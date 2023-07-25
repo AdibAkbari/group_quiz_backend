@@ -240,8 +240,6 @@ app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
 //  ================= IT 2 TEST ROUTES (OLD) ==========================
 // ====================================================================
 
-
-
 // Example get request
 app.get('/echo', (req: Request, res: Response) => {
   const data = req.query.echo as string;
@@ -621,7 +619,7 @@ app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
     if (response.error.includes('structure')) {
       return res.status(401).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(400).json(response);
+      return res.status(403).json(response);
     }
   }
   res.json(response);

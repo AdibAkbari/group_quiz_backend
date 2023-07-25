@@ -259,13 +259,13 @@ describe('valid edge cases', () => {
     { testname: 'points is 1', question: 'valid question', duration: 5, points: 1 },
     { testname: 'points is 10', question: 'valid question', duration: 5, points: 10 }
   ])('valid edge cases for question, duration and points: $testname', ({ question, duration, points }) => {
-    expect(createQuizQuestionRequest(quiz.quizId, user.token, question, duration, points, validAnswers)).toStrictEqual(expect.any(Number));
+    expect(createQuizQuestionRequest(quiz.quizId, user.token, question, duration, points, validAnswers).questionId).toStrictEqual(expect.any(Number));
   });
 
   test('sum of duration equals 3 minutes', () => {
     createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 60, 5, validAnswers);
     createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 60, 5, validAnswers);
 
-    expect(createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3', 60, 5, validAnswers)).toStrictEqual(expect.any(Number));
+    expect(createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3', 60, 5, validAnswers).questionId).toStrictEqual(expect.any(Number));
   });
 });

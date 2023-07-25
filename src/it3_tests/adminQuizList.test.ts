@@ -31,11 +31,11 @@ describe('Token invalid', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => adminQuizListRequest(token)).toThrow(HTTPError[401])
+    expect(() => adminQuizListRequest(token)).toThrow(HTTPError[401]);
   });
 
   test('Unused tokenId', () => {
-    expect(() => adminQuizListRequest(user.token + user2.token)).toThrow(HTTPError[403])
+    expect(() => adminQuizListRequest(user.token + user2.token)).toThrow(HTTPError[403]);
   });
 });
 

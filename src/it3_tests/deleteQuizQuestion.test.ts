@@ -86,7 +86,7 @@ describe('Invalid Questionid', () => {
 describe('Successfully removed quiz question', () => {
   // Sucessfully remove the quiz
   test('Sucessful quiz remove question empty return', () => {
-    expect(deleteQuizQuestionRequest(user.token, quiz.quizId + 1, question.questionId)).toStrictEqual({});
+    expect(deleteQuizQuestionRequest(user.token, quiz.quizId, question.questionId)).toStrictEqual({});
   });
 
   // Check that the quiz question is actually removed

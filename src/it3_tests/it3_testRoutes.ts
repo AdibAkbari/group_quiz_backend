@@ -69,7 +69,7 @@ export function clearRequest() {
   return requestHelper('DELETE', '/v1/clear', {});
 }
 
-// AUTH/USER ROUTES // 
+// AUTH/USER ROUTES //
 export function authLoginRequest(email: string, password: string) {
   return requestHelper('POST', '/v1/admin/auth/login', { email, password }, {});
 }
@@ -79,90 +79,104 @@ export function authRegisterRequest(email: string, password: string, nameFirst: 
 }
 
 export function updateUserPasswordRequest(token: string, oldPassword: string, newPassword: string) {
-  return requestHelper('PUT', '/v1/admin/user/password', { oldPassword, newPassword }, { token });
-}  
+  return requestHelper('PUT', '/v2/admin/user/password', { oldPassword, newPassword }, { token });
+}
 
 export function adminUserDetailsRequest(token: string) {
   return requestHelper('GET', '/v2/admin/user/details', {}, { token });
 }
 
 export function updateUserDetailsRequest(token: string, email: string, nameFirst: string, nameLast: string) {
-  return requestHelper('PUT', '/v1/admin/user/details', {email, nameFirst, nameLast}, { token });
-}    
-
-export function authLogoutRequest(tokenId: string) {
-  return requestHelper('POST', '/v1/admin/auth/logout', {}, { tokenId });
+  return requestHelper('PUT', '/v2/admin/user/details', { email, nameFirst, nameLast }, { token });
 }
 
-// QUIZ ROUTES // 
+export function authLogoutRequest(token: string) {
+  return requestHelper('POST', '/v2/admin/auth/logout', {}, { token });
+}
+
+// QUIZ ROUTES //
 export function quizCreateRequest(token: string, name: string, description: string) {
-  return requestHelper('POST', '/v1/admin/quiz', { name, description }, { token });
+  return requestHelper('POST', '/v2/admin/quiz', { name, description }, { token });
 }
 
 export function adminQuizInfoRequest(token: string, quizId: number) {
-  return requestHelper('GET', `/v1/admin/quiz/${quizId}`, {}, { token });
+  return requestHelper('GET', `/v2/admin/quiz/${quizId}`, {}, { token });
 }
 
 export function quizRemoveRequest(token: string, quizid: number) {
-  return requestHelper('DELETE', `/v1/admin/quiz/${quizid}`, {}, { token })
+  return requestHelper('DELETE', `/v2/admin/quiz/${quizid}`, {}, { token });
 }
 
 export function quizNameUpdateRequest(token: string, quizid: number, name: string) {
-  return requestHelper('PUT', `/v1/admin/quiz/${quizid}/name`, { name }, { token })
+  return requestHelper('PUT', `/v2/admin/quiz/${quizid}/name`, { name }, { token });
 }
 
 export function quizDescriptionUpdateRequest(quizid: number, token: string, description: string) {
-  return requestHelper('PUT', `/v1/admin/quiz/${quizid}/description`, { description }, { token })
+  return requestHelper('PUT', `/v2/admin/quiz/${quizid}/description`, { description }, { token });
 }
 
 export function adminQuizListRequest(token: string) {
-  return requestHelper('GET', '/v1/admin/quiz/list', {}, { token })
+  return requestHelper('GET', '/v2/admin/quiz/list', {}, { token });
 }
 
 export function quizTransferRequest (token: string, quizid: number, userEmail: string) {
-  return requestHelper('POST', `/v1/admin/quiz/${quizid}/transfer`, { userEmail }, { token })
+  return requestHelper('POST', `/v2/admin/quiz/${quizid}/transfer`, { userEmail }, { token });
 }
 
 export function quizTrashRequest(token: string) {
-  return requestHelper('GET', '/v1/admin/quiz/trash', {}, { token })
+  return requestHelper('GET', '/v2/admin/quiz/trash', {}, { token });
 }
 
 export function quizRestoreRequest(token: string, quizId: number) {
-  return requestHelper('POST', `/v1/admin/quiz/${quizId}/restore`, {}, { token })
+  return requestHelper('POST', `/v2/admin/quiz/${quizId}/restore`, {}, { token });
 }
 
 export function quizTrashEmptyRequest(token: string, quizIds: number[]) {
-  return requestHelper('DELETE', '/v1/admin/quiz/trash/empty', { quizIds: JSON.stringify(quizIds) }, { token })
+  return requestHelper('DELETE', '/v2/admin/quiz/trash/empty', { quizIds: JSON.stringify(quizIds) }, { token });
 }
 
-// QUESTION ROUTES // 
+// QUESTION ROUTES //
 
 export function createQuizQuestionRequest(quizId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
-  return requestHelper('POST', `/v1/admin/quiz/${quizId}/question`, { questionBody: {
-                                                                                        question,
-                                                                                        duration,
-                                                                                        points,
-                                                                                        answers
-                                                                                    } }, { token })
+  return requestHelper(
+    'POST',
+    `/v2/admin/quiz/${quizId}/question`,
+    {
+      questionBody: {
+        question,
+        duration,
+        points,
+        answers
+      }
+    },
+    { token }
+  );
 }
 
 export function moveQuizQuestionRequest(token: string, quizId: number, questionId: number, newPosition: number) {
-  return requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}/move`, { newPosition: newPosition }, { token })
+  return requestHelper('PUT', `/v2/admin/quiz/${quizId}/question/${questionId}/move`, { newPosition: newPosition }, { token });
 }
 
 export function deleteQuizQuestionRequest(token: string, quizId: number, questionId: number) {
-  return requestHelper('DELETE', `/v1/admin/quiz/${quizId}/question/${questionId}`, {}, { token })
+  return requestHelper('DELETE', `/v2/admin/quiz/${quizId}/question/${questionId}`, {}, { token });
 }
 
 export function quizQuestionDuplicateRequest(quizid: number, questionid: number, token: string) {
-  return requestHelper('POST', `/v1/admin/quiz/${quizid}/question/${questionid}/duplicate`, {}, { token })
+  return requestHelper('POST', `/v2/admin/quiz/${quizid}/question/${questionid}/duplicate`, {}, { token });
 }
 
 export function updateQuizQuestionRequest(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
-  return requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { questionBody: {
-                                                                                                    question,
-                                                                                                    duration,
-                                                                                                    points,
-                                                                                                    answers
-                                                                                                 }}, { token })
+  return requestHelper(
+    'PUT',
+    `/v2/admin/quiz/${quizId}/question/${questionId}`,
+    {
+      questionBody: {
+        question,
+        duration,
+        points,
+        answers
+      }
+    },
+    { token }
+  );
 }

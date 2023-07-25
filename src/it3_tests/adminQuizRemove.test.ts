@@ -9,8 +9,6 @@ import {
 import { TokenId, QuizId } from '../interfaces';
 import HTTPError from 'http-errors';
 
-const ERROR = { error: expect.any(String) };
-
 // Before each test, clear data and then create a new user and new quiz
 let user: TokenId;
 let quiz: QuizId;
@@ -34,7 +32,7 @@ describe('Token invalid', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => quizRemoveRequest(token, quiz.quizId)).toThrow(HTTPError[401])
+    expect(() => quizRemoveRequest(token, quiz.quizId)).toThrow(HTTPError[401]);
   });
 
   test('Nobody logged in', () => {
@@ -118,4 +116,3 @@ describe('Successfully removed quiz check', () => {
     expect(quiz3.quizId).not.toStrictEqual(quiz2.quizId);
   });
 });
-

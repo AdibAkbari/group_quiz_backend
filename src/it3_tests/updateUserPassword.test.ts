@@ -8,8 +8,6 @@ import {
 import HTTPError from 'http-errors';
 import { TokenId } from '../interfaces';
 
-const ERROR = { error: expect.any(String) };
-
 beforeEach(() => {
   clearRequest();
 });
@@ -60,7 +58,7 @@ describe('Error Cases: updateUserDetails', () => {
 describe('Valid Inputs', () => {
   test('update password once', () => {
     const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
-    expect(() => updateUserPasswordRequest(user.token, 'password1', 'password2')).toThrow(HTTPError[400]);
+    expect(updateUserPasswordRequest(user.token, 'password1', 'password2')).toStrictEqual({ });
     expect(() => authLoginRequest('email@gmail.com', 'password1')).toThrow(HTTPError[400]);
   });
 
@@ -70,6 +68,6 @@ describe('Valid Inputs', () => {
     expect(update).toStrictEqual({ });
     const update2 = updateUserPasswordRequest(user.token, 'password2', 'password3');
     expect(update2).toStrictEqual({ });
-    expect(() => authLoginRequest('email@gmail.com', 'password2')).toThrow(HTTPError[400]);
+    expect(() => authLoginRequest('email@gmail.com', 'password1')).toThrow(HTTPError[400]);
   });
 });

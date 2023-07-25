@@ -22,14 +22,14 @@ beforeEach(() => {
 
 describe('QuizId invalid', () => {
   test('Quiz Id does not refer to a valid quiz', () => {
-    expect(() => adminQuizInfoRequest(user.token, quiz.quizId + 1)).toThrow(HTTPError[400])
+    expect(() => adminQuizInfoRequest(user.token, quiz.quizId + 1)).toThrow(HTTPError[400]);
   });
 
   test('Quiz Id does not refer to a quiz that this user owns', () => {
     const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB');
-    expect(() => adminQuizInfoRequest(user2.token, quiz.quizId)).toThrow(HTTPError[400])
+    expect(() => adminQuizInfoRequest(user2.token, quiz.quizId)).toThrow(HTTPError[400]);
     const quiz2 = quizCreateRequest(user2.token, 'Dogs', 'A quiz about dogs');
-    expect(() => adminQuizInfoRequest(user.token, quiz2.quizId)).toThrow(HTTPError[400])
+    expect(() => adminQuizInfoRequest(user.token, quiz2.quizId)).toThrow(HTTPError[400]);
   });
 });
 
@@ -47,11 +47,11 @@ describe('Token invalid', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => adminQuizInfoRequest(token, quiz.quizId)).toThrow(HTTPError[401])
+    expect(() => adminQuizInfoRequest(token, quiz.quizId)).toThrow(HTTPError[401]);
   });
 
   test('Unused tokenId', () => {
-    expect(() => adminQuizInfoRequest(user.token + 1, quiz.quizId)).toThrow(HTTPError[403])
+    expect(() => adminQuizInfoRequest(user.token + 1, quiz.quizId)).toThrow(HTTPError[403]);
   });
 });
 
@@ -210,7 +210,7 @@ describe('testing with other functions', () => {
     });
 
     quizRemoveRequest(user.token, quiz.quizId);
-    expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual(ERROR);
+    expect(() => adminQuizInfoRequest(user.token, quiz.quizId)).toThrow(HTTPError[400]);
   });
 
   test('name update', () => {

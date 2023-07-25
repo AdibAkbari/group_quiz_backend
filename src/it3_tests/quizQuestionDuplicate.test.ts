@@ -34,7 +34,7 @@ describe('error cases', () => {
 
   test('user does not own quiz', () => {
     const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'Firstname', 'Lastname');
-    expect(() =>  quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user2.token)).toThrow(HTTPError[400]);
+    expect(() => quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user2.token)).toThrow(HTTPError[400]);
   });
 
   test('questionId invalid', () => {
