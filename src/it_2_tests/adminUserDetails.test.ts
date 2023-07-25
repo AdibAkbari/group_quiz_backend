@@ -2,12 +2,11 @@ import {
   adminUserDetailsRequest,
   authRegisterRequest,
   clearRequest
-} from './testRoutes';
+} from './it3_testRoutes';
 import {
   TokenId
 } from '../interfaces';
-
-const ERROR = { error: expect.any(String) };
+import HTTPError from 'http-errors';
 
 beforeEach(() => {
   clearRequest();
@@ -27,34 +26,27 @@ describe('Token invalid', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('token is not a valid structure: $testName', ({ token }) => {
-    const details = adminUserDetailsRequest(token);
-    expect(details.body).toStrictEqual(ERROR);
-    expect(details.statusCode).toStrictEqual(401);
+    expect(() => adminUserDetailsRequest(token)).toThrow(HTTPError[401]);
   });
 
   test('Nobody logged in', () => {
-    const userDetails = adminUserDetailsRequest('7');
-    expect(userDetails.body).toStrictEqual(ERROR);
-    expect(userDetails.statusCode).toStrictEqual(403);
+    expect(() => adminUserDetailsRequest('7')).toThrow(HTTPError[403]);
   });
 
   test('TokenId not logged in', () => {
-    const user = authRegisterRequest('email@gmail.com', 'password1', 'NameFirst', 'NameLast').body;
-    const userDetails = adminUserDetailsRequest(user.token + 1);
-    expect(userDetails.body).toStrictEqual(ERROR);
-    expect(userDetails.statusCode).toStrictEqual(403);
+    const user = authRegisterRequest('email@gmail.com', 'password1', 'NameFirst', 'NameLast');
+    expect(() => adminUserDetailsRequest(user.token + 1)).toThrow(HTTPError[403]);
   });
 });
 
 describe('Only one user registered', () => {
   let user: TokenId;
   beforeEach(() => {
-    user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
+    user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname');
   });
 
   test('Just registered', () => {
-    const userDetails = adminUserDetailsRequest(user.token);
-    expect(userDetails.body).toStrictEqual({
+    expect(adminUserDetailsRequest(user.token)).toStrictEqual({
       user: {
         userId: expect.any(Number),
         name: 'Firstname Lastname',
@@ -63,7 +55,6 @@ describe('Only one user registered', () => {
         numFailedPasswordsSinceLastLogin: 0
       }
     });
-    expect(userDetails.statusCode).toStrictEqual(200);
   });
 });
 
@@ -72,14 +63,13 @@ describe('multiple users registered', () => {
   let user2: TokenId;
   let user3: TokenId;
   beforeEach(() => {
-    user1 = authRegisterRequest('email1@gmail.com', 'password1', 'FirstnameA', 'LastnameA').body;
-    user2 = authRegisterRequest('email2@gmail.com', 'password2', 'FirstnameB', 'LastnameB').body;
-    user3 = authRegisterRequest('email3@gmail.com', 'password3', 'FirstnameC', 'LastnameC').body;
+    user1 = authRegisterRequest('email1@gmail.com', 'password1', 'FirstnameA', 'LastnameA');
+    user2 = authRegisterRequest('email2@gmail.com', 'password2', 'FirstnameB', 'LastnameB');
+    user3 = authRegisterRequest('email3@gmail.com', 'password3', 'FirstnameC', 'LastnameC');
   });
 
   test('Finding user 1', () => {
-    const userDetails1 = adminUserDetailsRequest(user1.token);
-    expect(userDetails1.body).toStrictEqual({
+    expect(adminUserDetailsRequest(user1.token)).toStrictEqual({
       user: {
         userId: expect.any(Number),
         name: 'FirstnameA LastnameA',
@@ -88,12 +78,10 @@ describe('multiple users registered', () => {
         numFailedPasswordsSinceLastLogin: expect.any(Number)
       }
     });
-    expect(userDetails1.statusCode).toStrictEqual(200);
   });
 
   test('Finding user 2', () => {
-    const userDetails2 = adminUserDetailsRequest(user2.token);
-    expect(userDetails2.body).toStrictEqual({
+    expect(adminUserDetailsRequest(user2.token)).toStrictEqual({
       user: {
         userId: expect.any(Number),
         name: 'FirstnameB LastnameB',
@@ -102,11 +90,10 @@ describe('multiple users registered', () => {
         numFailedPasswordsSinceLastLogin: expect.any(Number)
       }
     });
-    expect(userDetails2.statusCode).toStrictEqual(200);
   });
 
   test('Finding user 3', () => {
-    expect(adminUserDetailsRequest(user3.token).body).toStrictEqual({
+    expect(adminUserDetailsRequest(user3.token)).toStrictEqual({
       user: {
         userId: expect.any(Number),
         name: 'FirstnameC LastnameC',
