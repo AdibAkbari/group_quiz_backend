@@ -8,6 +8,7 @@ import {
   quizNameUpdateRequest,
   quizDescriptionUpdateRequest
 } from './it3_testRoutes';
+import HTTPError from 'http-errors';
 
 import { TokenId, QuizId } from '../interfaces';
 

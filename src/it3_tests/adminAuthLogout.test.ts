@@ -4,6 +4,7 @@ import {
   authRegisterRequest,
   authLogoutRequest
 } from './it3_testRoutes';
+import HTTPError from 'http-errors';
 
 beforeEach(() => {
   clearRequest();

@@ -4,6 +4,7 @@ import {
   quizCreateRequest,
   adminQuizInfoRequest,
 } from './it3_testRoutes';
+import HTTPError from 'http-errors';
 
 interface Token {
   token: string
