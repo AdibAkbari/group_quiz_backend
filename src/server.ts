@@ -144,7 +144,7 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
 // adminQuizList //
 app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   const token = req.query.token as string;
-  const response = adminQuizList(token);
+  const response = adminQuizList(token, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
       return res.status(401).json(response);
@@ -369,7 +369,7 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
 // adminQuizRemove //
 app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const token = req.query.token as string;
-  const response = adminQuizRemove(token, parseInt(req.params.quizid));
+  const response = adminQuizRemove(token, parseInt(req.params.quizid), false);
   if ('error' in response) {
     if (response.error.includes('Structure')) {
       return res.status(401).json(response);
