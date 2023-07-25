@@ -62,6 +62,13 @@ app.get('/v2/admin/user/details', (req: Request, res: Response) => {
   }
 });
 
+app.put('/v2/admin/quiz/:quizid/description', (req: Request, res: Response) => {
+  const token = req.headers.token;
+  if (typeof token === 'string') {
+    res.json(adminQuizDescriptionUpdate(parseInt(req.params.quizid), token, req.body.description));
+  }
+});
+
 // ====================================================================
 //  ================= IT 2 TEST ROUTES (OLD) ==========================
 // ====================================================================
@@ -76,25 +83,6 @@ app.get('/echo', (req: Request, res: Response) => {
 app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const { token, description } = req.body;
-  const response = adminQuizDescriptionUpdate(quizId, token, description);
-
-  if ('error' in response) {
-    if (response.error.includes('structure')) {
-      return res.status(401).json(response);
-    } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
-    } else if (response.error.includes('quizId') || response.error.includes('description')) {
-      return res.status(400).json(response);
-    }
-  }
-  res.json(response);
-});
-
-// adminQuizDescriptionUpdatev2 //
-app.put('/v2/admin/quiz/:quizid/description', (req: Request, res: Response) => {
-  const quizId = parseInt(req.params.quizid);
-  const description = req.body;
-  const token = req.header('token');
   const response = adminQuizDescriptionUpdate(quizId, token, description);
 
   if ('error' in response) {

@@ -11,6 +11,7 @@ import {
   isValidQuestionId,
   isValidEmail
 } from './helper';
+import HTTPError from 'http-errors';
 
 /**
    * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -368,30 +369,29 @@ export function adminQuizNameUpdate(token: string, quizId: number, name: string)
  * new description.
  *
  * @param {number} quizId
- * @param {string} tokenId
+ * @param {string} token
  * @param {string} description
  * @returns {{ }} empty object
  */
-export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, description: string): Record<string, never> | Error {
-  console.log(tokenId);
-  if (!isValidTokenStructure(tokenId)) {
-    return { error: 'token is not a valid structure' };
+export function adminQuizDescriptionUpdate (quizId: number, token: string, description: string): Record<string, never> | Error {
+  if (!isValidTokenStructure(token)) {
+    throw HTTPError(401, 'token is an invalid structure');
   }
 
-  if (!isTokenLoggedIn(tokenId)) {
-    return { error: 'token is not for a currently logged in session' };
+  if (!isTokenLoggedIn(token)) {
+    throw HTTPError(403, 'token is not for a currently logged in session');
   }
 
   if (!isValidQuizId(quizId)) {
-    return { error: 'quizId does not refer to valid quiz' };
+    throw HTTPError(400, 'quizId does not refer to valid quiz');
   }
 
-  if (!isValidCreator(quizId, tokenId)) {
-    return { error: 'quizId does not refer to a quiz that this user owns' };
+  if (!isValidCreator(quizId, token)) {
+    throw HTTPError(400, 'quizId does not refer to a quiz that this user owns');
   }
 
   if (description.length > 100) {
-    return { error: 'description must be less than 100 characters' };
+    throw HTTPError(400, 'description must be less than 100 characters');
   }
 
   const store: Data = getData();

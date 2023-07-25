@@ -350,17 +350,7 @@ export function quizQuestionDuplicateRequest(quizid: number, questionid: number,
 }
 
 export function quizDescriptionUpdateRequest(quizid: number, token: string, description: string) {
-  const res = request(
-    'PUT',
-    SERVER_URL + `/v1/admin/quiz/${quizid}/description`,
-    {
-      json: { token: token, description: description },
-    }
-  );
-  return {
-    body: JSON.parse(res.body.toString()),
-    statusCode: JSON.parse(res.statusCode.toString())
-  };
+  return requestHelper('PUT', `/v2/admin/quiz/${quizid}/description`, { description }, { token });
 }
 
 export function authLogoutRequest(tokenId: string) {
