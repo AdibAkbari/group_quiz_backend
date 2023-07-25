@@ -5,9 +5,8 @@ import {
   authRegisterRequest,
   quizCreateRequest,
   quizRemoveRequest,
-} from './testRoutes';
-
-const ERROR = { error: expect.any(String) };
+} from './it3_testRoutes';
+import HTTPError from 'http-errors';
 
 beforeEach(() => {
   clearRequest();
@@ -28,16 +27,12 @@ describe('adminQuizTrash', () => {
       { testName: 'token has negative sign', token: '-37294' },
       { testName: 'token has positive sign', token: '+38594' },
     ])('token is not a valid structure: $testName', ({ token }) => {
-      const trash = quizTrashRequest(token);
-      expect(trash.body).toStrictEqual(ERROR);
-      expect(trash.statusCode).toStrictEqual(401);
+      expect(() => quizTrashRequest(token)).toThrow(HTTPError[401]);
     });
 
     test('TokenId not logged in', () => {
       const user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
-      const trash = quizTrashRequest(user.token + 1);
-      expect(trash.body).toStrictEqual(ERROR);
-      expect(trash.statusCode).toStrictEqual(403);
+      expect(() => quizTrashRequest(user.token + 1)).toThrow(HTTPError[403]);
     });
   });
 
@@ -49,15 +44,14 @@ describe('adminQuizTrash', () => {
 
     test('empty quiz trash', () => {
       const trash = quizTrashRequest(user.token);
-      expect(trash.body).toStrictEqual({ quizzes: [] });
-      expect(trash.statusCode).toStrictEqual(200);
+      expect(trash).toStrictEqual({ quizzes: [] });
     });
 
     test('one quiz creator in trash quizzes', () => {
       // create quizzes
-      const quiz1 = quizCreateRequest(user.token, 'quiz1', '').body;
-      const quiz2 = quizCreateRequest(user.token, 'quiz2', '').body;
-      const quiz3 = quizCreateRequest(user.token, 'quiz3', '').body;
+      const quiz1 = quizCreateRequest(user.token, 'quiz1', '');
+      const quiz2 = quizCreateRequest(user.token, 'quiz2', '');
+      const quiz3 = quizCreateRequest(user.token, 'quiz3', '');
       // remove quizzes
       quizRemoveRequest(user.token, quiz1.quizId);
       quizRemoveRequest(user.token, quiz2.quizId);
@@ -79,7 +73,7 @@ describe('adminQuizTrash', () => {
           }
         ]
       };
-      const trashList = quizTrashRequest(user.token).body;
+      const trashList = quizTrashRequest(user.token);
       const trashSet = new Set(trashList.quizzes);
       const expectedSet = new Set(expected.quizzes);
       expect(trashSet).toStrictEqual(expectedSet);
@@ -88,11 +82,11 @@ describe('adminQuizTrash', () => {
     test('multiple quiz creators in trash quizzes', () => {
       const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
       // create quizzes of user
-      const quiz1 = quizCreateRequest(user.token, 'quiz1', '').body;
-      const quiz2 = quizCreateRequest(user.token, 'quiz2', '').body;
-      const quiz3 = quizCreateRequest(user.token, 'quiz3', '').body;
+      const quiz1 = quizCreateRequest(user.token, 'quiz1', '');
+      const quiz2 = quizCreateRequest(user.token, 'quiz2', '');
+      const quiz3 = quizCreateRequest(user.token, 'quiz3', '');
       // create quiz of user2
-      const user2Quiz = quizCreateRequest(user2.token, 'user2Quiz', '').body;
+      const user2Quiz = quizCreateRequest(user2.token, 'user2Quiz', '');
 
       // remove quizzes
       quizRemoveRequest(user.token, quiz1.quizId);
@@ -117,7 +111,7 @@ describe('adminQuizTrash', () => {
           }
         ]
       };
-      const trashList = quizTrashRequest(user.token).body;
+      const trashList = quizTrashRequest(user.token);
       const trashSet = new Set(trashList.quizzes);
       const expectedSet = new Set(expected.quizzes);
       expect(trashSet).toStrictEqual(expectedSet);

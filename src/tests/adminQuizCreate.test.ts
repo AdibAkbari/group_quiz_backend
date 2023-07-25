@@ -6,8 +6,6 @@ import {
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
 
-const ERROR = { error: expect.any(String) };
-
 interface Token {
   token: string
 }

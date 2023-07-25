@@ -255,17 +255,7 @@ export function quizTransferRequest (token: string, quizid: number, userEmail: s
 }
 
 export function quizTrashRequest(token: string) {
-  const res = request(
-    'GET',
-    SERVER_URL + '/v1/admin/quiz/trash',
-    {
-      qs: { token: token }
-    }
-  );
-  return {
-    body: JSON.parse(res.body.toString()),
-    statusCode: JSON.parse(res.statusCode.toString())
-  };
+  return requestHelper('GET', '/v2/admin/quiz/trash', { }, { token });
 }
 
 export function quizRestoreRequest(token: string, quizId: number) {

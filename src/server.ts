@@ -65,8 +65,14 @@ app.get('/v2/admin/user/details', (req: Request, res: Response) => {
 // adminQuizCreate //
 app.post('/v2/admin/quiz', (req: Request, res: Response) => {
   const token = req.headers.token as string;
-  const {name, description} = req.body;
+  const { name, description } = req.body;
   res.json(adminQuizCreate(token, name, description));
+});
+
+// adminQuizTrash //
+app.get('/v2/admin/quiz/trash', (req: Request, res: Response) => {
+  const token = req.headers.token as string;
+  res.json(adminQuizTrash(token));
 });
 
 // ====================================================================

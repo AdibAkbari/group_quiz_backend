@@ -164,12 +164,14 @@ export function adminQuizRemove(token: string, quizId: number): Record<string, n
 export function adminQuizTrash(token: string): {quizzes: QuizList[]} | Error {
   // invalid token structure
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    // return { error: 'Invalid Token Structure' };
+    throw HTTPError(401, 'Invalid Token Structure');
   }
 
   // token is not logged in
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    // return { error: 'Token not logged in' };
+    throw HTTPError(403, 'Token not logged in');
   }
 
   const data = getData();
