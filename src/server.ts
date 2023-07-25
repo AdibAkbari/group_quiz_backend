@@ -270,7 +270,7 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
 // adminAuthRegister //
 app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   // const { email, password, nameFirst, nameLast } = req.body;
-  const result = adminAuthRegister(req.body.email, req.body.password, req.body.nameFirst, req.body.nameLast, false);
+  const result = adminAuthRegister(req.body.email, req.body.password, req.body.nameFirst, req.body.nameLast);
   if ('error' in result) {
     res.status(400);
   }
@@ -310,7 +310,7 @@ app.put('/v1/admin/user/details', (req: Request, res: Response) => {
 // adminAuthLogin //
 app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
   const { email, password } = req.body;
-  const response = adminAuthLogin(email, password, false);
+  const response = adminAuthLogin(email, password);
   if ('error' in response) {
     return res.status(400).json(response);
   }
