@@ -2,6 +2,7 @@ import { setData, getData } from './dataStore';
 import { Error, Data, Users, Token, TokenId, User } from './interfaces';
 import validator from 'validator';
 import { isValidTokenStructure, isTokenLoggedIn, findUserFromToken, isWhiteSpace } from './helper';
+import HTTPError from 'http-errors';
 
 /**
  * Register a user with an email, password, and names, then returns their
@@ -127,15 +128,11 @@ export function adminUserDetails(token: string): User | Error {
   const data: Data = getData();
 
   if (!isValidTokenStructure(token)) {
-    return {
-      error: 'token is an invalid structure'
-    };
+    throw HTTPError(401, 'token is an invalid structure');
   }
 
   if (!isTokenLoggedIn(token)) {
-    return {
-      error: 'token is not logged in'
-    };
+    throw HTTPError(403, 'token is not logged in');
   }
 
   const userId = findUserFromToken(token);
