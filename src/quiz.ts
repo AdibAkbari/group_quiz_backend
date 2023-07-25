@@ -202,25 +202,29 @@ export function adminQuizTrash(token: string): {quizzes: QuizList[]} | Error {
 export function adminQuizRestore(token: string, quizId: number): Record<string, never> | Error {
   // invalid token structure
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    // return { error: 'Invalid Token Structure' };
+    throw HTTPError(401, 'Invalid Token Structure');
   }
 
   // token is not logged in
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    // return { error: 'Token not logged in' };
+    throw HTTPError(403, 'Token not logged in');
   }
 
   const data = getData();
   const quizIndex = data.trash.findIndex((quiz) => quiz.quizId === quizId);
   if (quizIndex === -1) {
-    return { error: 'Invalid: quiz is not currently in trash or does not exist' };
+    // return { error: 'Invalid: quiz is not currently in trash or does not exist' };
+    throw HTTPError(400, 'Invalid: quiz is not currently in trash or does not exist');
   }
 
   // get authUserId from token
   const authUserId = findUserFromToken(token);
 
   if (data.trash[quizIndex].creator !== authUserId) {
-    return { error: 'Invalid: user does not own quiz' };
+    // return { error: 'Invalid: user does not own quiz' };
+    throw HTTPError(400, 'Invalid: user does not own quiz');
   }
 
   // get time in seconds

@@ -259,17 +259,7 @@ export function quizTrashRequest(token: string) {
 }
 
 export function quizRestoreRequest(token: string, quizId: number) {
-  const res = request(
-    'POST',
-    SERVER_URL + `/v1/admin/quiz/${quizId}/restore`,
-    {
-      json: { token: token }
-    }
-  );
-  return {
-    body: JSON.parse(res.body.toString()),
-    statusCode: JSON.parse(res.statusCode.toString())
-  };
+  return requestHelper('POST', `/v2/admin/quiz/${quizId}/restore`, { }, { token });
 }
 
 export function updateQuizQuestionRequest(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {

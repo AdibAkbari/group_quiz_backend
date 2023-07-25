@@ -75,6 +75,13 @@ app.get('/v2/admin/quiz/trash', (req: Request, res: Response) => {
   res.json(adminQuizTrash(token));
 });
 
+// adminQuizRestore //
+app.post('/v2/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const token = req.headers.token as string;
+  res.json(adminQuizRestore(token, quizId));
+});
+
 // ====================================================================
 //  ================= IT 2 TEST ROUTES (OLD) ==========================
 // ====================================================================
