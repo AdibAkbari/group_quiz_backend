@@ -55,19 +55,6 @@ app.use(morgan('dev'));
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
 
-// adminQuizCreate //
-app.post('/v2/admin/quiz', (req: Request, res: Response) => {
-  const token = req.headers.token as string;
-  const { name, description } = req.body;
-  res.json(adminQuizCreate(token, name, description, true));
-});
-
-
-// ====================================================================
-//  ================= IT 2 TEST ROUTES (OLD) ==========================
-// ====================================================================
-
-
 // adminQuizDescriptionUpdate //
 app.put('/v2/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);

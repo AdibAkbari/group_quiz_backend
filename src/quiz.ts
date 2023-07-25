@@ -231,7 +231,7 @@ export function adminQuizRestore(token: string, quizId: number, isv2: boolean): 
  * @returns {{}} empty object
  */
 export function adminQuizTrashEmpty(token: string, quizIds: number[], isv2: boolean): Record<string, never> | Error {
-  if (!isValidTokenStructure(token)) {\
+  if (!isValidTokenStructure(token)) {
     return giveError(isv2, 'Invalid Token Structure', 401);
   }
 
