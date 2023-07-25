@@ -7,17 +7,18 @@ import {
   quizRemoveRequest,
   adminQuizListRequest,
   adminQuizInfoRequest,
-} from './it3_testRoutes';
+} from './testRoutes';
 import { TokenId, QuizId } from '../interfaces';
-import HTTPError from 'http-errors';
+
+const ERROR = { error: expect.any(String) };
 
 let user: TokenId;
 let quiz: QuizId;
 // creates a user and a quiz for the user.
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
-  quiz = quizCreateRequest(user.token, 'quiz1', '');
+  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
+  quiz = quizCreateRequest(user.token, 'quiz1', '').body;
 });
 
 describe('adminQuizRestore', () => {
@@ -35,49 +36,63 @@ describe('adminQuizRestore', () => {
       { testName: 'token has negative sign', token: '-37294' },
       { testName: 'token has positive sign', token: '+38594' },
     ])('token is not a valid structure: $testName', ({ token }) => {
-      expect(() => quizRestoreRequest(token, quiz.quizId)).toThrow(HTTPError[401]);
+      const restoreQuiz = quizRestoreRequest(token, quiz.quizId);
+      expect(restoreQuiz.body).toStrictEqual(ERROR);
+      expect(restoreQuiz.statusCode).toStrictEqual(401);
     });
 
     test('TokenId not logged in', () => {
-      expect(() => quizRestoreRequest(user.token + 1, quiz.quizId)).toThrow(HTTPError[403]);
+      const restoreQuiz = quizRestoreRequest(user.token + 1, quiz.quizId);
+      expect(restoreQuiz.body).toStrictEqual(ERROR);
+      expect(restoreQuiz.statusCode).toStrictEqual(403);
     });
 
     test('Quiz ID does not refer to a valid quiz', () => {
       quizRemoveRequest(user.token, quiz.quizId);
-      expect(() => quizRestoreRequest(user.token, quiz.quizId + 1)).toThrow(HTTPError[400]);
+      const restoreQuiz = quizRestoreRequest(user.token, quiz.quizId + 1);
+      expect(restoreQuiz.body).toStrictEqual(ERROR);
+      expect(restoreQuiz.statusCode).toStrictEqual(400);
     });
 
     test('Quiz ID does not refer to a quiz that this user owns', () => {
       quizRemoveRequest(user.token, quiz.quizId);
-      const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast');
-      const quiz2 = quizCreateRequest(user2.token, 'quiz2', '');
+      const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
+      const quiz2 = quizCreateRequest(user2.token, 'quiz2', '').body;
       quizRemoveRequest(user2.token, quiz2.quizId);
 
       // user tries to restore quiz created and removed by user2
-      expect(() => quizRestoreRequest(user.token, quiz2.quizId)).toThrow(HTTPError[400]);
+      const restoreQuiz = quizRestoreRequest(user.token, quiz2.quizId);
+      expect(restoreQuiz.body).toStrictEqual(ERROR);
+      expect(restoreQuiz.statusCode).toStrictEqual(400);
     });
 
     test('Quiz ID does not refer to a quiz in trash', () => {
-      expect(() => quizRestoreRequest(user.token, quiz.quizId)).toThrow(HTTPError[400]);
+      const restoreQuiz = quizRestoreRequest(user.token, quiz.quizId);
+      expect(restoreQuiz.body).toStrictEqual(ERROR);
+      expect(restoreQuiz.statusCode).toStrictEqual(400);
     });
   });
 
   describe('Success cases', () => {
-    let restoreQuiz: Record<string, never>;
+    let restoreQuizBody: Record<string, never>;
+    let restoreQuizStatusCode: number;
     let quiz2: QuizId;
     let quiz3: QuizId;
     // creates 2 more quizzes and removes all quizzes to trash
     beforeEach(() => {
-      quiz2 = quizCreateRequest(user.token, 'quiz2', '');
-      quiz3 = quizCreateRequest(user.token, 'quiz3', '');
+      quiz2 = quizCreateRequest(user.token, 'quiz2', '').body;
+      quiz3 = quizCreateRequest(user.token, 'quiz3', '').body;
       quizRemoveRequest(user.token, quiz.quizId);
       quizRemoveRequest(user.token, quiz2.quizId);
       quizRemoveRequest(user.token, quiz3.quizId);
-      restoreQuiz = quizRestoreRequest(user.token, quiz.quizId);
+      const restoreQuiz = quizRestoreRequest(user.token, quiz.quizId);
+      restoreQuizBody = restoreQuiz.body;
+      restoreQuizStatusCode = restoreQuiz.statusCode;
     });
 
     test('outputs empty object', () => {
-      expect(restoreQuiz).toStrictEqual({});
+      expect(restoreQuizBody).toStrictEqual({});
+      expect(restoreQuizStatusCode).toStrictEqual(200);
     });
 
     test('removes quiz from trash', () => {
@@ -93,7 +108,7 @@ describe('adminQuizRestore', () => {
           }
         ]
       };
-      const trashList = quizTrashRequest(user.token);
+      const trashList = quizTrashRequest(user.token).body;
       const trashSet = new Set(trashList.quizzes);
       const expectedSet = new Set(expected.quizzes);
       expect(trashSet).toStrictEqual(expectedSet);
@@ -108,12 +123,12 @@ describe('adminQuizRestore', () => {
           }
         ]
       };
-      expect(adminQuizListRequest(user.token)).toStrictEqual(expected);
+      expect(adminQuizListRequest(user.token).body).toStrictEqual(expected);
     });
 
     test('timeLastEdited successfully updated', () => {
       const timeNow = Math.floor(Date.now() / 1000);
-      const result = adminQuizInfoRequest(user.token, quiz.quizId);
+      const result = adminQuizInfoRequest(user.token, quiz.quizId).body;
       expect(result.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
       expect(result.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
     });
