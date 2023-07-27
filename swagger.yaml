@@ -765,8 +765,6 @@ components:
       schema:
         type: object
         properties:
-          token:
-            $ref: '#/components/prim/Token'
           action:
             $ref: '#/components/prim/Action'
     QuizSessionStatus:
@@ -1200,6 +1198,7 @@ paths:
           description: |
             If any of the following are true:
             - Old Password is not the correct old password
+            - Old Password and New Password match exactly
             - New Password has already been used before by this user
             - New Password is less than 8 characters
             - New Password does not contain at least one number and at least one letter
@@ -1232,7 +1231,7 @@ paths:
           description: |
             If any of the following are true:
             - Old Password is not the correct old password
-            - Old Password and New Password do not match
+            - Old Password and New Password match exactly
             - New Password has already been used before by this user
             - New Password is less than 8 characters
             - New Password does not contain at least one number and at least one letter

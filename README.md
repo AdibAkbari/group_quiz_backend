@@ -16,6 +16,8 @@
 * 11/07: Clarified for `/v1/admin/quiz/trash` that you are viewing the trash "for the logged in user"
 * 17/07: Slight elaborate of what "colours of a question" meant
 * 23/07: Fixed mistake in trash swagger; Replaced "c + 1" with "c" in marking criteria for iter3
+* 24/07: Aligned comments on `tsc` in iteration 3 to match lecture instructions
+* 25/07: Clarification on FINISH_COUNTDOWN length; Clarified some language in the requirements iteration 3 section; `/v1/admin/quiz/{quizid}/session/{sessionid}` removed double token. Typo fix on password update route. Typos fixed in 4 spots e.g. "Session Id does not refer to a valid question within this quiz"
 
 ## 🫡 0. Aims:
 
@@ -1251,7 +1253,7 @@ We have opted not to provide you with a sample structure - because we're not int
 
 Find 2-3 people to interview as target users. Target users are people who currently use a tool like Toohak, or intend to. Record their name and email address.
 
-Develop a series of questions (at least 4) to ask these target users to understand what *problems* they might have with teamwork-driven communication tools that are currently unsolved by Toohak. Give these questions to your target users and record their answers.
+Develop a series of questions (at least 4) to ask these target users to understand what *problems* they might have with quiz tools that are currently unsolved by Toohak. Give these questions to your target users and record their answers.
 
 Once you have done this, think about how you would solve the target users' problem(s) and write down a brief description of a proposed solution.
 
@@ -1279,7 +1281,7 @@ Now that you have a sense of the problem to solve, and what capabilities you wil
 
 ### 🦆 5.6. States & Actions
 
-Iteration 3 sees the introduction of a quiz session, which describes a particular instance of a quiz being run.
+Iteration 3 sees the introduction of a quiz session, which describes a particular instance of a quiz being run.e
 
 Sessions can be in one of many states:
  * **LOBBY**: Players can join in this state, and nothing has started
@@ -1297,6 +1299,8 @@ There are 4 key actions that an admin can send that moves us between these state
  * **END**: Go straight to the END state
 
 The constraints on moving between these states can be found in the state diagram here: https://miro.com/app/board/uXjVMNVSA6o=/?share_link_id=275801581370
+
+**FINISH_COUNTDOWN note**: The countdown timer in the backend should be set to 0.1 seconds for your final submission. This will allow testing and timing to be done much more easily. However, during development or general play before submission, you may want to set it to a higher number just to make the game experience more realistic.
 
 ### 🦆 5.7. Error raising
 
@@ -1489,7 +1493,7 @@ If a player does not answer a question, their rank is 0 for that question.
     <td>(Bonus Marks) Typescript</td>
     <td>10%</td>
     <td><ul>
-      <li>Up to 10% extra marks can be gained by ensuring your code is Typescript compliant using <code>npm run tsc</code>.</li>
+      <li>Up to 10% extra marks can be gained by ensuring your code is Typescript compliant using <code>npm run tsc</code>. This includes no use of the `any` keyword and includes no other check disabling keywords (e.g. "ts-nocheck")</li>
     </ul>
   </td>
   </tr>
