@@ -67,7 +67,7 @@ describe('invalid quizId', () => {
 
   // Quiz ID refers to a quiz that has a name that is already used by the target user
   test('User already has a quiz named', () => {
-    const quiz2 = quizCreateRequest(user2.token, 'quiz1', '');
+    quizCreateRequest(user2.token, 'quiz1', '');
 
     expect(() => quizTransferRequest(user.token, quiz.quizId, 'email2@gmail.com')).toThrow(HTTPError[400]);
   });

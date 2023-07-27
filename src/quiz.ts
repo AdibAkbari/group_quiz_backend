@@ -343,7 +343,7 @@ export function adminQuizNameUpdate(token: string, quizId: number, name: string,
   const timeNow = Math.floor(Date.now() / 1000);
 
   const quizToUpdate = data.quizzes.find((current) => current.quizId === quizId);
-  
+
   quizToUpdate.name = name;
   quizToUpdate.timeLastEdited = timeNow;
   setData(data);
