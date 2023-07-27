@@ -5,16 +5,21 @@ import {
   quizDescriptionUpdateRequest,
   quizCreateRequest,
   adminQuizInfoRequest,
+  quizDescriptionUpdateRequestV1,
+  quizCreateRequestV1,
+  adminQuizInfoRequestV1,
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
 
 import { TokenId, QuizId } from '../interfaces';
 
+const ERROR = { error: expect.any(String) };
+
 let user: TokenId;
 let quiz: QuizId;
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
+  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
   quiz = quizCreateRequest(user.token, 'My Quiz', 'First Description');
 });
 
@@ -24,7 +29,7 @@ describe('Error Cases', () => {
   });
 
   test('user does not own quiz', () => {
-    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'first', 'last');
+    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'first', 'last').body;
     const quiz2 = quizCreateRequest(user2.token, 'User 2 Quiz', 'First Description');
 
     expect(() => quizDescriptionUpdateRequest(quiz2.quizId, user.token, 'New Description')).toThrow(HTTPError[400]);
@@ -55,23 +60,55 @@ describe('Error Cases', () => {
   });
 });
 
-test('valid input', () => {
-  expect(quizDescriptionUpdateRequest(quiz.quizId, user.token, 'New Description')).toStrictEqual({ });
+describe('Success Cases', () => {
+  test('valid input', () => {
+    expect(quizDescriptionUpdateRequest(quiz.quizId, user.token, 'New Description')).toStrictEqual({ });
 
-  expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual(
-    {
-      quizId: quiz.quizId,
-      name: 'My Quiz',
-      timeCreated: expect.any(Number),
-      timeLastEdited: expect.any(Number),
-      description: 'New Description',
-      numQuestions: 0,
-      questions: [],
-      duration: 0
-    }
-  );
-  const timeNow = Math.floor(Date.now() / 1000);
-  const result = adminQuizInfoRequest(user.token, quiz.quizId);
-  expect(result.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
-  expect(result.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
-});
+    expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual(
+      {
+        quizId: quiz.quizId,
+        name: 'My Quiz',
+        timeCreated: expect.any(Number),
+        timeLastEdited: expect.any(Number),
+        description: 'New Description',
+        numQuestions: 0,
+        questions: [],
+        duration: 0
+      }
+    );
+    const timeNow = Math.floor(Date.now() / 1000);
+    const result = adminQuizInfoRequest(user.token, quiz.quizId);
+    expect(result.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
+    expect(result.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
+  });
+})
+
+describe('V1 WRAPPERS', () => {
+    test('valid input V1', () => {
+        const update = quizDescriptionUpdateRequestV1(quiz.quizId, user.token, 'New Description');
+        expect(update.body).toStrictEqual({ });
+        expect(update.statusCode).toBe(200);
+        expect(adminQuizInfoRequestV1(user.token, quiz.quizId).body).toStrictEqual(
+          {
+            quizId: quiz.quizId,
+            name: 'My Quiz',
+            timeCreated: expect.any(Number),
+            timeLastEdited: expect.any(Number),
+            description: 'New Description',
+            numQuestions: 0,
+            questions: [],
+            duration: 0
+          }
+        );
+        const timeNow = Math.floor(Date.now() / 1000);
+        const result = adminQuizInfoRequestV1(user.token, quiz.quizId).body;
+        expect(result.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
+        expect(result.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
+      });
+
+      test('description too long', () => {
+        const update = quizDescriptionUpdateRequestV1(quiz.quizId, user.token, '1'.repeat(101));
+        expect(update.body).toStrictEqual(ERROR);
+        expect(update.statusCode).toStrictEqual(400);
+      });
+})

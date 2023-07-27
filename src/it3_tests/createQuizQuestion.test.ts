@@ -3,18 +3,21 @@ import {
   authRegisterRequest,
   clearRequest,
   createQuizQuestionRequest,
-  adminQuizInfoRequest
+  adminQuizInfoRequest,
+  createQuizQuestionRequestV1
 } from './it3_testRoutes';
 import { TokenId, QuizId, QuestionId } from '../interfaces';
 import HTTPError from 'http-errors';
 
 const validAnswers = [{ answer: 'great', correct: true }, { answer: 'bad', correct: false }];
 
+const ERROR = { error: expect.any(String) };
+
 let user: TokenId;
 let quiz: QuizId;
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname');
+  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
   quiz = quizCreateRequest(user.token, 'Cats', 'A quiz about cats');
 });
 
@@ -24,7 +27,7 @@ describe('Valid answer inputs, invalid other input', () => {
   });
 
   test('QuizId does not refer to a quiz that this user owns', () => {
-    const user2 = authRegisterRequest('email1@gmail.com', 'password2', 'FirstnameB', 'LastnameB');
+    const user2 = authRegisterRequest('email1@gmail.com', 'password2', 'FirstnameB', 'LastnameB').body;
     const quiz2 = quizCreateRequest(user2.token, 'Dogs', 'A quiz about dogs');
     expect(() => createQuizQuestionRequest(quiz2.quizId, user.token, 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[400]);
   });
@@ -267,5 +270,22 @@ describe('valid edge cases', () => {
     createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 60, 5, validAnswers);
 
     expect(createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3', 60, 5, validAnswers).questionId).toStrictEqual(expect.any(Number));
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('Unused tokenId', () => {
+    const result = createQuizQuestionRequestV1(quiz.quizId, user.token + 1, 'How are you?', 5, 5, validAnswers);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(403);
+  });
+
+  let q1: QuestionId;
+  beforeEach(() => {
+    q1 = createQuizQuestionRequestV1(quiz.quizId, user.token, 'Question 1', 5, 5, validAnswers).body;
+  });
+
+  test('create 1 question', () => {
+    expect(q1.questionId).toStrictEqual(expect.any(Number));
   });
 });

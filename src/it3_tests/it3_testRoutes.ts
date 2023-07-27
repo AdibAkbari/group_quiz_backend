@@ -66,16 +66,40 @@ const requestHelper = (
 // ========================================================================= //
 
 export function clearRequest() {
-  return requestHelper('DELETE', '/v1/clear', {});
+  const res = request(
+    'DELETE',
+    SERVER_URL + '/v1/clear'
+  );
+  return JSON.parse(res.body.toString());
 }
 
 // AUTH/USER ROUTES //
 export function authLoginRequest(email: string, password: string) {
-  return requestHelper('POST', '/v1/admin/auth/login', { email, password }, {});
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/admin/auth/login',
+    {
+      json: { email: email, password: password },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
 }
 
 export function authRegisterRequest(email: string, password: string, nameFirst: string, nameLast: string) {
-  return requestHelper('POST', '/v1/admin/auth/register', { email, password, nameFirst, nameLast }, {});
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/admin/auth/register',
+    {
+      json: { email: email, password: password, nameFirst: nameFirst, nameLast: nameLast },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
 }
 
 export function updateUserPasswordRequest(token: string, oldPassword: string, newPassword: string) {
@@ -179,4 +203,298 @@ export function updateQuizQuestionRequest(quizId: number, questionId: number, to
     },
     { token }
   );
+}
+
+// ====================================================================
+//  ================= IT 2 TEST ROUTES (OLD) ==========================
+// ====================================================================
+
+export function quizCreateRequestV1(token: string, name: string, description: string) {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/admin/quiz',
+    {
+      json: { token: token, name: name, description: description },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function updateUserPasswordRequestV1(token: string, oldPassword: string, newPassword: string) {
+  const res = request(
+    'PUT',
+    SERVER_URL + '/v1/admin/user/password',
+    {
+      json: { token: token, oldPassword: oldPassword, newPassword: newPassword },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function adminUserDetailsRequestV1(token: string) {
+  const res = request(
+    'GET',
+    SERVER_URL + '/v1/admin/user/details',
+    {
+      qs: {
+        token: token,
+      }
+    });
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function adminQuizInfoRequestV1(token: string, quizId: number) {
+  const res = request(
+    'GET',
+    SERVER_URL + `/v1/admin/quiz/${quizId}`,
+    {
+      qs: {
+        token: token,
+      }
+    });
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function updateUserDetailsRequestV1(token: string, email: string, nameFirst: string, nameLast: string) {
+  const res = request(
+    'PUT',
+    SERVER_URL + '/v1/admin/user/details',
+    {
+      json: { token: token, email: email, nameFirst: nameFirst, nameLast: nameLast },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function createQuizQuestionRequestV1(quizId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
+  const res = request(
+    'POST',
+    SERVER_URL + `/v1/admin/quiz/${quizId}/question`,
+    {
+      json: {
+        token: token,
+        questionBody: {
+          question,
+          duration,
+          points,
+          answers
+        }
+      }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function moveQuizQuestionRequestV1(token: string, quizId: number, questionId: number, newPosition: number) {
+  const res = request(
+    'PUT',
+    SERVER_URL + `/v1/admin/quiz/${quizId}/question/${questionId}/move`,
+    {
+      json: {
+        token: token,
+        newPosition: newPosition,
+      }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function deleteQuizQuestionRequestV1(token: string, quizId: number, questionId: number) {
+  const res = request(
+    'DELETE',
+    SERVER_URL + `/v1/admin/quiz/${quizId}/question/${questionId}`,
+    {
+      qs: {
+        token: token,
+      }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function quizRemoveRequestV1(token: string, quizid: number) {
+  const res = request(
+    'DELETE',
+    SERVER_URL + `/v1/admin/quiz/${quizid}`,
+    {
+      qs: { token: token },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function quizNameUpdateRequestV1(token: string, quizid: number, name: string) {
+  const res = request(
+    'PUT',
+    SERVER_URL + `/v1/admin/quiz/${quizid}/name`,
+    {
+      json: { token: token, name: name },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function adminQuizListRequestV1(token: string) {
+  const res = request(
+    'GET',
+    SERVER_URL + '/v1/admin/quiz/list',
+    {
+      qs: {
+        token: token,
+      }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function quizTransferRequestV1(token: string, quizid: number, userEmail: string) {
+  const res = request(
+    'POST',
+    SERVER_URL + `/v1/admin/quiz/${quizid}/transfer`,
+    {
+      json: { token: token, userEmail: userEmail },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function quizTrashRequestV1(token: string) {
+  const res = request(
+    'GET',
+    SERVER_URL + '/v1/admin/quiz/trash',
+    {
+      qs: { token: token }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function quizRestoreRequestV1(token: string, quizId: number) {
+  const res = request(
+    'POST',
+    SERVER_URL + `/v1/admin/quiz/${quizId}/restore`,
+    {
+      json: { token: token }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function updateQuizQuestionRequestV1(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
+  const res = request(
+    'PUT',
+    SERVER_URL + `/v1/admin/quiz/${quizId}/question/${questionId}`,
+    {
+      json: {
+        token: token,
+        questionBody: {
+          question,
+          duration,
+          points,
+          answers
+        }
+      }
+    });
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function quizTrashEmptyRequestV1(token: string, quizIds: number[]) {
+  const res = request(
+    'DELETE',
+    SERVER_URL + '/v1/admin/quiz/trash/empty',
+    {
+      qs: { token: token, quizIds: JSON.stringify(quizIds) }
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function quizQuestionDuplicateRequestV1(quizid: number, questionid: number, token: string) {
+  const res = request(
+    'POST',
+    SERVER_URL + `/v1/admin/quiz/${quizid}/question/${questionid}/duplicate`,
+    {
+      json: { token: token },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function quizDescriptionUpdateRequestV1(quizid: number, token: string, description: string) {
+  const res = request(
+    'PUT',
+    SERVER_URL + `/v1/admin/quiz/${quizid}/description`,
+    {
+      json: { token: token, description: description },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
+}
+
+export function authLogoutRequestV1(tokenId: string) {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/admin/auth/logout',
+    {
+      json: { token: tokenId },
+    }
+  );
+  return {
+    body: JSON.parse(res.body.toString()),
+    statusCode: JSON.parse(res.statusCode.toString())
+  };
 }

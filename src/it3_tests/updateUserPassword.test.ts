@@ -4,9 +4,12 @@ import {
   authLoginRequest,
   clearRequest,
   updateUserPasswordRequest,
+  updateUserPasswordRequestV1,
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
 import { TokenId } from '../interfaces';
+
+const ERROR = { error: expect.any(String) };
 
 beforeEach(() => {
   clearRequest();
@@ -14,12 +17,12 @@ beforeEach(() => {
 
 describe('Error Cases: updateUserDetails', () => {
   test('Old Password Incorrect', () => {
-    const user: TokenId = authRegisterRequest('email@gmail.com', 'password1', 'NameFirst', 'NameLast');
+    const user: TokenId = authRegisterRequest('email@gmail.com', 'password1', 'NameFirst', 'NameLast').body;
     expect(() => updateUserPasswordRequest(user.token, 'password2', 'password3')).toThrow(HTTPError[400]);
   });
 
   test('New Password Used Previously', () => {
-    const user = authRegisterRequest('email@gmail.com', 'password1', 'NameFirst', 'NameLast');
+    const user = authRegisterRequest('email@gmail.com', 'password1', 'NameFirst', 'NameLast').body;
     updateUserPasswordRequest(user.token, 'password1', 'password2');
     expect(() => updateUserPasswordRequest(user.token, 'password2', 'password1')).toThrow(HTTPError[400]);
   });
@@ -30,7 +33,7 @@ describe('Error Cases: updateUserDetails', () => {
     { testName: 'new password must contain number', pass: 'password' },
     { testName: 'new password must contain letter', pass: '12345678' },
   ])('$testName: $pass', ({ pass }) => {
-    const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
+    const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
     expect(() => updateUserPasswordRequest(user.token, 'password1', pass)).toThrow(HTTPError[400]);
   });
 
@@ -57,17 +60,33 @@ describe('Error Cases: updateUserDetails', () => {
 
 describe('Valid Inputs', () => {
   test('update password once', () => {
-    const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
+    const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
     expect(updateUserPasswordRequest(user.token, 'password1', 'password2')).toStrictEqual({ });
-    expect(() => authLoginRequest('email@gmail.com', 'password1')).toThrow(HTTPError[400]);
+    const login = authLoginRequest('email@gmail.com', 'password1');
+    expect(login.statusCode).toBe(400);
+    expect(login.body).toStrictEqual(ERROR);
   });
 
   test('update password twice', () => {
-    const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
+    const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
     const update = updateUserPasswordRequest(user.token, 'password1', 'password2');
     expect(update).toStrictEqual({ });
     const update2 = updateUserPasswordRequest(user.token, 'password2', 'password3');
     expect(update2).toStrictEqual({ });
-    expect(() => authLoginRequest('email@gmail.com', 'password1')).toThrow(HTTPError[400]);
+    const login = authLoginRequest('email@gmail.com', 'password1');
+    expect(login.statusCode).toBe(400);
+    expect(login.body).toStrictEqual(ERROR);
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('update password once', () => {
+    const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
+    const update = updateUserPasswordRequestV1(user.token, 'password1', 'password2');
+    expect(update.statusCode).toBe(200);
+    expect(update.body).toStrictEqual({ });
+    const login = authLoginRequest('email@gmail.com', 'password1');
+    expect(login.statusCode).toBe(400);
+    expect(login.body).toStrictEqual(ERROR);
   });
 });

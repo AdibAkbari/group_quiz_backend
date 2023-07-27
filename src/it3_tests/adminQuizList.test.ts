@@ -3,18 +3,21 @@ import {
   adminQuizListRequest,
   quizCreateRequest,
   authRegisterRequest,
-  clearRequest
+  clearRequest,
+  adminQuizListRequestV1,
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
 
 import { TokenId, QuizId } from '../interfaces';
 
+const ERROR = { error: expect.any(String) };
+
 let user: TokenId;
 let user2: TokenId;
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname');
-  user2 = authRegisterRequest('email1@gmail.com', 'password2', 'FirstnameB', 'LastnameB');
+  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
+  user2 = authRegisterRequest('email1@gmail.com', 'password2', 'FirstnameB', 'LastnameB').body;
 });
 
 describe('Token invalid', () => {
@@ -132,5 +135,19 @@ describe('User does own quizzes', () => {
     const receivedSet = new Set(received.quizzes);
     const expectedSet = new Set(expected.quizzes);
     expect(receivedSet).toStrictEqual(expectedSet);
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('No quizzes', () => {
+    expect(adminQuizListRequestV1(user.token).body).toStrictEqual({
+      quizzes: []
+    });
+  });
+
+  test('Unused tokenId', () => {
+    const list = adminQuizListRequestV1(user.token + user2.token);
+    expect(list.body).toStrictEqual(ERROR);
+    expect(list.statusCode).toStrictEqual(403);
   });
 });

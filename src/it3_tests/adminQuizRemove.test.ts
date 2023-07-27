@@ -5,16 +5,19 @@ import {
   quizRemoveRequest,
   adminQuizListRequest,
   adminQuizInfoRequest,
+  quizRemoveRequestV1,
 } from './it3_testRoutes';
 import { TokenId, QuizId } from '../interfaces';
 import HTTPError from 'http-errors';
+
+const ERROR = { error: expect.any(String) };
 
 // Before each test, clear data and then create a new user and new quiz
 let user: TokenId;
 let quiz: QuizId;
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
+  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
   quiz = quizCreateRequest(user.token, 'quiz1', '');
 });
 
@@ -52,7 +55,7 @@ describe('Failed to remove', () => {
 
   // Testing the user does not own the quiz that is trying to be removed
   test('Quiz ID does not refer to a quiz that this user owns', () => {
-    const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast');
+    const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
     const quiz2 = quizCreateRequest(user2.token, 'quiz2', '');
 
     expect(() => quizRemoveRequest(user.token, quiz2.quizId)).toThrow(HTTPError[400]);
@@ -114,5 +117,19 @@ describe('Successfully removed quiz check', () => {
 
     expect(quiz3.quizId).not.toStrictEqual(quiz.quizId);
     expect(quiz3.quizId).not.toStrictEqual(quiz2.quizId);
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('Sucessful quiz remove return', () => {
+    const removeQuiz = quizRemoveRequestV1(user.token, quiz.quizId);
+    expect(removeQuiz.body).toStrictEqual({});
+    expect(removeQuiz.statusCode).toStrictEqual(200);
+  });
+
+  test('Quiz ID does not refer to a valid quiz', () => {
+    const removeQuiz = quizRemoveRequestV1(user.token, quiz.quizId + 1);
+    expect(removeQuiz.body).toStrictEqual(ERROR);
+    expect(removeQuiz.statusCode).toStrictEqual(400);
   });
 });

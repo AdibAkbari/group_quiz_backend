@@ -3,8 +3,12 @@ import {
   authRegisterRequest,
   quizCreateRequest,
   adminQuizInfoRequest,
+  quizCreateRequestV1,
+  adminQuizInfoRequestV1,
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
+
+const ERROR = { error: expect.any(String) };
 
 interface Token {
   token: string
@@ -19,7 +23,7 @@ describe('invalid name/description edge cases', () => {
   let user: Token;
   beforeEach(() => {
     clearRequest();
-    user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
+    user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
   });
 
   test.each([
@@ -83,7 +87,7 @@ describe('Token invalid', () => {
   });
 
   test('TokenId not logged in', () => {
-    const user = authRegisterRequest('email@gmail.com', 'password1', 'NameFirst', 'NameLast');
+    const user = authRegisterRequest('email@gmail.com', 'password1', 'NameFirst', 'NameLast').body;
     expect(() => quizCreateRequest(user.token + 1, 'TestQuiz', '')).toThrow(HTTPError[403]);
   });
 });
@@ -94,7 +98,7 @@ describe('valid input tests', () => {
   let user: Token;
   beforeEach(() => {
     clearRequest();
-    user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
+    user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
   });
 
   test('valid input - testing quizId creation', () => {
@@ -115,5 +119,26 @@ describe('valid input tests', () => {
         duration: 0,
       }
     );
+  });
+});
+
+// Successful quizCreate
+describe('V1 WRAPPERS', () => {
+  // test adminQuizCreate correct output
+  let user: Token;
+  beforeEach(() => {
+    clearRequest();
+    user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
+  });
+
+  test('valid input - testing quizId creation', () => {
+    expect(quizCreateRequestV1(user.token, 'TestQuiz', '').body).toStrictEqual({ quizId: expect.any(Number) });
+  });
+
+  test('name already used by user for another quiz', () => {
+    quizCreateRequestV1(user.token, 'TestQuiz', '');
+    const quiz = quizCreateRequestV1(user.token, 'TestQuiz', '');
+    expect(quiz.statusCode).toBe(400);
+    expect(quiz.body).toStrictEqual(ERROR);
   });
 });

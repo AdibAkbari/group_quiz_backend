@@ -4,7 +4,8 @@ import {
   clearRequest,
   createQuizQuestionRequest,
   deleteQuizQuestionRequest,
-  adminQuizInfoRequest
+  adminQuizInfoRequest,
+  deleteQuizQuestionRequestV1
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
 import {
@@ -15,12 +16,14 @@ import {
 
 const validAnswers = [{ answer: 'great', correct: true }, { answer: 'bad', correct: false }];
 
+const ERROR = { error: expect.any(String) };
+
 let user: TokenId;
 let quiz: QuizId;
 let question: QuestionId;
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname');
+  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
   quiz = quizCreateRequest(user.token, 'Cats', 'A quiz about cats');
   question = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 5, validAnswers);
 });
@@ -55,7 +58,7 @@ describe('Invalid QuizId', () => {
 
   // Testing the user does not own the quiz that is trying to be removed
   test('Quiz ID does not refer to a quiz that this user owns', () => {
-    const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast');
+    const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
     const quiz2 = quizCreateRequest(user2.token, 'quiz2', '');
 
     expect(() => deleteQuizQuestionRequest(user.token, quiz2.quizId, question.questionId)).toThrow(HTTPError[400]);
@@ -76,7 +79,7 @@ describe('Invalid Questionid', () => {
 
   // Testing the question id exist but the user does not have any questions
   test('QuestionId Exist but not in the users Quiz', () => {
-    const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast');
+    const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
     const quiz2 = quizCreateRequest(user2.token, 'quiz2', '');
 
     expect(() => deleteQuizQuestionRequest(user2.token, quiz2.quizId, question.questionId)).toThrow(HTTPError[400]);
@@ -141,5 +144,19 @@ describe('Successfully removed quiz question', () => {
 
     expect(question3.questionId).not.toStrictEqual(question.questionId);
     expect(question3.questionId).not.toStrictEqual(question2.questionId);
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('Quiz ID does not refer to a valid quiz', () => {
+    const deleteQuestion = deleteQuizQuestionRequestV1(user.token, quiz.quizId + 1, question.questionId);
+    expect(deleteQuestion.body).toStrictEqual(ERROR);
+    expect(deleteQuestion.statusCode).toStrictEqual(400);
+  });
+
+  test('Sucessful quiz remove question empty return', () => {
+    const deleteQuestion = deleteQuizQuestionRequestV1(user.token, quiz.quizId, question.questionId);
+    expect(deleteQuestion.body).toStrictEqual({});
+    expect(deleteQuestion.statusCode).toStrictEqual(200);
   });
 });

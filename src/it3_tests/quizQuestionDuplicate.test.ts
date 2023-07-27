@@ -6,6 +6,7 @@ import {
   createQuizQuestionRequest,
   quizQuestionDuplicateRequest,
   adminQuizInfoRequest,
+  quizQuestionDuplicateRequestV1
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
 
@@ -15,6 +16,7 @@ import {
   QuestionId,
 } from '../interfaces';
 
+const ERROR = { error: expect.any(String) };
 const validAnswers = [{ answer: 'great', correct: true }, { answer: 'bad', correct: false }];
 
 let user: TokenId;
@@ -22,7 +24,7 @@ let quiz: QuizId;
 let question: QuestionId;
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
+  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
   quiz = quizCreateRequest(user.token, 'My Quiz', 'This is my quiz');
   question = createQuizQuestionRequest(quiz.quizId, user.token, 'How are you?', 5, 5, validAnswers);
 });
@@ -33,7 +35,7 @@ describe('error cases', () => {
   });
 
   test('user does not own quiz', () => {
-    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'Firstname', 'Lastname');
+    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'Firstname', 'Lastname').body;
     expect(() => quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user2.token)).toThrow(HTTPError[400]);
   });
 
@@ -154,5 +156,13 @@ describe('valid input', () => {
     });
     expect(info.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
     expect(info.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('TokenId not logged in', () => {
+    const result = quizQuestionDuplicateRequestV1(quiz.quizId, question.questionId, user.token + 1);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(403);
   });
 });

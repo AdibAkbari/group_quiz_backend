@@ -4,16 +4,20 @@ import {
   quizNameUpdateRequest,
   adminQuizInfoRequest,
   quizCreateRequest,
+  quizNameUpdateRequestV1,
+  adminQuizInfoRequestV1,
 } from './it3_testRoutes';
 import { TokenId, QuizId } from '../interfaces';
 import HTTPError from 'http-errors';
+
+const ERROR = { error: expect.any(String) };
 
 // Before each test, clear data and then create a new user and new quiz
 let user: TokenId;
 let quiz: QuizId;
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
+  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
   quiz = quizCreateRequest(user.token, 'quiz1', '');
 });
 
@@ -51,7 +55,7 @@ describe('Invalid adminQuizNameUpdate', () => {
 
   // Testing the user does not own the quiz that is trying to be removed
   test('Quiz ID does not refer to a quiz that this user owns', () => {
-    const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast');
+    const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
     const quiz2 = quizCreateRequest(user2.token, 'quiz2', '');
 
     expect(() => quizNameUpdateRequest(user.token, quiz2.quizId, 'NewQuizName')).toThrow(HTTPError[400]);
@@ -136,5 +140,34 @@ describe('Valid adminQuizNameUpdate', () => {
 
     expect(timeSent).toBeGreaterThanOrEqual(expectedTimeTransfered);
     expect(timeSent).toBeLessThanOrEqual(expectedTimeTransfered + 3);
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('Name is just whitespace', () => {
+    const newQuiz = quizNameUpdateRequestV1(user.token, quiz.quizId, '          ');
+    expect(newQuiz.body).toStrictEqual(ERROR);
+    expect(newQuiz.statusCode).toStrictEqual(400);
+  });
+
+  test.each([
+    { name: 'Short' },
+    { name: 'LongQuizNameWithClosetoMaxName' },
+  ])('Successful Quiz Name Update: "$name"', ({ name }) => {
+    const newQuiz = quizNameUpdateRequestV1(user.token, quiz.quizId, name);
+    expect(newQuiz.body).toStrictEqual({});
+    expect(newQuiz.statusCode).toStrictEqual(200);
+
+    expect(adminQuizInfoRequestV1(user.token, quiz.quizId).body).toStrictEqual({
+      quizId: quiz.quizId,
+      name: name,
+      timeCreated: expect.any(Number),
+      timeLastEdited: expect.any(Number),
+      description: '',
+      numQuestions: 0,
+      questions: [],
+      duration: 0,
+    });
+    expect(adminQuizInfoRequestV1(user.token, quiz.quizId).statusCode).toStrictEqual(200);
   });
 });

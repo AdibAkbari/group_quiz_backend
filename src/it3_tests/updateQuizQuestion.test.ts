@@ -5,19 +5,21 @@ import {
   createQuizQuestionRequest,
   updateQuizQuestionRequest,
   deleteQuizQuestionRequest,
-  adminQuizInfoRequest
+  adminQuizInfoRequest,
+  updateQuizQuestionRequestV1
 } from './it3_testRoutes';
 import { TokenId } from '../interfaces';
 import HTTPError from 'http-errors';
 
 const validAnswers = [{ answer: 'great', correct: true }, { answer: 'bad', correct: false }];
+const ERROR = { error: expect.any(String) };
 
 let user: TokenId;
 let quizId: number;
 let questionId: number;
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname');
+  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
   quizId = quizCreateRequest(user.token, 'Cats', 'A quiz about cats').quizId;
   questionId = createQuizQuestionRequest(quizId, user.token, 'Question 1?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).questionId;
 });
@@ -28,7 +30,7 @@ describe('Invalid params', () => {
   });
 
   test('QuizId does not refer to a quiz that this user owns', () => {
-    const user2 = authRegisterRequest('email1@gmail.com', 'password2', 'FirstnameB', 'LastnameB');
+    const user2 = authRegisterRequest('email1@gmail.com', 'password2', 'FirstnameB', 'LastnameB').body;
     expect(() => updateQuizQuestionRequest(quizId, questionId, user2.token, 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[400]);
   });
 
@@ -279,5 +281,21 @@ describe('valid edge cases', () => {
     createQuizQuestionRequest(quizId, user.token, 'Question 2', 60, 5, validAnswers);
     const result = updateQuizQuestionRequest(quizId, questionId, user.token, 'New Question 1', 60, 5, validAnswers);
     expect(result).toStrictEqual({});
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('sum of new duration equals 3 minutes', () => {
+    createQuizQuestionRequest(quizId, user.token, 'Question 1', 60, 5, validAnswers);
+    createQuizQuestionRequest(quizId, user.token, 'Question 2', 60, 5, validAnswers);
+    const result = updateQuizQuestionRequestV1(quizId, questionId, user.token, 'New Question 1', 60, 5, validAnswers);
+    expect(result.body).toStrictEqual({});
+    expect(result.statusCode).toStrictEqual(200);
+  });
+
+  test('Unused tokenId', () => {
+    const result = updateQuizQuestionRequestV1(quizId, questionId, user.token + 1, 'How are you?', 5, 5, validAnswers);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(403);
   });
 });

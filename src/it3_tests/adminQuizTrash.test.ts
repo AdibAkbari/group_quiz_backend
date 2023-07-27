@@ -5,8 +5,11 @@ import {
   authRegisterRequest,
   quizCreateRequest,
   quizRemoveRequest,
+  quizTrashRequestV1,
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
+
+const ERROR = { error: expect.any(String) };
 
 beforeEach(() => {
   clearRequest();
@@ -31,7 +34,7 @@ describe('adminQuizTrash', () => {
     });
 
     test('TokenId not logged in', () => {
-      const user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
+      const user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
       expect(() => quizTrashRequest(user.token + 1)).toThrow(HTTPError[403]);
     });
   });
@@ -39,7 +42,7 @@ describe('adminQuizTrash', () => {
   describe('Success cases', () => {
     let user : TokenId;
     beforeEach(() => {
-      user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
+      user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
     });
 
     test('empty quiz trash', () => {
@@ -80,7 +83,7 @@ describe('adminQuizTrash', () => {
     });
 
     test('multiple quiz creators in trash quizzes', () => {
-      const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast');
+      const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
       // create quizzes of user
       const quiz1 = quizCreateRequest(user.token, 'quiz1', '');
       const quiz2 = quizCreateRequest(user.token, 'quiz2', '');
@@ -116,5 +119,27 @@ describe('adminQuizTrash', () => {
       const expectedSet = new Set(expected.quizzes);
       expect(trashSet).toStrictEqual(expectedSet);
     });
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
+    const trash = quizTrashRequestV1(token);
+    expect(trash.body).toStrictEqual(ERROR);
+    expect(trash.statusCode).toStrictEqual(401);
+  });
+
+  let user : TokenId;
+  beforeEach(() => {
+    user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
+  });
+
+  test('empty quiz trash', () => {
+    const trash = quizTrashRequestV1(user.token);
+    expect(trash.body).toStrictEqual({ quizzes: [] });
+    expect(trash.statusCode).toStrictEqual(200);
   });
 });

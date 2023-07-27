@@ -6,17 +6,20 @@ import {
   createQuizQuestionRequest,
   quizRemoveRequest,
   quizNameUpdateRequest,
-  quizDescriptionUpdateRequest
+  quizDescriptionUpdateRequest, 
+  adminQuizInfoRequestV1,
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
 
 import { TokenId, QuizId } from '../interfaces';
 
+const ERROR = { error: expect.any(String) };
+
 let user: TokenId;
 let quiz: QuizId;
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname');
+  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
   quiz = quizCreateRequest(user.token, 'Cats', 'A quiz about cats');
 });
 
@@ -26,7 +29,7 @@ describe('QuizId invalid', () => {
   });
 
   test('Quiz Id does not refer to a quiz that this user owns', () => {
-    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB');
+    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB').body;
     expect(() => adminQuizInfoRequest(user2.token, quiz.quizId)).toThrow(HTTPError[400]);
     const quiz2 = quizCreateRequest(user2.token, 'Dogs', 'A quiz about dogs');
     expect(() => adminQuizInfoRequest(user.token, quiz2.quizId)).toThrow(HTTPError[400]);
@@ -70,7 +73,7 @@ describe('Valid inputs', () => {
   });
 
   test('more than one quiz stored', () => {
-    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB');
+    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB').body;
     const quiz2 = quizCreateRequest(user2.token, 'Dogs', 'A quiz about dogs');
     expect(adminQuizInfoRequest(user2.token, quiz2.quizId)).toStrictEqual({
       quizId: quiz2.quizId,
@@ -85,7 +88,7 @@ describe('Valid inputs', () => {
   });
 
   test('more than one quiz created by user', () => {
-    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB');
+    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'FirstnameB', 'LastnameB').body;
     quizCreateRequest(user2.token, 'Dogs', 'A quiz about dogs');
     const quiz3 = quizCreateRequest(user.token, 'Birds', 'A quiz about birds');
     expect(adminQuizInfoRequest(user.token, quiz3.quizId)).toStrictEqual({
@@ -261,5 +264,29 @@ describe('testing with other functions', () => {
       questions: [],
       duration: 0
     });
+  });
+});
+
+
+describe('V1 WRAPPERS', () => {
+  test('Quiz Id does not refer to a valid quiz', () => {
+    const result = adminQuizInfoRequestV1(user.token, quiz.quizId + 1);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(400);
+  });
+
+  test('only one quiz created', () => {
+    const result = adminQuizInfoRequestV1(user.token, quiz.quizId);
+    expect(result.body).toStrictEqual({
+      quizId: quiz.quizId,
+      name: 'Cats',
+      timeCreated: expect.any(Number),
+      timeLastEdited: expect.any(Number),
+      description: 'A quiz about cats',
+      numQuestions: 0,
+      questions: [],
+      duration: 0
+    });
+    expect(result.statusCode).toStrictEqual(200);
   });
 });

@@ -4,7 +4,8 @@ import {
   clearRequest,
   createQuizQuestionRequest,
   moveQuizQuestionRequest,
-  adminQuizInfoRequest
+  adminQuizInfoRequest,
+  moveQuizQuestionRequestV1
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
 
@@ -13,6 +14,8 @@ import {
 } from '../interfaces';
 
 const validAnswers = [{ answer: 'great', correct: true }, { answer: 'bad', correct: false }];
+
+const ERROR = { error: expect.any(String) };
 
 let user: TokenId;
 let quizId: number;
@@ -24,7 +27,7 @@ let question5Id: number;
 
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname');
+  user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
   quizId = quizCreateRequest(user.token, 'Cats', 'A quiz about cats').quizId;
   question1Id = createQuizQuestionRequest(quizId, user.token, 'Question 1?', 6, 3, validAnswers).questionId;
   question2Id = createQuizQuestionRequest(quizId, user.token, 'Question 2?', 6, 3, validAnswers).questionId;
@@ -58,7 +61,7 @@ describe('Invalid params', () => {
   });
 
   test('QuizId does not refer to a quiz that this user owns', () => {
-    const user2 = authRegisterRequest('email1@gmail.com', 'password2', 'FirstnameB', 'LastnameB');
+    const user2 = authRegisterRequest('email1@gmail.com', 'password2', 'FirstnameB', 'LastnameB').body;
     expect(() => moveQuizQuestionRequest(user2.token, quizId, question1Id, 1)).toThrow(HTTPError[400]);
   });
 
@@ -213,5 +216,19 @@ describe('Successful Move Question', () => {
 
     expect(timeSent).toBeGreaterThanOrEqual(expectedTimeTransfered);
     expect(timeSent).toBeLessThanOrEqual(expectedTimeTransfered + 3);
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('correct return', () => {
+    const result = moveQuizQuestionRequestV1(user.token, quizId, question1Id, 1);
+    expect(result.body).toStrictEqual({});
+    expect(result.statusCode).toStrictEqual(200);
+  });
+
+  test('newPosition > n-1, where n is the number of questions', () => {
+    const result = moveQuizQuestionRequestV1(user.token, quizId, question1Id, 2);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(400);
   });
 });

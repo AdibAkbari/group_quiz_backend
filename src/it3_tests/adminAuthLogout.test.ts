@@ -2,9 +2,12 @@
 import {
   clearRequest,
   authRegisterRequest,
-  authLogoutRequest
+  authLogoutRequest,
+  authLogoutRequestV1
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
+
+const ERROR = { error: expect.any(String) };
 
 beforeEach(() => {
   clearRequest();
@@ -28,7 +31,7 @@ describe('error cases tests', () => {
   });
 
   test('user created then logged out', () => {
-    const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
+    const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
     const userToken = user.token;
     authLogoutRequest(userToken);
     expect(() => authLogoutRequest(userToken)).toThrow(HTTPError[403]);
@@ -41,14 +44,33 @@ describe('error cases tests', () => {
 
 describe('successful cases', () => {
   test('one token created', () => {
-    const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
+    const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
     expect(authLogoutRequest(user.token)).toStrictEqual({ });
   });
 
   test('two tokens created', () => {
     authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
-    const user2 = authRegisterRequest('email123@gmail.com', 'password1', 'nameFirst', 'nameLast');
+    const user2 = authRegisterRequest('email123@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
 
     expect(authLogoutRequest(user2.token)).toStrictEqual({ });
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('user created then logged out', () => {
+    const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
+    const userToken = user.token;
+    authLogoutRequestV1(userToken);
+    const logout = authLogoutRequestV1(userToken);
+    expect(logout.body).toStrictEqual(ERROR);
+    expect(logout.statusCode).toStrictEqual(403);
+  });
+
+  test('two tokens created', () => {
+    authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
+    const user2 = authRegisterRequest('email123@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
+    const logout = authLogoutRequestV1(user2.token);
+    expect(logout.body).toStrictEqual({ });
+    expect(logout.statusCode).toStrictEqual(200);
   });
 });

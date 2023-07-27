@@ -1,12 +1,15 @@
 import {
   adminUserDetailsRequest,
   authRegisterRequest,
-  clearRequest
+  clearRequest,
+  adminUserDetailsRequestV1,
 } from './it3_testRoutes';
 import {
   TokenId
 } from '../interfaces';
 import HTTPError from 'http-errors';
+
+const ERROR = { error: expect.any(String) };
 
 beforeEach(() => {
   clearRequest();
@@ -34,7 +37,7 @@ describe('Token invalid', () => {
   });
 
   test('TokenId not logged in', () => {
-    const user = authRegisterRequest('email@gmail.com', 'password1', 'NameFirst', 'NameLast');
+    const user = authRegisterRequest('email@gmail.com', 'password1', 'NameFirst', 'NameLast').body;
     expect(() => adminUserDetailsRequest(user.token + 1)).toThrow(HTTPError[403]);
   });
 });
@@ -42,7 +45,7 @@ describe('Token invalid', () => {
 describe('Only one user registered', () => {
   let user: TokenId;
   beforeEach(() => {
-    user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname');
+    user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
   });
 
   test('Just registered', () => {
@@ -63,9 +66,9 @@ describe('multiple users registered', () => {
   let user2: TokenId;
   let user3: TokenId;
   beforeEach(() => {
-    user1 = authRegisterRequest('email1@gmail.com', 'password1', 'FirstnameA', 'LastnameA');
-    user2 = authRegisterRequest('email2@gmail.com', 'password2', 'FirstnameB', 'LastnameB');
-    user3 = authRegisterRequest('email3@gmail.com', 'password3', 'FirstnameC', 'LastnameC');
+    user1 = authRegisterRequest('email1@gmail.com', 'password1', 'FirstnameA', 'LastnameA').body;
+    user2 = authRegisterRequest('email2@gmail.com', 'password2', 'FirstnameB', 'LastnameB').body;
+    user3 = authRegisterRequest('email3@gmail.com', 'password3', 'FirstnameC', 'LastnameC').body;
   });
 
   test('Finding user 1', () => {
@@ -102,5 +105,33 @@ describe('multiple users registered', () => {
         numFailedPasswordsSinceLastLogin: expect.any(Number)
       }
     });
+  });
+});
+
+
+describe('V1 WRAPPERS', () => {
+  test('Nobody logged in', () => {
+    const userDetails = adminUserDetailsRequestV1('7');
+    expect(userDetails.body).toStrictEqual(ERROR);
+    expect(userDetails.statusCode).toStrictEqual(403);
+  });
+
+  let user: TokenId;
+  beforeEach(() => {
+    user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
+  });
+
+  test('Just registered', () => {
+    const userDetails = adminUserDetailsRequestV1(user.token);
+    expect(userDetails.body).toStrictEqual({
+      user: {
+        userId: expect.any(Number),
+        name: 'Firstname Lastname',
+        email: 'email@gmail.com',
+        numSuccessfulLogins: 1,
+        numFailedPasswordsSinceLastLogin: 0
+      }
+    });
+    expect(userDetails.statusCode).toStrictEqual(200);
   });
 });

@@ -2,7 +2,7 @@
 import {
   clearRequest,
   authRegisterRequest,
-} from './testRoutes';
+} from './it3_testRoutes';
 
 beforeEach(() => {
   clearRequest();

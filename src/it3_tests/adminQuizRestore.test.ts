@@ -7,16 +7,19 @@ import {
   quizRemoveRequest,
   adminQuizListRequest,
   adminQuizInfoRequest,
+  quizRestoreRequestV1,
 } from './it3_testRoutes';
 import { TokenId, QuizId } from '../interfaces';
 import HTTPError from 'http-errors';
+
+const ERROR = { error: expect.any(String) };
 
 let user: TokenId;
 let quiz: QuizId;
 // creates a user and a quiz for the user.
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
+  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
   quiz = quizCreateRequest(user.token, 'quiz1', '');
 });
 
@@ -49,7 +52,7 @@ describe('adminQuizRestore', () => {
 
     test('Quiz ID does not refer to a quiz that this user owns', () => {
       quizRemoveRequest(user.token, quiz.quizId);
-      const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast');
+      const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
       const quiz2 = quizCreateRequest(user2.token, 'quiz2', '');
       quizRemoveRequest(user2.token, quiz2.quizId);
 
@@ -117,5 +120,13 @@ describe('adminQuizRestore', () => {
       expect(result.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
       expect(result.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
     });
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('Quiz ID does not refer to a quiz in trash', () => {
+    const restoreQuiz = quizRestoreRequestV1(user.token, quiz.quizId);
+    expect(restoreQuiz.body).toStrictEqual(ERROR);
+    expect(restoreQuiz.statusCode).toStrictEqual(400);
   });
 });

@@ -6,9 +6,13 @@ import {
   quizCreateRequest,
   quizRemoveRequest,
   quizTrashEmptyRequest,
+  quizTrashEmptyRequestV1,
+  quizRestoreRequestV1,
 } from './it3_testRoutes';
 import { TokenId, QuizId } from '../interfaces';
 import HTTPError from 'http-errors';
+
+const ERROR = { error: expect.any(String) };
 
 let user: TokenId;
 let quiz1: QuizId;
@@ -17,7 +21,7 @@ let quiz3: QuizId;
 // creates a user and a quiz for the user.
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
+  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
   quiz1 = quizCreateRequest(user.token, 'quiz1', '');
   quiz2 = quizCreateRequest(user.token, 'quiz2', '');
   quiz3 = quizCreateRequest(user.token, 'quiz3', '');
@@ -57,7 +61,7 @@ describe('adminQuizTrash', () => {
     });
 
     test('One or more quizIds do not refer to a quiz that this user owns', () => {
-      const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast');
+      const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
       const quizNotOwned = quizCreateRequest(user2.token, 'quizNotOwned', '');
       quizRemoveRequest(user2.token, quizNotOwned.quizId);
 
@@ -96,5 +100,16 @@ describe('adminQuizTrash', () => {
       };
       expect(quizTrashRequest(user.token)).toStrictEqual(expected);
     });
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('One or more quizIds do not refer to a quiz in trash', () => {
+    quizRestoreRequestV1(user.token, quiz1.quizId);
+    const quizIds = [quiz1.quizId, quiz2.quizId, quiz3.quizId];
+
+    const emptyTrash = quizTrashEmptyRequestV1(user.token, quizIds);
+    expect(emptyTrash.body).toStrictEqual(ERROR);
+    expect(emptyTrash.statusCode).toStrictEqual(400);
   });
 });

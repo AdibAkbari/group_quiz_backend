@@ -4,7 +4,9 @@ import {
   quizCreateRequest,
   quizTransferRequest,
   adminQuizInfoRequest,
-  adminQuizListRequest
+  adminQuizListRequest,
+  quizCreateRequestV1,
+  quizTransferRequestV1,
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
 
@@ -13,15 +15,17 @@ import {
   QuizId
 } from '../interfaces';
 
+const ERROR = { error: expect.any(String) };
+
 // Before each test, clear data and then create a new user and new quiz
 let user: TokenId;
 let user2: TokenId;
 let quiz: QuizId;
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last');
+  user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
   quiz = quizCreateRequest(user.token, 'quiz1', '');
-  user2 = authRegisterRequest('email2@gmail.com', 'password2', 'firsttwo', 'lasttwo');
+  user2 = authRegisterRequest('email2@gmail.com', 'password2', 'firsttwo', 'lasttwo').body;
 });
 
 // token not valid
@@ -117,5 +121,21 @@ describe('Successful quiz transfer', () => {
 
     expect(timeSent).toBeGreaterThanOrEqual(expectedTimeTransfered);
     expect(timeSent).toBeLessThanOrEqual(expectedTimeTransfered + 3);
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('Quiz ID does not refer to a quiz that this user owns', () => {
+    const quiz2 = quizCreateRequestV1(user2.token, 'quiz2', '').body;
+
+    const transfer = quizTransferRequestV1(user.token, quiz2.quizId, 'email2@gmail.com');
+    expect(transfer.body).toStrictEqual(ERROR);
+    expect(transfer.statusCode).toStrictEqual(400);
+  });
+
+  test('Successful transfer quiz empty object response', () => {
+    const transfer = quizTransferRequestV1(user.token, quiz.quizId, 'email2@gmail.com');
+    expect(transfer.body).toStrictEqual({});
+    expect(transfer.statusCode).toStrictEqual(200);
   });
 });

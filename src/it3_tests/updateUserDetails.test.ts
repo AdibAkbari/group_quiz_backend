@@ -4,21 +4,25 @@ import {
   authRegisterRequest,
   clearRequest,
   updateUserDetailsRequest,
+  updateUserDetailsRequestV1,
+  adminUserDetailsRequestV1
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
 
 import { TokenId } from '../interfaces';
 
+const ERROR = { error: expect.any(String) };
+
 let user: TokenId;
 
 beforeEach(() => {
   clearRequest();
-  user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
+  user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
 });
 
 describe('Error Cases: updateUserDetails', () => {
   test('Email used by another user', () => {
-    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'NameFirst', 'NameLast');
+    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'NameFirst', 'NameLast').body;
     expect(() => updateUserDetailsRequest(user2.token, 'email@gmail.com', 'NameFirst', 'NameLast')).toThrow(HTTPError[400]);
   });
 
@@ -94,6 +98,32 @@ describe('Valid Inputs', () => {
         userId: expect.any(Number),
         name: 'nameFirst nameLast',
         email: 'email@gmail.com',
+        numSuccessfulLogins: 1,
+        numFailedPasswordsSinceLastLogin: 0
+      }
+    });
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('Email used by another user', () => {
+    const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'NameFirst', 'NameLast').body;
+    const update = updateUserDetailsRequestV1(user2.token, 'email@gmail.com', 'NameFirst', 'NameLast');
+    expect(update.body).toStrictEqual(ERROR);
+    expect(update.statusCode).toStrictEqual(400);
+  });
+
+  test('update all fields', () => {
+    const update = updateUserDetailsRequestV1(user.token, 'newEmail@gmail.com', 'newFirst', 'newLast');
+    expect(update.statusCode).toBe(200);
+    expect(update.body).toStrictEqual({ });
+    const userDetails = adminUserDetailsRequestV1(user.token);
+    expect(userDetails.statusCode).toStrictEqual(200);
+    expect(userDetails.body).toStrictEqual({
+      user: {
+        userId: expect.any(Number),
+        name: 'newFirst newLast',
+        email: 'newEmail@gmail.com',
         numSuccessfulLogins: 1,
         numFailedPasswordsSinceLastLogin: 0
       }
