@@ -118,31 +118,6 @@ app.post('/v2/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   res.json(response);
 });
 
-// adminQuizTransfer //
-app.post('/v2/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
-  const token = req.headers.token as string;
-  const userEmail = req.body.userEmail as string;
-  const response = adminQuizTransfer(token, parseInt(req.params.quizid), userEmail, true);
-  res.json(response);
-});
-
-// updateUserPassword //
-app.put('/v2/admin/user/password', (req: Request, res: Response) => {
-  const token = req.headers.token as string;
-  const { oldPassword, newPassword } = req.body;
-  const response = updateUserPassword(token, oldPassword, newPassword, true);
-  res.json(response);
-});
-
-// adminQuizNameUpdate //
-app.put('/v2/admin/quiz/:quizid/name', (req: Request, res: Response) => {
-  const token = req.headers.token as string;
-  const name = req.body.name as string;
-
-  const response = adminQuizNameUpdate(token, parseInt(req.params.quizid), name, true);
-  res.json(response);
-});
-
 // createQuizQuestion //
 app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const { question, duration, points, answers } = req.body.questionBody;
@@ -395,61 +370,6 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
       return res.status(400).json(response);
     }
   }
-  res.json(response);
-});
-
-// adminQuizTransfer //
-app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
-  const token = req.body.token as string;
-  const userEmail = req.body.userEmail as string;
-  const response = adminQuizTransfer(token, parseInt(req.params.quizid), userEmail, false);
-  if ('error' in response) {
-    if (response.error.includes('Structure')) {
-      return res.status(401).json(response);
-    } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
-    } else if (response.error.includes('QuizId') || response.error.includes('own') ||
-                 response.error.includes('name') || response.error.includes('Email')) {
-      return res.status(400).json(response);
-    }
-  }
-  res.json(response);
-});
-
-// updateUserPassword //
-app.put('/v1/admin/user/password', (req: Request, res: Response) => {
-  const { token, oldPassword, newPassword } = req.body;
-  const response = updateUserPassword(token, oldPassword, newPassword, false);
-  if ('error' in response) {
-    if (response.error.includes('structure')) {
-      return res.status(401).json(response);
-    } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
-    } else if (response.error.includes('password')) {
-      return res.status(400).json(response);
-    }
-  }
-  res.json(response);
-});
-
-// adminQuizNameUpdate //
-app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
-  const token = req.body.token as string;
-  const name = req.body.name as string;
-
-  const response = adminQuizNameUpdate(token, parseInt(req.params.quizid), name, false);
-
-  if ('error' in response) {
-    if (response.error.includes('Structure')) {
-      return res.status(401).json(response);
-    } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
-    } else if (response.error.includes('Name') || response.error.includes('QuizId') ||
-                 response.error.includes('own') || response.error.includes('white space')) {
-      return res.status(400).json(response);
-    }
-  }
-
   res.json(response);
 });
 

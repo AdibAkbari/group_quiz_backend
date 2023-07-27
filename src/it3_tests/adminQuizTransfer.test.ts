@@ -69,7 +69,7 @@ describe('invalid quizId', () => {
   test('User already has a quiz named', () => {
     const quiz2 = quizCreateRequest(user2.token, 'quiz1', '');
 
-    expect(() => quizTransferRequest(user.token, quiz2.quizId, 'email2@gmail.com')).toThrow(HTTPError[400]);
+    expect(() => quizTransferRequest(user.token, quiz.quizId, 'email2@gmail.com')).toThrow(HTTPError[400]);
   });
 });
 

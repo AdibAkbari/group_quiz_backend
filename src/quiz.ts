@@ -338,21 +338,15 @@ export function adminQuizNameUpdate(token: string, quizId: number, name: string,
   if (!checkNameValidity(name, authUserId)) {
     return giveError(isv2, 'Invalid: Name', 400);
   }
-  // Check name isn't just whitespace
-  if (isWhiteSpace(name)) {
-    return giveError(isv2, 'Invalid: Quiz name cannot be solely white space', 400);
-  }
 
   const data: Data = getData();
   const timeNow = Math.floor(Date.now() / 1000);
 
   const quizToUpdate = data.quizzes.find((current) => current.quizId === quizId);
-
-  if (quizToUpdate) {
-    quizToUpdate.name = name;
-    quizToUpdate.timeLastEdited = timeNow;
-    setData(data);
-  }
+  
+  quizToUpdate.name = name;
+  quizToUpdate.timeLastEdited = timeNow;
+  setData(data);
 
   return { };
 }
@@ -537,7 +531,7 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
   const questionId: number = data.quizzes[index].questionCount;
 
   const answerArray: Answer[] = [];
-  const colours = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink'];
+  const colours = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'brown'];
   let answerId = 0;
 
   for (const current of answers) {
