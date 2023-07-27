@@ -108,7 +108,6 @@ describe('multiple users registered', () => {
   });
 });
 
-
 describe('V1 WRAPPERS', () => {
   test('Nobody logged in', () => {
     const userDetails = adminUserDetailsRequestV1('7');
@@ -116,22 +115,12 @@ describe('V1 WRAPPERS', () => {
     expect(userDetails.statusCode).toStrictEqual(403);
   });
 
-  let user: TokenId;
-  beforeEach(() => {
-    user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
-  });
-
-  test('Just registered', () => {
-    const userDetails = adminUserDetailsRequestV1(user.token);
-    expect(userDetails.body).toStrictEqual({
-      user: {
-        userId: expect.any(Number),
-        name: 'Firstname Lastname',
-        email: 'email@gmail.com',
-        numSuccessfulLogins: 1,
-        numFailedPasswordsSinceLastLogin: 0
-      }
-    });
-    expect(userDetails.statusCode).toStrictEqual(200);
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
+    const details = adminUserDetailsRequestV1(token);
+    expect(details.body).toStrictEqual(ERROR);
+    expect(details.statusCode).toStrictEqual(401);
   });
 });

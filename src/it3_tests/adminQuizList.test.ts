@@ -139,15 +139,34 @@ describe('User does own quizzes', () => {
 });
 
 describe('V1 WRAPPERS', () => {
-  test('No quizzes', () => {
-    expect(adminQuizListRequestV1(user.token).body).toStrictEqual({
-      quizzes: []
-    });
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
+    const list = adminQuizListRequestV1(token);
+    expect(list.body).toStrictEqual(ERROR);
+    expect(list.statusCode).toStrictEqual(401);
   });
 
   test('Unused tokenId', () => {
     const list = adminQuizListRequestV1(user.token + user2.token);
     expect(list.body).toStrictEqual(ERROR);
     expect(list.statusCode).toStrictEqual(403);
+  });
+
+  let quiz: QuizId;
+  beforeEach(() => {
+    quiz = quizCreateRequest(user.token, 'Cats', 'A quiz about cats');
+  });
+
+  test('user owns one quiz', () => {
+    expect(adminQuizListRequestV1(user.token).body).toStrictEqual({
+      quizzes: [
+        {
+          quizId: quiz.quizId,
+          name: 'Cats'
+        }
+      ]
+    });
   });
 });

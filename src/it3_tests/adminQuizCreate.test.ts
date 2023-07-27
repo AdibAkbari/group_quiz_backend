@@ -4,7 +4,6 @@ import {
   quizCreateRequest,
   adminQuizInfoRequest,
   quizCreateRequestV1,
-  adminQuizInfoRequestV1,
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
 
@@ -124,15 +123,25 @@ describe('valid input tests', () => {
 
 // Successful quizCreate
 describe('V1 WRAPPERS', () => {
-  // test adminQuizCreate correct output
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
+    const quiz = quizCreateRequestV1(token, 'TestQuiz', '');
+    expect(quiz.body).toStrictEqual(ERROR);
+    expect(quiz.statusCode).toStrictEqual(401);
+  });
+
+  test('Nobody logged in', () => {
+    const quiz = quizCreateRequestV1('7', 'TestQuiz', '');
+    expect(quiz.body).toStrictEqual(ERROR);
+    expect(quiz.statusCode).toStrictEqual(403);
+  });
+
   let user: Token;
   beforeEach(() => {
     clearRequest();
     user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
-  });
-
-  test('valid input - testing quizId creation', () => {
-    expect(quizCreateRequestV1(user.token, 'TestQuiz', '').body).toStrictEqual({ quizId: expect.any(Number) });
   });
 
   test('name already used by user for another quiz', () => {

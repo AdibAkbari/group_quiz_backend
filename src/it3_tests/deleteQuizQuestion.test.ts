@@ -154,6 +154,21 @@ describe('V1 WRAPPERS', () => {
     expect(deleteQuestion.statusCode).toStrictEqual(400);
   });
 
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
+    const result = deleteQuizQuestionRequestV1(token, quiz.quizId, question.questionId);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(401);
+  });
+
+  test('Unused tokenId', () => {
+    const result = deleteQuizQuestionRequestV1(user.token + 1, quiz.quizId, question.questionId);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(403);
+  });
+
   test('Sucessful quiz remove question empty return', () => {
     const deleteQuestion = deleteQuizQuestionRequestV1(user.token, quiz.quizId, question.questionId);
     expect(deleteQuestion.body).toStrictEqual({});

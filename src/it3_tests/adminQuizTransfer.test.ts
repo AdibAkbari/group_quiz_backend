@@ -133,6 +133,21 @@ describe('V1 WRAPPERS', () => {
     expect(transfer.statusCode).toStrictEqual(400);
   });
 
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
+    const transfer = quizTransferRequestV1(token, quiz.quizId, 'email2@gmail.com');
+    expect(transfer.body).toStrictEqual(ERROR);
+    expect(transfer.statusCode).toStrictEqual(401);
+  });
+
+  test('Nobody logged in', () => {
+    const transfer = quizTransferRequestV1('7', quiz.quizId, 'email2@gmail.com');
+    expect(transfer.body).toStrictEqual(ERROR);
+    expect(transfer.statusCode).toStrictEqual(403);
+  });
+
   test('Successful transfer quiz empty object response', () => {
     const transfer = quizTransferRequestV1(user.token, quiz.quizId, 'email2@gmail.com');
     expect(transfer.body).toStrictEqual({});

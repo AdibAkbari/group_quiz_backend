@@ -129,4 +129,28 @@ describe('V1 WRAPPERS', () => {
     expect(restoreQuiz.body).toStrictEqual(ERROR);
     expect(restoreQuiz.statusCode).toStrictEqual(400);
   });
+
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
+    const restoreQuiz = quizRestoreRequestV1(token, quiz.quizId);
+    expect(restoreQuiz.body).toStrictEqual(ERROR);
+    expect(restoreQuiz.statusCode).toStrictEqual(401);
+  });
+
+  test('TokenId not logged in', () => {
+    const restoreQuiz = quizRestoreRequestV1(user.token + 1, quiz.quizId);
+    expect(restoreQuiz.body).toStrictEqual(ERROR);
+    expect(restoreQuiz.statusCode).toStrictEqual(403);
+  });
+
+  test('outputs empty object', () => {
+    const quiz2 = quizCreateRequest(user.token, 'quiz2', '');
+    quizRemoveRequest(user.token, quiz2.quizId);
+
+    const restoreQuiz = quizRestoreRequestV1(user.token, quiz2.quizId);
+    expect(restoreQuiz.body).toStrictEqual({});
+    expect(restoreQuiz.statusCode).toStrictEqual(200);
+  });
 });

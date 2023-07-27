@@ -6,7 +6,7 @@ import {
   createQuizQuestionRequest,
   quizRemoveRequest,
   quizNameUpdateRequest,
-  quizDescriptionUpdateRequest, 
+  quizDescriptionUpdateRequest,
   adminQuizInfoRequestV1,
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
@@ -267,7 +267,6 @@ describe('testing with other functions', () => {
   });
 });
 
-
 describe('V1 WRAPPERS', () => {
   test('Quiz Id does not refer to a valid quiz', () => {
     const result = adminQuizInfoRequestV1(user.token, quiz.quizId + 1);
@@ -275,18 +274,57 @@ describe('V1 WRAPPERS', () => {
     expect(result.statusCode).toStrictEqual(400);
   });
 
-  test('only one quiz created', () => {
-    const result = adminQuizInfoRequestV1(user.token, quiz.quizId);
-    expect(result.body).toStrictEqual({
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
+    const list = adminQuizInfoRequestV1(token, quiz.quizId);
+    expect(list.body).toStrictEqual(ERROR);
+    expect(list.statusCode).toStrictEqual(401);
+  });
+
+  test('Unused tokenId', () => {
+    const list = adminQuizInfoRequestV1(user.token + 1, quiz.quizId);
+    expect(list.body).toStrictEqual(ERROR);
+    expect(list.statusCode).toStrictEqual(403);
+  });
+
+  let questionId: number;
+  beforeEach(() => {
+    questionId = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).questionId;
+  });
+
+  test('one question created', () => {
+    expect(adminQuizInfoRequestV1(user.token, quiz.quizId).body).toStrictEqual({
       quizId: quiz.quizId,
       name: 'Cats',
       timeCreated: expect.any(Number),
       timeLastEdited: expect.any(Number),
       description: 'A quiz about cats',
-      numQuestions: 0,
-      questions: [],
-      duration: 0
+      numQuestions: 1,
+      questions: [
+        {
+          questionId: questionId,
+          question: 'Question 1',
+          duration: 6,
+          points: 3,
+          answers: [
+            {
+              answerId: expect.any(Number),
+              answer: 'answer1',
+              colour: expect.any(String),
+              correct: true
+            },
+            {
+              answerId: expect.any(Number),
+              answer: 'answer2',
+              colour: expect.any(String),
+              correct: false
+            }
+          ]
+        }
+      ],
+      duration: 6
     });
-    expect(result.statusCode).toStrictEqual(200);
   });
 });

@@ -285,17 +285,30 @@ describe('valid edge cases', () => {
 });
 
 describe('V1 WRAPPERS', () => {
-  test('sum of new duration equals 3 minutes', () => {
-    createQuizQuestionRequest(quizId, user.token, 'Question 1', 60, 5, validAnswers);
-    createQuizQuestionRequest(quizId, user.token, 'Question 2', 60, 5, validAnswers);
-    const result = updateQuizQuestionRequestV1(quizId, questionId, user.token, 'New Question 1', 60, 5, validAnswers);
-    expect(result.body).toStrictEqual({});
-    expect(result.statusCode).toStrictEqual(200);
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
+    const result = updateQuizQuestionRequestV1(quizId, questionId, token, 'How are you?', 5, 5, validAnswers);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(401);
   });
 
   test('Unused tokenId', () => {
     const result = updateQuizQuestionRequestV1(quizId, questionId, user.token + 1, 'How are you?', 5, 5, validAnswers);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(403);
+  });
+
+  test('QuizId does not refer to a valid quiz', () => {
+    const result = updateQuizQuestionRequestV1(quizId + 1, questionId, user.token, 'How are you?', 5, 5, validAnswers);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(400);
+  });
+
+  test('correct return type and status code', () => {
+    const result = updateQuizQuestionRequestV1(quizId, questionId, user.token, 'New Question', 5, 4, validAnswers);
+    expect(result.body).toStrictEqual({});
+    expect(result.statusCode).toStrictEqual(200);
   });
 });

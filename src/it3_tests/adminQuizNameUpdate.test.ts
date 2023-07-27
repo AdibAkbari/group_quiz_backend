@@ -5,7 +5,6 @@ import {
   adminQuizInfoRequest,
   quizCreateRequest,
   quizNameUpdateRequestV1,
-  adminQuizInfoRequestV1,
 } from './it3_testRoutes';
 import { TokenId, QuizId } from '../interfaces';
 import HTTPError from 'http-errors';
@@ -151,23 +150,26 @@ describe('V1 WRAPPERS', () => {
   });
 
   test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
+    const newQuiz = quizNameUpdateRequestV1(token, quiz.quizId, 'TestQuizUpdate');
+    expect(newQuiz.body).toStrictEqual(ERROR);
+    expect(newQuiz.statusCode).toStrictEqual(401);
+  });
+
+  test('Nobody logged in', () => {
+    const newQuiz = quizNameUpdateRequestV1('7', quiz.quizId, 'TestQuizUpdate');
+    expect(newQuiz.body).toStrictEqual(ERROR);
+    expect(newQuiz.statusCode).toStrictEqual(403);
+  });
+
+  test.each([
+    { name: 'qz1' },
     { name: 'Short' },
-    { name: 'LongQuizNameWithClosetoMaxName' },
   ])('Successful Quiz Name Update: "$name"', ({ name }) => {
     const newQuiz = quizNameUpdateRequestV1(user.token, quiz.quizId, name);
     expect(newQuiz.body).toStrictEqual({});
     expect(newQuiz.statusCode).toStrictEqual(200);
-
-    expect(adminQuizInfoRequestV1(user.token, quiz.quizId).body).toStrictEqual({
-      quizId: quiz.quizId,
-      name: name,
-      timeCreated: expect.any(Number),
-      timeLastEdited: expect.any(Number),
-      description: '',
-      numQuestions: 0,
-      questions: [],
-      duration: 0,
-    });
-    expect(adminQuizInfoRequestV1(user.token, quiz.quizId).statusCode).toStrictEqual(200);
   });
 });

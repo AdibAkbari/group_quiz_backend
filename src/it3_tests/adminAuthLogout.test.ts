@@ -66,11 +66,12 @@ describe('V1 WRAPPERS', () => {
     expect(logout.statusCode).toStrictEqual(403);
   });
 
-  test('two tokens created', () => {
-    authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
-    const user2 = authRegisterRequest('email123@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
-    const logout = authLogoutRequestV1(user2.token);
-    expect(logout.body).toStrictEqual({ });
-    expect(logout.statusCode).toStrictEqual(200);
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('invalid token structure: $testName', ({ token }) => {
+    const logout = authLogoutRequestV1(token);
+    expect(logout.body).toStrictEqual(ERROR);
+    expect(logout.statusCode).toStrictEqual(401);
   });
 });

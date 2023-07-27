@@ -220,15 +220,30 @@ describe('Successful Move Question', () => {
 });
 
 describe('V1 WRAPPERS', () => {
-  test('correct return', () => {
-    const result = moveQuizQuestionRequestV1(user.token, quizId, question1Id, 1);
-    expect(result.body).toStrictEqual({});
-    expect(result.statusCode).toStrictEqual(200);
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
+    const result = moveQuizQuestionRequestV1(token, quizId, question1Id, 1);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(401);
+  });
+
+  test('Unused tokenId', () => {
+    const result = moveQuizQuestionRequestV1(user.token + 1, quizId, question1Id, 1);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(403);
   });
 
   test('newPosition > n-1, where n is the number of questions', () => {
     const result = moveQuizQuestionRequestV1(user.token, quizId, question1Id, 2);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(400);
+  });
+
+  test('correct return', () => {
+    const result = moveQuizQuestionRequestV1(user.token, quizId, question1Id, 1);
+    expect(result.body).toStrictEqual({});
+    expect(result.statusCode).toStrictEqual(200);
   });
 });

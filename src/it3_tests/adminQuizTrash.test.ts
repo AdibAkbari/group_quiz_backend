@@ -132,6 +132,12 @@ describe('V1 WRAPPERS', () => {
     expect(trash.statusCode).toStrictEqual(401);
   });
 
+  test('TokenId not logged in', () => {
+    const trash = quizTrashRequestV1('7');
+    expect(trash.body).toStrictEqual(ERROR);
+    expect(trash.statusCode).toStrictEqual(403);
+  });
+
   let user : TokenId;
   beforeEach(() => {
     user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;

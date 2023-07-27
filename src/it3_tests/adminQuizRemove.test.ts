@@ -121,15 +121,30 @@ describe('Successfully removed quiz check', () => {
 });
 
 describe('V1 WRAPPERS', () => {
-  test('Sucessful quiz remove return', () => {
-    const removeQuiz = quizRemoveRequestV1(user.token, quiz.quizId);
-    expect(removeQuiz.body).toStrictEqual({});
-    expect(removeQuiz.statusCode).toStrictEqual(200);
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
+    const removeQuiz = quizRemoveRequestV1(token, quiz.quizId);
+    expect(removeQuiz.body).toStrictEqual(ERROR);
+    expect(removeQuiz.statusCode).toStrictEqual(401);
+  });
+
+  test('Nobody logged in', () => {
+    const removeQuiz = quizRemoveRequestV1('7', quiz.quizId);
+    expect(removeQuiz.body).toStrictEqual(ERROR);
+    expect(removeQuiz.statusCode).toStrictEqual(403);
   });
 
   test('Quiz ID does not refer to a valid quiz', () => {
     const removeQuiz = quizRemoveRequestV1(user.token, quiz.quizId + 1);
     expect(removeQuiz.body).toStrictEqual(ERROR);
     expect(removeQuiz.statusCode).toStrictEqual(400);
+  });
+
+  test('Sucessful quiz remove return', () => {
+    const removeQuiz = quizRemoveRequestV1(user.token, quiz.quizId);
+    expect(removeQuiz.body).toStrictEqual({});
+    expect(removeQuiz.statusCode).toStrictEqual(200);
   });
 });

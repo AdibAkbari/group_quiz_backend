@@ -113,8 +113,23 @@ describe('V1 WRAPPERS', () => {
     expect(update.statusCode).toStrictEqual(400);
   });
 
-  test('update all fields', () => {
-    const update = updateUserDetailsRequestV1(user.token, 'newEmail@gmail.com', 'newFirst', 'newLast');
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('invalid token: $testName', ({ token }) => {
+    const update = updateUserDetailsRequestV1(token, 'email123@gmail.com', 'nameFirst', 'nameLast');
+    expect(update.statusCode).toBe(401);
+    expect(update.body).toStrictEqual(ERROR);
+  });
+
+  test('tokenId not logged in', () => {
+    const update = updateUserDetailsRequestV1('12345', 'email123@gmail.com', 'nameFirst', 'nameLast');
+    expect(update.statusCode).toBe(403);
+    expect(update.body).toStrictEqual(ERROR);
+  });
+
+  test('keep all same', () => {
+    const update = updateUserDetailsRequestV1(user.token, 'email@gmail.com', 'nameFirst', 'nameLast');
     expect(update.statusCode).toBe(200);
     expect(update.body).toStrictEqual({ });
     const userDetails = adminUserDetailsRequestV1(user.token);
@@ -122,8 +137,8 @@ describe('V1 WRAPPERS', () => {
     expect(userDetails.body).toStrictEqual({
       user: {
         userId: expect.any(Number),
-        name: 'newFirst newLast',
-        email: 'newEmail@gmail.com',
+        name: 'nameFirst nameLast',
+        email: 'email@gmail.com',
         numSuccessfulLogins: 1,
         numFailedPasswordsSinceLastLogin: 0
       }

@@ -49,9 +49,6 @@ export function findUserFromToken(token: string): number {
    * @returns {boolean} - returns false if it dosn't exist
    */
 export function isValidQuizId(quizId: number): boolean {
-  if (isNaN(quizId)) {
-    return false;
-  }
   const data: Data = getData();
   if (data.quizzes.find(id => id.quizId === quizId) === undefined) {
     return false;

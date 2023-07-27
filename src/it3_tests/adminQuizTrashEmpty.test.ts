@@ -112,4 +112,38 @@ describe('V1 WRAPPERS', () => {
     expect(emptyTrash.body).toStrictEqual(ERROR);
     expect(emptyTrash.statusCode).toStrictEqual(400);
   });
+
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
+    const quizIds = [quiz1.quizId, quiz2.quizId, quiz3.quizId];
+
+    const emptyTrash = quizTrashEmptyRequestV1(token, quizIds);
+    expect(emptyTrash.body).toStrictEqual(ERROR);
+    expect(emptyTrash.statusCode).toStrictEqual(401);
+  });
+
+  test('TokenId not logged in', () => {
+    const quizIds = [quiz1.quizId, quiz2.quizId, quiz3.quizId];
+
+    const emptyTrash = quizTrashEmptyRequestV1(user.token + 1, quizIds);
+    expect(emptyTrash.body).toStrictEqual(ERROR);
+    expect(emptyTrash.statusCode).toStrictEqual(403);
+  });
+
+  let trashEmptyBody: Record<string, never>;
+  let trashEmptyStatusCode: number;
+  // empties trash
+  beforeEach(() => {
+    const quizIds = [quiz1.quizId, quiz3.quizId];
+    const trashEmpty = quizTrashEmptyRequestV1(user.token, quizIds);
+    trashEmptyBody = trashEmpty.body;
+    trashEmptyStatusCode = trashEmpty.statusCode;
+  });
+
+  test('outputs empty object', () => {
+    expect(trashEmptyBody).toStrictEqual({});
+    expect(trashEmptyStatusCode).toStrictEqual(200);
+  });
 });

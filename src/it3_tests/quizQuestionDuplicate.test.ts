@@ -165,4 +165,25 @@ describe('V1 WRAPPERS', () => {
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(403);
   });
+
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token invalid structure: $testName', ({ token }) => {
+    const result = quizQuestionDuplicateRequestV1(quiz.quizId, question.questionId, token);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(401);
+  });
+
+  test('questionId invalid', () => {
+    const result = quizQuestionDuplicateRequestV1(quiz.quizId, question.questionId + 1, user.token);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(400);
+  });
+
+  test('one question duplicate', () => {
+    const result = quizQuestionDuplicateRequestV1(quiz.quizId, question.questionId, user.token);
+    expect(result.body).toStrictEqual({ newQuestionId: expect.any(Number) });
+    expect(result.statusCode).toStrictEqual(200);
+  });
 });

@@ -89,4 +89,31 @@ describe('V1 WRAPPERS', () => {
     expect(login.statusCode).toBe(400);
     expect(login.body).toStrictEqual(ERROR);
   });
+
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('invalid token: $testName', ({ token }) => {
+    const update = updateUserPasswordRequestV1(token, 'password1', 'password2');
+    expect(update.statusCode).toBe(401);
+    expect(update.body).toStrictEqual(ERROR);
+  });
+
+  test('tokenId not logged in', () => {
+    const update = updateUserPasswordRequestV1('12345', 'password1', 'password2');
+    expect(update.statusCode).toBe(403);
+    expect(update.body).toStrictEqual(ERROR);
+  });
+
+  test.each([
+    { testName: 'empty new password', pass: '' },
+    { testName: 'new password too short', pass: 'pass1' },
+    { testName: 'new password must contain number', pass: 'password' },
+    { testName: 'new password must contain letter', pass: '12345678' },
+  ])('$testName: $pass', ({ pass }) => {
+    const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
+    const update = updateUserPasswordRequestV1(user.token, 'password1', pass);
+    expect(update.statusCode).toBe(400);
+    expect(update.body).toStrictEqual(ERROR);
+  });
 });
