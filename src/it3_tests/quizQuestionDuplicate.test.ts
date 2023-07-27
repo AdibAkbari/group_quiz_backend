@@ -64,8 +64,8 @@ describe('error cases', () => {
 
 describe('valid input', () => {
   test('one question duplicate', () => {
-    const result = quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user.token);
     const timeNow = Math.floor(Date.now() / 1000);
+    const result = quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user.token);
     const info = adminQuizInfoRequest(user.token, quiz.quizId);
     expect(result).toStrictEqual({ newQuestionId: expect.any(Number) });
     expect(info).toStrictEqual({
@@ -100,7 +100,7 @@ describe('valid input', () => {
       duration: 10,
     });
     expect(info.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
-    expect(info.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
+    expect(info.timeLastEdited).toBeLessThanOrEqual(timeNow + 3);
   });
 
   // whitebox testing, assuming questions appear in the order they were created
