@@ -205,11 +205,6 @@ export function updateQuizQuestionRequest(quizId: number, questionId: number, to
   );
 }
 
-// PLAYER ROUTES //
-export function playerJoinRequest(sessionId: number, name: string) {
-  return requestHelper('POST', `/v1/player/join`, {sessionId, name});
-}
-
 // ====================================================================
 //  ================= IT 2 TEST ROUTES (OLD) ==========================
 // ====================================================================
@@ -502,4 +497,18 @@ export function authLogoutRequestV1(tokenId: string) {
     body: JSON.parse(res.body.toString()),
     statusCode: JSON.parse(res.statusCode.toString())
   };
+}
+
+// ====================================================================
+//  ================= IT 3 TEST ROUTES (NEW) ==========================
+// ====================================================================
+
+// Session routes
+export function startSessionRequest(quizId: number, token: string, autoStartNum: number) {
+  return requestHelper('POST', `/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
+}
+
+// PLAYER ROUTES //
+export function playerJoinRequest(sessionId: number, name: string) {
+  return requestHelper('POST', '/v1/player/join', { sessionId, name });
 }

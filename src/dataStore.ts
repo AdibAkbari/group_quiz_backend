@@ -8,6 +8,7 @@ let data: Data = {
   quizCount: 0,
   tokens: [],
   trash: [],
+  sessions: []
 };
 
 // YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1

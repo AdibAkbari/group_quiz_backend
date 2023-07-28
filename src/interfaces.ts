@@ -1,3 +1,4 @@
+
 // interfaces needed for all files
 export interface Users {
   email: string;
@@ -64,12 +65,39 @@ export interface Token {
   userId: number;
 }
 
+interface QuestionResponse {
+  questionId: number;
+  playerAnswers: {answerId: number}[];
+  answerTime: number;
+  points: number;
+}
+
+interface Players {
+  name: string;
+  playerId: number;
+  questionResponse: QuestionResponse[];
+  score: number
+}
+
+export interface Session {
+  sessionId: number,
+  sessionState: string;
+  autoStartNum: number;
+  atQuestion: number;
+  currentQuestionStartTime?: number;
+  players: Players[];
+  playerIdCount: number;
+  metadata: Quizzes;
+  timer?: ReturnType<typeof setTimeout>
+}
+
 export interface Data {
   users: Users[];
   quizzes: Quizzes[];
   quizCount: number;
   tokens: Token[];
   trash: Quizzes[];
+  sessions: Session[]
 }
 
 export interface Error {
@@ -100,22 +128,4 @@ export interface QuizList {
 export interface Answers {
   answer: string,
   correct: boolean
-}
-
-export interface PlayerAnswers {
-  answerId: number,
-}
-
-export interface PlayerQuestions {
-  questionId: number,
-  playerAnswers: PlayerAnswers[],
-  answerDuration: number,
-  points: number,
-}
-
-export interface Players {
-  playerName: string,
-  playerId: number,
-  playerQuestions: PlayerQuestions[],
-  score: number,
 }

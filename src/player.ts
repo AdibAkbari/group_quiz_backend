@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
 import { generateName } from './helper';
-import { Player } from './interfaces';
+import { Players } from './interfaces';
 import HTTPError from 'http-errors';
 
 export function playerJoin(sessionId: number, playerName: string): { playerId: number } {
@@ -15,24 +15,22 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
     playerName = generateName();
   }
 
-  console.log(playerName)
-
-  if (session.players.find(player => player.playerName = playerName)) {
+  if (session.players.find(player => player.playerName === playerName)) {
     throw HTTPError(400, 'Name of user entered is not unique');
   }
 
-  session.playerCount++;
-  const playerId: number = session.playerCount;
+  session.playerIdCount++;
+  const playerId: number = session.playerIdCount;
 
   const player: Players = {
     playerName: playerName,
-    playerId: data,
-    questions: [],
+    playerId: playerId,
+    questionResponse: [],
     score: 0,
-  }
+  };
 
-  session.players.push(player)
+  session.players.push(player);
   setData(data);
-  
+
   return { playerId: playerId };
 }

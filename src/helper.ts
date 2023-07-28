@@ -166,21 +166,22 @@ export function giveError(isv2: boolean, errorMessage: string, statusCode: numbe
 }
 
 export function generateName() {
-    const letters = "abcdefghijklmnopqrstuvwxyz";
-    const numbers = "0123456789";
-    
-    function randomString(str) {
-        const array = str.split("");
-        for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array.join("");
+  const letters = 'abcdefghijklmnopqrstuvwxyz';
+  const numbers = '0123456789';
+
+  function randomString(str) {
+    const array = str.split('');
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
-    
-    let nameChar = randomString(letters).slice(0, 5);
-    let nameNum = randomString(numbers).slice(0, 3);
+    return array.join('');
+  }
 
-    return playerName = nameChar + nameNum;
+  const nameChar = randomString(letters).slice(0, 5);
+  const nameNum = randomString(numbers).slice(0, 3);
+
+  const playerName = nameChar + nameNum;
+
+  return playerName;
 }
-
