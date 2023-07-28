@@ -498,3 +498,13 @@ export function authLogoutRequestV1(tokenId: string) {
     statusCode: JSON.parse(res.statusCode.toString())
   };
 }
+
+// ====================================================================
+//  ================= IT 3 TEST ROUTES (NEW) ==========================
+// ====================================================================
+
+
+// Session routes
+export function startSessionRequest(quizId: number, token: string, autoStartNum: number) {
+  return requestHelper('POST', `/v1/quiz/${quizId}/session/start`, { autoStartNum }, { token });
+}
