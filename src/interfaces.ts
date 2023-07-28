@@ -101,3 +101,21 @@ export interface Answers {
   answer: string,
   correct: boolean
 }
+
+export interface PlayerAnswers {
+  answerId: number,
+}
+
+export interface PlayerQuestions {
+  questionId: number,
+  playerAnswers: PlayerAnswers[],
+  answerDuration: number,
+  points: number,
+}
+
+export interface Players {
+  playerName: string,
+  playerId: number,
+  playerQuestions: PlayerQuestions[],
+  score: number,
+}

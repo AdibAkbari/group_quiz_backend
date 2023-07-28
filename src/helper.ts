@@ -164,3 +164,23 @@ export function giveError(isv2: boolean, errorMessage: string, statusCode: numbe
   }
   return { error: errorMessage };
 }
+
+export function generateName() {
+    const letters = "abcdefghijklmnopqrstuvwxyz";
+    const numbers = "0123456789";
+    
+    function randomString(str) {
+        const array = str.split("");
+        for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array.join("");
+    }
+    
+    let nameChar = randomString(letters).slice(0, 5);
+    let nameNum = randomString(numbers).slice(0, 3);
+
+    return playerName = nameChar + nameNum;
+}
+

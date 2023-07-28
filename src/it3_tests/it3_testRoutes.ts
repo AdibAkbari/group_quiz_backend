@@ -205,6 +205,11 @@ export function updateQuizQuestionRequest(quizId: number, questionId: number, to
   );
 }
 
+// PLAYER ROUTES //
+export function playerJoinRequest(sessionId: number, name: string) {
+  return requestHelper('POST', `/v1/player/join`, {sessionId, name});
+}
+
 // ====================================================================
 //  ================= IT 2 TEST ROUTES (OLD) ==========================
 // ====================================================================

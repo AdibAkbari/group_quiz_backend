@@ -32,6 +32,7 @@ import {
   updateQuizQuestion,
   moveQuizQuestion
 } from './quiz';
+import { playerJoin } from './player';
 import { clear } from './other';
 
 // Set up web app
@@ -210,6 +211,14 @@ app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
   const response = quizQuestionDuplicate(quizId, questionId, token, true);
   res.json(response);
 });
+
+// playerJoin //
+app.post('/v1/player/join', (req: Request, res: Response) => {
+    const sessionId = parseInt(req.body.sessionId);
+    const playerName = req.body.name as string;
+    const response = playerJoin(sessionId, playerName);
+    res.json(response);
+  });
 
 // ====================================================================
 //  ================= IT 2 TEST ROUTES (OLD) ==========================
