@@ -19,6 +19,7 @@ beforeEach(() => {
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
   // questionId = createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers).questionId;
+  createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers).questionId;
 });
 
 describe('invalid token', () => {
