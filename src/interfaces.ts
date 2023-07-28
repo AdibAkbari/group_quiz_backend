@@ -1,4 +1,3 @@
-import { NumberLiteralType } from "typescript";
 
 // interfaces needed for all files
 export interface Users {
