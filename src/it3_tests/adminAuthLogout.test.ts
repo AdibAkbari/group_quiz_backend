@@ -2,8 +2,10 @@
 import {
   clearRequest,
   authRegisterRequest,
-  authLogoutRequest
-} from './testRoutes';
+  authLogoutRequest,
+  authLogoutRequestV1
+} from './it3_testRoutes';
+import HTTPError from 'http-errors';
 
 const ERROR = { error: expect.any(String) };
 
@@ -25,40 +27,51 @@ describe('error cases tests', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('invalid token structure: $testName', ({ token }) => {
-    const logout = authLogoutRequest(token);
-    expect(logout.body).toStrictEqual(ERROR);
-    expect(logout.statusCode).toStrictEqual(401);
+    expect(() => authLogoutRequest(token)).toThrow(HTTPError[401]);
   });
 
   test('user created then logged out', () => {
     const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
     const userToken = user.token;
     authLogoutRequest(userToken);
-    const logout = authLogoutRequest(userToken);
-    expect(logout.body).toStrictEqual(ERROR);
-    expect(logout.statusCode).toStrictEqual(400);
+    expect(() => authLogoutRequest(userToken)).toThrow(HTTPError[403]);
   });
 
   test('token never created', () => {
-    const logout = authLogoutRequest('12345');
-    expect(logout.body).toStrictEqual(ERROR);
-    expect(logout.statusCode).toStrictEqual(400);
+    expect(() => authLogoutRequest('12345')).toThrow(HTTPError[403]);
   });
 });
 
 describe('successful cases', () => {
   test('one token created', () => {
     const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
-    const logout = authLogoutRequest(user.token);
-    expect(logout.body).toStrictEqual({ });
-    expect(logout.statusCode).toStrictEqual(200);
+    expect(authLogoutRequest(user.token)).toStrictEqual({ });
   });
 
   test('two tokens created', () => {
     authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast');
     const user2 = authRegisterRequest('email123@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
-    const logout = authLogoutRequest(user2.token);
-    expect(logout.body).toStrictEqual({ });
-    expect(logout.statusCode).toStrictEqual(200);
+
+    expect(authLogoutRequest(user2.token)).toStrictEqual({ });
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('user created then logged out', () => {
+    const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
+    const userToken = user.token;
+    authLogoutRequestV1(userToken);
+    const logout = authLogoutRequestV1(userToken);
+    expect(logout.body).toStrictEqual(ERROR);
+    expect(logout.statusCode).toStrictEqual(403);
+  });
+
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('invalid token structure: $testName', ({ token }) => {
+    const logout = authLogoutRequestV1(token);
+    expect(logout.body).toStrictEqual(ERROR);
+    expect(logout.statusCode).toStrictEqual(401);
   });
 });

@@ -1,9 +1,9 @@
 import {
   authRegisterRequest,
   authLoginRequest,
-  adminUserDetailsRequest,
+  adminUserDetailsRequestV1,
   clearRequest
-} from './testRoutes';
+} from './it3_testRoutes';
 import {
   TokenId
 } from '../interfaces';
@@ -39,7 +39,7 @@ describe('adminAuthLogin', () => {
       test('Correct incrementation of numFailedPasswordsSinceLastLogin', () => {
         authLoginRequest('email@gmail.com', 'password2');
         expect(
-          adminUserDetailsRequest(user.token).body.user.numFailedPasswordsSinceLastLogin
+          adminUserDetailsRequestV1(user.token).body.user.numFailedPasswordsSinceLastLogin
         ).toBe(1);
       });
     });
@@ -54,13 +54,13 @@ describe('adminAuthLogin', () => {
     test('Correct incrementation of numSuccessfulLogins', () => {
       authLoginRequest('email@gmail.com', 'password1');
       expect(
-        adminUserDetailsRequest(user.token).body.user.numSuccessfulLogins
+        adminUserDetailsRequestV1(user.token).body.user.numSuccessfulLogins
       ).toBe(2);
     });
     test('Correct reset of numFailedPasswordsSinceLastLogin', () => {
       authLoginRequest('email@gmail.com', 'password1');
       expect(
-        adminUserDetailsRequest(user.token).body.user.numFailedPasswordsSinceLastLogin
+        adminUserDetailsRequestV1(user.token).body.user.numFailedPasswordsSinceLastLogin
       ).toBe(0);
     });
   });

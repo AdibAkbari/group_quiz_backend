@@ -2,7 +2,7 @@ import {
   clearRequest,
   authRegisterRequest,
   authLoginRequest
-} from './testRoutes';
+} from './it3_testRoutes';
 
 describe('clearV1 Tests', () => {
   // Check that clear returns the correct object

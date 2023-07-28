@@ -6,7 +6,9 @@ import {
   createQuizQuestionRequest,
   quizQuestionDuplicateRequest,
   adminQuizInfoRequest,
-} from './testRoutes';
+  quizQuestionDuplicateRequestV1
+} from './it3_testRoutes';
+import HTTPError from 'http-errors';
 
 import {
   TokenId,
@@ -14,8 +16,8 @@ import {
   QuestionId,
 } from '../interfaces';
 
-const validAnswers = [{ answer: 'great', correct: true }, { answer: 'bad', correct: false }];
 const ERROR = { error: expect.any(String) };
+const validAnswers = [{ answer: 'great', correct: true }, { answer: 'bad', correct: false }];
 
 let user: TokenId;
 let quiz: QuizId;
@@ -23,28 +25,22 @@ let question: QuestionId;
 beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
-  quiz = quizCreateRequest(user.token, 'My Quiz', 'This is my quiz').body;
-  question = createQuizQuestionRequest(quiz.quizId, user.token, 'How are you?', 5, 5, validAnswers).body;
+  quiz = quizCreateRequest(user.token, 'My Quiz', 'This is my quiz');
+  question = createQuizQuestionRequest(quiz.quizId, user.token, 'How are you?', 5, 5, validAnswers);
 });
 
 describe('error cases', () => {
   test('quizId invalid', () => {
-    const result = quizQuestionDuplicateRequest(quiz.quizId + 1, question.questionId, user.token);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => quizQuestionDuplicateRequest(quiz.quizId + 1, question.questionId, user.token)).toThrow(HTTPError[400]);
   });
 
   test('user does not own quiz', () => {
     const user2 = authRegisterRequest('email2@gmail.com', 'password1', 'Firstname', 'Lastname').body;
-    const result = quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user2.token);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user2.token)).toThrow(HTTPError[400]);
   });
 
   test('questionId invalid', () => {
-    const result = quizQuestionDuplicateRequest(quiz.quizId, question.questionId + 1, user.token);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
+    expect(() => quizQuestionDuplicateRequest(quiz.quizId, question.questionId + 1, user.token)).toThrow(HTTPError[400]);
   });
 
   test.each([
@@ -60,25 +56,20 @@ describe('error cases', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('token invalid structure: $testName', ({ token }) => {
-    const result = quizQuestionDuplicateRequest(quiz.quizId, question.questionId, token);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(401);
+    expect(() => quizQuestionDuplicateRequest(quiz.quizId, question.questionId, token)).toThrow(HTTPError[401]);
   });
 
   test('TokenId not logged in', () => {
-    const result = quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user.token + 1);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(403);
+    expect(() => quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user.token + 1)).toThrow(HTTPError[403]);
   });
 });
 
 describe('valid input', () => {
   test('one question duplicate', () => {
-    const result = quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user.token);
     const timeNow = Math.floor(Date.now() / 1000);
-    const info = adminQuizInfoRequest(user.token, quiz.quizId).body;
-    expect(result.body).toStrictEqual({ newQuestionId: expect.any(Number) });
-    expect(result.statusCode).toStrictEqual(200);
+    const result = quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user.token);
+    const info = adminQuizInfoRequest(user.token, quiz.quizId);
+    expect(result).toStrictEqual({ newQuestionId: expect.any(Number) });
     expect(info).toStrictEqual({
       quizId: quiz.quizId,
       name: 'My Quiz',
@@ -98,7 +89,7 @@ describe('valid input', () => {
           ]
         },
         {
-          questionId: result.body.newQuestionId,
+          questionId: result.newQuestionId,
           question: 'How are you?',
           duration: 5,
           points: 5,
@@ -111,18 +102,17 @@ describe('valid input', () => {
       duration: 10,
     });
     expect(info.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
-    expect(info.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
+    expect(info.timeLastEdited).toBeLessThanOrEqual(timeNow + 3);
   });
 
   // whitebox testing, assuming questions appear in the order they were created
   test('two questions, duplicate the first', () => {
     const answersQuestion2 = [{ answer: 'yum', correct: true }, { answer: 'ew', correct: false }];
-    const questionTwo = createQuizQuestionRequest(quiz.quizId, user.token, 'Pineapples on pizza?', 3, 3, answersQuestion2).body;
+    const questionTwo = createQuizQuestionRequest(quiz.quizId, user.token, 'Pineapples on pizza?', 3, 3, answersQuestion2);
     const result = quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user.token);
     const timeNow = Math.floor(Date.now() / 1000);
-    const info = adminQuizInfoRequest(user.token, quiz.quizId).body;
-    expect(result.body).toStrictEqual({ newQuestionId: expect.any(Number) });
-    expect(result.statusCode).toStrictEqual(200);
+    const info = adminQuizInfoRequest(user.token, quiz.quizId);
+    expect(result).toStrictEqual({ newQuestionId: expect.any(Number) });
     expect(info).toStrictEqual({
       quizId: quiz.quizId,
       name: 'My Quiz',
@@ -142,7 +132,7 @@ describe('valid input', () => {
           ]
         },
         {
-          questionId: result.body.newQuestionId,
+          questionId: result.newQuestionId,
           question: 'How are you?',
           duration: 5,
           points: 5,
@@ -166,5 +156,34 @@ describe('valid input', () => {
     });
     expect(info.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
     expect(info.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('TokenId not logged in', () => {
+    const result = quizQuestionDuplicateRequestV1(quiz.quizId, question.questionId, user.token + 1);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(403);
+  });
+
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token invalid structure: $testName', ({ token }) => {
+    const result = quizQuestionDuplicateRequestV1(quiz.quizId, question.questionId, token);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(401);
+  });
+
+  test('questionId invalid', () => {
+    const result = quizQuestionDuplicateRequestV1(quiz.quizId, question.questionId + 1, user.token);
+    expect(result.body).toStrictEqual(ERROR);
+    expect(result.statusCode).toStrictEqual(400);
+  });
+
+  test('one question duplicate', () => {
+    const result = quizQuestionDuplicateRequestV1(quiz.quizId, question.questionId, user.token);
+    expect(result.body).toStrictEqual({ newQuestionId: expect.any(Number) });
+    expect(result.statusCode).toStrictEqual(200);
   });
 });

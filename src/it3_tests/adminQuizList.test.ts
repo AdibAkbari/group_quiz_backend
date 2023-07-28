@@ -3,8 +3,10 @@ import {
   adminQuizListRequest,
   quizCreateRequest,
   authRegisterRequest,
-  clearRequest
-} from './testRoutes';
+  clearRequest,
+  adminQuizListRequestV1,
+} from './it3_testRoutes';
+import HTTPError from 'http-errors';
 
 import { TokenId, QuizId } from '../interfaces';
 
@@ -32,32 +34,24 @@ describe('Token invalid', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('token is not a valid structure: $testName', ({ token }) => {
-    const list = adminQuizListRequest(token);
-    expect(list.body).toStrictEqual(ERROR);
-    expect(list.statusCode).toStrictEqual(401);
+    expect(() => adminQuizListRequest(token)).toThrow(HTTPError[401]);
   });
 
   test('Unused tokenId', () => {
-    const list = adminQuizListRequest(user.token + user2.token);
-    expect(list.body).toStrictEqual(ERROR);
-    expect(list.statusCode).toStrictEqual(403);
+    expect(() => adminQuizListRequest(user.token + user2.token)).toThrow(HTTPError[403]);
   });
 });
 
 describe('User owns no quizzes', () => {
-  test('correct status code', () => {
-    expect(adminQuizListRequest(user.token).statusCode).toStrictEqual(200);
-  });
-
   test('No quizzes', () => {
-    expect(adminQuizListRequest(user.token).body).toStrictEqual({
+    expect(adminQuizListRequest(user.token)).toStrictEqual({
       quizzes: []
     });
   });
 
   test('One quiz created on system', () => {
     quizCreateRequest(user2.token, 'Cats', '');
-    expect(adminQuizListRequest(user.token).body).toStrictEqual({
+    expect(adminQuizListRequest(user.token)).toStrictEqual({
       quizzes: []
     });
   });
@@ -66,7 +60,7 @@ describe('User owns no quizzes', () => {
     quizCreateRequest(user2.token, 'Cats', '');
     quizCreateRequest(user2.token, 'Dogs', '');
     quizCreateRequest(user2.token, 'Birds', '');
-    expect(adminQuizListRequest(user.token).body).toStrictEqual({
+    expect(adminQuizListRequest(user.token)).toStrictEqual({
       quizzes: []
     });
   });
@@ -75,11 +69,11 @@ describe('User owns no quizzes', () => {
 describe('User does own quizzes', () => {
   let quiz: QuizId;
   beforeEach(() => {
-    quiz = quizCreateRequest(user.token, 'Cats', 'A quiz about cats').body;
+    quiz = quizCreateRequest(user.token, 'Cats', 'A quiz about cats');
   });
 
   test('user owns one quiz', () => {
-    expect(adminQuizListRequest(user.token).body).toStrictEqual({
+    expect(adminQuizListRequest(user.token)).toStrictEqual({
       quizzes: [
         {
           quizId: quiz.quizId,
@@ -90,7 +84,7 @@ describe('User does own quizzes', () => {
   });
 
   test('user owns two quizzes', () => {
-    const quiz2 = quizCreateRequest(user.token, 'Dogs', 'A quiz about dogs').body;
+    const quiz2 = quizCreateRequest(user.token, 'Dogs', 'A quiz about dogs');
     const expected = {
       quizzes: [
         {
@@ -103,20 +97,20 @@ describe('User does own quizzes', () => {
         }
       ]
     };
-    const received = adminQuizListRequest(user.token).body;
+    const received = adminQuizListRequest(user.token);
     const receivedSet = new Set(received.quizzes);
     const expectedSet = new Set(expected.quizzes);
     expect(receivedSet).toStrictEqual(expectedSet);
   });
 
   test('user owns multiple quizzes', () => {
-    const quiz2 = quizCreateRequest(user.token, 'Dogs', 'A quiz about dogs').body;
+    const quiz2 = quizCreateRequest(user.token, 'Dogs', 'A quiz about dogs');
     quizCreateRequest(user2.token, 'Birds', 'A quiz about birds');
-    const quiz4 = quizCreateRequest(user.token, 'Ducks', 'A quiz about ducks').body;
-    const quiz5 = quizCreateRequest(user.token, 'Lizards', 'A quiz about lizards').body;
+    const quiz4 = quizCreateRequest(user.token, 'Ducks', 'A quiz about ducks');
+    const quiz5 = quizCreateRequest(user.token, 'Lizards', 'A quiz about lizards');
     quizCreateRequest(user2.token, 'Goats', 'A quiz about goats');
 
-    const received = adminQuizListRequest(user.token).body;
+    const received = adminQuizListRequest(user.token);
     const expected = {
       quizzes: [
         {
@@ -142,8 +136,37 @@ describe('User does own quizzes', () => {
     const expectedSet = new Set(expected.quizzes);
     expect(receivedSet).toStrictEqual(expectedSet);
   });
+});
 
-  test('correct status code', () => {
-    expect(adminQuizListRequest(user.token).statusCode).toStrictEqual(200);
+describe('V1 WRAPPERS', () => {
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
+    const list = adminQuizListRequestV1(token);
+    expect(list.body).toStrictEqual(ERROR);
+    expect(list.statusCode).toStrictEqual(401);
+  });
+
+  test('Unused tokenId', () => {
+    const list = adminQuizListRequestV1(user.token + user2.token);
+    expect(list.body).toStrictEqual(ERROR);
+    expect(list.statusCode).toStrictEqual(403);
+  });
+
+  let quiz: QuizId;
+  beforeEach(() => {
+    quiz = quizCreateRequest(user.token, 'Cats', 'A quiz about cats');
+  });
+
+  test('user owns one quiz', () => {
+    expect(adminQuizListRequestV1(user.token).body).toStrictEqual({
+      quizzes: [
+        {
+          quizId: quiz.quizId,
+          name: 'Cats'
+        }
+      ]
+    });
   });
 });

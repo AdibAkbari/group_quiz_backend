@@ -5,8 +5,10 @@ import {
   quizRemoveRequest,
   adminQuizListRequest,
   adminQuizInfoRequest,
-} from './testRoutes';
+  quizRemoveRequestV1,
+} from './it3_testRoutes';
 import { TokenId, QuizId } from '../interfaces';
+import HTTPError from 'http-errors';
 
 const ERROR = { error: expect.any(String) };
 
@@ -16,7 +18,7 @@ let quiz: QuizId;
 beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
-  quiz = quizCreateRequest(user.token, 'quiz1', '').body;
+  quiz = quizCreateRequest(user.token, 'quiz1', '');
 });
 
 describe('Token invalid', () => {
@@ -33,60 +35,48 @@ describe('Token invalid', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('token is not a valid structure: $testName', ({ token }) => {
-    const removeQuiz = quizRemoveRequest(token, quiz.quizId);
-    expect(removeQuiz.body).toStrictEqual(ERROR);
-    expect(removeQuiz.statusCode).toStrictEqual(401);
+    expect(() => quizRemoveRequest(token, quiz.quizId)).toThrow(HTTPError[401]);
   });
 
   test('Nobody logged in', () => {
-    const removeQuiz = quizRemoveRequest('7', quiz.quizId);
-    expect(removeQuiz.body).toStrictEqual(ERROR);
-    expect(removeQuiz.statusCode).toStrictEqual(403);
+    expect(() => quizRemoveRequest('7', quiz.quizId)).toThrow(HTTPError[403]);
   });
 
   test('TokenId not logged in', () => {
-    const removeQuiz = quizRemoveRequest(user.token + 1, quiz.quizId);
-    expect(removeQuiz.body).toStrictEqual(ERROR);
-    expect(removeQuiz.statusCode).toStrictEqual(403);
+    expect(() => quizRemoveRequest(user.token + 1, quiz.quizId)).toThrow(HTTPError[403]);
   });
 });
 
 describe('Failed to remove', () => {
   // Testing quizID does not exist
   test('Quiz ID does not refer to a valid quiz', () => {
-    const removeQuiz = quizRemoveRequest(user.token, quiz.quizId + 1);
-    expect(removeQuiz.body).toStrictEqual(ERROR);
-    expect(removeQuiz.statusCode).toStrictEqual(400);
+    expect(() => quizRemoveRequest(user.token, quiz.quizId + 1)).toThrow(HTTPError[400]);
   });
 
   // Testing the user does not own the quiz that is trying to be removed
   test('Quiz ID does not refer to a quiz that this user owns', () => {
     const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
-    const quiz2 = quizCreateRequest(user2.token, 'quiz2', '').body;
+    const quiz2 = quizCreateRequest(user2.token, 'quiz2', '');
 
-    const removeQuiz = quizRemoveRequest(user.token, quiz2.quizId);
-    expect(removeQuiz.body).toStrictEqual(ERROR);
-    expect(removeQuiz.statusCode).toStrictEqual(400);
+    expect(() => quizRemoveRequest(user.token, quiz2.quizId)).toThrow(HTTPError[400]);
   });
 });
 
 describe('Successfully removed quiz check', () => {
   // Sucessfully remove the quiz
   test('Sucessful quiz remove return', () => {
-    const removeQuiz = quizRemoveRequest(user.token, quiz.quizId);
-    expect(removeQuiz.body).toStrictEqual({});
-    expect(removeQuiz.statusCode).toStrictEqual(200);
+    expect(quizRemoveRequest(user.token, quiz.quizId)).toStrictEqual({});
   });
 
   // Check that the quiz is actually removed
   test('Sucessful quiz remove integrated check', () => {
-    const quiz2 = quizCreateRequest(user.token, 'quiz2', '').body;
-    const quizToRemove = quizCreateRequest(user.token, 'quizToRemove', '').body;
-    const quiz3 = quizCreateRequest(user.token, 'quiz3', '').body;
+    const quiz2 = quizCreateRequest(user.token, 'quiz2', '');
+    const quizToRemove = quizCreateRequest(user.token, 'quizToRemove', '');
+    const quiz3 = quizCreateRequest(user.token, 'quiz3', '');
 
     quizRemoveRequest(user.token, quizToRemove.quizId);
 
-    const received = adminQuizListRequest(user.token).body;
+    const received = adminQuizListRequest(user.token);
     const expected = {
       quizzes: [
         {
@@ -112,24 +102,49 @@ describe('Successfully removed quiz check', () => {
   // check that once a quiz is removed, the quiz id no longer exists
   test('No quiz Id once a quiz is removed', () => {
     quizRemoveRequest(user.token, quiz.quizId);
-    const quizInfo = adminQuizInfoRequest(user.token, quiz.quizId);
-    expect(quizInfo.body).toStrictEqual(ERROR);
-    expect(quizInfo.statusCode).toStrictEqual(400);
+    expect(() => adminQuizInfoRequest(user.token, quiz.quizId)).toThrow(HTTPError[400]);
 
     quizCreateRequest(user.token, 'quiz2', '');
-    const quizInfo2 = adminQuizInfoRequest(user.token, quiz.quizId);
-    expect(quizInfo2.body).toStrictEqual(ERROR);
-    expect(quizInfo2.statusCode).toStrictEqual(400);
+    expect(() => adminQuizInfoRequest(user.token, quiz.quizId)).toThrow(HTTPError[400]);
   });
 
   // check that once a quiz is removed, the next quiz still has a unique quiz id
   test('Unique quiz Id once a quiz is removed', () => {
-    const quizToRemove = quizCreateRequest(user.token, 'quizToRemove', '').body;
-    const quiz2 = quizCreateRequest(user.token, 'quiz2', '').body;
+    const quizToRemove = quizCreateRequest(user.token, 'quizToRemove', '');
+    const quiz2 = quizCreateRequest(user.token, 'quiz2', '');
     quizRemoveRequest(user.token, quizToRemove.quizId);
-    const quiz3 = quizCreateRequest(user.token, 'quiz3', '').body;
+    const quiz3 = quizCreateRequest(user.token, 'quiz3', '');
 
     expect(quiz3.quizId).not.toStrictEqual(quiz.quizId);
     expect(quiz3.quizId).not.toStrictEqual(quiz2.quizId);
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
+    const removeQuiz = quizRemoveRequestV1(token, quiz.quizId);
+    expect(removeQuiz.body).toStrictEqual(ERROR);
+    expect(removeQuiz.statusCode).toStrictEqual(401);
+  });
+
+  test('Nobody logged in', () => {
+    const removeQuiz = quizRemoveRequestV1('7', quiz.quizId);
+    expect(removeQuiz.body).toStrictEqual(ERROR);
+    expect(removeQuiz.statusCode).toStrictEqual(403);
+  });
+
+  test('Quiz ID does not refer to a valid quiz', () => {
+    const removeQuiz = quizRemoveRequestV1(user.token, quiz.quizId + 1);
+    expect(removeQuiz.body).toStrictEqual(ERROR);
+    expect(removeQuiz.statusCode).toStrictEqual(400);
+  });
+
+  test('Sucessful quiz remove return', () => {
+    const removeQuiz = quizRemoveRequestV1(user.token, quiz.quizId);
+    expect(removeQuiz.body).toStrictEqual({});
+    expect(removeQuiz.statusCode).toStrictEqual(200);
   });
 });

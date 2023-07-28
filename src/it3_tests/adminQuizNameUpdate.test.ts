@@ -4,8 +4,11 @@ import {
   quizNameUpdateRequest,
   adminQuizInfoRequest,
   quizCreateRequest,
-} from './testRoutes';
+  quizNameUpdateRequestV1,
+} from './it3_testRoutes';
 import { TokenId, QuizId } from '../interfaces';
+import HTTPError from 'http-errors';
+
 const ERROR = { error: expect.any(String) };
 
 // Before each test, clear data and then create a new user and new quiz
@@ -14,7 +17,7 @@ let quiz: QuizId;
 beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
-  quiz = quizCreateRequest(user.token, 'quiz1', '').body;
+  quiz = quizCreateRequest(user.token, 'quiz1', '');
 });
 
 describe('Token invalid', () => {
@@ -31,40 +34,30 @@ describe('Token invalid', () => {
     { testName: 'token has negative sign', token: '-37294' },
     { testName: 'token has positive sign', token: '+38594' },
   ])('token is not a valid structure: $testName', ({ token }) => {
-    const newQuiz = quizNameUpdateRequest(token, quiz.quizId, 'TestQuizUpdate');
-    expect(newQuiz.body).toStrictEqual(ERROR);
-    expect(newQuiz.statusCode).toStrictEqual(401);
+    expect(() => quizNameUpdateRequest(token, quiz.quizId, 'TestQuizUpdate')).toThrow(HTTPError[401]);
   });
 
   test('Nobody logged in', () => {
-    const newQuiz = quizNameUpdateRequest('7', quiz.quizId, 'TestQuizUpdate');
-    expect(newQuiz.body).toStrictEqual(ERROR);
-    expect(newQuiz.statusCode).toStrictEqual(403);
+    expect(() => quizNameUpdateRequest('7', quiz.quizId, 'TestQuizUpdate')).toThrow(HTTPError[403]);
   });
 
   test('TokenId not logged in', () => {
-    const newQuiz = quizNameUpdateRequest(user.token + 1, quiz.quizId, 'TestQuizUpdate');
-    expect(newQuiz.body).toStrictEqual(ERROR);
-    expect(newQuiz.statusCode).toStrictEqual(403);
+    expect(() => quizNameUpdateRequest(user.token + 1, quiz.quizId, 'TestQuizUpdate')).toThrow(HTTPError[403]);
   });
 });
 
 describe('Invalid adminQuizNameUpdate', () => {
   // Testing quizID does not exist
   test('Quiz ID does not refer to a valid quiz', () => {
-    const newQuiz = quizNameUpdateRequest(user.token, quiz.quizId + 1, 'TestQuizUpdate');
-    expect(newQuiz.body).toStrictEqual(ERROR);
-    expect(newQuiz.statusCode).toStrictEqual(400);
+    expect(() => quizNameUpdateRequest(user.token, quiz.quizId + 1, 'TestQuizUpdate')).toThrow(HTTPError[400]);
   });
 
   // Testing the user does not own the quiz that is trying to be removed
   test('Quiz ID does not refer to a quiz that this user owns', () => {
     const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
-    const quiz2 = quizCreateRequest(user2.token, 'quiz2', '').body;
+    const quiz2 = quizCreateRequest(user2.token, 'quiz2', '');
 
-    const newQuiz = quizNameUpdateRequest(user.token, quiz2.quizId, 'NewQuizName');
-    expect(newQuiz.body).toStrictEqual(ERROR);
-    expect(newQuiz.statusCode).toStrictEqual(400);
+    expect(() => quizNameUpdateRequest(user.token, quiz2.quizId, 'NewQuizName')).toThrow(HTTPError[400]);
   });
 
   // Output error if new name contains not alphanumeric characters
@@ -82,9 +75,7 @@ describe('Invalid adminQuizNameUpdate', () => {
       test: 'Invalid semi colon'
     },
   ])('"$test": "$name"', ({ name, test }) => {
-    const newQuiz = quizNameUpdateRequest(user.token, quiz.quizId, name);
-    expect(newQuiz.body).toStrictEqual(ERROR);
-    expect(newQuiz.statusCode).toStrictEqual(400);
+    expect(() => quizNameUpdateRequest(user.token, quiz.quizId, name)).toThrow(HTTPError[400]);
   });
 
   // Output error if new name is either less than 3 characters long or more than 30 characters long
@@ -98,24 +89,18 @@ describe('Invalid adminQuizNameUpdate', () => {
       test: '> 30'
     },
   ])('"$test": "$name"', ({ name, test }) => {
-    const newQuiz = quizNameUpdateRequest(user.token, quiz.quizId, name);
-    expect(newQuiz.body).toStrictEqual(ERROR);
-    expect(newQuiz.statusCode).toStrictEqual(400);
+    expect(() => quizNameUpdateRequest(user.token, quiz.quizId, name)).toThrow(HTTPError[400]);
   });
 
   // Output error if the name is already used by the current logged in user for another quiz
   test('Name is already used by the current logged in user for another quiz', () => {
-    const quiz2 = quizCreateRequest(user.token, 'quiz2', '').body;
-    const newQuiz = quizNameUpdateRequest(user.token, quiz2.quizId, 'quiz1');
-    expect(newQuiz.body).toStrictEqual(ERROR);
-    expect(newQuiz.statusCode).toStrictEqual(400);
+    const quiz2 = quizCreateRequest(user.token, 'quiz2', '');
+    expect(() => quizNameUpdateRequest(user.token, quiz2.quizId, 'quiz1')).toThrow(HTTPError[400]);
   });
 
   // Output error if the name is just white space
   test('Name is just whitespace', () => {
-    const newQuiz = quizNameUpdateRequest(user.token, quiz.quizId, '          ');
-    expect(newQuiz.body).toStrictEqual(ERROR);
-    expect(newQuiz.statusCode).toStrictEqual(400);
+    expect(() => quizNameUpdateRequest(user.token, quiz.quizId, '          ')).toThrow(HTTPError[400]);
   });
 });
 
@@ -130,11 +115,9 @@ describe('Valid adminQuizNameUpdate', () => {
     { name: 'Quiz1' },
     { name: 'New Quiz' },
   ])('Successful Quiz Name Update: "$name"', ({ name }) => {
-    const newQuiz = quizNameUpdateRequest(user.token, quiz.quizId, name);
-    expect(newQuiz.body).toStrictEqual({});
-    expect(newQuiz.statusCode).toStrictEqual(200);
+    expect(quizNameUpdateRequest(user.token, quiz.quizId, name)).toStrictEqual({});
 
-    expect(adminQuizInfoRequest(user.token, quiz.quizId).body).toStrictEqual({
+    expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual({
       quizId: quiz.quizId,
       name: name,
       timeCreated: expect.any(Number),
@@ -144,20 +127,49 @@ describe('Valid adminQuizNameUpdate', () => {
       questions: [],
       duration: 0,
     });
-    expect(adminQuizInfoRequest(user.token, quiz.quizId).statusCode).toStrictEqual(200);
   });
 
   test('Correct time last edited', () => {
     const expectedTimeTransfered = Math.floor(Date.now() / 1000);
-    const newQuiz = quizNameUpdateRequest(user.token, quiz.quizId, 'New Quiz Name');
-    expect(newQuiz.body).toStrictEqual({});
-    expect(newQuiz.statusCode).toStrictEqual(200);
+    expect(quizNameUpdateRequest(user.token, quiz.quizId, 'New Quiz Name')).toStrictEqual({});
 
-    const quizInfo = adminQuizInfoRequest(user.token, quiz.quizId).body;
+    const quizInfo = adminQuizInfoRequest(user.token, quiz.quizId);
 
     const timeSent = quizInfo.timeLastEdited;
 
     expect(timeSent).toBeGreaterThanOrEqual(expectedTimeTransfered);
     expect(timeSent).toBeLessThanOrEqual(expectedTimeTransfered + 3);
+  });
+});
+
+describe('V1 WRAPPERS', () => {
+  test('Name is just whitespace', () => {
+    const newQuiz = quizNameUpdateRequestV1(user.token, quiz.quizId, '          ');
+    expect(newQuiz.body).toStrictEqual(ERROR);
+    expect(newQuiz.statusCode).toStrictEqual(400);
+  });
+
+  test.each([
+    { testName: 'token just letters', token: 'hello' },
+    { testName: 'token starts with letters', token: 'a54364' },
+  ])('token is not a valid structure: $testName', ({ token }) => {
+    const newQuiz = quizNameUpdateRequestV1(token, quiz.quizId, 'TestQuizUpdate');
+    expect(newQuiz.body).toStrictEqual(ERROR);
+    expect(newQuiz.statusCode).toStrictEqual(401);
+  });
+
+  test('Nobody logged in', () => {
+    const newQuiz = quizNameUpdateRequestV1('7', quiz.quizId, 'TestQuizUpdate');
+    expect(newQuiz.body).toStrictEqual(ERROR);
+    expect(newQuiz.statusCode).toStrictEqual(403);
+  });
+
+  test.each([
+    { name: 'qz1' },
+    { name: 'Short' },
+  ])('Successful Quiz Name Update: "$name"', ({ name }) => {
+    const newQuiz = quizNameUpdateRequestV1(user.token, quiz.quizId, name);
+    expect(newQuiz.body).toStrictEqual({});
+    expect(newQuiz.statusCode).toStrictEqual(200);
   });
 });

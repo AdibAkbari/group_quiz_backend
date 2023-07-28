@@ -1,5 +1,6 @@
 import { getData } from './dataStore';
 import { Data, Quizzes } from './interfaces';
+import HTTPError from 'http-errors';
 
 // HELPER FUNCTIONS
 /**
@@ -48,9 +49,6 @@ export function findUserFromToken(token: string): number {
    * @returns {boolean} - returns false if it dosn't exist
    */
 export function isValidQuizId(quizId: number): boolean {
-  if (isNaN(quizId)) {
-    return false;
-  }
   const data: Data = getData();
   if (data.quizzes.find(id => id.quizId === quizId) === undefined) {
     return false;
@@ -158,4 +156,11 @@ export function isValidEmail (userEmail: string): boolean {
   }
 
   return false;
+}
+
+export function giveError(isv2: boolean, errorMessage: string, statusCode: number) {
+  if (isv2) {
+    throw HTTPError(statusCode, errorMessage);
+  }
+  return { error: errorMessage };
 }

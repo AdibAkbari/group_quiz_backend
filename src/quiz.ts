@@ -9,7 +9,8 @@ import {
   isTokenLoggedIn,
   findUserFromToken,
   isValidQuestionId,
-  isValidEmail
+  isValidEmail,
+  giveError
 } from './helper';
 
 /**
@@ -22,19 +23,15 @@ import {
    *              }>
    *          }}
    */
-export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
+export function adminQuizList (token: string, isv2: boolean): {quizzes: QuizList[]} | Error {
   const data: Data = getData();
 
   if (!isValidTokenStructure(token)) {
-    return {
-      error: 'token is an invalid structure'
-    };
+    return giveError(isv2, 'token is an invalid structure', 401);
   }
 
   if (!isTokenLoggedIn(token)) {
-    return {
-      error: 'token is not logged in'
-    };
+    return giveError(isv2, 'token is not logged in', 403);
   }
 
   const authUserId = findUserFromToken(token);
@@ -55,15 +52,15 @@ export function adminQuizList (token: string): {quizzes: QuizList[]} | Error {
  * @param {string} description
  * @returns {{quizId: number}} quizId
  */
-export function adminQuizCreate(token: string, name: string, description: string): QuizId | Error {
+export function adminQuizCreate(token: string, name: string, description: string, isv2: boolean): QuizId | Error {
   // invalid token structure
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    return giveError(isv2, 'Invalid Token Structure', 401);
   }
 
   // token is not logged in
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    return giveError(isv2, 'Token not logged in', 403);
   }
 
   // get authUserId from token
@@ -71,12 +68,12 @@ export function adminQuizCreate(token: string, name: string, description: string
 
   // invalid name
   if (!checkNameValidity(name, authUserId)) {
-    return { error: 'Invalid Name' };
+    return giveError(isv2, 'Invalid Name', 400);
   }
 
   // invalid description
   if (description.length > 100) {
-    return { error: 'Invalid Description' };
+    return giveError(isv2, 'Invalid Description', 400);
   }
 
   // get time in seconds
@@ -107,31 +104,29 @@ export function adminQuizCreate(token: string, name: string, description: string
   };
 }
 /**
- * Given a particular quizId, permanently remove the quiz.
+ * Given a particular quizId, send the quiz to trash
  *
  * @param {string} token
  * @param {number} quizId
  * @returns {{ }} empty object
  */
-export function adminQuizRemove(token: string, quizId: number): Record<string, never> | Error {
+export function adminQuizRemove(token: string, quizId: number, isv2: boolean): Record<string, never> | Error {
   // invalid token structure
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    return giveError(isv2, 'Invalid Token Structure', 401);
   }
 
   // token is not logged in
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    return giveError(isv2, 'Token not logged in', 403);
   }
 
   if (!isValidQuizId(quizId)) {
-    return { error: 'Invalid: QuizId' };
+    return giveError(isv2, 'Invalid: QuizId', 400);
   }
 
-  // get authUserId from token
-
   if (!isValidCreator(quizId, token)) {
-    return { error: 'Invalid: user does not own quiz' };
+    return giveError(isv2, 'Invalid: user does not own quiz', 400);
   }
 
   const data: Data = getData();
@@ -156,15 +151,15 @@ export function adminQuizRemove(token: string, quizId: number): Record<string, n
  *              }>
  *          }}
  */
-export function adminQuizTrash(token: string): {quizzes: QuizList[]} | Error {
+export function adminQuizTrash(token: string, isv2: boolean): {quizzes: QuizList[]} | Error {
   // invalid token structure
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    return giveError(isv2, 'Invalid Token Structure', 401);
   }
 
   // token is not logged in
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    return giveError(isv2, 'Token not logged in', 403);
   }
 
   const data = getData();
@@ -192,28 +187,28 @@ export function adminQuizTrash(token: string): {quizzes: QuizList[]} | Error {
    * @param {number} quizId
    * @returns { } empty object
    */
-export function adminQuizRestore(token: string, quizId: number): Record<string, never> | Error {
+export function adminQuizRestore(token: string, quizId: number, isv2: boolean): Record<string, never> | Error {
   // invalid token structure
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    return giveError(isv2, 'Invalid Token Structure', 401);
   }
 
   // token is not logged in
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    return giveError(isv2, 'Token not logged in', 403);
   }
 
   const data = getData();
   const quizIndex = data.trash.findIndex((quiz) => quiz.quizId === quizId);
   if (quizIndex === -1) {
-    return { error: 'Invalid: quiz is not currently in trash or does not exist' };
+    return giveError(isv2, 'Invalid: quiz is not currently in trash or does not exist', 400);
   }
 
   // get authUserId from token
   const authUserId = findUserFromToken(token);
 
   if (data.trash[quizIndex].creator !== authUserId) {
-    return { error: 'Invalid: user does not own quiz' };
+    return giveError(isv2, 'Invalid: user does not own quiz', 400);
   }
 
   // get time in seconds
@@ -234,13 +229,13 @@ export function adminQuizRestore(token: string, quizId: number): Record<string, 
  * @param {number[]} quizIds
  * @returns {{}} empty object
  */
-export function adminQuizTrashEmpty(token: string, quizIds: number[]): Record<string, never> | Error {
+export function adminQuizTrashEmpty(token: string, quizIds: number[], isv2: boolean): Record<string, never> | Error {
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    return giveError(isv2, 'Invalid Token Structure', 401);
   }
 
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    return giveError(isv2, 'Token not logged in', 403);
   }
 
   const data = getData();
@@ -249,10 +244,10 @@ export function adminQuizTrashEmpty(token: string, quizIds: number[]): Record<st
   for (const quizId of quizIds) {
     const quiz = data.trash.find((quiz) => quiz.quizId === quizId);
     if (quiz === undefined) {
-      return { error: 'one or more quizIds not currently in trash or do not exist' };
+      return giveError(isv2, 'one or more quizIds not currently in trash or do not exist', 400);
     }
     if (quiz.creator !== authUserId) {
-      return { error: 'one or more quizIds refer to a quiz that user does not own' };
+      return giveError(isv2, 'one or more quizIds refer to a quiz that user does not own', 400);
     }
   }
 
@@ -276,21 +271,21 @@ export function adminQuizTrashEmpty(token: string, quizIds: number[]): Record<st
 *           description: string,
 *          }}
 */
-export function adminQuizInfo(token: string, quizId: number): Error | QuizInfo {
+export function adminQuizInfo(token: string, quizId: number, isv2: boolean): Error | QuizInfo {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
-    return { error: 'invalid token structure' };
+    return giveError(isv2, 'invalid token structure', 401);
   }
   if (!isTokenLoggedIn(token)) {
-    return { error: 'token is not logged in' };
+    return giveError(isv2, 'token is not logged in', 403);
   }
 
   // Error checking for quizId
   if (!isValidQuizId(quizId)) {
-    return { error: 'invalid quizId' };
+    return giveError(isv2, 'invalid quizId', 400);
   }
   if (!isValidCreator(quizId, token)) {
-    return { error: 'invalid quizId' };
+    return giveError(isv2, 'invalid quizId', 400);
   }
 
   const data: Data = getData();
@@ -318,34 +313,30 @@ export function adminQuizInfo(token: string, quizId: number): Error | QuizInfo {
  * @param {string} name
  * @returns {{ }} empty object
  */
-export function adminQuizNameUpdate(token: string, quizId: number, name: string): Record<string, never> | Error {
+export function adminQuizNameUpdate(token: string, quizId: number, name: string, isv2: boolean): Record<string, never> | Error {
   // Check if token structure is invalid
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    return giveError(isv2, 'Invalid Token Structure', 401);
   }
   // Check if token is not logged in
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    return giveError(isv2, 'Token not logged in', 403);
   }
 
   // Check inputted quizId is valid
   if (!isValidQuizId(quizId)) {
-    return { error: 'Invalid: QuizId' };
+    return giveError(isv2, 'Invalid: QuizId', 400);
   }
   // Check inputted Quiz ID does not refer to a quiz that this user owns
   if (!isValidCreator(quizId, token)) {
-    return { error: 'Invalid: You do not own this quiz' };
+    return giveError(isv2, 'Invalid: You do not own this quiz', 400);
   }
 
   // Get authUserId from token
   const authUserId = findUserFromToken(token);
   // Check if the name is valid
   if (!checkNameValidity(name, authUserId)) {
-    return { error: 'Invalid: Name' };
-  }
-  // Check name isn't just whitespace
-  if (isWhiteSpace(name)) {
-    return { error: 'Invalid: Quiz name cannot be solely white space' };
+    return giveError(isv2, 'Invalid: Name', 400);
   }
 
   const data: Data = getData();
@@ -353,11 +344,9 @@ export function adminQuizNameUpdate(token: string, quizId: number, name: string)
 
   const quizToUpdate = data.quizzes.find((current) => current.quizId === quizId);
 
-  if (quizToUpdate) {
-    quizToUpdate.name = name;
-    quizToUpdate.timeLastEdited = timeNow;
-    setData(data);
-  }
+  quizToUpdate.name = name;
+  quizToUpdate.timeLastEdited = timeNow;
+  setData(data);
 
   return { };
 }
@@ -372,25 +361,25 @@ export function adminQuizNameUpdate(token: string, quizId: number, name: string)
  * @param {string} description
  * @returns {{ }} empty object
  */
-export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, description: string): Record<string, never> | Error {
+export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, description: string, isv2: boolean): Record<string, never> | Error {
   if (!isValidTokenStructure(tokenId)) {
-    return { error: 'token is not a valid structure' };
+    return giveError(isv2, 'token is not a valid structure', 401);
   }
 
   if (!isTokenLoggedIn(tokenId)) {
-    return { error: 'token is not for a currently logged in session' };
+    return giveError(isv2, 'token is not for a currently logged in session', 403);
   }
 
   if (!isValidQuizId(quizId)) {
-    return { error: 'quizId does not refer to valid quiz' };
+    return giveError(isv2, 'quizId does not refer to valid quiz', 400);
   }
 
   if (!isValidCreator(quizId, tokenId)) {
-    return { error: 'quizId does not refer to a quiz that this user owns' };
+    return giveError(isv2, 'quizId does not refer to a quiz that this user owns', 400);
   }
 
   if (description.length > 100) {
-    return { error: 'description must be less than 100 characters' };
+    return giveError(isv2, 'description must be less than 100 characters', 400);
   }
 
   const store: Data = getData();
@@ -411,26 +400,26 @@ export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, des
  * @param {string} userEmail
  * @returns {{ }} empty object
  */
-export function adminQuizTransfer (token: string, quizId: number, userEmail: string): Record<string, never> | Error {
+export function adminQuizTransfer (token: string, quizId: number, userEmail: string, isv2: boolean): Record<string, never> | Error {
   if (!isValidTokenStructure(token)) {
-    return { error: 'Invalid Token Structure' };
+    return giveError(isv2, 'Invalid Token Structure', 401);
   }
 
   if (!isTokenLoggedIn(token)) {
-    return { error: 'Token not logged in' };
+    return giveError(isv2, 'Token not logged in', 403);
   }
 
   if (!isValidQuizId(quizId)) {
-    return { error: 'Invalid: QuizId' };
+    return giveError(isv2, 'Invalid: QuizId', 400);
   }
 
   if (!isValidCreator(quizId, token)) {
-    return { error: 'Invalid: You do not own this quiz' };
+    return giveError(isv2, 'Invalid: You do not own this quiz', 400);
   }
 
   // Check if email exist
   if (!isValidEmail(userEmail)) {
-    return { error: 'Invalid: Email does not exist' };
+    return giveError(isv2, 'Invalid: Email does not exist', 400);
   }
 
   const data: Data = getData();
@@ -438,7 +427,7 @@ export function adminQuizTransfer (token: string, quizId: number, userEmail: str
 
   const loggedInUser = data.users.find((current) => current.authUserId === authUserId);
   if (loggedInUser.email === userEmail) {
-    return { error: 'Invalid: Email is current users' };
+    return giveError(isv2, 'Invalid: Email is current users', 400);
   }
 
   // Find the correct quiz based on input
@@ -450,7 +439,7 @@ export function adminQuizTransfer (token: string, quizId: number, userEmail: str
   // Check if the user owns a quiz with the same name
   const sameName = transferUserQuizzes.find((current) => current.name === currentQuiz.name);
   if (sameName) {
-    return { error: 'Invalid: User already has a Quiz with the same name' };
+    return giveError(isv2, 'Invalid: User already has a Quiz with the same name', 400);
   }
 
   const timeNow: number = Math.floor((new Date()).getTime() / 1000);
@@ -476,65 +465,65 @@ export function adminQuizTransfer (token: string, quizId: number, userEmail: str
  * @param {Answers[]} answers
  * @returns {questionId: number}
  */
-export function createQuizQuestion(quizId: number, token: string, question: string, duration: number, points: number, answers: Answers[]): {questionId: number} | Error {
+export function createQuizQuestion(quizId: number, token: string, question: string, duration: number, points: number, answers: Answers[], isv2: boolean): {questionId: number} | Error {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
-    return { error: 'invalid token structure' };
+    return giveError(isv2, 'invalid token structure', 401);
   }
   if (!isTokenLoggedIn(token)) {
-    return { error: 'token is not logged in' };
+    return giveError(isv2, 'token is not logged in', 403);
   }
 
   // Error checking for quizId
   if (!isValidQuizId(quizId)) {
-    return { error: 'invalid quiz Id' };
+    return giveError(isv2, 'invalid quiz Id', 400);
   }
 
   if (!isValidCreator(quizId, token)) {
-    return { error: 'invalid quiz Id' };
+    return giveError(isv2, 'invalid quiz Id', 400);
   }
 
   // Error checking for quiz question inputs
   if (question.length < 5 || question.length > 50) {
-    return { error: 'invalid input: question must be 5-50 characters long' };
+    return giveError(isv2, 'invalid input: question must be 5-50 characters long', 400);
   }
 
   // Note: assume question cannot be only whitespace
   if (isWhiteSpace(question)) {
-    return { error: 'invalid input: question cannot be only whitespace' };
+    return giveError(isv2, 'invalid input: question cannot be only whitespace', 400);
   }
 
   if (answers.length > 6 || answers.length < 2) {
-    return { error: 'invalid input: must have 2-6 answers' };
+    return giveError(isv2, 'invalid input: must have 2-6 answers', 400);
   }
 
   if (duration <= 0) {
-    return { error: 'invalid input: question duration must be a positive number' };
+    return giveError(isv2, 'invalid input: question duration must be a positive number', 400);
   }
 
   if (points < 1 || points > 10) {
-    return { error: 'invalid input: points must be between 1 and 10' };
+    return giveError(isv2, 'invalid input: points must be between 1 and 10', 400);
   }
 
   if (answers.find(answer => (answer.answer.length > 30 || answer.answer.length < 1)) !== undefined) {
-    return { error: 'invalid input: answers must be 1-30 characters long' };
+    return giveError(isv2, 'invalid input: answers must be 1-30 characters long', 400);
   }
 
   for (const current of answers) {
     if ((answers.filter(answer => answer.answer === current.answer)).length > 1) {
-      return { error: 'invalid input: cannot have duplicate answer strings' };
+      return giveError(isv2, 'invalid input: cannot have duplicate answer strings', 400);
     }
   }
 
   if (answers.find(answer => answer.correct === true) === undefined) {
-    return { error: 'invalid input: must be at least one correct answer' };
+    return giveError(isv2, 'invalid input: must be at least one correct answer', 400);
   }
 
   const data = getData();
   const index = data.quizzes.findIndex(id => id.quizId === quizId);
 
   if (data.quizzes[index].duration + duration > 180) {
-    return { error: 'invalid input: question durations cannot exceed 3 minutes' };
+    return giveError(isv2, 'invalid input: question durations cannot exceed 3 minutes', 400);
   }
 
   // Creating new quiz question
@@ -542,7 +531,7 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
   const questionId: number = data.quizzes[index].questionCount;
 
   const answerArray: Answer[] = [];
-  const colours = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink'];
+  const colours = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'brown'];
   let answerId = 0;
 
   for (const current of answers) {
@@ -577,60 +566,60 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
   };
 }
 
-export function updateQuizQuestion(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answers[]): Record<string, never> | Error {
+export function updateQuizQuestion(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answers[], isv2: boolean): Record<string, never> | Error {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
-    return { error: 'invalid token structure' };
+    return giveError(isv2, 'invalid token structure', 401);
   }
   if (!isTokenLoggedIn(token)) {
-    return { error: 'token is not logged in' };
+    return giveError(isv2, 'token is not logged in', 403);
   }
 
   // Error checking for quizId and questionId
   if (!isValidQuizId(quizId)) {
-    return { error: 'invalid param: quiz Id' };
+    return giveError(isv2, 'invalid param: quiz Id', 400);
   }
   if (!isValidCreator(quizId, token)) {
-    return { error: 'invalid param: quiz Id' };
+    return giveError(isv2, 'invalid param: quiz Id', 400);
   }
   if (!isValidQuestionId(quizId, questionId)) {
-    return { error: 'invalid param: questionId' };
+    return giveError(isv2, 'invalid param: questionId', 400);
   }
 
   // Error checking for quiz question inputs
   if (question.length < 5 || question.length > 50) {
-    return { error: 'invalid input: question must be 5-50 characters long' };
+    return giveError(isv2, 'invalid input: question must be 5-50 characters long', 400);
   }
 
   // Note: assume question cannot be only whitespace
   if (isWhiteSpace(question)) {
-    return { error: 'invalid input: question cannot be only whitespace' };
+    return giveError(isv2, 'invalid input: question cannot be only whitespace', 400);
   }
 
   if (answers.length > 6 || answers.length < 2) {
-    return { error: 'invalid input: must have 2-6 answers' };
+    return giveError(isv2, 'invalid input: must have 2-6 answers', 400);
   }
 
   if (duration <= 0) {
-    return { error: 'invalid input: question duration must be a positive number' };
+    return giveError(isv2, 'invalid input: question duration must be a positive number', 400);
   }
 
   if (points < 1 || points > 10) {
-    return { error: 'invalid input: points must be between 1 and 10' };
+    return giveError(isv2, 'invalid input: points must be between 1 and 10', 400);
   }
 
   if (answers.find(answer => (answer.answer.length > 30 || answer.answer.length < 1)) !== undefined) {
-    return { error: 'invalid input: answers must be 1-30 characters long' };
+    return giveError(isv2, 'invalid input: answers must be 1-30 characters long', 400);
   }
 
   for (const current of answers) {
     if ((answers.filter(answer => answer.answer === current.answer)).length > 1) {
-      return { error: 'invalid input: cannot have duplicate answer strings' };
+      return giveError(isv2, 'invalid input: cannot have duplicate answer strings', 400);
     }
   }
 
   if (answers.find(answer => answer.correct === true) === undefined) {
-    return { error: 'invalid input: must be at least one correct answer' };
+    return giveError(isv2, 'invalid input: must be at least one correct answer', 400);
   }
 
   const data = getData();
@@ -639,7 +628,7 @@ export function updateQuizQuestion(quizId: number, questionId: number, token: st
   const newDuration = currentQuiz.duration + duration - currentQuiz.questions[qIndex].duration;
 
   if (newDuration > 180) {
-    return { error: 'invalid input: question durations cannot exceed 3 minutes' };
+    return giveError(isv2, 'invalid input: question durations cannot exceed 3 minutes', 400);
   }
 
   // Updating quiz question
@@ -684,26 +673,26 @@ export function updateQuizQuestion(quizId: number, questionId: number, token: st
  * @param {string} token
  * @returns {newQuestionId: number}
  */
-export function quizQuestionDuplicate (quizId: number, questionId: number, token: string): { newQuestionId: number } | Error {
+export function quizQuestionDuplicate (quizId: number, questionId: number, token: string, isv2: boolean): { newQuestionId: number } | Error {
   if (!isValidTokenStructure(token)) {
-    return { error: 'invalid token structure' };
+    return giveError(isv2, 'invalid token structure', 401);
   }
 
   if (!isTokenLoggedIn(token)) {
-    return { error: 'token is not logged in' };
+    return giveError(isv2, 'token is not logged in', 403);
   }
 
   // Error checking for quizId
   if (!isValidQuizId(quizId)) {
-    return { error: 'invalid quiz Id' };
+    return giveError(isv2, 'invalid quiz Id', 400);
   }
 
   if (!isValidCreator(quizId, token)) {
-    return { error: 'invalid quiz Id' };
+    return giveError(isv2, 'invalid quiz Id', 400);
   }
 
   if (!isValidQuestionId(quizId, questionId)) {
-    return { error: 'invalid question id' };
+    return giveError(isv2, 'invalid question id', 400);
   }
 
   const data: Data = getData();
@@ -737,26 +726,26 @@ export function quizQuestionDuplicate (quizId: number, questionId: number, token
  * @param {number} questionId
  * @returns {questionId: number}
  */
-export function deleteQuizQuestion (token: string, quizId: number, questionId: number): Record<string, never> | Error {
+export function deleteQuizQuestion (token: string, quizId: number, questionId: number, isv2: boolean): Record<string, never> | Error {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
-    return { error: 'invalid token structure' };
+    return giveError(isv2, 'invalid token structure', 401);
   }
 
   if (!isTokenLoggedIn(token)) {
-    return { error: 'token is not logged in' };
+    return giveError(isv2, 'token is not logged in', 403);
   }
 
   if (!isValidQuizId(quizId)) {
-    return { error: 'invalid quiz Id' };
+    return giveError(isv2, 'invalid quiz Id', 400);
   }
 
   if (!isValidCreator(quizId, token)) {
-    return { error: 'invalid quiz Id' };
+    return giveError(isv2, 'invalid quiz Id', 400);
   }
 
   if (!isValidQuestionId(quizId, questionId)) {
-    return { error: 'invalid param: questionId' };
+    return giveError(isv2, 'invalid param: questionId', 400);
   }
 
   const data: Data = getData();
@@ -787,41 +776,41 @@ export function deleteQuizQuestion (token: string, quizId: number, questionId: n
  * @param {number} newPosition
  * @returns {}
  */
-export function moveQuizQuestion(token: string, quizId: number, questionId: number, newPosition: number): Record<string, never> | Error {
+export function moveQuizQuestion(token: string, quizId: number, questionId: number, newPosition: number, isv2: boolean): Record<string, never> | Error {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
-    return { error: 'invalid token structure' };
+    return giveError(isv2, 'invalid token structure', 401);
   }
   if (!isTokenLoggedIn(token)) {
-    return { error: 'token is not logged in' };
+    return giveError(isv2, 'token is not logged in', 403);
   }
 
   // Error checking for quizId and questionId
   if (!isValidQuizId(quizId)) {
-    return { error: 'invalid param: quiz Id' };
+    return giveError(isv2, 'invalid param: quiz Id', 400);
   }
   if (!isValidCreator(quizId, token)) {
-    return { error: 'invalid param: quiz Id' };
+    return giveError(isv2, 'invalid param: quiz Id', 400);
   }
   if (!isValidQuestionId(quizId, questionId)) {
-    return { error: 'invalid param: questionId' };
+    return giveError(isv2, 'invalid param: questionId', 400);
   }
 
   // Error checking for New Position
   if (newPosition < 0) {
-    return { error: 'invalid input: newPosition has to be greater then 0' };
+    return giveError(isv2, 'invalid input: newPosition has to be greater then 0', 400);
   }
 
   const data = getData();
   const currentQuiz = data.quizzes.find(id => id.quizId === quizId);
 
   if (newPosition > (currentQuiz.numQuestions - 1)) {
-    return { error: 'invalid input:  newPosition must be less than the number of questions' };
+    return giveError(isv2, 'invalid input:  newPosition must be less than the number of questions', 400);
   }
 
   const questionIndex = currentQuiz.questions.findIndex(id => id.questionId === questionId);
   if (newPosition === questionIndex) {
-    return { error: 'invalid input: newPosition is current position' };
+    return giveError(isv2, 'invalid input: newPosition is current position', 400);
   }
 
   // Remove question from current position
