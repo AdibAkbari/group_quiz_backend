@@ -577,15 +577,13 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
 
 
 // startSession //
-app.post('/v1/admin/quiz/:quidid/session/start', (req: Request, res: Response) => {
+app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const { autoStartNum } = req.body;
   const token = req.headers.token as string;
   const response = startSession(quizId, token, autoStartNum);
   res.json(response);
 });
-
-
 
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================

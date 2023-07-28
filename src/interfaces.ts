@@ -81,14 +81,15 @@ interface Players {
 }
 
 export interface Session {
+  sessionId: number,
   sessionState: string;
   autoStartNum: number;
   atQuestion: number;
-  currentQuestionStartTime: number;
+  currentQuestionStartTime?: number;
   players: Players[];
   playerIdCount: number;
   metadata: Quizzes;
-  timer: ReturnType<typeof setTimeout>
+  timer?: ReturnType<typeof setTimeout>
 }
 
 export interface Data {

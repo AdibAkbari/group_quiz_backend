@@ -16,7 +16,7 @@ const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2',
 
 beforeEach(() => {
     clearRequest();
-    token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.tokenId;
+    token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
     quizId = quizCreateRequest(token, 'quiz1', '').quizId;
     questionId = createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers).questionId;
 });
@@ -35,7 +35,7 @@ describe('invalid token', () => {
       });
 
     test('TokenId not logged in', () => {
-        expect(() => startSessionRequest(quizId, token + 1, 3)).toThrow(HTTPError[401]);
+        expect(() => startSessionRequest(quizId, token + 1, 3)).toThrow(HTTPError[403]);
     });  
 })
 
@@ -45,12 +45,16 @@ describe('invalid input', () => {
     });
 
     test('user does not own quiz', () => {
-        const token2 = authRegisterRequest('email2@gmail.com', 'password1', 'firstname', 'lastname').body.tokenId;
+        const token2 = authRegisterRequest('email2@gmail.com', 'password1', 'firstname', 'lastname').body.token;
         expect(() => startSessionRequest(quizId, token2, 3)).toThrow(HTTPError[400]);
     });
 
     test('autostart num > 50', () => {
         expect(() => startSessionRequest(quizId, token, 51)).toThrow(HTTPError[400]);
+    });
+
+    test('autostart num negative', () => {
+        expect(() => startSessionRequest(quizId, token, -1)).toThrow(HTTPError[400]);
     });
 
     test('10 sessions already active', () => {
@@ -80,7 +84,7 @@ describe('invalid input', () => {
 })
 
 describe('successful cases', () => {
-    test('correct return type', () => {
+    test.only('correct return type', () => {
         expect(startSessionRequest(quizId, token, 3)).toStrictEqual({sessionId: expect.any(Number)});
     });
 
