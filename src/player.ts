@@ -15,7 +15,7 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
     playerName = generateName();
   }
 
-  if (session.players.find(player => player.playerName === playerName)) {
+  if (session.players.find(player => player.name === playerName)) {
     throw HTTPError(400, 'Name of user entered is not unique');
   }
 
@@ -23,7 +23,7 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
   const playerId: number = session.playerIdCount;
 
   const player: Players = {
-    playerName: playerName,
+    name: playerName,
     playerId: playerId,
     questionResponse: [],
     score: 0,
