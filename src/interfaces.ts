@@ -91,6 +91,13 @@ export interface Session {
   timer?: ReturnType<typeof setTimeout>
 }
 
+export interface SessionStatus {
+  state: number,
+  atQuestion: string,
+  players: Players[];
+  metadata: QuizInfo;
+}
+
 export interface Data {
   users: Users[];
   quizzes: Quizzes[];
