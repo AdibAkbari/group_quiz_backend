@@ -35,7 +35,7 @@ import {
 import { clear } from './other';
 import {
   startSession,
-  sessionState,
+  sessionStatus,
 } from './session';
 
 // Set up web app
@@ -584,12 +584,12 @@ app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) =
   res.json(response);
 });
 
-// sessionState //
+// sessionStatus //
 app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const sessionId = parseInt(req.params.sessionid);
   const token = req.headers.token as string;
-  const response = sessionState(token, quizId, sessionId);
+  const response = sessionStatus(token, quizId, sessionId);
   res.json(response);
 });
 

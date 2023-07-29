@@ -43,8 +43,7 @@ export function startSession(quizId: number, token: string, autoStartNum: number
   return { sessionId: sessionId };
 }
 
-
-export function sessionStatus(token: string, quizId: number, sessionid: number): SessionStatus {
+export function sessionStatus(token: string, quizId: number, sessionId: number): SessionStatus {
   if (!isValidTokenStructure(token)) {
     throw HTTPError(401, 'Token is not a valid structure');
   }
@@ -54,10 +53,10 @@ export function sessionStatus(token: string, quizId: number, sessionid: number):
   if (!isValidQuizId(quizId) || !isValidCreator(quizId, token)) {
     throw HTTPError(400, 'Invalid QuizId');
   }
-//   if () {
-//     throw HTTPError(400, 'Invalid: Session Id');
-//   }
-
+  //   if () {
+  //     throw HTTPError(400, 'Invalid: Session Id');
+  //   }
+  const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
 
   const playerNames = session.players.map(player => player.name);

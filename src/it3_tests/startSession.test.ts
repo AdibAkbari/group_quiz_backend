@@ -1,10 +1,9 @@
 import {
+  startSessionRequest,
   clearRequest,
   authRegisterRequest,
   quizCreateRequest,
   createQuizQuestionRequest,
-  startSessionRequest,
-  sessionStateRequest,
   // updateQuizQuestionRequest
 } from './it3_testRoutes';
 import { } from '../interfaces';

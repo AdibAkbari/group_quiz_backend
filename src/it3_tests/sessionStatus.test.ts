@@ -4,8 +4,8 @@ import {
   quizCreateRequest,
   createQuizQuestionRequest,
   startSessionRequest,
-  playerJoinRequest,
-  sessionStateRequest,
+  // playerJoinRequest,
+  sessionStatusRequest,
   // sessionUpdateRequest,
 } from './it3_testRoutes';
 import { } from '../interfaces';
@@ -35,23 +35,22 @@ describe('invalid token', () => {
     { testName: 'token has decimal point', token: '53.74' },
     { testName: 'token has negative sign', token: '-37294' },
   ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => sessionStateRequest(token, quizId, sessionId)).toThrow(HTTPError[401]);
+    expect(() => sessionStatusRequest(token, quizId, sessionId)).toThrow(HTTPError[401]);
   });
 
   test('TokenId not logged in', () => {
-    expect(() => sessionStateRequest(token + 1, quizId, sessionId)).toThrow(HTTPError[403]);
+    expect(() => sessionStatusRequest(token + 1, quizId, sessionId)).toThrow(HTTPError[403]);
   });
 });
 
-
 describe('Error cases', () => {
   test('quizId not a valid quiz', () => {
-    expect(() => sessionStateRequest(token, quizId + 1, sessionId)).toThrow(HTTPError[400]);
+    expect(() => sessionStatusRequest(token, quizId + 1, sessionId)).toThrow(HTTPError[400]);
   });
 
   test('user does not own quiz', () => {
     const token2 = authRegisterRequest('email2@gmail.com', 'password1', 'firstname', 'lastname').body.token;
-    expect(() => sessionStateRequest(token2, quizId, sessionId)).toThrow(HTTPError[400]);
+    expect(() => sessionStatusRequest(token2, quizId, sessionId)).toThrow(HTTPError[400]);
   });
 
   // test.todo('Session Id does not refer to a valid question within this quiz', () => {
@@ -60,8 +59,8 @@ describe('Error cases', () => {
 
 describe('Success cases', () => {
   test('Correct Return', () => {
-    expect(sessionStateRequest(token, quizId, sessionId)).toStrictEqual(
-        {
+    expect(sessionStatusRequest(token, quizId, sessionId)).toStrictEqual(
+      {
         state: 'LOBBY',
         atQuestion: 0,
         players: [],
@@ -75,15 +74,30 @@ describe('Success cases', () => {
           questions: [
             {
               questionId: 1,
-              question: "Question 1",
+              question: 'Question 1',
               duration: 5,
-              //thumbnailUrl: "http://google.com/some/image/path.jpg",
+              // thumbnailUrl: "http://google.com/some/image/path.jpg",
               points: 6,
-              answers: validAnswers
+              answers:  [
+                {
+                  answerId: expect.any(Number),
+                  answer: 'answer1',
+                  colour: expect.any(String),
+                  correct: true
+                },
+                {
+                  answerId: expect.any(Number),
+                  answer: 'answer2',
+                  colour: expect.any(String),
+                  correct: false
+                }
+              ]
             }
           ],
+          creator: 1,
           duration: 5,
-          //thumbnailUrl: "",
+          questionCount: 1,
+          // thumbnailUrl: "",
         }
       });
   });
