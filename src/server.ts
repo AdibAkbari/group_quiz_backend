@@ -32,11 +32,14 @@ import {
   updateQuizQuestion,
   moveQuizQuestion
 } from './quiz';
-import { playerJoin } from './player';
-import { clear } from './other';
+import { 
+  playerJoin, 
+  playerStatus 
+} from './player';
 import {
   startSession
 } from './session';
+import { clear } from './other';
 
 // Set up web app
 const app = express();
@@ -589,6 +592,13 @@ app.post('/v1/player/join', (req: Request, res: Response) => {
   const sessionId = parseInt(req.body.sessionId);
   const playerName = req.body.name as string;
   const response = playerJoin(sessionId, playerName);
+  res.json(response);
+});
+
+// playerStatus //
+app.post('/v1/player/:playerid', (req: Request, res: Response) => {
+  const playerid = parseInt(req.params.playerid);
+  const response = playerStatus(playerid);
   res.json(response);
 });
 

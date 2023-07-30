@@ -33,7 +33,6 @@ export function startSession(quizId: number, token: string, autoStartNum: number
     autoStartNum: autoStartNum,
     atQuestion: 0,
     players: [],
-    playerIdCount: 0,
     metadata: quiz,
   };
 

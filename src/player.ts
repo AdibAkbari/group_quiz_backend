@@ -19,8 +19,8 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
     throw HTTPError(400, 'Name of user entered is not unique');
   }
 
-  session.playerIdCount++;
-  const playerId: number = session.playerIdCount;
+  data.playerIdCount++;
+  const playerId: number = data.playerIdCount;
 
   const player: Players = {
     name: playerName,
@@ -33,4 +33,13 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
   setData(data);
 
   return { playerId: playerId };
+}
+
+export function playerStatus(playerId: number): PlayerStatus {
+
+  return {
+    state: "LOBBY",
+    numQuestions: 1,
+    atQuestion: 3
+  };
 }

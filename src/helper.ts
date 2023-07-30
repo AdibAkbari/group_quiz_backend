@@ -165,6 +165,12 @@ export function giveError(isv2: boolean, errorMessage: string, statusCode: numbe
   return { error: errorMessage };
 }
 
+/**
+ * Helper function to generate a random name if user didnt enter a name
+ * 
+ * @param {} - no params
+ * @returns {string} - playerName
+ */
 export function generateName() {
   const letters = 'abcdefghijklmnopqrstuvwxyz';
   const numbers = '0123456789';
@@ -184,4 +190,19 @@ export function generateName() {
   const playerName = nameChar + nameNum;
 
   return playerName;
+}
+
+/**
+   * Helper function to determine if the playerId exist
+   *
+   * @param {number} playerId
+   * @returns {boolean} - returns true if does exist
+   * @returns {boolean} - returns false if it dosn't exist
+   */
+export function isValidPlayerId(playerId: number): boolean {
+  const data: Data = getData();
+  if (data.sessions.find(id => id.quizId === quizId) === undefined) {
+    return false;
+  }
+  return true;
 }
