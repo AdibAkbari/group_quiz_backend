@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
 import { isValidTokenStructure, isTokenLoggedIn, isValidQuizId, isValidCreator, isValidSessionId } from './helper';
-import { Session, SessionStatus } from './interfaces';
+import { Session, SessionStatus, SessionResults } from './interfaces';
 import HTTPError from 'http-errors';
 
 export function startSession(quizId: number, token: string, autoStartNum: number): { sessionId: number } {
@@ -98,7 +98,7 @@ export function sessionResults(quizId: number, sessionId: number, token: string)
     throw HTTPError(400, 'Session is not in FINAL_RESULTS state');
   }
 
-  const playerList: Players[] = [];
+  const playerList = [];
   // go through players in session and get actual info from players in data by matching player name
   for (const playerName of session.players) {
     const player = data.players.find(player => player.name === playerName);
