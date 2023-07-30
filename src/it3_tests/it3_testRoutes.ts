@@ -507,3 +507,7 @@ export function authLogoutRequestV1(tokenId: string) {
 export function startSessionRequest(quizId: number, token: string, autoStartNum: number) {
   return requestHelper('POST', `/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
 }
+
+export function sessionResultsRequest(quizId: number, sessionId: number, token: string) {
+  return requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}/results`, { }, { token });
+}
