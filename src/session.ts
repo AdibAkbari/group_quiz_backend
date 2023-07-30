@@ -47,6 +47,7 @@ export function startSession(quizId: number, token: string, autoStartNum: number
   return { sessionId: sessionId };
 }
 
+
 export function sessionStatus(token: string, quizId: number, sessionId: number): SessionStatus {
   if (!isValidTokenStructure(token)) {
     throw HTTPError(401, 'Token is not a valid structure');
@@ -73,3 +74,5 @@ export function sessionStatus(token: string, quizId: number, sessionId: number):
     metadata: session.metadata,
   };
 }
+
+

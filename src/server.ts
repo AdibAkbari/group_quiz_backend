@@ -36,6 +36,7 @@ import {
   playerJoin,
   playerStatus,
   playerSubmitAnswer,
+  playerCurrentQuestionInfo,
 } from './player';
 import {
   startSession,
@@ -613,6 +614,14 @@ app.get('/v1/player/:playerid', (req: Request, res: Response) => {
   res.json(response);
 });
 
+// playerCurrentQuestionInfo //
+app.get('/v1/player/:playerid/question/:questionposition', (req: Request, res: Response) => {
+  const playerid = parseInt(req.params.playerid);
+  const questionposition = parseInt(req.params.questionposition);
+  const response = playerCurrentQuestionInfo(playerid, questionposition);
+  res.json(response);
+});
+
 // playerSubmitAnswer //
 app.put('/v1/player/:playerid/question/:questionposition/answer', (req: Request, res: Response) => {
   const answerIds = req.body.answerIds;
@@ -621,6 +630,7 @@ app.put('/v1/player/:playerid/question/:questionposition/answer', (req: Request,
   const response = playerSubmitAnswer(answerIds, playerid, questionposition);
   res.json(response);
 });
+
 
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================

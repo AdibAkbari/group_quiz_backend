@@ -1,5 +1,5 @@
 import { getData, setData } from './dataStore';
-import { generateName, isValidPlayerId } from './helper';
+import { generateName, isValidPlayerId, isValidQuestionPosition } from './helper';
 import { Players, PlayerStatus } from './interfaces';
 import HTTPError from 'http-errors';
 
@@ -54,6 +54,32 @@ export function playerStatus(playerId: number): PlayerStatus {
     atQuestion: session.atQuestion
   };
 }
+
+export function playerCurrentQuestionInfo(playerId: number, questionPosition: number): PlayerStatus {
+  if (!isValidPlayerId(playerId)) {
+    throw HTTPError(400, 'Invalid: PlayerId');
+  }
+
+  if (!isValidQuestionPosition(playerId, questionPosition)) {
+    throw HTTPError(400, 'Invalid: questionPosition');
+  }
+
+  const data = getData();
+  const player = data.players.find(id => id.playerId === playerId);
+  const session = data.sessions.find(id => id.sessionId === player.sessionId);
+
+  if (session.sessionState === 'LOBBY' || session.sessionState === 'END') {
+    throw HTTPError(400, 'Invalid: State');
+  }
+
+  const currentQuestion = session.metadata.questions[questionPosition];
+
+  return {
+    currentQuestion
+  };
+}
+
+
 
 export function playerSubmitAnswer(answerIds: number[], playerId: number, questionposition: number): Record<string, never> {
   return {};
