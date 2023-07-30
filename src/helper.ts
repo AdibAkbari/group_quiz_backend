@@ -113,7 +113,7 @@ export function isValidQuestionPosition(playerId: number, questionPosition: numb
   if (questionPosition < 0) {
     return false;
   }
-  if (questionPosition !== session.atQuestion) {
+  if (questionPosition !== session.atQuestion - 1) {
     return false;
   }
   return true;
