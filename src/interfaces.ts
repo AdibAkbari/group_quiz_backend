@@ -1,3 +1,5 @@
+import { NumberLiteralType } from "typescript";
+
 // interfaces needed for all files
 export interface Users {
   email: string;
@@ -66,7 +68,7 @@ export interface Token {
 
 export interface QuestionResponse {
   questionId: number;
-  playerAnswers: {answerId: number}[];
+  playerAnswers: number[];
   answerTime: number;
   points: number;
 }
@@ -132,6 +134,22 @@ export interface QuestionId {
 
 export interface NewQuestionId {
   newQuestionId: number;
+}
+
+interface QuestionCorrectBreakdown {
+  answerId: number;
+  playersCorrect: string[];
+}
+
+interface QuestionResult {
+  questionId: number;
+  questionCorrectBreakdown: QuestionCorrectBreakdown[];
+  averageAnswerTime: number;
+  percentCorrect: number;
+}
+export interface SessionResults {
+  usersRankedByScore: {name: string, score: number}[];
+  questionResults: QuestionResult[];
 }
 
 export interface QuizList {

@@ -90,6 +90,18 @@ export function isValidQuestionId(quizId: number, questionId: number): boolean {
   return true;
 }
 
+export function isValidSessionId(sessionId: number, quizId: number): boolean {
+  const data = getData();
+  const session = data.sessions.find(id => id.sessionId === sessionId);
+  if (session === undefined) {
+    return false;
+  }
+  if (session.metadata.quizId !== quizId) {
+    return false;
+  }
+  return true;
+}
+
 /**
    * Helper function for adminQuizCreate to check if a quiz name is valid
    *
@@ -175,7 +187,7 @@ export function generateName() {
   const letters = 'abcdefghijklmnopqrstuvwxyz';
   const numbers = '0123456789';
 
-  function randomString(str) {
+  function randomString(str: string) {
     const array = str.split('');
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));

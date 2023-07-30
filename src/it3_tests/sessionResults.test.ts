@@ -10,12 +10,12 @@ import {
 import { } from '../interfaces';
 import HTTPError from 'http-errors';
 
-function sleepSync(ms: number) {
-  const startTime = new Date().getTime();
-  while (new Date().getTime() - startTime < ms) {
-    // zzzZZ - comment needed so eslint doesn't complain
-  }
-}
+// function sleepSync(ms: number) {
+//   const startTime = new Date().getTime();
+//   while (new Date().getTime() - startTime < ms) {
+//     // zzzZZ - comment needed so eslint doesn't complain
+//   }
+// }
 
 let token: string;
 let quizId: number;
@@ -28,7 +28,7 @@ beforeEach(() => {
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
   // questionId = createQuizQuestionRequest(quizId, token, 'Question 1', 1, 6, validAnswers).questionId;
-  createQuizQuestionRequest(quizId, token, 'Question 1', 1, 6, validAnswers).questionId;
+  createQuizQuestionRequest(quizId, token, 'Question 1', 1, 6, validAnswers);
   sessionId = startSessionRequest(quizId, token, 1);
 });
 
@@ -41,35 +41,34 @@ describe('Error cases', () => {
     { testName: 'token has decimal point', token: '53.74' },
     { testName: 'token has negative sign', token: '-37294' },
   ])('token is not a valid structure: $testName', ({ token }) => {
-    //updateSessionRequest(quizId, sessionId, token, "GO_TO_FINAL_RESULTS");
+    // updateSessionRequest(quizId, sessionId, token, "GO_TO_FINAL_RESULTS");
     expect(() => sessionResultsRequest(quizId, sessionId, token)).toThrow(HTTPError[401]);
   });
 
   test('TokenId not logged in', () => {
-    //updateSessionRequest(quizId, sessionId, token, "GO_TO_FINAL_RESULTS");
+    // updateSessionRequest(quizId, sessionId, token, "GO_TO_FINAL_RESULTS");
     expect(() => sessionResultsRequest(quizId, sessionId, token + 1)).toThrow(HTTPError[403]);
   });
 
   test('quizId not a valid quiz', () => {
-    //updateSessionRequest(quizId, sessionId, token, "GO_TO_FINAL_RESULTS");
+    // updateSessionRequest(quizId, sessionId, token, "GO_TO_FINAL_RESULTS");
     expect(() => sessionResultsRequest(quizId + 1, sessionId, token)).toThrow(HTTPError[400]);
   });
 
   test('user does not own quiz', () => {
-    //updateSessionRequest(quizId, sessionId, token, "GO_TO_FINAL_RESULTS");
+    // updateSessionRequest(quizId, sessionId, token, "GO_TO_FINAL_RESULTS");
     const token2 = authRegisterRequest('email2@gmail.com', 'password1', 'firstname', 'lastname').body.token;
     expect(() => sessionResultsRequest(quizId, sessionId, token2)).toThrow(HTTPError[400]);
   });
 
   test('Session Id does not refer to a valid session within this quiz', () => {
-    //updateSessionRequest(quizId, sessionId, token, "GO_TO_FINAL_RESULTS");
+    // updateSessionRequest(quizId, sessionId, token, "GO_TO_FINAL_RESULTS");
     expect(() => sessionResultsRequest(quizId, sessionId + 1, token)).toThrow(HTTPError[400]);
   });
 
   test('Session is not in FINAL_RESULTS state', () => {
     expect(() => sessionResultsRequest(quizId, sessionId, token)).toThrow(HTTPError[400]);
   });
-
 });
 
 describe('Success cases', () => {
@@ -141,7 +140,7 @@ describe('Success cases', () => {
   //   const incorrectAnswerId = questionInfo.answers[1].answerId;
   //   // Test Player answers current question with correct answer
   //   submitAnswerRequest({answerIds: [correctAnswerId]}, playerId, questionPosition);
-  //   // Test Player2 answer current question with incorrect answer 
+  //   // Test Player2 answer current question with incorrect answer
   //   submitAnswerRequest({answerIds: [incorrectAnswerId]}, player2Id, questionPosition);
 
   //   sleepSync(questionInfo.duration * 1000);
