@@ -34,7 +34,6 @@ beforeEach(() => {
   // Update session state to start a question
 });
 
-
 describe('Error cases', () => {
   test('PlayerId does not exist', () => {
     expect(() => playerCurrentQuestionInfoRequest(playerId + 1, FIRST_POS)).toThrow(HTTPError[400]);
@@ -44,10 +43,10 @@ describe('Error cases', () => {
     expect(() => playerCurrentQuestionInfoRequest(playerId, THIRD_POS)).toThrow(HTTPError[400]);
   });
 
-//   test('Session is not currently on this question', () => {
-//     // Update session state to first question
-//     expect(() => playerCurrentQuestionInfoRequest(playerId, SECOND_POS)).toThrow(HTTPError[400]);
-//   });
+  //   test('Session is not currently on this question', () => {
+  //     // Update session state to first question
+  //     expect(() => playerCurrentQuestionInfoRequest(playerId, SECOND_POS)).toThrow(HTTPError[400]);
+  //   });
 
   test('Session is in LOBBY', () => {
     expect(() => playerCurrentQuestionInfoRequest(playerId, FIRST_POS)).toThrow(HTTPError[400]);
