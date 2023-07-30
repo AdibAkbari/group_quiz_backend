@@ -520,3 +520,7 @@ export function playerJoinRequest(sessionId: number, name: string) {
 export function playerStatusRequest(playerId: number) {
   return requestHelper('GET', `/v1/player/${playerId}`, {});
 }
+
+export function playerCurrentQuestionInfoRequest(playerId: number, questionPosition: number) {
+  return requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}`, {});
+}

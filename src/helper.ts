@@ -90,7 +90,6 @@ export function isValidQuestionId(quizId: number, questionId: number): boolean {
   return true;
 }
 
-
 export function isValidSessionId(sessionId: number, quizId: number): boolean {
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
@@ -103,6 +102,22 @@ export function isValidSessionId(sessionId: number, quizId: number): boolean {
   return true;
 }
 
+export function isValidQuestionPosition(playerId: number, questionPosition: number): boolean {
+  const data = getData();
+  const player = data.players.find(id => id.playerId === playerId);
+  const session = data.sessions.find(id => id.sessionId === player.sessionId);
+
+  if(questionPosition > session.metadata.numQuestions) {
+    return false;
+  }
+  if(questionPosition < 0) {
+    return false;
+  }
+  if(questionPosition !== session.atQuestion) {
+    return false;
+  }
+  return true;
+}
 
 /**
    * Helper function for adminQuizCreate to check if a quiz name is valid
