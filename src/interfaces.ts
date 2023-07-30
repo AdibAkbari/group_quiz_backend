@@ -72,6 +72,7 @@ export interface QuestionResponse {
 }
 
 export interface Players {
+  sessionId: number;
   name: string;
   playerId: number;
   questionResponse: QuestionResponse[];
@@ -90,9 +91,16 @@ export interface Session {
   autoStartNum: number;
   atQuestion: number;
   currentQuestionStartTime?: number;
-  players: Players[];
+  players: string[];
   metadata: Quizzes;
   timer?: ReturnType<typeof setTimeout>
+}
+
+export interface SessionStatus {
+  state: number,
+  atQuestion: string,
+  players: Players[];
+  metadata: QuizInfo;
 }
 
 export interface Data {
@@ -102,6 +110,7 @@ export interface Data {
   tokens: Token[];
   trash: Quizzes[];
   sessions: Session[];
+  players: Players[];
   playerIdCount: number;
 }
 

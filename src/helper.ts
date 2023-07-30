@@ -167,7 +167,7 @@ export function giveError(isv2: boolean, errorMessage: string, statusCode: numbe
 
 /**
  * Helper function to generate a random name if user didnt enter a name
- * 
+ *
  * @param {} - no params
  * @returns {string} - playerName
  */
@@ -201,7 +201,7 @@ export function generateName() {
    */
 export function isValidPlayerId(playerId: number): boolean {
   const data: Data = getData();
-  if (data.sessions.find(id => id.quizId === quizId) === undefined) {
+  if (data.players.find(id => id.playerId === playerId) === undefined) {
     return false;
   }
   return true;

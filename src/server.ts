@@ -32,12 +32,13 @@ import {
   updateQuizQuestion,
   moveQuizQuestion
 } from './quiz';
-import { 
-  playerJoin, 
-  playerStatus 
+import {
+  playerJoin,
+  playerStatus
 } from './player';
 import {
-  startSession
+  startSession,
+  sessionStatus,
 } from './session';
 import { clear } from './other';
 
@@ -587,6 +588,15 @@ app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) =
   res.json(response);
 });
 
+// sessionStatus //
+app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const sessionId = parseInt(req.params.sessionid);
+  const token = req.headers.token as string;
+  const response = sessionStatus(token, quizId, sessionId);
+  res.json(response);
+});
+
 // playerJoin //
 app.post('/v1/player/join', (req: Request, res: Response) => {
   const sessionId = parseInt(req.body.sessionId);
@@ -596,7 +606,7 @@ app.post('/v1/player/join', (req: Request, res: Response) => {
 });
 
 // playerStatus //
-app.post('/v1/player/:playerid', (req: Request, res: Response) => {
+app.get('/v1/player/:playerid', (req: Request, res: Response) => {
   const playerid = parseInt(req.params.playerid);
   const response = playerStatus(playerid);
   res.json(response);

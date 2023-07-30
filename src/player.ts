@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
-import { generateName } from './helper';
-import { Players } from './interfaces';
+import { generateName, isValidPlayerId } from './helper';
+import { Players, PlayerStatus } from './interfaces';
 import HTTPError from 'http-errors';
 
 export function playerJoin(sessionId: number, playerName: string): { playerId: number } {
@@ -15,7 +15,7 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
     playerName = generateName();
   }
 
-  if (session.players.find(player => player.name === playerName)) {
+  if (session.players.find(name => name === playerName)) {
     throw HTTPError(400, 'Name of user entered is not unique');
   }
 
@@ -23,23 +23,34 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
   const playerId: number = data.playerIdCount;
 
   const player: Players = {
+    sessionId: sessionId,
     name: playerName,
     playerId: playerId,
     questionResponse: [],
     score: 0,
   };
 
-  session.players.push(player);
+  data.players.push(player);
+  session.players.push(playerName);
   setData(data);
 
   return { playerId: playerId };
 }
 
 export function playerStatus(playerId: number): PlayerStatus {
+  if (!isValidPlayerId(playerId)) {
+    throw HTTPError(400, 'Invalid: PlayerId');
+  }
+
+  const data = getData();
+  const player = data.players.find(id => id.playerId === playerId);
+  const session = data.sessions.find(id => id.sessionId === player.sessionId);
+
+  const numQuestions = session.metadata.questionCount;
 
   return {
-    state: "LOBBY",
-    numQuestions: 1,
-    atQuestion: 3
+    state: session.sessionState,
+    numQuestions: numQuestions,
+    atQuestion: session.atQuestion
   };
 }

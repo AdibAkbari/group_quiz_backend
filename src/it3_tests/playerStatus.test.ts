@@ -14,6 +14,7 @@ import HTTPError from 'http-errors';
 let token: string;
 let quizId: number;
 let sessionId: number;
+let playerId: number;
 // let questionId: number;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
 
@@ -27,7 +28,6 @@ beforeEach(() => {
   playerId = playerJoinRequest(sessionId, 'Joe').playerId;
 });
 
-
 describe('Error cases', () => {
   test('PlayerId does not exist', () => {
     expect(() => playerStatusRequest(playerId + 1)).toThrow(HTTPError[400]);
@@ -36,37 +36,37 @@ describe('Error cases', () => {
 
 describe('Success cases', () => {
   test('Correct Return LOBBY state', () => {
-    expect(playerStatusRequest(playerId)).toStrictEqual({ 
+    expect(playerStatusRequest(playerId)).toStrictEqual({
       state: 'LOBBY',
       numQuestions: 1,
-      atQuestion: 0,                                          
+      atQuestion: 0,
     });
   });
 
-//   test('Correct Return FINAL_RESULTS state', () => {
-//     // Update session state
-//     expect(playerStatusRequest(playerId)).toStrictEqual({ 
-//       state: 'FINAL_RESULTS',
-//       numQuestions: 1,
-//       atQuestion: 0,                                          
-//     });
-//   });
+  //   test('Correct Return FINAL_RESULTS state', () => {
+  //     // Update session state
+  //     expect(playerStatusRequest(playerId)).toStrictEqual({
+  //       state: 'FINAL_RESULTS',
+  //       numQuestions: 1,
+  //       atQuestion: 0,
+  //     });
+  //   });
 
-//   test('Correct Return END state', () => {
-//     // Update session state
-//     expect(playerStatusRequest(playerId)).toStrictEqual({ 
-//       state: 'END',
-//       numQuestions: 1,
-//       atQuestion: 0,                                          
-//     });
-//   });
+  //   test('Correct Return END state', () => {
+  //     // Update session state
+  //     expect(playerStatusRequest(playerId)).toStrictEqual({
+  //       state: 'END',
+  //       numQuestions: 1,
+  //       atQuestion: 0,
+  //     });
+  //   });
 
 //   test('Multiple Questions and at Question is not 0', () => {
-//     // Update session state 
-//     expect(playerStatusRequest(playerId)).toStrictEqual({ 
+//     // Update session state
+//     expect(playerStatusRequest(playerId)).toStrictEqual({
 //       state: 'QUESTION_COUNTDOWN',
 //       numQuestions: 1,
-//       atQuestion: 1,                                          
+//       atQuestion: 1,
 //     });
 //   });
 });

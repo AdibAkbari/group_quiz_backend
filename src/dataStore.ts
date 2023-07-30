@@ -9,6 +9,7 @@ let data: Data = {
   tokens: [],
   trash: [],
   sessions: [],
+  players: [],
   playerIdCount: 0,
 };
 

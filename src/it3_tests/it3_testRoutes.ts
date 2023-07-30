@@ -508,11 +508,15 @@ export function startSessionRequest(quizId: number, token: string, autoStartNum:
   return requestHelper('POST', `/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
 }
 
+export function sessionStatusRequest(token: string, quizId: number, sessionId: number) {
+  return requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
+}
+
 // PLAYER ROUTES //
 export function playerJoinRequest(sessionId: number, name: string) {
   return requestHelper('POST', '/v1/player/join', { sessionId, name });
 }
 
 export function playerStatusRequest(playerId: number) {
-  return requestHelper('GET', `/v1/player/${playerId}`, );
+  return requestHelper('GET', `/v1/player/${playerId}`, {});
 }
