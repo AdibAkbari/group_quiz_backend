@@ -32,11 +32,16 @@ import {
   updateQuizQuestion,
   moveQuizQuestion
 } from './quiz';
-import { clear } from './other';
+import {
+  playerJoin,
+  playerStatus
+} from './player';
 import {
   startSession,
+  sessionStatus,
   updateSessionState
 } from './session';
+import { clear } from './other';
 
 // Set up web app
 const app = express();
@@ -591,6 +596,30 @@ app.put('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Respons
   const { action } = req.body;
   const token = req.headers.token as string;
   const response = updateSessionState(quizId, sessionId, token, action);
+  res.json(response);
+});
+
+// sessionStatus //
+app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const sessionId = parseInt(req.params.sessionid);
+  const token = req.headers.token as string;
+  const response = sessionStatus(token, quizId, sessionId);
+  res.json(response);
+});
+
+// playerJoin //
+app.post('/v1/player/join', (req: Request, res: Response) => {
+  const sessionId = parseInt(req.body.sessionId);
+  const playerName = req.body.name as string;
+  const response = playerJoin(sessionId, playerName);
+  res.json(response);
+});
+
+// playerStatus //
+app.get('/v1/player/:playerid', (req: Request, res: Response) => {
+  const playerid = parseInt(req.params.playerid);
+  const response = playerStatus(playerid);
   res.json(response);
 });
 

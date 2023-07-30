@@ -4,7 +4,7 @@ import {
     authRegisterRequest,
     quizCreateRequest,
     createQuizQuestionRequest,
-    getSessionStatus
+    sessionStatusRequest
   } from './it3_testRoutes';
   import { } from '../interfaces';
   import HTTPError from 'http-errors';
@@ -148,96 +148,96 @@ import { updateSessionState } from '../session';
     })
     
     test('each state during a game with one question', () => {
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("LOBBY");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("LOBBY");
 
       // lobby -> question_countdown
       expect(updateSessionState(quizId, sessionId, token, "NEXT_QUESTION")).toStrictEqual({});
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("QUESTION_COUNTDOWN");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("QUESTION_COUNTDOWN");
 
       // question_countdown -> question_open
       jest.advanceTimersByTime(finishCountdown + 1);
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("QUESTION_OPEN");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("QUESTION_OPEN");
 
       // question_open -> question_close
       jest.advanceTimersByTime(questionDuration);
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("QUESTION_CLOSE");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("QUESTION_CLOSE");
 
       // question_close -> answer_show
       expect(updateSessionState(quizId, sessionId, token, "GO_TO_ANSWER")).toStrictEqual({});
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("ANSWER_SHOW");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("ANSWER_SHOW");
 
       // answer_show -> final_results
       expect(updateSessionState(quizId, sessionId, token, "GO_TO_FINAL_RESULTS")).toStrictEqual({});
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("FINAL_RESULTS");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("FINAL_RESULTS");
 
       // final_results -> end
       expect(updateSessionState(quizId, sessionId, token, "END")).toStrictEqual({});
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("END");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("END");
     })
 
     test('two questions in the game', () => {
       createQuizQuestionRequest(quizId, token, 'Question 2', questionDuration, 6, validAnswers).questionId;
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("LOBBY");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("LOBBY");
 
       // lobby -> question_countdown
       updateSessionState(quizId, sessionId, token, "NEXT_QUESTION");      
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("QUESTION_COUNTDOWN");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("QUESTION_COUNTDOWN");
 
       // question_countdown -> question_open
       jest.advanceTimersByTime(finishCountdown + 1);
 
       // question_open -> answer_show
       updateSessionState(quizId, sessionId, token, "GO_TO_ANSWER");
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("ANSWER_SHOW");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("ANSWER_SHOW");
 
       // answer_show -> question_countdown
       updateSessionState(quizId, sessionId, token, "NEXT_QUESTION");
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("QUESTION_COUNTDOWN");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("QUESTION_COUNTDOWN");
 
       // question_countdown -> question_open
       jest.advanceTimersByTime(finishCountdown + 1);
-      const sessionInfo = getSessionStatus(quizId, sessionId, token);
+      const sessionInfo = sessionStatusRequest(token, quizId, sessionId);
       expect(sessionInfo.state).toStrictEqual("QUESTION_OPEN");
       expect(sessionInfo.atQuestion).toStrictEqual(2);
 
       // question_open -> question_close
       jest.advanceTimersByTime(questionDuration);
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("QUESTION_CLOSE");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("QUESTION_CLOSE");
 
       // question_close -> final_results
       updateSessionState(quizId, sessionId, token, "GO_TO_FINAL_RESULTS");
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("FINAL_RESULTS");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("FINAL_RESULTS");
 
       // final_results -> end
       updateSessionState(quizId, sessionId, token, "END");
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("END");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("END");
     })
   })
 
   describe('end action from each state', () => {
     test('lobby', () => {
       updateSessionState(quizId, sessionId, token, "END");
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("END");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("END");
     })
 
     test('question_countdown', () => {
       updateSessionState(quizId, sessionId, token, "NEXT_QUESTION");
       updateSessionState(quizId, sessionId, token, "END");
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("END");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("END");
     })
 
     test('question_open', () => {
       updateSessionState(quizId, sessionId, token, "NEXT_QUESTION");
       jest.advanceTimersByTime(finishCountdown + 1);
       updateSessionState(quizId, sessionId, token, "END");
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("END");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("END");
     })
 
     test('question_close', () => {
       updateSessionState(quizId, sessionId, token, "NEXT_QUESTION");
       jest.advanceTimersByTime(finishCountdown + questionDuration + 1);
       updateSessionState(quizId, sessionId, token, "END");
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("END");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("END");
     })
 
     test('answer_show', () => {
@@ -245,7 +245,7 @@ import { updateSessionState } from '../session';
       jest.advanceTimersByTime(finishCountdown + 1);
       updateSessionState(quizId, sessionId, token, "GO_TO_ANSWER");
       updateSessionState(quizId, sessionId, token, "END");
-      expect(getSessionStatus(quizId, sessionId, token).state).toStrictEqual("END");
+      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("END");
     })
 
     // final_result has already been tested

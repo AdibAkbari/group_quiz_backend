@@ -511,3 +511,16 @@ export function startSessionRequest(quizId: number, token: string, autoStartNum:
 export function updateSessionState(quizId: number, sessionId: number, token: string, action: string) {
   return requestHelper('PUT', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
 }
+
+export function sessionStatusRequest(token: string, quizId: number, sessionId: number) {
+  return requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
+}
+
+// PLAYER ROUTES //
+export function playerJoinRequest(sessionId: number, name: string) {
+  return requestHelper('POST', '/v1/player/join', { sessionId, name });
+}
+
+export function playerStatusRequest(playerId: number) {
+  return requestHelper('GET', `/v1/player/${playerId}`, {});
+}
