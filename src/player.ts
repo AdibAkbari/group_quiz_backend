@@ -54,3 +54,7 @@ export function playerStatus(playerId: number): PlayerStatus {
     atQuestion: session.atQuestion
   };
 }
+
+export function playerSubmitAnswer(answerIds: number[], playerId: number, questionposition: number): Record<string, never> {
+  return {};
+}
