@@ -532,3 +532,12 @@ export function playerCurrentQuestionInfoRequest(playerId: number, questionPosit
 export function playerResultsRequest(playerId: number) {
   return requestHelper('GET', `/v1/player/${playerId}/results`, { }, { });
 }
+
+export function playerQuestionResultsRequest(playerId: number, questionPosition: number) {
+  return requestHelper(
+    'GET', 
+    `/v1/player/${playerId}/question/${questionPosition}/results`, 
+    { }, 
+    { }
+  );
+}
