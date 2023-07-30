@@ -79,6 +79,7 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
     }
 
     session.sessionState = "QUESTION_COUNTDOWN";
+    session.atQuestion++;
     session.timer = setTimeout(questionOpen, COUNTDOWN, sessionId);
   }
   
@@ -110,7 +111,7 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
     if(session.sessionState === "QUESTION_OPEN" || session.sessionState === "QUESTION_COUNTDOWN") {
       clearTimeout(session.timer);
     }
-    session.sessionState = "FINAL_RESULTS";
+    session.sessionState = "END";
   }
 
   setData(data);
@@ -140,7 +141,7 @@ function calculateQuestionPoints(sessionId: number) {
   let session = data.sessions.find(id => id.sessionId === sessionId);
 
   const question = session.metadata.questions[session.atQuestion - 1];
-  const questionId = question.questionId
+  const questionId = question.questionId;
   const correctAnswers = question.answers.filter(answer => answer.correct === true);
 
   let sessionPlayers = data.players.filter(session => session.sessionId === sessionId);

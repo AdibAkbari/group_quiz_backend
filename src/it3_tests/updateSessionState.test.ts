@@ -63,10 +63,6 @@ import { updateSessionState } from '../session';
       expect(() => updateSessionState(quizId2, sessionId, token, "NEXT_QUESTION")).toThrow(HTTPError[400]);
     })
 
-    test('action is not a valid action enum', () => {
-      expect(() => updateSessionState(quizId, sessionId, token, "NEXT")).toThrow(HTTPError[400]);
-    });
-
     test.each([
       { action: "ISDJFSI" },
       { action: "NEXT" },
@@ -74,7 +70,7 @@ import { updateSessionState } from '../session';
       { action: "NEXT_QUESITON" },
       { action: "next_question" }
     ])('action is not a valid action enum', ({ action }) => {
-      expect(() => updateSessionState(quizId, sessionId, token, action)).toThrow(HTTPError[401]);
+      expect(() => updateSessionState(quizId, sessionId, token, action)).toThrow(HTTPError[400]);
     });
 
   });
@@ -182,40 +178,41 @@ import { updateSessionState } from '../session';
 
     test('two questions in the game', () => {
       createQuizQuestionRequest(quizId, token, 'Question 2', questionDuration, 6, validAnswers).questionId;
-      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("LOBBY");
+      const sessionId2 = startSessionRequest(quizId, token, 3).sessionId;
+      expect(sessionStatusRequest(token, quizId, sessionId2).state).toStrictEqual("LOBBY");
 
       // lobby -> question_countdown
-      updateSessionState(quizId, sessionId, token, "NEXT_QUESTION");      
-      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("QUESTION_COUNTDOWN");
+      updateSessionState(quizId, sessionId2, token, "NEXT_QUESTION");      
+      expect(sessionStatusRequest(token, quizId, sessionId2).state).toStrictEqual("QUESTION_COUNTDOWN");
 
       // question_countdown -> question_open
       jest.advanceTimersByTime(finishCountdown + 1);
 
       // question_open -> answer_show
-      updateSessionState(quizId, sessionId, token, "GO_TO_ANSWER");
-      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("ANSWER_SHOW");
+      updateSessionState(quizId, sessionId2, token, "GO_TO_ANSWER");
+      expect(sessionStatusRequest(token, quizId, sessionId2).state).toStrictEqual("ANSWER_SHOW");
 
       // answer_show -> question_countdown
-      updateSessionState(quizId, sessionId, token, "NEXT_QUESTION");
-      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("QUESTION_COUNTDOWN");
+      updateSessionState(quizId, sessionId2, token, "NEXT_QUESTION");
+      expect(sessionStatusRequest(token, quizId, sessionId2).state).toStrictEqual("QUESTION_COUNTDOWN");
 
       // question_countdown -> question_open
       jest.advanceTimersByTime(finishCountdown + 1);
-      const sessionInfo = sessionStatusRequest(token, quizId, sessionId);
+      const sessionInfo = sessionStatusRequest(token, quizId, sessionId2);
       expect(sessionInfo.state).toStrictEqual("QUESTION_OPEN");
       expect(sessionInfo.atQuestion).toStrictEqual(2);
 
       // question_open -> question_close
       jest.advanceTimersByTime(questionDuration);
-      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("QUESTION_CLOSE");
+      expect(sessionStatusRequest(token, quizId, sessionId2).state).toStrictEqual("QUESTION_CLOSE");
 
       // question_close -> final_results
-      updateSessionState(quizId, sessionId, token, "GO_TO_FINAL_RESULTS");
-      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("FINAL_RESULTS");
+      updateSessionState(quizId, sessionId2, token, "GO_TO_FINAL_RESULTS");
+      expect(sessionStatusRequest(token, quizId, sessionId2).state).toStrictEqual("FINAL_RESULTS");
 
       // final_results -> end
-      updateSessionState(quizId, sessionId, token, "END");
-      expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual("END");
+      updateSessionState(quizId, sessionId2, token, "END");
+      expect(sessionStatusRequest(token, quizId, sessionId2).state).toStrictEqual("END");
     })
   })
 
