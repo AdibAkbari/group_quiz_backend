@@ -1,5 +1,5 @@
 import { getData } from './dataStore';
-import { Data, Players, QuestionResult, Quizzes, Session } from './interfaces';
+import { Data, Players, QuestionResult, Quizzes, Session, SessionResults } from './interfaces';
 import HTTPError from 'http-errors';
 
 // HELPER FUNCTIONS
@@ -236,6 +236,14 @@ export function isValidPlayerId(playerId: number): boolean {
   return true;
 }
 
+/**
+ * Returns the results object for the specified question in the given session
+ * 
+ * @param {number} position
+ * @param {Session} session
+ * @param {Players[]} playerList
+ * @returns {QuestionResult} - Object with results from specific question
+ */
 export function questionResult(position: number, session: Session, playerList: Players[]): QuestionResult {
   // Reset arrays and counters for each question
   let totalAnswerTime = 0;
@@ -284,5 +292,29 @@ export function questionResult(position: number, session: Session, playerList: P
     questionCorrectBreakdown: questionCorrectBreakdown,
     averageAnswerTime: totalAnswerTime / numPlayers,
     percentCorrect: Math.round((100 * numCorrectPlayers) / numPlayers)
+  };
+}
+/**
+ * Returns full results from a completed quiz session
+ * 
+ * @param session 
+ * @returns {SessionResults} - object containing results of quiz session 
+ */
+export function getSessionResults(session: Session) {
+  const data = getData();
+  const playerList = data.players.filter(player => session.players.includes(player.name));
+
+  const mappedPlayers = playerList.map(({ name, score }) => ({ name, score }));
+  const rankedPlayers = mappedPlayers.sort((player1, player2) => {
+    return player2.score - player1.score;
+  });
+
+  const questionResults = session.metadata.questions.map(
+    (_, position) => questionResult(position, session, playerList)
+  );
+
+  return {
+    usersRankedByScore: rankedPlayers,
+    questionResults: questionResults
   };
 }

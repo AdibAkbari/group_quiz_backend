@@ -37,6 +37,7 @@ import {
   playerStatus,
   playerCurrentQuestionInfo,
   playerResults,
+  playerQuestionResults,
 } from './player';
 import {
   startSession,
@@ -631,10 +632,18 @@ app.get('/v1/player/:playerid/question/:questionposition', (req: Request, res: R
   res.json(response);
 });
 
-// playerStatus //
+// playerResults //
 app.get('/v1/player/:playerid/results', (req: Request, res: Response) => {
   const playerid = parseInt(req.params.playerid);
   const response = playerResults(playerid);
+  res.json(response);
+});
+
+// playerQuestionResults //
+app.get('/v1/player/:playerid/question/:questionposition/results', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const questionPosition = parseInt(req.params.questionposition);
+  const response = playerQuestionResults(playerId, questionPosition);
   res.json(response);
 });
 

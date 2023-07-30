@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
-import { generateName, isValidPlayerId, isValidQuestionPosition, questionResult } from './helper';
-import { Players, PlayerStatus, SessionResults } from './interfaces';
+import { generateName, getSessionResults, isValidPlayerId, isValidQuestionPosition, questionResult } from './helper';
+import { Players, PlayerStatus, QuestionResult, SessionResults } from './interfaces';
 import HTTPError from 'http-errors';
 
 export function playerJoin(sessionId: number, playerName: string): { playerId: number } {
@@ -92,24 +92,31 @@ export function playerResults(playerId: number): SessionResults {
     throw HTTPError(400, 'Session is not in FINAL_RESULTS state');
   }
 
-  const playerList: Players[] = [];
-  // go through players in session and get actual info from players in data by matching player name
-  for (const playerName of session.players) {
-    const player = data.players.find(player => player.name === playerName);
-    playerList.push(player);
+  return getSessionResults(session);
+}
+
+export function playerQuestionResults(playerId: number, questionPosition: number): QuestionResult {
+  if (!isValidPlayerId(playerId)) {
+    throw HTTPError(400, 'Invalid: PlayerId');
   }
 
-  const mappedPlayers = playerList.map(({ name, score }) => ({ name, score }));
-  const rankedPlayers = mappedPlayers.sort((player1, player2) => {
-    return player2.score - player1.score;
-  });
+  const data = getData();
+  const player = data.players.find(id => id.playerId === playerId);
+  const session = data.sessions.find(id => id.sessionId === player.sessionId);
 
-  const questionResults = session.metadata.questions.map(
-    (_, position) => questionResult(position, session, playerList)
-  );
+  if (questionPosition > session.metadata.numQuestions - 1) {
+    throw HTTPError(400, 'Question position is not valid');
+  }
 
-  return {
-    usersRankedByScore: rankedPlayers,
-    questionResults: questionResults
-  };
+  if (session.sessionState !== 'ANSWER_SHOW') {
+    throw HTTPError(400, 'Session is not in FINAL_RESULTS state');
+  }
+
+  if (session.atQuestion !== questionPosition) {
+    throw HTTPError(400, 'Session not yet up to this question');
+  }
+
+  const playerList = data.players.filter(player => session.players.includes(player.name));
+
+  return questionResult(questionPosition, session, playerList);
 }
