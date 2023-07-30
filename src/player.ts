@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
-import { generateName, isValidPlayerId, isValidQuestionPosition } from './helper';
-import { Players, PlayerStatus } from './interfaces';
+import { generateName, isValidPlayerId, isValidQuestionPosition, questionResult } from './helper';
+import { Players, PlayerStatus, SessionResults } from './interfaces';
 import HTTPError from 'http-errors';
 
 export function playerJoin(sessionId: number, playerName: string): { playerId: number } {
@@ -76,5 +76,40 @@ export function playerCurrentQuestionInfo(playerId: number, questionPosition: nu
 
   return {
     currentQuestion
+  };
+}
+
+export function playerResults(playerId: number): SessionResults {
+  if (!isValidPlayerId(playerId)) {
+    throw HTTPError(400, 'Invalid: PlayerId');
+  }
+
+  const data = getData();
+  const player = data.players.find(id => id.playerId === playerId);
+  const session = data.sessions.find(id => id.sessionId === player.sessionId);
+
+  if (session.sessionState !== 'FINAL_RESULTS') {
+    throw HTTPError(400, 'Session is not in FINAL_RESULTS state');
+  }
+
+  const playerList: Players[] = [];
+  // go through players in session and get actual info from players in data by matching player name
+  for (const playerName of session.players) {
+    const player = data.players.find(player => player.name === playerName);
+    playerList.push(player);
+  }
+
+  const mappedPlayers = playerList.map(({ name, score }) => ({ name, score }));
+  const rankedPlayers = mappedPlayers.sort((player1, player2) => {
+    return player2.score - player1.score;
+  });
+
+  const questionResults = session.metadata.questions.map(
+    (_, position) => questionResult(position, session, playerList)
+  );
+
+  return {
+    usersRankedByScore: rankedPlayers,
+    questionResults: questionResults
   };
 }

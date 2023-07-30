@@ -1,5 +1,5 @@
 import { getData } from './dataStore';
-import { Data, Quizzes } from './interfaces';
+import { Data, Players, QuestionResult, Quizzes, Session } from './interfaces';
 import HTTPError from 'http-errors';
 
 // HELPER FUNCTIONS
@@ -234,4 +234,55 @@ export function isValidPlayerId(playerId: number): boolean {
     return false;
   }
   return true;
+}
+
+export function questionResult(position: number, session: Session, playerList: Players[]): QuestionResult {
+  // Reset arrays and counters for each question
+  let totalAnswerTime = 0;
+  let numPlayers = 0;
+  let numCorrectPlayers = 0;
+  const question = session.metadata.questions[position];
+
+  const questionCorrectBreakdown = [];
+  // set to keep track of which players have been added to counts already
+  const addedPlayers = new Set();
+
+  for (const answer of question.answers) {
+    const playersCorrect = [];
+
+    for (const player of playerList) {
+      const questionResponse = player.questionResponse.find(
+        (questionResponse) => questionResponse.questionId === question.questionId
+      );
+
+      if (questionResponse !== undefined) {
+        if (answer.correct && questionResponse.playerAnswers.includes(answer.answerId)) {
+          playersCorrect.push(player.name);
+        }
+        if (!addedPlayers.has(player.name)) {
+          totalAnswerTime += questionResponse.answerTime;
+          numPlayers++;
+          addedPlayers.add(player.name);
+
+          if (questionResponse.points !== 0) {
+            numCorrectPlayers++;
+          }
+        }
+      }
+    }
+    // pushes to list for each correct answer after adding all correct players to playerCorrect
+    if (answer.correct) {
+      questionCorrectBreakdown.push({
+        answerId: answer.answerId,
+        playersCorrect: playersCorrect
+      });
+    }
+  }
+
+  return {
+    questionId: question.questionId,
+    questionCorrectBreakdown: questionCorrectBreakdown,
+    averageAnswerTime: totalAnswerTime / numPlayers,
+    percentCorrect: Math.round((100 * numCorrectPlayers) / numPlayers)
+  };
 }
