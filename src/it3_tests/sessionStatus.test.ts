@@ -53,8 +53,10 @@ describe('Error cases', () => {
     expect(() => sessionStatusRequest(token2, quizId, sessionId)).toThrow(HTTPError[400]);
   });
 
-  // test.todo('Session Id does not refer to a valid question within this quiz', () => {
-  // });
+  test('sessionId invalid', () => {
+    expect(() => sessionStatusRequest(token, quizId, sessionId + 1)).toThrow(HTTPError[400]);
+  });
+
 });
 
 describe('Success cases', () => {

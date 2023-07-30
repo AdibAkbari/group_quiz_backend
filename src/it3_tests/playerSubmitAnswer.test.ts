@@ -29,7 +29,9 @@ beforeEach(() => {
 });
 
 describe('Error cases', () => {
-
+  test('PlayerId does not exist', () => {
+    expect(() => playerSubmitAnswerRequest(answerIds, playerId + 1, 1)).toThrow(HTTPError[400]);
+  });
 });
 
 describe('Success cases', () => {
