@@ -93,10 +93,27 @@ export function isValidQuestionId(quizId: number, questionId: number): boolean {
 export function isValidSessionId(sessionId: number, quizId: number): boolean {
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
-  if (session === undefined) {
+  if(session === undefined) {
     return false;
   }
-  if (session.metadata.quizId !== quizId) {
+  if(session.metadata.quizId !== quizId) {
+    return false;
+  }
+  return true;
+}
+
+export function isValidQuestionPosition(playerId: number, questionPosition: number): boolean {
+  const data = getData();
+  const player = data.players.find(id => id.playerId === playerId);
+  const session = data.sessions.find(id => id.sessionId === player.sessionId);
+
+  if(questionPosition > session.metadata.numQuestions) {
+    return false;
+  }
+  if(questionPosition < 0) {
+    return false;
+  }
+  if(questionPosition !== session.atQuestion) {
     return false;
   }
   return true;

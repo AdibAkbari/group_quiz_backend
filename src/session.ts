@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
 import { isValidTokenStructure, isTokenLoggedIn, isValidQuizId, isValidCreator, isValidSessionId } from './helper';
-import { Players, Session, SessionResults, SessionStatus } from './interfaces';
+import { Session, SessionStatus } from './interfaces';
 import HTTPError from 'http-errors';
 
 export function startSession(quizId: number, token: string, autoStartNum: number): { sessionId: number } {
@@ -42,6 +42,7 @@ export function startSession(quizId: number, token: string, autoStartNum: number
   return { sessionId: sessionId };
 }
 
+
 export function sessionStatus(token: string, quizId: number, sessionId: number): SessionStatus {
   if (!isValidTokenStructure(token)) {
     throw HTTPError(401, 'Token is not a valid structure');
@@ -52,9 +53,9 @@ export function sessionStatus(token: string, quizId: number, sessionId: number):
   if (!isValidQuizId(quizId) || !isValidCreator(quizId, token)) {
     throw HTTPError(400, 'Invalid QuizId');
   }
-  //   if () {
-  //     throw HTTPError(400, 'Invalid: Session Id');
-  //   }
+  if (!isValidSessionId(sessionId, quizId)) {
+    throw HTTPError(400, 'Invalid: Session Id');
+  }
 
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);

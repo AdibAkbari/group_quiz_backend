@@ -4,7 +4,7 @@ import {
   quizCreateRequest,
   createQuizQuestionRequest,
   startSessionRequest,
-  // playerJoinRequest,
+  playerJoinRequest,
   sessionStatusRequest,
   // sessionUpdateRequest,
 } from './it3_testRoutes';
@@ -53,8 +53,9 @@ describe('Error cases', () => {
     expect(() => sessionStatusRequest(token2, quizId, sessionId)).toThrow(HTTPError[400]);
   });
 
-  // test.todo('Session Id does not refer to a valid question within this quiz', () => {
-  // });
+  test('sessionId invalid', () => {
+    expect(() => sessionStatusRequest(token, quizId, sessionId + 1)).toThrow(HTTPError[400]);
+  });
 });
 
 describe('Success cases', () => {
@@ -64,6 +65,57 @@ describe('Success cases', () => {
         state: 'LOBBY',
         atQuestion: 0,
         players: [],
+        metadata: {
+          quizId: quizId,
+          name: 'quiz1',
+          timeCreated: expect.any(Number),
+          timeLastEdited: expect.any(Number),
+          description: '',
+          numQuestions: 1,
+          questions: [
+            {
+              questionId: 1,
+              question: 'Question 1',
+              duration: 5,
+              // thumbnailUrl: "http://google.com/some/image/path.jpg",
+              points: 6,
+              answers: [
+                {
+                  answerId: expect.any(Number),
+                  answer: 'answer1',
+                  colour: expect.any(String),
+                  correct: true
+                },
+                {
+                  answerId: expect.any(Number),
+                  answer: 'answer2',
+                  colour: expect.any(String),
+                  correct: false
+                }
+              ]
+            }
+          ],
+          creator: 1,
+          duration: 5,
+          questionCount: 1,
+          // thumbnailUrl: "",
+        }
+      });
+  });
+
+  test('Names sorted correctly', () => {
+    playerJoinRequest(sessionId, 'Chad');
+    playerJoinRequest(sessionId, 'Andy');
+    playerJoinRequest(sessionId, 'Ben');
+    expect(sessionStatusRequest(token, quizId, sessionId)).toStrictEqual(
+      {
+        state: 'LOBBY',
+        atQuestion: 0,
+        players: [
+          'Andy',
+          'Ben',
+          'Chad'
+        ],
         metadata: {
           quizId: quizId,
           name: 'quiz1',
