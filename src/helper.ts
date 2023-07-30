@@ -90,6 +90,18 @@ export function isValidQuestionId(quizId: number, questionId: number): boolean {
   return true;
 }
 
+export function isValidSessionId(sessionId: number, quizId: number): boolean {
+  const data = getData();
+  const session = data.sessions.find(id => id.sessionId === sessionId);
+  if(session === undefined) {
+    return false;
+  }
+  if(session.metadata.quizId !== quizId) {
+    return false;
+  }
+  return true;
+}
+
 /**
    * Helper function for adminQuizCreate to check if a quiz name is valid
    *
