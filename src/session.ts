@@ -42,3 +42,8 @@ export function startSession(quizId: number, token: string, autoStartNum: number
 
   return { sessionId: sessionId };
 }
+
+
+export function updateSessionState(quizId: number, sessionId: number, token: string, action: string): {} {
+  return {};
+}
