@@ -97,9 +97,9 @@ export interface Session {
 }
 
 export interface SessionStatus {
-  state: number,
-  atQuestion: string,
-  players: Players[];
+  state: string,
+  atQuestion: number,
+  players: string[];
   metadata: QuizInfo;
 }
 

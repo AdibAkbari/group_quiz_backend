@@ -238,7 +238,7 @@ export function isValidPlayerId(playerId: number): boolean {
 
 /**
  * Returns the results object for the specified question in the given session
- * 
+ *
  * @param {number} position
  * @param {Session} session
  * @param {Players[]} playerList
@@ -296,11 +296,11 @@ export function questionResult(position: number, session: Session, playerList: P
 }
 /**
  * Returns full results from a completed quiz session
- * 
- * @param session 
- * @returns {SessionResults} - object containing results of quiz session 
+ *
+ * @param session
+ * @returns {SessionResults} - object containing results of quiz session
  */
-export function getSessionResults(session: Session) {
+export function getSessionResults(session: Session): SessionResults {
   const data = getData();
   const playerList = data.players.filter(player => session.players.includes(player.name));
 

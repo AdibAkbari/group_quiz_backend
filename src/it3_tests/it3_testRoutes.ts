@@ -535,9 +535,9 @@ export function playerResultsRequest(playerId: number) {
 
 export function playerQuestionResultsRequest(playerId: number, questionPosition: number) {
   return requestHelper(
-    'GET', 
-    `/v1/player/${playerId}/question/${questionPosition}/results`, 
-    { }, 
+    'GET',
+    `/v1/player/${playerId}/question/${questionPosition}/results`,
+    { },
     { }
   );
 }

@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
 import { generateName, getSessionResults, isValidPlayerId, isValidQuestionPosition, questionResult } from './helper';
-import { Players, PlayerStatus, QuestionResult, SessionResults } from './interfaces';
+import { Players, PlayerStatus, Question, QuestionResult, SessionResults } from './interfaces';
 import HTTPError from 'http-errors';
 
 export function playerJoin(sessionId: number, playerName: string): { playerId: number } {
@@ -55,7 +55,7 @@ export function playerStatus(playerId: number): PlayerStatus {
   };
 }
 
-export function playerCurrentQuestionInfo(playerId: number, questionPosition: number): PlayerStatus {
+export function playerCurrentQuestionInfo(playerId: number, questionPosition: number): Question {
   if (!isValidPlayerId(playerId)) {
     throw HTTPError(400, 'Invalid: PlayerId');
   }
@@ -74,9 +74,7 @@ export function playerCurrentQuestionInfo(playerId: number, questionPosition: nu
 
   const currentQuestion = session.metadata.questions[questionPosition];
 
-  return {
-    currentQuestion
-  };
+  return currentQuestion;
 }
 
 export function playerResults(playerId: number): SessionResults {

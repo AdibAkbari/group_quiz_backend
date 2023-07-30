@@ -1,5 +1,4 @@
 import {
-  playerResultsRequest,
   startSessionRequest,
   clearRequest,
   authRegisterRequest,
@@ -57,7 +56,6 @@ describe('Error cases', () => {
     // updateSessionRequest(quizId, sessionId, token, "GO_TO_ANSWER");
     expect(() => playerQuestionResultsRequest(playerId, 0)).toThrow(HTTPError[400]);
   });
-  
 });
 
 describe('Success cases', () => {
@@ -109,7 +107,7 @@ describe('Success cases', () => {
   //     averageAnswerTime: expect.any(Number), // calculate this??
   //     percentCorrect: 100
   //   };
-      
+
   //   expect(playerQuestionResultsRequest(playerId, questionPosition)).toStrictEqual(expected);
   // });
 

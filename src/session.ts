@@ -1,5 +1,5 @@
 import { getData, setData } from './dataStore';
-import { isValidTokenStructure, isTokenLoggedIn, isValidQuizId, isValidCreator, isValidSessionId, questionResult, getSessionResults } from './helper';
+import { isValidTokenStructure, isTokenLoggedIn, isValidQuizId, isValidCreator, isValidSessionId, getSessionResults } from './helper';
 import { Session, SessionStatus, SessionResults } from './interfaces';
 import HTTPError from 'http-errors';
 
@@ -76,26 +76,22 @@ export function sessionResults(quizId: number, sessionId: number, token: string)
   if (!isTokenLoggedIn(token)) {
     throw HTTPError(403, 'Token is not logged in');
   }
-
   if (!isValidQuizId(quizId)) {
     throw HTTPError(400, 'invalid quiz Id');
   }
-
   if (!isValidCreator(quizId, token)) {
     throw HTTPError(400, 'quizId does not refer to a quiz that this user owns');
   }
-
   if (!isValidSessionId(sessionId, quizId)) {
     throw HTTPError(400, 'Session Id does not refer to a valid session within this quiz');
   }
 
   const data = getData();
-
   const session = data.sessions.find(session => session.sessionId === sessionId);
 
   if (session.sessionState !== 'FINAL_RESULTS') {
     throw HTTPError(400, 'Session is not in FINAL_RESULTS state');
   }
 
-  return getSessionResults(session); 
+  return getSessionResults(session);
 }
