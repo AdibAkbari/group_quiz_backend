@@ -825,3 +825,55 @@ export function moveQuizQuestion(token: string, quizId: number, questionId: numb
 
   return {};
 }
+
+/**
+ * Update quiz thumbnail
+ * 
+ * @param {number} quizId
+ * @param {string} token
+ * @param {string} imgUrl
+ * @returns {{}} empty object
+*/
+export function updateQuizThumbnail(quizId: number, token: string, imgUrl: string): {} {
+  // error checking
+  if (!isValidTokenStructure(token)) {
+    throw HTTPError(401, 'Token is not a valid structure');
+  }
+  if (!isTokenLoggedIn(token)) {
+    throw HTTPError(403, 'Token is not logged in');
+  }
+  if (!isValidQuizId(quizId) || !isValidCreator(quizId, token)) {
+    throw HTTPError(400, 'Invalid QuizId');
+  }
+
+  var request = new XMLHttpRequest();
+  request.open("GET", imgUrl, true);
+  request.send();
+  let validLink = 0;
+  request.onload = function() {
+    status = request.status;
+    if (request.status == 200) {
+      validLink = 1;
+    }
+  }
+  if (validLink === 0) {
+    throw HTTPError(400, 'imgUrl does not return a valid file')
+  }
+
+  let validImg = 0;
+  validImg = fetch(imgUrl, {method: 'HEAD'}).then(res => {
+    res.headers.get('Content-Type').startsWith('image/jpeg' | 'image/png')
+  })
+  if (validImg === 0) {
+    throw HTTPError(400, 'imgUrl must be a jpg or png image')
+  }
+
+
+  let data = getData();
+  const quizIndex = data.quizzes.findIndex(id => id.quizId === quizId);
+
+  data.quizzes[quizIndex].thumbnailUrl = imgUrl;
+  setData(data);
+
+  return {};
+}
