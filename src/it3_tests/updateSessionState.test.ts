@@ -58,6 +58,11 @@ import { updateSessionState } from '../session';
       expect(() => updateSessionState(quizId, sessionId + 1, token, "NEXT_QUESTION")).toThrow(HTTPError[400]);
     });
 
+    test('session not the same as quiz', () => {
+      const quizId2 = quizCreateRequest(token, 'quiz2', '').quizId;
+      expect(() => updateSessionState(quizId2, sessionId, token, "NEXT_QUESTION")).toThrow(HTTPError[400]);
+    })
+
     test('action is not a valid action enum', () => {
       expect(() => updateSessionState(quizId, sessionId, token, "NEXT")).toThrow(HTTPError[400]);
     });
