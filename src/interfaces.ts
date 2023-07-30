@@ -45,6 +45,7 @@ export interface Quizzes {
   questions: Question[];
   creator: number;
   duration: number;
+  thumbnailUrl: string;
   questionCount: number;
 }
 
