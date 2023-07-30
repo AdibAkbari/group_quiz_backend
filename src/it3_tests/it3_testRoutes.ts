@@ -528,3 +528,7 @@ export function playerStatusRequest(playerId: number) {
 export function playerCurrentQuestionInfoRequest(playerId: number, questionPosition: number) {
   return requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}`, {});
 }
+
+export function playerResultsRequest(playerId: number) {
+  return requestHelper('GET', `/v1/player/${playerId}/results`, { }, { });
+}
