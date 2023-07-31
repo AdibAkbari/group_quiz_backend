@@ -10,10 +10,13 @@ import {
   findUserFromToken,
   isValidQuestionId,
   isValidEmail,
-  giveError
+  giveError,
+  getImg,
+  urlExists,
 } from './helper';
 import HTTPError from 'http-errors';
-import XMLHttpRequest from 'xhr2';
+import isUrl from 'is-url'
+const isImageURL = require('image-url-validator').default;
 
 /**
    * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -828,10 +831,13 @@ export function moveQuizQuestion(token: string, quizId: number, questionId: numb
   return {};
 }
 
-const isImgUrl = (url: string) => {
-  return fetch(url, {method: 'HEAD'}).then(res => {
-    return res.headers.get('Content-Type').startsWith('image/jpeg')
-  })
+async function isURLValid(url) {
+  try {
+    const response = await fetch(url);
+    return true; // Returns true if the response status is in the 200-299 range
+  } catch (error) {
+    return false; // An error occurred, so the URL is not valid
+  }
 }
 
 /**
@@ -855,41 +861,43 @@ export function updateQuizThumbnail(quizId: number, token: string, imgUrl: strin
     throw HTTPError(400, 'Invalid QuizId');
   }
 
+  // let isValid = false;
+  // (async () => {
+  //   isValid = await isURLValid(imgUrl); // true (if the URL exists and returns a successful response)
+  // })();
+  // if (isValid === false) {
+  //   throw HTTPError(400, 'imgUrl does not return a valid file')
+  // }
+  // if (!(await isURLValid(imgUrl))) {
+  //   throw HTTPError(400, 'imgUrl does not return a valid file');
+  // }
   
 
-  // var request = new XMLHttpRequest();
-  // request.open("GET", imgUrl, true);
-  // request.send();
-  // let validLink = 0;
-  // let status;
-  // request.onload = function() {
-  //   status = request.status;
-  //   if (request.status == 200) {
-  //     validLink = 1;
+  // (async () => {
+  //   const isValid = await urlExists(imgUrl);
+  //   if (!isValid) {
+  //     throw HTTPError(400, 'imgUrl does not return a valid file');
   //   }
-  // }
-  if (validLink === 0) {
-    throw HTTPError(400, 'imgUrl does not return a valid file')
-  }
-
-  let validImg = 0;
-  // validImg = fetch(imgUrl, {method: 'HEAD'}).then(res => {
-  //   return res.headers.get('Content-Type').startsWith('image/jpeg')
   // })
-  // if (validImg === 0) {
-  //   throw HTTPError(400, 'imgUrl must be a jpg or png image')
+  // if (!urlExists(imgUrl)) {
+  //   throw HTTPError(400, 'imgUrl does not return a valid file');
   // }
-
-  if (!isImgUrl(imgUrl)) {
-    throw HTTPError(400, 'imgUrl must be a jpg or png image');
+  
+  if (imgUrl.match(/\.(jpeg|jpg|png)$/) === null) {
+    throw HTTPError(400, 'imgUrl must be a jpg or png image')
   }
 
-  //console.log(validImg);
+  // let isValid = 0;
+  // isImageURL(imgUrl).then(is_image => {
+  //   isValid = 1;
+  // });
+
+  const newUrl = getImg(imgUrl);
 
   let data = getData();
   const quizIndex = data.quizzes.findIndex(id => id.quizId === quizId);
+  data.quizzes[quizIndex].thumbnailUrl = newUrl;
 
-  data.quizzes[quizIndex].thumbnailUrl = imgUrl;
   setData(data);
 
   return {};

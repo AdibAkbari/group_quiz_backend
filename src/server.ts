@@ -52,6 +52,9 @@ const HOST: string = process.env.IP || 'localhost';
 // for logging errors (print to terminal)
 app.use(morgan('dev'));
 
+// access static folder if using /static/
+app.use('static', express.static('static'));
+
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
