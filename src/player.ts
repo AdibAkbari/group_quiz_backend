@@ -117,7 +117,7 @@ export function playerSubmitAnswer(answerIds: number[], playerId: number, questi
 
   // If answer exist, delete exisiting and submit new one
   const playerResponseExist = player.questionResponse.findIndex(ques => ques.questionId === currentQuestion.questionId);
-  if (playerResponseExist) {
+  if (playerResponseExist !== -1) {
     player.questionResponse.splice(playerResponseExist, 1);
   }
 

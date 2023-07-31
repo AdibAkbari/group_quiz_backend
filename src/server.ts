@@ -41,6 +41,7 @@ import {
 import {
   startSession,
   sessionStatus,
+  updateSessionState
 } from './session';
 import { clear } from './other';
 
@@ -587,6 +588,15 @@ app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) =
   const { autoStartNum } = req.body;
   const token = req.headers.token as string;
   const response = startSession(quizId, token, autoStartNum);
+  res.json(response);
+});
+
+// updateSessionState //
+app.put('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const sessionId = parseInt(req.params.sessionid);
+  const token = req.headers.token as string;
+  const response = updateSessionState(quizId, sessionId, token, req.body.action);
   res.json(response);
 });
 

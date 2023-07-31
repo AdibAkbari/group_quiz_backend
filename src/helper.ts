@@ -204,7 +204,7 @@ export function generateName() {
   const letters = 'abcdefghijklmnopqrstuvwxyz';
   const numbers = '0123456789';
 
-  function randomString(str) {
+  function randomString(str: string) {
     const array = str.split('');
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
