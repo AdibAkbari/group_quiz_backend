@@ -47,10 +47,17 @@ describe('Error cases', () => {
     expect(() => playerCurrentQuestionInfoRequest(playerId + 1, FIRST_POS)).toThrow(HTTPError[400]);
   });
 
-  test('Question position is not valid for the session this player is in', () => {
+  test('Question position too high', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);
     expect(() => playerCurrentQuestionInfoRequest(playerId, THIRD_POS)).toThrow(HTTPError[400]);
+  });
+
+  
+  test('Question position too low', () => {
+    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
+    sleepSync(finishCountdown);
+    expect(() => playerCurrentQuestionInfoRequest(playerId, -1)).toThrow(HTTPError[400]);
   });
 
   test('Session is not currently on this question', () => {

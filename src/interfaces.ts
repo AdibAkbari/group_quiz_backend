@@ -66,7 +66,7 @@ export interface Token {
 
 export interface QuestionResponse {
   questionId: number;
-  playerAnswers: {answerId: number}[];
+  playerAnswers: number[];
   answerTime: number;
   points: number;
 }
