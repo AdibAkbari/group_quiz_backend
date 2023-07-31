@@ -93,7 +93,6 @@ export interface Session {
   currentQuestionStartTime?: number;
   players: string[];
   metadata: Quizzes;
-  timer?: ReturnType<typeof setTimeout>
 }
 
 export interface SessionStatus {

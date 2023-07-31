@@ -80,6 +80,7 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
 
     session.sessionState = 'QUESTION_COUNTDOWN';
     session.atQuestion++;
+    
     const timer = timers.find(id => id.sessionId === sessionId);
     const timerId = setTimeout(questionOpen, COUNTDOWN, sessionId);
     if(timer !== undefined) {
