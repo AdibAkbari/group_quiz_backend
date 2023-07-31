@@ -105,7 +105,6 @@ describe('successful cases', () => {
                       questionId: questionId,
                       question: 'Question 1',
                       duration: 5,
-                      thumbnailUrl: '',
                       points: 6,
                       answers: [
                           { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true},
@@ -137,7 +136,6 @@ describe('successful cases', () => {
                       questionId: questionId,
                       question: 'Question 1',
                       duration: 5,
-                      thumbnailUrl: '',
                       points: 6,
                       answers: [
                           { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true},

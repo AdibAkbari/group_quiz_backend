@@ -213,11 +213,14 @@ export function sessionStatus(token: string, quizId: number, sessionId: number):
   const session = data.sessions.find(id => id.sessionId === sessionId);
 
   const playerNames = session.players.sort();
+  const metaData = session.metadata;
+  delete metaData.creator;
+  delete metaData.questionCount;
 
   return {
     state: session.sessionState,
     atQuestion: session.atQuestion,
     players: playerNames,
-    metadata: session.metadata,
+    metadata: metaData,
   };
 }
