@@ -593,9 +593,8 @@ app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) =
 app.put('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const sessionId = parseInt(req.params.sessionid);
-  const { action } = req.body;
   const token = req.headers.token as string;
-  const response = updateSessionState(quizId, sessionId, token, action);
+  const response = updateSessionState(quizId, sessionId, token, req.body.action);
   res.json(response);
 });
 

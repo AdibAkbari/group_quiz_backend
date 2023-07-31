@@ -143,3 +143,9 @@ export interface Answers {
   answer: string,
   correct: boolean
 }
+
+
+export interface Timers {
+  sessionId: number,
+  timer: ReturnType<typeof setTimeout>
+}

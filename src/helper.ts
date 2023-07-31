@@ -93,10 +93,10 @@ export function isValidQuestionId(quizId: number, questionId: number): boolean {
 export function isValidSessionId(sessionId: number, quizId: number): boolean {
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
-  if(session === undefined) {
+  if (session === undefined) {
     return false;
   }
-  if(session.metadata.quizId !== quizId) {
+  if (session.metadata.quizId !== quizId) {
     return false;
   }
   return true;
