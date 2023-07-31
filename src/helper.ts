@@ -286,12 +286,14 @@ export function questionResult(position: number, session: Session, playerList: P
       });
     }
   }
+  const averageAnswerTime = numPlayers === 0? 0 : totalAnswerTime / numPlayers;
+  const percentCorrect = numPlayers === 0? 0 : Math.round((100 * numCorrectPlayers) / numPlayers);
 
   return {
     questionId: question.questionId,
     questionCorrectBreakdown: questionCorrectBreakdown,
-    averageAnswerTime: totalAnswerTime / numPlayers,
-    percentCorrect: Math.round((100 * numCorrectPlayers) / numPlayers)
+    averageAnswerTime: averageAnswerTime,
+    percentCorrect: percentCorrect
   };
 }
 /**

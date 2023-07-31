@@ -133,7 +133,7 @@ export interface NewQuestionId {
   newQuestionId: number;
 }
 
-interface QuestionCorrectBreakdown {
+export interface QuestionCorrectBreakdown {
   answerId: number;
   playersCorrect: string[];
 }
