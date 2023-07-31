@@ -1,5 +1,5 @@
 import { getData } from './dataStore';
-import { Data, Quizzes } from './interfaces';
+import { Data, Quizzes, Question } from './interfaces';
 import HTTPError from 'http-errors';
 
 // HELPER FUNCTIONS
