@@ -1,6 +1,8 @@
 import { getData } from './dataStore';
 import { Data, Quizzes } from './interfaces';
 import HTTPError from 'http-errors';
+import request from 'sync-request';
+import fs from 'fs'
 
 // HELPER FUNCTIONS
 /**
@@ -163,4 +165,21 @@ export function giveError(isv2: boolean, errorMessage: string, statusCode: numbe
     throw HTTPError(statusCode, errorMessage);
   }
   return { error: errorMessage };
+}
+
+/**
+   * Helper function to download and save an image
+   *
+   * @param {string} imgUrl
+   * @returns {string} thumbnailUrl
+   */
+export function getImg(imgUrl: string) {
+  const res = request(
+    'GET',
+    imgUrl,
+  );
+  const body = req.getBody();
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  const thumbnail: string = (Math.floor(Math.random() * timeNow)).toString();
+  fs.writeFileSync('../static/')
 }

@@ -1,7 +1,9 @@
 import {
     authRegisterRequest,
     updateQuizThumbnailRequest,
-    clearRequest
+    clearRequest,
+	quizCreateRequest,
+	adminQuizInfoRequest,
   } from './it3_testRoutes';
 import { TokenId, QuizId } from '../interfaces';
 import HTTPError from 'http-errors';
@@ -28,7 +30,7 @@ describe('Token invalid', () => {
 	});
   
 	test('TokenId not logged in', () => {
-		expect(() => updateQuizThumbnailRequest(quiz.quizId, user.token + 1, "https://www.dcnewsnow.com/wp-content/uploads/sites/14/2022/07/Cat.jpg")).toThrow(HTTPError[403]);
+		expect(() => updateQuizThumbnailRequest(quiz.quizId, '712345', "https://www.dcnewsnow.com/wp-content/uploads/sites/14/2022/07/Cat.jpg")).toThrow(HTTPError[403]);
 	});
 });
 

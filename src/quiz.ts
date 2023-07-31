@@ -12,6 +12,8 @@ import {
   isValidEmail,
   giveError
 } from './helper';
+import HTTPError from 'http-errors';
+import XMLHttpRequest from 'xhr2';
 
 /**
    * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -826,6 +828,12 @@ export function moveQuizQuestion(token: string, quizId: number, questionId: numb
   return {};
 }
 
+const isImgUrl = (url: string) => {
+  return fetch(url, {method: 'HEAD'}).then(res => {
+    return res.headers.get('Content-Type').startsWith('image/jpeg')
+  })
+}
+
 /**
  * Update quiz thumbnail
  * 
@@ -835,6 +843,7 @@ export function moveQuizQuestion(token: string, quizId: number, questionId: numb
  * @returns {{}} empty object
 */
 export function updateQuizThumbnail(quizId: number, token: string, imgUrl: string): {} {
+  console.log(imgUrl);
   // error checking
   if (!isValidTokenStructure(token)) {
     throw HTTPError(401, 'Token is not a valid structure');
@@ -846,28 +855,36 @@ export function updateQuizThumbnail(quizId: number, token: string, imgUrl: strin
     throw HTTPError(400, 'Invalid QuizId');
   }
 
-  var request = new XMLHttpRequest();
-  request.open("GET", imgUrl, true);
-  request.send();
-  let validLink = 0;
-  request.onload = function() {
-    status = request.status;
-    if (request.status == 200) {
-      validLink = 1;
-    }
-  }
+  
+
+  // var request = new XMLHttpRequest();
+  // request.open("GET", imgUrl, true);
+  // request.send();
+  // let validLink = 0;
+  // let status;
+  // request.onload = function() {
+  //   status = request.status;
+  //   if (request.status == 200) {
+  //     validLink = 1;
+  //   }
+  // }
   if (validLink === 0) {
     throw HTTPError(400, 'imgUrl does not return a valid file')
   }
 
   let validImg = 0;
-  validImg = fetch(imgUrl, {method: 'HEAD'}).then(res => {
-    res.headers.get('Content-Type').startsWith('image/jpeg' | 'image/png')
-  })
-  if (validImg === 0) {
-    throw HTTPError(400, 'imgUrl must be a jpg or png image')
+  // validImg = fetch(imgUrl, {method: 'HEAD'}).then(res => {
+  //   return res.headers.get('Content-Type').startsWith('image/jpeg')
+  // })
+  // if (validImg === 0) {
+  //   throw HTTPError(400, 'imgUrl must be a jpg or png image')
+  // }
+
+  if (!isImgUrl(imgUrl)) {
+    throw HTTPError(400, 'imgUrl must be a jpg or png image');
   }
 
+  //console.log(validImg);
 
   let data = getData();
   const quizIndex = data.quizzes.findIndex(id => id.quizId === quizId);

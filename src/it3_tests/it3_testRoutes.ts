@@ -159,6 +159,10 @@ export function quizTrashEmptyRequest(token: string, quizIds: number[]) {
   return requestHelper('DELETE', '/v2/admin/quiz/trash/empty', { quizIds: JSON.stringify(quizIds) }, { token });
 }
 
+export function updateQuizThumbnailRequest(quizid: number, token: string, imgUrl: string) {
+  return requestHelper('PUT', `/v1/admin/quiz/${quizid}/thumbnail`, { quizid, imgUrl }, { token });
+}
+
 // QUESTION ROUTES //
 
 export function createQuizQuestionRequest(quizId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
