@@ -641,7 +641,6 @@ app.put('/v1/player/:playerid/question/:questionposition/answer', (req: Request,
   res.json(response);
 });
 
-
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================

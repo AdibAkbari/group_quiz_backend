@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
 import { generateName, isValidPlayerId, isValidQuestionPosition } from './helper';
-import { Players, PlayerStatus, QuestionResponse } from './interfaces';
+import { Players, PlayerStatus, QuestionResponse, QuestionInfo, AnswerInfo } from './interfaces';
 import HTTPError from 'http-errors';
 
 export function playerJoin(sessionId: number, playerName: string): { playerId: number } {
@@ -55,7 +55,7 @@ export function playerStatus(playerId: number): PlayerStatus {
   };
 }
 
-export function playerCurrentQuestionInfo(playerId: number, questionPosition: number): PlayerStatus {
+export function playerCurrentQuestionInfo(playerId: number, questionPosition: number): QuestionInfo {
   if (!isValidPlayerId(playerId)) {
     throw HTTPError(400, 'Invalid: PlayerId');
   }
@@ -73,15 +73,20 @@ export function playerCurrentQuestionInfo(playerId: number, questionPosition: nu
   }
 
   const currentQuestion = session.metadata.questions[questionPosition];
+  for (const answer of currentQuestion.answers) {
+    delete answer.correct
+  }
 
   return {
-    currentQuestion
+    questionId: currentQuestion.questionId,
+    question: currentQuestion.question,
+    duration: currentQuestion.duration,
+    points: currentQuestion.points,
+    answers: currentQuestion.answers,
   };
 }
 
-
-
-export function playerSubmitAnswer(answerIds: number[], playerId: number, questionposition: number): Record<string, never> {
+export function playerSubmitAnswer(answerIds: number[], playerId: number, questionPosition: number): Record<string, never> {
   if (!isValidPlayerId(playerId)) {
     throw HTTPError(400, 'Invalid: PlayerId');
   }
@@ -99,10 +104,8 @@ export function playerSubmitAnswer(answerIds: number[], playerId: number, questi
   }
 
   const currentQuestion = session.metadata.questions[questionPosition];
-  for (let id of answerIds) {
-    if (!currentQuestion.answers.includes(id)) {
-      throw HTTPError(400, 'Answer IDs are not valid for this particular question');
-    }
+  if (!answerIds.every(answerId => currentQuestion.answers.some(answer => answer.answerId === answerId))) {
+    throw HTTPError(400, 'Answer IDs are not valid for this particular question');
   }
 
   for (const current of answerIds) {

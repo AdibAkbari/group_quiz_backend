@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
 import { Data } from './interfaces';
-import { clearTimers } from './session'
+import { clearTimers } from './session';
 
 /**
  * Reset the state of the application back to the start.
