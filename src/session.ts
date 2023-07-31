@@ -163,7 +163,7 @@ function calculateQuestionPoints(sessionId: number) {
 
   for (const player in sessionPlayers) {
     const currentAnswer = sessionPlayers[player].questionResponse.find(id => id.questionId === questionId);
-    if (currentAnswer.playerAnswers !== correctAnswers) {
+    if (currentAnswer === undefined || currentAnswer.playerAnswers !== correctAnswers) {
       sessionPlayers.splice(parseInt(player), 1);
     }
   }
