@@ -95,9 +95,7 @@ describe('Success cases', () => {
               ]
             }
           ],
-          creator: 1,
           duration: 5,
-          questionCount: 1,
           // thumbnailUrl: "",
         }
       });
@@ -146,9 +144,7 @@ describe('Success cases', () => {
               ]
             }
           ],
-          creator: 1,
           duration: 5,
-          questionCount: 1,
           // thumbnailUrl: "",
         }
       });
