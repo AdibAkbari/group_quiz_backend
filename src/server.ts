@@ -33,6 +33,9 @@ import {
   moveQuizQuestion
 } from './quiz';
 import { clear } from './other';
+import {
+  startSession
+} from './session';
 
 // Set up web app
 const app = express();
@@ -53,6 +56,10 @@ app.use(morgan('dev'));
 
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
+// ====================================================================
+
+// ====================================================================
+//  ================= IT 2 TEST ROUTES (NEW) ==========================
 // ====================================================================
 
 // adminQuizDescriptionUpdate //
@@ -560,6 +567,19 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
       return res.status(400).json(response);
     }
   }
+  res.json(response);
+});
+
+// ====================================================================
+//  =================== IT 3 TEST ROUTES ==============================
+// ====================================================================
+
+// startSession //
+app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const { autoStartNum } = req.body;
+  const token = req.headers.token as string;
+  const response = startSession(quizId, token, autoStartNum);
   res.json(response);
 });
 

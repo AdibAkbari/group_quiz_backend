@@ -16,6 +16,7 @@ export function clear (): Record<string, never> {
     quizCount: 0,
     tokens: [],
     trash: [],
+    sessions: []
   };
 
   setData(data);
