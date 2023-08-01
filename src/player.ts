@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
 import { generateName, isValidPlayerId, isValidQuestionPosition } from './helper';
-import { Players, PlayerStatus, QuestionResponse, QuestionInfo, AnswerInfo, Message } from './interfaces';
+import { Players, PlayerStatus, QuestionResponse, QuestionInfo, Message } from './interfaces';
 import HTTPError from 'http-errors';
 
 export function playerJoin(sessionId: number, playerName: string): { playerId: number } {
@@ -46,14 +46,14 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
  */
 export function playerSendChat (playerId: number, message: string): Record<string, never> {
   const data = getData();
-  //console.log(data);
-  
+  // console.log(data);
+
   if (data.players.find(id => id.playerId === playerId) === undefined) {
     throw HTTPError(400, 'player does not exist');
   }
 
   if (message.length < 1 | message.length > 100) {
-    throw HTTPError(400, 'message must be between 1 and 100 characters')
+    throw HTTPError(400, 'message must be between 1 and 100 characters');
   }
 
   const player = data.players.find(id => id.playerId === playerId);
@@ -62,9 +62,9 @@ export function playerSendChat (playerId: number, message: string): Record<strin
   const messageObject: Message = {
     messageBody: message,
     playerId: playerId,
-    playerName: player.playerName,
+    playerName: player.name,
     timeSent: timeNow,
-  }
+  };
 
   if (data.sessions[sessionIndex].messages === undefined) {
     data.sessions[sessionIndex].messages = [];
@@ -112,7 +112,7 @@ export function playerCurrentQuestionInfo(playerId: number, questionPosition: nu
 
   const currentQuestion = session.metadata.questions[questionPosition];
   for (const answer of currentQuestion.answers) {
-    delete answer.correct
+    delete answer.correct;
   }
 
   return {
@@ -182,17 +182,22 @@ export function playerSubmitAnswer(answerIds: number[], playerId: number, questi
  * View Messages in Session
  *
  * @param {number} playerId
- * @returns {array} Message 
+ * @returns {array} Message
  */
 export function playerViewChat (playerId: number): Message[] {
   const data = getData();
-  //console.log(data);
-  
+  // console.log(data);
+
   if (data.players.find(id => id.playerId === playerId) === undefined) {
     throw HTTPError(400, 'player does not exist');
   }
 
   const player = data.players.find(id => id.playerId === playerId);
   const sessionIndex = data.sessions.findIndex(id => id.sessionId === player.sessionId);
-  return { messages: data.sessions[sessionIndex].messages }
+
+  if (data.sessions[sessionIndex].messages === undefined) {
+    return { messages: [] };
+  }
+
+  return { messages: data.sessions[sessionIndex].messages };
 }

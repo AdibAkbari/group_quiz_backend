@@ -79,7 +79,6 @@ export interface Players {
   score: number
 }
 
-
 interface Message {
   messageBody: string;
   playerId: number;
@@ -157,7 +156,6 @@ export interface Timers {
   sessionId: number,
   timer: ReturnType<typeof setTimeout>
 }
-
 
 export interface AnswerInfo {
   answerId: number;

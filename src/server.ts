@@ -45,7 +45,7 @@ import {
   sessionStatus,
   updateSessionState
 } from './session';
-import { clear } from './other'
+import { clear } from './other';
 
 // Set up web app
 const app = express();
@@ -234,14 +234,14 @@ app.post('/v1/player/:playerid/chat', (req: Request, res: Response) => {
   const message = req.body.message;
   const response = playerSendChat(playerId, message);
   res.json(response);
-}) 
+});
 
-// playerViewChat // 
+// playerViewChat //
 app.get('/v1/player/:playerid/chat', (req: Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
   const response = playerViewChat(playerId);
   res.json(response);
-})
+});
 
 // ====================================================================
 //  ================= IT 2 TEST ROUTES (OLD) ==========================

@@ -8,7 +8,6 @@ import {
   playerSubmitAnswerRequest,
   playerCurrentQuestionInfoRequest,
   updateSessionStateRequest,
-  sessionStatusRequest,
 } from './it3_testRoutes';
 import { } from '../interfaces';
 import HTTPError from 'http-errors';

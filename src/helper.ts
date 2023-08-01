@@ -107,10 +107,10 @@ export function isValidQuestionPosition(playerId: number, questionPosition: numb
   const player = data.players.find(id => id.playerId === playerId);
   const session = data.sessions.find(id => id.sessionId === player.sessionId);
 
-  if(questionPosition > session.metadata.numQuestions) {
+  if (questionPosition > session.metadata.numQuestions) {
     return false;
   }
-  if(questionPosition < 0) {
+  if (questionPosition < 0) {
     return false;
   }
   if (questionPosition !== session.atQuestion - 1) {
