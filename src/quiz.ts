@@ -14,6 +14,12 @@ import {
   isEndState,
 } from './helper';
 import HTTPError from 'http-errors';
+import fs from 'fs';
+import request, { HttpVerb } from 'sync-request';
+import config from './config.json';
+
+const port = config.port;
+const url = config.localhost;
 
 /**
    * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -836,6 +842,62 @@ export function moveQuizQuestion(token: string, quizId: number, questionId: numb
 
   const timeNow: number = Math.floor((new Date()).getTime() / 1000);
   currentQuiz.timeLastEdited = timeNow;
+
+  setData(data);
+
+  return {};
+}
+
+
+/**
+ * Update quiz thumbnail
+ * 
+ * @param {number} quizId
+ * @param {string} token
+ * @param {string} imgUrl
+ * @returns {{}} empty object
+*/
+export function updateQuizThumbnail(quizId: number, token: string, imgUrl: string): {} {
+  console.log(imgUrl);
+  // error checking
+  if (!isValidTokenStructure(token)) {
+    throw HTTPError(401, 'Token is not a valid structure');
+  }
+  if (!isTokenLoggedIn(token)) {
+    throw HTTPError(403, 'Token is not logged in');
+  }
+  if (!isValidQuizId(quizId) || !isValidCreator(quizId, token)) {
+    throw HTTPError(400, 'Invalid QuizId');
+  }
+  
+  if (imgUrl.match(/\.(jpeg|jpg|png)$/) === null) {
+    throw HTTPError(400, 'imgUrl must be a jpg or png image')
+  }
+
+  const res = request('GET', imgUrl);
+  if (res.statusCode !== 200) {
+    // If the image link is invalid, throw an HTTPError with 400 Bad Request status code
+    throw HTTPError(400, 'invalid image');
+  }
+
+  const body = res.getBody();
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  const thumbnail: string = (Math.floor(Math.random() * timeNow)).toString();
+  let fileType: string;
+  if (imgUrl.match(/\.(jpeg|jpg)$/) !== null) {
+    fileType = 'jpg'
+  }
+  if (imgUrl.match(/\.(png)$/) !== null) {
+    fileType = 'png'
+  }
+
+  fs.writeFileSync(`./static/${thumbnail}.${fileType}`, body, { flag: 'w' });
+  const newUrl = `./static/${thumbnail}.${fileType}`;
+
+  
+  let data = getData();
+  const quizIndex = data.quizzes.findIndex(id => id.quizId === quizId);
+  data.quizzes[quizIndex].thumbnailUrl = `http://${url}:${port}/${newUrl}`;
 
   setData(data);
 

@@ -30,7 +30,8 @@ import {
   adminQuizTransfer,
   deleteQuizQuestion,
   updateQuizQuestion,
-  moveQuizQuestion
+  moveQuizQuestion,
+  updateQuizThumbnail
 } from './quiz';
 import {
   playerJoin,
@@ -225,6 +226,15 @@ app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
   const response = quizQuestionDuplicate(quizId, questionId, token, true);
   res.json(response);
 });
+
+// updateQuizThumbnail //
+app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const token = req.headers.token as string;
+  const imgUrl = req.body.imgUrl;
+  const response = updateQuizThumbnail(quizId, token, imgUrl);
+  res.json(response);
+})
 
 // ====================================================================
 //  ================= IT 2 TEST ROUTES (OLD) ==========================
