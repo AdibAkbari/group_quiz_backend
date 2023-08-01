@@ -22,7 +22,7 @@ beforeEach(() => {
     clearRequest();
     token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
     quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-    // questionId = createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers).questionId;
+    createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers).questionId;
     sessionId = startSessionRequest(quizId, token, 3).sessionId;
     playerId = playerJoinRequest(sessionId, 'Player One').playerId;
 });

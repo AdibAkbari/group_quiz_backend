@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
 import { generateName } from './helper';
-import { Players } from './interfaces';
+import { Players, Message } from './interfaces';
 import HTTPError from 'http-errors';
 
 export function playerJoin(sessionId: number, playerName: string): { playerId: number } {
@@ -42,3 +42,27 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
  * @param {string} message
  * @returns {} empty object
  */
+export function playerSendChat (playerId: number, message: string): Record<string, never> {
+  const data = getData;
+
+  if (data.players.find(id => id.playerId === playerId) === undefined) {
+    throw HTTPError(400, 'player does not exist');
+  }
+
+  if (messsage.length < 1 | message.length > 100) {
+    throw HTTPError(400, 'message must be between 1 and 100 characters')
+  }
+
+  const player = data.players.find(id => id.playerId === playerId);
+  const sessionIndex = data.sessions.findIndex(id => id.sessionId === player.sessionId);
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  const message: Message = {
+    messageBody: message,
+    playerId: playerId,
+    playerName: player.playerName,
+    timeSent: timeNow,
+  }
+
+  data.sessions[sessionIndex].messages.push(message);
+  setData(data);
+}

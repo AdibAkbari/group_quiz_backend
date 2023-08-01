@@ -32,7 +32,7 @@ import {
   updateQuizQuestion,
   moveQuizQuestion
 } from './quiz';
-import { playerJoin } from './player';
+import { playerJoin, playerSendChat } from './player';
 import { clear } from './other';
 import {
   startSession
@@ -218,6 +218,14 @@ app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
   const response = quizQuestionDuplicate(quizId, questionId, token, true);
   res.json(response);
 });
+
+// playerSendChat //
+app.post('/v1/player/:playerid/chat', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const message = req.body.message;
+  const response = playerSendChat(playerId, message);
+  res.json(response);
+}) 
 
 // ====================================================================
 //  ================= IT 2 TEST ROUTES (OLD) ==========================
