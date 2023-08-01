@@ -158,7 +158,6 @@ function calculateQuestionPoints(sessionId: number) {
   const question = session.metadata.questions[session.atQuestion - 1];
   const questionId = question.questionId;
   let correctAnswers = question.answers.filter(answer => (answer.correct === true));
-  correctAnswers = correctAnswers.map(answer => {answer: answer.answerId});
 
   const sessionPlayers = data.players.filter(session => session.sessionId === sessionId);
 
