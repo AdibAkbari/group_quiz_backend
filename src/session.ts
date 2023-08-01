@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
 import { isValidTokenStructure, isTokenLoggedIn, isValidQuizId, isValidCreator, getSessionResults, isValidSessionId } from './helper';
-import { Session, SessionStatus, SessionResults, Timers } from './interfaces';
+import { Session, SessionStatus, SessionResults, Timers, Data } from './interfaces';
 import HTTPError from 'http-errors';
 
 const COUNTDOWN = 150;
@@ -91,7 +91,6 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
         timer: timerId
       });
     }
-    setData(data);
   }
 
   // action: go_to_answer
@@ -104,8 +103,7 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
       clearTimeout(timer.timer);
     }
     session.sessionState = 'ANSWER_SHOW';
-    setData(data);
-    calculateQuestionPoints(sessionId);
+    calculateQuestionPoints(sessionId, data);
   }
 
   // action: go_to_final_results
@@ -114,8 +112,7 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
       throw HTTPError(400, 'Action enum cannot be applied in current state');
     }
     session.sessionState = 'FINAL_RESULTS';
-    setData(data);
-    calculateQuestionPoints(sessionId);
+    calculateQuestionPoints(sessionId, data);
   }
 
   // action: end
@@ -128,8 +125,9 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
       clearTimeout(timer.timer);
     }
     session.sessionState = 'END';
-    setData(data);
   }
+
+  setData(data);
 
   return {};
 }
@@ -154,8 +152,7 @@ function questionClose(sessionId: number) {
   setData(data);
 }
 
-function calculateQuestionPoints(sessionId: number) {
-  const data = getData();
+function calculateQuestionPoints(sessionId: number, data: Data) {
   const session = data.sessions.find(id => id.sessionId === sessionId);
 
   const question = session.metadata.questions[session.atQuestion - 1];

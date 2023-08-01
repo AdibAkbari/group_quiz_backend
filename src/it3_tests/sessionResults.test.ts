@@ -87,8 +87,8 @@ describe('Success cases', () => {
   test('valid output one player, no answer submitted', () => {
     const playerId = playerJoinRequest(sessionId, 'Player').playerId;
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    const questionPosition = playerStatusRequest(playerId).atQuestion;
-    const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition - 1);
+    const questionPosition = playerStatusRequest(playerId).atQuestion - 1;
+    const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition);
     const correctAnswerId = questionInfo.answers[0].answerId;
 
     sleepSync(finishCountdown);
@@ -124,14 +124,14 @@ describe('Success cases', () => {
   test('valid output one player, one correct answer', () => {
     const playerId = playerJoinRequest(sessionId, 'Player').playerId;
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    const questionPosition = playerStatusRequest(playerId).atQuestion;
-    const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition - 1);
+    const questionPosition = playerStatusRequest(playerId).atQuestion - 1;
+    const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition);
     const correctAnswerId = questionInfo.answers[0].answerId;
 
     sleepSync(finishCountdown);
     const answerTime = 1;
     sleepSync(answerTime * 1000);
-    playerSubmitAnswerRequest([correctAnswerId], playerId, questionPosition - 1);
+    playerSubmitAnswerRequest([correctAnswerId], playerId, questionPosition);
 
     sleepSync(questionInfo.duration * 1000 - answerTime);
 

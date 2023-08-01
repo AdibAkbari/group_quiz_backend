@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
 import { generateName, getSessionResults, isValidPlayerId, isValidQuestionPosition, questionResult } from './helper';
-import { Players, PlayerStatus, Question, QuestionResult, SessionResults, QuestionResponse, QuestionInfo, AnswerInfo } from './interfaces';
+import { Players, PlayerStatus, QuestionResult, SessionResults, QuestionResponse, QuestionInfo } from './interfaces';
 import HTTPError from 'http-errors';
 
 export function playerJoin(sessionId: number, playerName: string): { playerId: number } {
@@ -116,10 +116,10 @@ export function playerQuestionResults(playerId: number, questionPosition: number
   }
 
   if (session.sessionState !== 'ANSWER_SHOW') {
-    throw HTTPError(400, 'Session is not in FINAL_RESULTS state');
+    throw HTTPError(400, 'Session is not in ANSWER_SHOW state');
   }
 
-  if (session.atQuestion !== questionPosition) {
+  if (!isValidQuestionPosition(playerId, questionPosition)) {
     throw HTTPError(400, 'Session not yet up to this question');
   }
 

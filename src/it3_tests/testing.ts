@@ -15,8 +15,7 @@ const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2',
 clearRequest();
 const token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
 const quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-const questionId = createQuizQuestionRequest(quizId, token, 'Question 1', duration, 6, validAnswers).questionId;
-// createQuizQuestionRequest(quizId, token, 'Question 1', 1, 6, validAnswers);
+createQuizQuestionRequest(quizId, token, 'Question 1', duration, 6, validAnswers);
 const sessionId = startSessionRequest(quizId, token, 2).sessionId;
 
 const playerId = playerJoinRequest(sessionId, 'Player').playerId;
