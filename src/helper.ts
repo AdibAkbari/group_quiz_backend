@@ -89,6 +89,10 @@ export function isValidQuestionId(quizId: number, questionId: number): boolean {
   }
   return true;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 83e12590c1e2ba209475d1c3c68cf6afed77dc8d
 /**
  * Helper function to determine if session Id is a valid session
  *
@@ -97,6 +101,7 @@ export function isValidQuestionId(quizId: number, questionId: number): boolean {
  * @returns {boolean} - returns true if sessionId is a valid session within this quiz, false otherwise
  */
 export function isValidSessionId(sessionId: number, quizId: number): boolean {
+<<<<<<< HEAD
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
   if (session === undefined) {
@@ -109,6 +114,8 @@ export function isValidSessionId(sessionId: number, quizId: number): boolean {
 }
 
 export function isValidQuestionPosition(playerId: number, questionPosition: number): boolean {
+=======
+>>>>>>> 83e12590c1e2ba209475d1c3c68cf6afed77dc8d
   const data = getData();
   const player = data.players.find(id => id.playerId === playerId);
   const session = data.sessions.find(id => id.sessionId === player.sessionId);

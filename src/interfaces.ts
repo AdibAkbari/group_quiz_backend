@@ -148,7 +148,6 @@ export interface Timers {
   timer: ReturnType<typeof setTimeout>
 }
 
-
 export interface AnswerInfo {
   answerId: number;
   answer: string;

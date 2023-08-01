@@ -75,7 +75,6 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
 
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
-  console.log(session.sessionState);
 
   // action: next_question
   if (action === 'NEXT_QUESTION') {
@@ -88,16 +87,16 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
 
     session.sessionState = 'QUESTION_COUNTDOWN';
     session.atQuestion++;
-    
+
     const timer = timers.find(id => id.sessionId === sessionId);
     const timerId = setTimeout(questionOpen, COUNTDOWN, sessionId);
-    if(timer !== undefined) {
-      timer.timer = timerId; 
+    if (timer !== undefined) {
+      timer.timer = timerId;
     } else {
       timers.push({
         sessionId: sessionId,
         timer: timerId
-      })
+      });
     }
   }
 
@@ -147,8 +146,8 @@ function questionOpen(sessionId: number) {
   const duration = session.metadata.questions[session.atQuestion - 1].duration;
 
   const timerId = setTimeout(questionClose, duration * 1000, sessionId);
-  let timer = timers.find(id => id.sessionId === sessionId);
-  timer.timer = timerId; 
+  const timer = timers.find(id => id.sessionId === sessionId);
+  timer.timer = timerId;
   setData(data);
 }
 
@@ -165,13 +164,13 @@ function calculateQuestionPoints(sessionId: number) {
 
   const question = session.metadata.questions[session.atQuestion - 1];
   const questionId = question.questionId;
-  const correctAnswers = question.answers.filter(answer => answer.correct === true);
+  const correctAnswers = question.answers.filter(answer => (answer.correct === true));
 
   const sessionPlayers = data.players.filter(session => session.sessionId === sessionId);
 
   for (const player in sessionPlayers) {
     const currentAnswer = sessionPlayers[player].questionResponse.find(id => id.questionId === questionId);
-    if (currentAnswer.playerAnswers !== correctAnswers) {
+    if (currentAnswer === undefined || currentAnswer.playerAnswers !== correctAnswers) {
       sessionPlayers.splice(parseInt(player), 1);
     }
   }
@@ -198,9 +197,9 @@ function calculateQuestionPoints(sessionId: number) {
 }
 
 export function clearTimers() {
-    for (const timer of timers) {
-      clearTimeout(timer.timer);
-    }
+  for (const timer of timers) {
+    clearTimeout(timer.timer);
+  }
 }
 
 /**
