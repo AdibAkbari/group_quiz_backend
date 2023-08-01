@@ -193,5 +193,5 @@ export function getImg(imgUrl: string) {
   }
 
   fs.writeFileSync(`./static/${thumbnail}.${fileType}`, body, { flag: 'w' });
-  return `./static/${thumbnail}.${fileType}`;
+  return `${thumbnail}.${fileType}`;
 }

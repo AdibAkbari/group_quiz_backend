@@ -14,6 +14,7 @@ import {
   getImg,
 } from './helper';
 import HTTPError from 'http-errors';
+import config from './config.json';
 
 /**
    * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -857,7 +858,7 @@ export function updateQuizThumbnail(quizId: number, token: string, imgUrl: strin
 
   const data = getData();
   const quizIndex = data.quizzes.findIndex(id => id.quizId === quizId);
-  data.quizzes[quizIndex].thumbnailUrl = newUrl;
+  data.quizzes[quizIndex].thumbnailUrl = `${config.url}:${config.port}/static/${newUrl}`;
 
   setData(data);
 
