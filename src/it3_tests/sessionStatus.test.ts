@@ -14,7 +14,6 @@ import HTTPError from 'http-errors';
 let token: string;
 let quizId: number;
 let sessionId: number;
-
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
 
 beforeEach(() => {
@@ -94,9 +93,7 @@ describe('Success cases', () => {
               ]
             }
           ],
-          creator: 1,
           duration: 5,
-          questionCount: 1,
           // thumbnailUrl: "",
         }
       });
@@ -145,9 +142,7 @@ describe('Success cases', () => {
               ]
             }
           ],
-          creator: 1,
           duration: 5,
-          questionCount: 1,
           // thumbnailUrl: "",
         }
       });

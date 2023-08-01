@@ -42,7 +42,6 @@ export function startSession(quizId: number, token: string, autoStartNum: number
   return { sessionId: sessionId };
 }
 
-
 export function sessionStatus(token: string, quizId: number, sessionId: number): SessionStatus {
   if (!isValidTokenStructure(token)) {
     throw HTTPError(401, 'Token is not a valid structure');
@@ -61,13 +60,14 @@ export function sessionStatus(token: string, quizId: number, sessionId: number):
   const session = data.sessions.find(id => id.sessionId === sessionId);
 
   const playerNames = session.players.sort();
+  const metaData = session.metadata;
+  delete metaData.creator;
+  delete metaData.questionCount;
 
   return {
     state: session.sessionState,
     atQuestion: session.atQuestion,
     players: playerNames,
-    metadata: session.metadata,
+    metadata: metaData,
   };
 }
-
-
