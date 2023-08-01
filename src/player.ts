@@ -13,6 +13,9 @@ import HTTPError from 'http-errors';
 export function playerJoin(sessionId: number, playerName: string): { playerId: number } {
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
+  if (session === undefined) {
+    throw HTTPError(400, 'Invalid: Session Id');
+  }
 
   if (session.sessionState !== 'LOBBY') {
     throw HTTPError(400, 'Session is not in LOBBY state');
