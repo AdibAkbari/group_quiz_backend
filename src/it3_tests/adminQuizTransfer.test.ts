@@ -2,9 +2,12 @@ import {
   clearRequest,
   authRegisterRequest,
   quizCreateRequest,
+  createQuizQuestionRequest,
   quizTransferRequest,
   adminQuizInfoRequest,
   adminQuizListRequest,
+  startSessionRequest,
+  updateSessionStateRequest,
   quizCreateRequestV1,
   quizTransferRequestV1,
 } from './it3_testRoutes';
@@ -85,6 +88,15 @@ describe('invalid userEmail', () => {
 
   test('userEmail is the current logged in user', () => {
     expect(() => quizTransferRequest(user.token, quiz.quizId, 'email@gmail.com')).toThrow(HTTPError[400]);
+  });
+});
+
+describe('Quiz is not in END state', () => {
+  test('quiz not in end state', () => {
+    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 6, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]);
+    const sessionId = startSessionRequest(quiz.quizId, user.token, 3).sessionId;
+    updateSessionStateRequest(quiz.quizId, sessionId, user.token, 'NEXT_QUESTION');
+    expect(() => quizTransferRequest(user.token, quiz.quizId, 'fakeemail@gmail.com')).toThrow(HTTPError[400]);
   });
 });
 

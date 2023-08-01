@@ -4,6 +4,8 @@ import {
   clearRequest,
   createQuizQuestionRequest,
   deleteQuizQuestionRequest,
+  startSessionRequest,
+  updateSessionStateRequest,
   adminQuizInfoRequest,
   deleteQuizQuestionRequestV1
 } from './it3_testRoutes';
@@ -83,6 +85,15 @@ describe('Invalid Questionid', () => {
     const quiz2 = quizCreateRequest(user2.token, 'quiz2', '');
 
     expect(() => deleteQuizQuestionRequest(user2.token, quiz2.quizId, question.questionId)).toThrow(HTTPError[400]);
+  });
+});
+
+describe('Quiz is not in END state', () => {
+  test('quiz not in end state', () => {
+    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 6, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]);
+    const sessionId = startSessionRequest(quiz.quizId, user.token, 3).sessionId;
+    updateSessionStateRequest(quiz.quizId, sessionId, user.token, 'NEXT_QUESTION');
+    expect(() => deleteQuizQuestionRequest(user.token, quiz.quizId, question.questionId)).toThrow(HTTPError[400]);
   });
 });
 

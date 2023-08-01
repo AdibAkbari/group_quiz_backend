@@ -60,16 +60,16 @@ export function playerCurrentQuestionInfo(playerId: number, questionPosition: nu
     throw HTTPError(400, 'Invalid: PlayerId');
   }
 
-  if (!isValidQuestionPosition(playerId, questionPosition)) {
-    throw HTTPError(400, 'Invalid: questionPosition');
-  }
-
   const data = getData();
   const player = data.players.find(id => id.playerId === playerId);
   const session = data.sessions.find(id => id.sessionId === player.sessionId);
 
   if (session.sessionState === 'LOBBY' || session.sessionState === 'END') {
     throw HTTPError(400, 'Invalid: State');
+  }
+
+  if (!isValidQuestionPosition(playerId, questionPosition)) {
+    throw HTTPError(400, 'Invalid: questionPosition');
   }
 
   const currentQuestion = session.metadata.questions[questionPosition];

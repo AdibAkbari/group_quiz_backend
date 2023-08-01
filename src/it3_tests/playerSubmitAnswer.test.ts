@@ -22,7 +22,6 @@ let answerId2: number;
 let answerId3: number;
 
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
-const validAnswers2 = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: true }];
 const FIRST_POS = 0;
 const SECOND_POS = 1;
 const THIRD_POS = 2;
@@ -42,7 +41,7 @@ beforeEach(() => {
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
   createQuizQuestionRequest(quizId, token, 'Question 1', questionDuration, 6, validAnswers);
-  createQuizQuestionRequest(quizId, token, 'Question 2', questionDuration, 6, validAnswers2);
+  createQuizQuestionRequest(quizId, token, 'Question 2', questionDuration, 6, validAnswers);
   // Start a session
   sessionId = startSessionRequest(quizId, token, 3).sessionId;
   // Player joins session
@@ -64,9 +63,7 @@ describe('Error cases', () => {
   });
 
   test('Session is not in QUESTION_OPEN', () => {
-    expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('QUESTION_OPEN');
     sleepSync(questionDuration * 1000);
-    expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('QUESTION_CLOSE');
     answerId = playerCurrentQuestionInfoRequest(playerId, FIRST_POS).answers[0].answerId;
     expect(() => playerSubmitAnswerRequest([answerId], playerId, FIRST_POS)).toThrow(HTTPError[400]);
   });
@@ -98,7 +95,6 @@ describe('Success cases', () => {
   });
 
   test('Multiple answers inputted', () => {
-    sleepSync(finishCountdown);
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);

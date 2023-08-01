@@ -5,6 +5,9 @@ import {
   quizRemoveRequest,
   adminQuizListRequest,
   adminQuizInfoRequest,
+  createQuizQuestionRequest,
+  startSessionRequest,
+  updateSessionStateRequest,
   quizRemoveRequestV1,
 } from './it3_testRoutes';
 import { TokenId, QuizId } from '../interfaces';
@@ -59,6 +62,15 @@ describe('Failed to remove', () => {
     const quiz2 = quizCreateRequest(user2.token, 'quiz2', '');
 
     expect(() => quizRemoveRequest(user.token, quiz2.quizId)).toThrow(HTTPError[400]);
+  });
+});
+
+describe('Quiz is not in END state', () => {
+  test('quiz not in end state', () => {
+    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 6, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]);
+    const sessionId = startSessionRequest(quiz.quizId, user.token, 3).sessionId;
+    updateSessionStateRequest(quiz.quizId, sessionId, user.token, 'NEXT_QUESTION');
+    expect(() => quizRemoveRequest(user.token, quiz.quizId)).toThrow(HTTPError[400]);
   });
 });
 
