@@ -156,7 +156,7 @@ describe('Success cases', () => {
           ],
         }
       ],
-      averageAnswerTime: answerTime / 2,
+      averageAnswerTime: answerTime,
       percentCorrect: 50
     };
 

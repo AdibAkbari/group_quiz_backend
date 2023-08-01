@@ -2,6 +2,8 @@ import { getData, setData } from './dataStore';
 import { isValidTokenStructure, isTokenLoggedIn, isValidQuizId, isValidCreator, getSessionResults, isValidSessionId } from './helper';
 import { Session, SessionStatus, SessionResults, Timers, Data } from './interfaces';
 import HTTPError from 'http-errors';
+import fs from 'fs';
+import config from './config.json';
 
 const COUNTDOWN = 150;
 const timers:Timers[] = [];
@@ -264,4 +266,73 @@ export function sessionResults(quizId: number, sessionId: number, token: string)
   }
 
   return getSessionResults(session);
+}
+
+export function sessionResultsCSV(quizId: number, sessionId: number, token: string) {
+  if (!isValidTokenStructure(token)) {
+    throw HTTPError(401, 'Token is not a valid structure');
+  }
+  if (!isTokenLoggedIn(token)) {
+    throw HTTPError(403, 'Token is not logged in');
+  }
+  if (!isValidQuizId(quizId)) {
+    throw HTTPError(400, 'invalid quiz Id');
+  }
+  if (!isValidCreator(quizId, token)) {
+    throw HTTPError(400, 'quizId does not refer to a quiz that this user owns');
+  }
+  if (!isValidSessionId(sessionId, quizId)) {
+    throw HTTPError(400, 'Session Id does not refer to a valid session within this quiz');
+  }
+
+  const data = getData();
+  const session = data.sessions.find(session => session.sessionId === sessionId);
+
+  if (session.sessionState !== 'FINAL_RESULTS') {
+    throw HTTPError(400, 'Session is not in FINAL_RESULTS state');
+  }
+
+  const playerList = data.players.filter(player => session.players.includes(player.name));
+
+  const numQuestions = session.metadata.numQuestions;
+
+  const header: string[] = ['Player'];
+  for (let i = 1; i <= numQuestions; i++) {
+    header.push(`question${i}score`);
+    header.push(`question${i}rank`);
+  }
+
+  const results: string[][] = [];
+  for (let row = 0; row < playerList.length; row++) {
+    const playerResults: string[] = [playerList[row].name];
+    for (let col = 0; col < numQuestions; col++) {
+      if (playerList[row].questionResponse[col] === undefined) {
+        playerResults.push('0');
+        playerResults.push('0');
+      } else {
+        const questionRanking = playerList.filter(player => player.questionResponse[col] !== undefined);
+        questionRanking.sort((player1, player2) => {
+          return player2.questionResponse[col].points - player1.questionResponse[col].points;
+        });
+        console.log('QUESTION RANKING\n' + questionRanking);
+        const score = playerList[row].questionResponse[col].points;
+        const rank = (questionRanking.findIndex(player => player.playerId === playerList[row].playerId) + 1);
+        playerResults.push(score.toString());
+        playerResults.push(rank.toString());
+      }
+    }
+    results.push(playerResults);
+  }
+
+  results.sort((row1, row2) => (row1[0].localeCompare(row2[0])));
+  results.unshift(header);
+
+  const csvResults = results.map(row => row.join(',')).join('\n');
+
+  fs.writeFileSync(`./session${sessionId}_results.csv`, csvResults);
+
+  // Construct the URL to the file and return it
+  const fileUrl = `${config.url}:${config.port}/session${sessionId}_results.csv`;
+
+  return { url: fileUrl };
 }

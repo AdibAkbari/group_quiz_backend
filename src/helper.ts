@@ -296,6 +296,9 @@ export function questionResult(position: number, session: Session, playerList: P
             numCorrectPlayers++;
           }
         }
+      } else if (!addedPlayers.has(player.name)) {
+        numPlayers++;
+        addedPlayers.add(player.name);
       }
     }
     // pushes to list for each correct answer after adding all correct players to playerCorrect
@@ -306,7 +309,7 @@ export function questionResult(position: number, session: Session, playerList: P
       });
     }
   }
-  const averageAnswerTime = numPlayers === 0 ? 0 : totalAnswerTime / numPlayers;
+  const averageAnswerTime = numPlayers === 0 ? 0 : Math.round(totalAnswerTime / numPlayers);
   const percentCorrect = numPlayers === 0 ? 0 : Math.round((100 * numCorrectPlayers) / numPlayers);
 
   return {

@@ -12,6 +12,10 @@ import {
   playerSubmitAnswerRequest
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
+import fs from 'fs';
+import config from '../config.json';
+
+const SERVER_URL = `${config.url}:${config.port}`;
 
 function sleepSync(ms: number) {
   const startTime = new Date().getTime();
@@ -23,7 +27,6 @@ function sleepSync(ms: number) {
 let token: string;
 let quizId: number;
 let sessionId: number;
-let questionId: number;
 const duration = 2;
 const finishCountdown = 150;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
@@ -32,8 +35,7 @@ beforeEach(() => {
   clearRequest();
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  questionId = createQuizQuestionRequest(quizId, token, 'Question 1', duration, 6, validAnswers).questionId;
-  // createQuizQuestionRequest(quizId, token, 'Question 1', 1, 6, validAnswers);
+  createQuizQuestionRequest(quizId, token, 'Question 1', duration, 6, validAnswers);
   sessionId = startSessionRequest(quizId, token, 1).sessionId;
 });
 
@@ -83,134 +85,97 @@ describe('Error cases', () => {
   });
 });
 
-// describe('Success cases', () => {
-//   test('valid output one player, no answer submitted', () => {
-//     const playerId = playerJoinRequest(sessionId, 'Player').playerId;
-//     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-//     const questionPosition = playerStatusRequest(playerId).atQuestion - 1;
-//     const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition);
-//     const correctAnswerId = questionInfo.answers[0].answerId;
+describe('Success cases', () => {
+  test('valid output one question, no player', () => {
+    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
+    sleepSync(finishCountdown);
+    sleepSync(duration * 1000);
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
 
-//     sleepSync(finishCountdown);
-//     sleepSync(questionInfo.duration * 1000);
-//     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
-//     const playersCorrect: string[] = [];
+    const expected = [
+      ['Player', 'question1score', 'question1rank'],
+    ];
 
-//     const expected = {
-//       usersRankedByScore: [
-//         {
-//           name: 'Player',
-//           score: 0
-//         }
-//       ],
-//       questionResults: [
-//         {
-//           questionId: questionId,
-//           questionCorrectBreakdown: [
-//             {
-//               answerId: correctAnswerId,
-//               playersCorrect: playersCorrect,
-//             }
-//           ],
-//           averageAnswerTime: 0,
-//           percentCorrect: 0
-//         }
-//       ]
-//     };
+    const csvUrl = sessionResultsCSVRequest(quizId, sessionId, token).url;
+    const filePath = getPathFromUrl(csvUrl);
+    const received = readCSVFile(filePath);
 
-//     expect(sessionResultsCSVRequest(quizId, sessionId, token)).toStrictEqual(expected);
-//   });
+    expect(received).toStrictEqual(expected);
+  });
 
-//   test('valid output one player, one correct answer', () => {
-//     const playerId = playerJoinRequest(sessionId, 'Player').playerId;
-//     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-//     const questionPosition = playerStatusRequest(playerId).atQuestion - 1;
-//     const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition);
-//     const correctAnswerId = questionInfo.answers[0].answerId;
+  test('valid output 3 players, two questions', () => {
+    createQuizQuestionRequest(quizId, token, 'Question 2', duration, 6, validAnswers);
+    const session2Id = startSessionRequest(quizId, token, 3).sessionId;
 
-//     sleepSync(finishCountdown);
-//     const answerTime = 1;
-//     sleepSync(answerTime * 1000);
-//     playerSubmitAnswerRequest([correctAnswerId], playerId, questionPosition);
+    const playerId = playerJoinRequest(session2Id, 'Chicken').playerId;
+    const player2Id = playerJoinRequest(session2Id, 'Dog').playerId;
+    playerJoinRequest(session2Id, 'Player');
 
-//     sleepSync(questionInfo.duration * 1000 - answerTime);
+    updateSessionStateRequest(quizId, session2Id, token, 'NEXT_QUESTION');
+    const questionPosition = playerStatusRequest(playerId).atQuestion - 1;
+    const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition);
 
-//     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
+    let correctAnswerId = questionInfo.answers[0].answerId;
+    sleepSync(finishCountdown);
+    const answerTime = 1;
+    sleepSync(answerTime * 1000);
+    playerSubmitAnswerRequest([correctAnswerId], playerId, questionPosition);
+    playerSubmitAnswerRequest([correctAnswerId], player2Id, questionPosition);
 
-//     const expected = {
-//       usersRankedByScore: [
-//         {
-//           name: 'Player',
-//           score: questionInfo.points
-//         }
-//       ],
-//       questionResults: [
-//         {
-//           questionId: questionId,
-//           questionCorrectBreakdown: [
-//             {
-//               answerId: correctAnswerId,
-//               playersCorrect: [
-//                 'Player'
-//               ],
-//             }
-//           ],
-//           averageAnswerTime: answerTime,
-//           percentCorrect: 100
-//         }
-//       ]
-//     };
-//     expect(sessionResultsCSVRequest(quizId, sessionId, token)).toStrictEqual(expected);
-//   });
+    sleepSync(questionInfo.duration * 1000 - answerTime);
 
-//   test('valid output two players', () => {
-//     const playerId = playerJoinRequest(sessionId, 'Player').playerId;
-//     const player2Id = playerJoinRequest(sessionId, 'Player2').playerId;
-//     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-//     const questionPosition = playerStatusRequest(playerId).atQuestion - 1;
-//     const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition);
-//     const correctAnswerId = questionInfo.answers[0].answerId;
-//     const incorrectAnswerId = questionInfo.answers[1].answerId;
+    updateSessionStateRequest(quizId, session2Id, token, 'GO_TO_ANSWER');
+    updateSessionStateRequest(quizId, session2Id, token, 'NEXT_QUESTION');
 
-//     sleepSync(finishCountdown);
-//     // Player answers current question with correct answer immediately
-//     playerSubmitAnswerRequest([correctAnswerId], playerId, questionPosition);
-//     const answerTime = 1;
-//     sleepSync(answerTime * 1000);
-//     // Player2 answer current question with incorrect answer after 1 second
-//     playerSubmitAnswerRequest([incorrectAnswerId], player2Id, questionPosition);
+    const question2Info = playerCurrentQuestionInfoRequest(playerId, questionPosition + 1);
+    correctAnswerId = question2Info.answers[0].answerId;
+    const incorrectAnswerId = question2Info.answers[1].answerId;
 
-//     sleepSync(questionInfo.duration * 1000 - answerTime);
+    sleepSync(finishCountdown);
+    sleepSync(answerTime * 1000);
 
-//     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
+    playerSubmitAnswerRequest([incorrectAnswerId], playerId, questionPosition + 1);
+    playerSubmitAnswerRequest([correctAnswerId], player2Id, questionPosition + 1);
 
-//     const expected = {
-//       usersRankedByScore: [
-//         {
-//           name: 'Player',
-//           score: questionInfo.points
-//         },
-//         {
-//           name: 'Player2',
-//           score: 0
-//         }
-//       ],
-//       questionResults: [
-//         {
-//           questionId: questionId,
-//           questionCorrectBreakdown: [
-//             {
-//               answerId: correctAnswerId,
-//               playersCorrect: [
-//                 'Player'
-//               ],
-//             }
-//           ],
-//           averageAnswerTime: answerTime / 2,
-//           percentCorrect: 50
-//         }
-//       ]
-//     };
-//     expect(sessionResultsCSVRequest(quizId, sessionId, token)).toStrictEqual(expected);
-//   });
-// });
+    sleepSync(questionInfo.duration * 1000 - answerTime);
+    updateSessionStateRequest(quizId, session2Id, token, 'GO_TO_ANSWER');
+
+    updateSessionStateRequest(quizId, session2Id, token, 'GO_TO_FINAL_RESULTS');
+
+    const expected = [
+      ['Player', 'question1score', 'question1rank', 'question2score', 'question2rank'],
+      ['Chicken', '6', '1', '0', '2'],
+      ['Dog', '3', '2', '6', '1'],
+      ['Player', '0', '0', '0', '0']
+    ];
+
+    const csvUrl = sessionResultsCSVRequest(quizId, session2Id, token).url;
+    const filePath = getPathFromUrl(csvUrl);
+    const received = readCSVFile(filePath);
+
+    expect(received).toStrictEqual(expected);
+  });
+});
+
+function getPathFromUrl(inputString: string): string {
+  if (inputString.startsWith(SERVER_URL)) {
+    return './' + inputString.slice(SERVER_URL.length);
+  }
+  return inputString;
+}
+
+// Function to read the CSV file and return the data as an array of objects
+function readCSVFile(filePath: string): string[][] {
+  const csvData: string = fs.readFileSync(filePath, 'utf-8');
+  const rows: string[] = csvData.split('\n');
+
+  const header: string[] = rows[0].split(',');
+  const csvRows: string[][] = [header];
+
+  for (let i = 1; i < rows.length; i++) {
+    const values: string[] = rows[i].split(',');
+    csvRows.push(values);
+  }
+
+  return csvRows;
+}

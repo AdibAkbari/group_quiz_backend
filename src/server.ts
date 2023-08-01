@@ -44,7 +44,8 @@ import {
   startSession,
   sessionStatus,
   sessionResults,
-  updateSessionState
+  updateSessionState,
+  sessionResultsCSV
 } from './session';
 import { clear } from './other';
 
@@ -618,6 +619,15 @@ app.get('/v1/admin/quiz/:quizid/session/:sessionid/results', (req: Request, res:
   const sessionId = parseInt(req.params.sessionid);
   const token = req.headers.token as string;
   const response = sessionResults(quizId, sessionId, token);
+  res.json(response);
+});
+
+// sessionResultsCSV //
+app.get('/v1/admin/quiz/:quizid/session/:sessionid/results/csv', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const sessionId = parseInt(req.params.sessionid);
+  const token = req.headers.token as string;
+  const response = sessionResultsCSV(quizId, sessionId, token);
   res.json(response);
 });
 
