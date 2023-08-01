@@ -4,7 +4,7 @@ import { Session, SessionStatus, SessionResults, Timers, Data } from './interfac
 import HTTPError from 'http-errors';
 
 const COUNTDOWN = 150;
-let timers:Timers[] = [];
+const timers:Timers[] = [];
 
 export function startSession(quizId: number, token: string, autoStartNum: number): { sessionId: number} {
   if (!isValidTokenStructure(token)) {
@@ -80,16 +80,16 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
 
     session.sessionState = 'QUESTION_COUNTDOWN';
     session.atQuestion++;
-    
+
     const timer = timers.find(id => id.sessionId === sessionId);
     const timerId = setTimeout(questionOpen, COUNTDOWN, sessionId);
-    if(timer !== undefined) {
-      timer.timer = timerId; 
+    if (timer !== undefined) {
+      timer.timer = timerId;
     } else {
       timers.push({
         sessionId: sessionId,
         timer: timerId
-      })
+      });
     }
   }
 
@@ -140,8 +140,8 @@ function questionOpen(sessionId: number) {
   const duration = session.metadata.questions[session.atQuestion - 1].duration;
 
   const timerId = setTimeout(questionClose, duration * 1000, sessionId);
-  let timer = timers.find(id => id.sessionId === sessionId);
-  timer.timer = timerId; 
+  const timer = timers.find(id => id.sessionId === sessionId);
+  timer.timer = timerId;
   setData(data);
 }
 
@@ -207,9 +207,9 @@ function arraysContainSameElements(arr1: number[], arr2: number[]): boolean {
 }
 
 export function clearTimers() {
-    for (const timer of timers) {
-      clearTimeout(timer.timer);
-    }
+  for (const timer of timers) {
+    clearTimeout(timer.timer);
+  }
 }
 
 export function sessionStatus(token: string, quizId: number, sessionId: number): SessionStatus {
@@ -230,15 +230,12 @@ export function sessionStatus(token: string, quizId: number, sessionId: number):
   const session = data.sessions.find(id => id.sessionId === sessionId);
 
   const playerNames = session.players.sort();
-  const metaData = session.metadata;
-  delete metaData.creator;
-  delete metaData.questionCount;
 
   return {
     state: session.sessionState,
     atQuestion: session.atQuestion,
     players: playerNames,
-    metadata: metaData,
+    metadata: session.metadata,
   };
 }
 

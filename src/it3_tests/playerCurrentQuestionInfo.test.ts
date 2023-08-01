@@ -16,7 +16,6 @@ let quizId: number;
 let sessionId: number;
 let playerId: number;
 let questionOneId: number;
-let questionTwoId: number;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
 const FIRST_POS = 0;
 const SECOND_POS = 1;
@@ -35,7 +34,7 @@ beforeEach(() => {
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
   questionOneId = createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers).questionId;
-  questionTwoId = createQuizQuestionRequest(quizId, token, 'Question 2', 5, 6, validAnswers).questionId;
+  createQuizQuestionRequest(quizId, token, 'Question 2', 5, 6, validAnswers);
   sessionId = startSessionRequest(quizId, token, 3).sessionId;
   playerId = playerJoinRequest(sessionId, 'Joe').playerId;
 });
@@ -53,7 +52,6 @@ describe('Error cases', () => {
     expect(() => playerCurrentQuestionInfoRequest(playerId, THIRD_POS)).toThrow(HTTPError[400]);
   });
 
-  
   test('Question position too low', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);

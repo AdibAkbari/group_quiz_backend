@@ -107,10 +107,10 @@ export function isValidQuestionPosition(playerId: number, questionPosition: numb
   const player = data.players.find(id => id.playerId === playerId);
   const session = data.sessions.find(id => id.sessionId === player.sessionId);
 
-  if(questionPosition > session.metadata.numQuestions) {
+  if (questionPosition > session.metadata.numQuestions) {
     return false;
   }
-  if(questionPosition < 0) {
+  if (questionPosition < 0) {
     return false;
   }
   if (questionPosition !== session.atQuestion - 1) {
@@ -245,9 +245,8 @@ export function isValidPlayerId(playerId: number): boolean {
    */
 export function isEndState(quizId: number): boolean {
   const data: Data = getData();
-  const quiz = data.quizzes.find(id => id.quizId === quizId);
   const session = data.sessions.find(session => session.metadata.quizId === quizId);
-  
+
   if (session === undefined) {
     return true;
   }

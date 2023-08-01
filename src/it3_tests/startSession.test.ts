@@ -112,7 +112,9 @@ describe('successful cases', () => {
             ]
           }
         ],
+        creator: 1,
         duration: 5,
+        questionCount: 1,
       }
     });
   });
@@ -143,7 +145,9 @@ describe('successful cases', () => {
             ]
           }
         ],
+        creator: 1,
         duration: 5,
+        questionCount: 1,
       }
     });
   });
