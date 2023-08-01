@@ -4,22 +4,22 @@ import {
   authRegisterRequest,
   quizCreateRequest,
   createQuizQuestionRequest,
-  // updateQuizQuestionRequest
+  updateQuizQuestionRequest,
+  sessionStatusRequest
 } from './it3_testRoutes';
 import { } from '../interfaces';
 import HTTPError from 'http-errors';
 
 let token: string;
 let quizId: number;
-// let questionId: number;
+let questionId: number;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
 
 beforeEach(() => {
   clearRequest();
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  // questionId = createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers).questionId;
-  createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers);
+  questionId = createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers).questionId;
 });
 
 describe('invalid token', () => {
@@ -87,68 +87,64 @@ describe('successful cases', () => {
     expect(startSessionRequest(quizId, token, 3)).toStrictEqual({ sessionId: expect.any(Number) });
   });
 
-  // test('successful creation', () => {
-  //     const sessionId = startSessionRequest(quizId, token, 3).sessionId;
-  //     expect(getSessionStatus(quizId, sessionId, token)).toStrictEqual({
-  //         state: "LOBBY",
-  //         atQuestion: 0,
-  //         players: [],
-  //         metadata: {
-  //             quizId: quizId,
-  //             name: 'quiz1',
-  //             timeCreated: expect.any(Number),
-  //             timeLastEdited: expect.any(Number),
-  //             description: '',
-  //             numQuestions: 1,
-  //             questions: [
-  //                 {
-  //                     questionId: questionId,
-  //                     question: 'Question 1',
-  //                     duration: 5,
-  //                     thumbnailUrl: '',
-  //                     points: 6,
-  //                     answers: [
-  //                         { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true},
-  //                         { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false}
-  //                     ]
-  //                 }
-  //             ],
-  //             duration: 5,
-  //             thumbnailUrl: ''
-  //         }
-  //     })
-  // });
+  test('successful creation', () => {
+    const sessionId = startSessionRequest(quizId, token, 3).sessionId;
+    expect(sessionStatusRequest(token, quizId, sessionId)).toStrictEqual({
+      state: 'LOBBY',
+      atQuestion: 0,
+      players: [],
+      metadata: {
+        quizId: quizId,
+        name: 'quiz1',
+        timeCreated: expect.any(Number),
+        timeLastEdited: expect.any(Number),
+        description: '',
+        numQuestions: 1,
+        questions: [
+          {
+            questionId: questionId,
+            question: 'Question 1',
+            duration: 5,
+            points: 6,
+            answers: [
+              { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true },
+              { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false }
+            ]
+          }
+        ],
+        duration: 5,
+      }
+    });
+  });
 
-  // test('makes a copy of quiz on session start', () => {
-  //     const sessionId = startSessionRequest(quizId, token, 3).sessionId;
-  //     updateQuizQuestionRequest(quizId, questionId, token, 'Updated question', 10, 9, validAnswers)
-  //     expect(getSessionStatus(quizId, sessionId, token)).toStrictEqual({
-  //         state: "LOBBY",
-  //         atQuestion: 0,
-  //         players: [],
-  //         metadata: {
-  //             quizId: quizId,
-  //             name: 'quiz1',
-  //             timeCreated: expect.any(Number),
-  //             timeLastEdited: expect.any(Number),
-  //             description: '',
-  //             numQuestions: 1,
-  //             questions: [
-  //                 {
-  //                     questionId: questionId,
-  //                     question: 'Question 1',
-  //                     duration: 5,
-  //                     thumbnailUrl: '',
-  //                     points: 6,
-  //                     answers: [
-  //                         { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true},
-  //                         { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false}
-  //                     ]
-  //                 }
-  //             ],
-  //             duration: 5,
-  //             thumbnailUrl: ''
-  //         }
-  //     })
-  // })
+  test('makes a copy of quiz on session start', () => {
+    const sessionId = startSessionRequest(quizId, token, 3).sessionId;
+    updateQuizQuestionRequest(quizId, questionId, token, 'Updated question', 10, 9, validAnswers);
+    expect(sessionStatusRequest(token, quizId, sessionId)).toStrictEqual({
+      state: 'LOBBY',
+      atQuestion: 0,
+      players: [],
+      metadata: {
+        quizId: quizId,
+        name: 'quiz1',
+        timeCreated: expect.any(Number),
+        timeLastEdited: expect.any(Number),
+        description: '',
+        numQuestions: 1,
+        questions: [
+          {
+            questionId: questionId,
+            question: 'Question 1',
+            duration: 5,
+            points: 6,
+            answers: [
+              { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true },
+              { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false }
+            ]
+          }
+        ],
+        duration: 5,
+      }
+    });
+  });
 });

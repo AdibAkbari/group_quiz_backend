@@ -1,5 +1,6 @@
 import { getData, setData } from './dataStore';
 import { Data } from './interfaces';
+import { clearTimers } from './session';
 
 /**
  * Reset the state of the application back to the start.
@@ -20,6 +21,8 @@ export function clear (): Record<string, never> {
     players: [],
     playerIdCount: 0,
   };
+
+  clearTimers();
 
   setData(data);
 
