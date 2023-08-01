@@ -5,7 +5,7 @@ import HTTPError from 'http-errors';
 
 /**
  * Allow player to join a session
- * 
+ *
  * @param {number} sessionId
  * @param {string} playerName
  * @returns {playerId: number}
@@ -49,7 +49,7 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
 
 /**
  * Allow player to join a session
- * 
+ *
  * @param {number} playerId
  * @returns {PlayerStatus}
  */

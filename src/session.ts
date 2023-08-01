@@ -5,7 +5,7 @@ import HTTPError from 'http-errors';
 
 /**
  *This copies the quiz, so that any edits whilst a session is running does not affect active session
- * 
+ *
  * @param {number} quizId
  * @param {string} token
  * @param {number} autoStartNum
@@ -52,7 +52,7 @@ export function startSession(quizId: number, token: string, autoStartNum: number
 
 /**
  * Update the state of a particular session by sending an action command
- * 
+ *
  * @param {number} quizId
  * @param {string} token
  * @param {number} sessionId
