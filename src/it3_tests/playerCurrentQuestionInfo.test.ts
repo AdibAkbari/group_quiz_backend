@@ -74,23 +74,23 @@ describe('Success cases', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);
     expect(playerCurrentQuestionInfoRequest(playerId, FIRST_POS)).toStrictEqual({
-        questionId: questionOneId,
-        question: 'Question 1',
-        duration: 5,
-        // thumbnailUrl: 'http://google.com/some/image/path.jpg',
-        points: 6,
-        answers: [
-          {
-            answerId: expect.any(Number),
-            answer: 'answer1',
-            colour: expect.any(String),
-          },
-          {
-            answerId: expect.any(Number),
-            answer: 'answer2',
-            colour: expect.any(String),
-          }
-        ],
+      questionId: questionOneId,
+      question: 'Question 1',
+      duration: 5,
+      // thumbnailUrl: 'http://google.com/some/image/path.jpg',
+      points: 6,
+      answers: [
+        {
+          answerId: expect.any(Number),
+          answer: 'answer1',
+          colour: expect.any(String),
+        },
+        {
+          answerId: expect.any(Number),
+          answer: 'answer2',
+          colour: expect.any(String),
+        }
+      ],
     });
   });
 });

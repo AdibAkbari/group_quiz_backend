@@ -91,6 +91,7 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
         timer: timerId
       });
     }
+    setData(data);
   }
 
   // action: go_to_answer
@@ -103,6 +104,7 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
       clearTimeout(timer.timer);
     }
     session.sessionState = 'ANSWER_SHOW';
+    setData(data);
     calculateQuestionPoints(sessionId);
   }
 
@@ -112,6 +114,8 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
       throw HTTPError(400, 'Action enum cannot be applied in current state');
     }
     session.sessionState = 'FINAL_RESULTS';
+    setData(data);
+    calculateQuestionPoints(sessionId);
   }
 
   // action: end
@@ -124,9 +128,8 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
       clearTimeout(timer.timer);
     }
     session.sessionState = 'END';
+    setData(data);
   }
-
-  setData(data);
 
   return {};
 }
@@ -161,14 +164,17 @@ function calculateQuestionPoints(sessionId: number) {
 
   const sessionPlayers = data.players.filter(session => session.sessionId === sessionId);
 
-  for (const player in sessionPlayers) {
-    const currentAnswer = sessionPlayers[player].questionResponse.find(id => id.questionId === questionId);
-    if (currentAnswer.playerAnswers !== correctAnswers.map(answer => answer.answerId)) {
-      sessionPlayers.splice(parseInt(player), 1);
+  const filteredPlayers = [];
+  for (const player of sessionPlayers) {
+    const currentAnswer = player.questionResponse.find(id => id.questionId === questionId);
+    if (currentAnswer && currentAnswer.playerAnswers.length > 0) {
+      if (arraysContainSameElements(currentAnswer.playerAnswers, correctAnswers.map(answer => answer.answerId))) {
+        filteredPlayers.push(player);
+      }
     }
   }
 
-  sessionPlayers.sort(function(a, b) {
+  filteredPlayers.sort(function(a, b) {
     const timeA = a.questionResponse.find(id => id.questionId === questionId).answerTime;
     const timeB = b.questionResponse.find(id => id.questionId === questionId).answerTime;
     if (timeA < timeB) {
@@ -179,7 +185,7 @@ function calculateQuestionPoints(sessionId: number) {
 
   const points = question.points;
   let counter = 1;
-  for (const player of sessionPlayers) {
+  for (const player of filteredPlayers) {
     const playerInfo = data.players.find(id => id.playerId === player.playerId);
     const point = points * 1 / counter;
     playerInfo.score += point;
@@ -187,6 +193,20 @@ function calculateQuestionPoints(sessionId: number) {
     counter++;
   }
   setData(data);
+}
+
+function arraysContainSameElements(arr1: number[], arr2: number[]): boolean {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+
+  const set1 = new Set(arr1);
+  const set2 = new Set(arr2);
+
+  return (
+    arr1.every(element => set2.has(element)) &&
+    arr2.every(element => set1.has(element))
+  );
 }
 
 export function clearTimers() {

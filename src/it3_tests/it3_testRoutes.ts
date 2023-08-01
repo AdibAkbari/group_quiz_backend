@@ -537,7 +537,6 @@ export function playerSubmitAnswerRequest(answerIds: number[], playerId: number,
   return requestHelper('PUT', `/v1/player/${playerId}/question/${questionposition}/answer`, { answerIds });
 }
 
-
 export function playerResultsRequest(playerId: number) {
   return requestHelper('GET', `/v1/player/${playerId}/results`, { }, { });
 }

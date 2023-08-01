@@ -74,7 +74,7 @@ export function playerCurrentQuestionInfo(playerId: number, questionPosition: nu
 
   const currentQuestion = session.metadata.questions[questionPosition];
   for (const answer of currentQuestion.answers) {
-    delete answer.correct
+    delete answer.correct;
   }
 
   return {
@@ -128,7 +128,6 @@ export function playerQuestionResults(playerId: number, questionPosition: number
   return questionResult(questionPosition, session, playerList);
 }
 
-
 export function playerSubmitAnswer(answerIds: number[], playerId: number, questionPosition: number): Record<string, never> {
   if (!isValidPlayerId(playerId)) {
     throw HTTPError(400, 'Invalid: PlayerId');
@@ -168,7 +167,7 @@ export function playerSubmitAnswer(answerIds: number[], playerId: number, questi
   }
 
   const timeNow: number = Math.floor(Date.now() / 1000);
-  const answerTime: number = session.timer - timeNow;
+  const answerTime: number = timeNow - session.currentQuestionStartTime;
 
   const response: QuestionResponse = {
     questionId: currentQuestion.questionId,
