@@ -35,6 +35,10 @@ describe('Error cases', () => {
   test('message body too short', () => {
     expect(() => playerSendChatRequest(playerId, '')).toThrow(HTTPError[400]);
   });
+
+  test('message body too long', () => {
+    expect(() => playerSendChatRequest(playerId, 'a'.repeat(101))).toThrow(HTTPError[400]);
+  });
 });
 
 describe('Success Cases', () => {
