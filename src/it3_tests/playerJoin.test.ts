@@ -33,6 +33,11 @@ describe('Error cases', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     expect(() => playerJoinRequest(sessionId, 'Player One')).toThrow(HTTPError[400]);
   });
+
+  test('Invalid sessionId', () => {
+    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
+    expect(() => playerJoinRequest(sessionId + 1, 'Player One')).toThrow(HTTPError[400]);
+  });
 });
 
 describe('Success cases', () => {

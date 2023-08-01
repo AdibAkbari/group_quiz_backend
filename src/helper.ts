@@ -194,11 +194,32 @@ export function isValidEmail (userEmail: string): boolean {
   return false;
 }
 
+/**
+ * Helper function to give error based on if it is a v1 or v2 route
+ *
+ * @param {} - no params
+ * @returns {string} - playerName
+ */
 export function giveError(isv2: boolean, errorMessage: string, statusCode: number) {
   if (isv2) {
     throw HTTPError(statusCode, errorMessage);
   }
   return { error: errorMessage };
+}
+
+/**
+ * Helper function to generate a random string 
+ *
+ * @param {} - no params
+ * @returns {string} - playerName
+ */
+export function randomString(string: string) {
+  const array = string.split('');
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array.join('');
 }
 
 /**
@@ -210,15 +231,6 @@ export function giveError(isv2: boolean, errorMessage: string, statusCode: numbe
 export function generateName() {
   const letters = 'abcdefghijklmnopqrstuvwxyz';
   const numbers = '0123456789';
-
-  function randomString(str: string) {
-    const array = str.split('');
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array.join('');
-  }
 
   const nameChar = randomString(letters).slice(0, 5);
   const nameNum = randomString(numbers).slice(0, 3);
@@ -252,7 +264,6 @@ export function isValidPlayerId(playerId: number): boolean {
    */
 export function isEndState(quizId: number): boolean {
   const data: Data = getData();
-  const quiz = data.quizzes.find(id => id.quizId === quizId);
   const session = data.sessions.find(session => session.metadata.quizId === quizId);
 
   if (session === undefined) {

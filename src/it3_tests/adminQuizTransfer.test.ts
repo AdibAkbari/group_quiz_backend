@@ -106,6 +106,13 @@ describe('Successful quiz transfer', () => {
     expect(quizTransferRequest(user.token, quiz.quizId, 'email2@gmail.com')).toStrictEqual({});
   });
 
+  test('Quiz IS in END state', () => {
+    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 6, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]);
+    const sessionId = startSessionRequest(quiz.quizId, user.token, 3).sessionId;
+    updateSessionStateRequest(quiz.quizId, sessionId, user.token, 'END');
+    expect(quizTransferRequest(user.token, quiz.quizId, 'email2@gmail.com')).toStrictEqual({});
+  });
+
   test('Successful transfer quiz integrated test', () => {
     expect(quizTransferRequest(user.token, quiz.quizId, 'email2@gmail.com')).toStrictEqual({});
 

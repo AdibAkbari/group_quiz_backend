@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
 import { generateName, isValidPlayerId, isValidQuestionPosition } from './helper';
-import { Players, PlayerStatus, QuestionResponse, QuestionInfo, AnswerInfo } from './interfaces';
+import { Players, PlayerStatus, QuestionResponse, QuestionInfo } from './interfaces';
 import HTTPError from 'http-errors';
 
 /**
@@ -13,7 +13,7 @@ import HTTPError from 'http-errors';
 export function playerJoin(sessionId: number, playerName: string): { playerId: number } {
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
-  if (session === undefined) {
+  if (data.sessions.find(id => id.sessionId === sessionId) === undefined) {
     throw HTTPError(400, 'Invalid: Session Id');
   }
 
