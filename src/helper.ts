@@ -90,6 +90,13 @@ export function isValidQuestionId(quizId: number, questionId: number): boolean {
   return true;
 }
 
+/**
+ * Helper function to determine if session Id is a valid session
+ *
+ * @param {number} quizId
+ * @param {number} sessionId
+ * @returns {boolean} - returns true if sessionId is a valid session within this quiz, false otherwise
+ */
 export function isValidSessionId(sessionId: number, quizId: number): boolean {
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);

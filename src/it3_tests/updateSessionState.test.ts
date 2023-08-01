@@ -25,7 +25,6 @@ function sleepSync(ms: number) {
   }
 }
 
-
 beforeEach(() => {
   clearRequest();
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
@@ -33,8 +32,6 @@ beforeEach(() => {
   createQuizQuestionRequest(quizId, token, 'Question 1', questionDuration, 6, validAnswers);
   sessionId = startSessionRequest(quizId, token, 3).sessionId;
 });
-
-
 
 describe('invalid token', () => {
   test.each([
@@ -84,23 +81,19 @@ describe('invalid input', () => {
 });
 
 describe('action enum cannot be applied in current state', () => {
-
-
-  
   test('invalid action in lobby state', () => {
     expect(() => updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER')).toThrow(HTTPError[400]);
     expect(() => updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS')).toThrow(HTTPError[400]);
   });
 
-
   test.each([
-    {action: "NEXT_QUESTION"},
-    {action: "GO_TO_ANSWER"},
-    {action: "GO_TO_FINAL_RESULTS"},
-  ])('invalid action in question_countdown state', ({action}) => {
+    { action: 'NEXT_QUESTION' },
+    { action: 'GO_TO_ANSWER' },
+    { action: 'GO_TO_FINAL_RESULTS' },
+  ])('invalid action in question_countdown state', ({ action }) => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     expect(() => updateSessionStateRequest(quizId, sessionId, token, action)).toThrow(HTTPError[400]);
-  })
+  });
 
   test('invalid action in question_open', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
@@ -110,7 +103,7 @@ describe('action enum cannot be applied in current state', () => {
   });
   test('invalid action in answer_show', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    
+
     sleepSync(finishCountdown);
     expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('QUESTION_OPEN');
 
@@ -147,7 +140,6 @@ describe('action enum cannot be applied in current state', () => {
 });
 
 describe('valid input sequences', () => {
-
   test('each state during a game with one question', () => {
     expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('LOBBY');
 
@@ -217,8 +209,6 @@ describe('valid input sequences', () => {
 });
 
 describe('end action from each state', () => {
-
-  
   test('lobby', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'END');
     expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('END');

@@ -509,7 +509,6 @@ export function startSessionRequest(quizId: number, token: string, autoStartNum:
 }
 
 export function updateSessionStateRequest(quizId: number, sessionId: number, token: string, action: string) {
- 
   return requestHelper('PUT', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
 }
 

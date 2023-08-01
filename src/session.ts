@@ -4,8 +4,16 @@ import { Session, SessionStatus, Timers } from './interfaces';
 import HTTPError from 'http-errors';
 
 const COUNTDOWN = 150;
-let timers:Timers[] = [];
+const timers:Timers[] = [];
 
+/**
+ *This copies the quiz, so that any edits whilst a session is running does not affect active session
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {number} autoStartNum
+ * @returns {sessionId: number}
+ */
 export function startSession(quizId: number, token: string, autoStartNum: number): { sessionId: number} {
   if (!isValidTokenStructure(token)) {
     throw HTTPError(401, 'Token is not a valid structure');
@@ -80,16 +88,16 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
 
     session.sessionState = 'QUESTION_COUNTDOWN';
     session.atQuestion++;
-    
+
     const timer = timers.find(id => id.sessionId === sessionId);
     const timerId = setTimeout(questionOpen, COUNTDOWN, sessionId);
-    if(timer !== undefined) {
-      timer.timer = timerId; 
+    if (timer !== undefined) {
+      timer.timer = timerId;
     } else {
       timers.push({
         sessionId: sessionId,
         timer: timerId
-      })
+      });
     }
   }
 
@@ -139,8 +147,8 @@ function questionOpen(sessionId: number) {
   const duration = session.metadata.questions[session.atQuestion - 1].duration;
 
   const timerId = setTimeout(questionClose, duration * 1000, sessionId);
-  let timer = timers.find(id => id.sessionId === sessionId);
-  timer.timer = timerId; 
+  const timer = timers.find(id => id.sessionId === sessionId);
+  timer.timer = timerId;
   setData(data);
 }
 
@@ -157,7 +165,7 @@ function calculateQuestionPoints(sessionId: number) {
 
   const question = session.metadata.questions[session.atQuestion - 1];
   const questionId = question.questionId;
-  let correctAnswers = question.answers.filter(answer => (answer.correct === true));
+  const correctAnswers = question.answers.filter(answer => (answer.correct === true));
 
   const sessionPlayers = data.players.filter(session => session.sessionId === sessionId);
 
@@ -190,11 +198,19 @@ function calculateQuestionPoints(sessionId: number) {
 }
 
 export function clearTimers() {
-    for (const timer of timers) {
-      clearTimeout(timer.timer);
-    }
+  for (const timer of timers) {
+    clearTimeout(timer.timer);
+  }
 }
 
+/**
+ * Update the state of a particular session by sending an action command
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {number} sessionId
+ * @returns {SessionStatus}
+ */
 export function sessionStatus(token: string, quizId: number, sessionId: number): SessionStatus {
   if (!isValidTokenStructure(token)) {
     throw HTTPError(401, 'Token is not a valid structure');
