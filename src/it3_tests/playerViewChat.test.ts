@@ -17,6 +17,7 @@ let quizId: number;
 let sessionId: number;
 let player;
 let playerId: number;
+let playerName: number;
 // let questionId: number;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
 
