@@ -47,6 +47,7 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
 export function playerSendChat (playerId: number, message: string): Record<string, never> {
   const data = getData;
 
+  console.log(data);
   if (data.players.find(id => id.playerId === playerId) === undefined) {
     throw HTTPError(400, 'player does not exist');
   }
