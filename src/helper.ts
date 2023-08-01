@@ -3,7 +3,6 @@ import { Data, Quizzes } from './interfaces';
 import HTTPError from 'http-errors';
 import request from 'sync-request';
 import fs from 'fs';
-var XMLHttpRequest = require('xhr2');
 
 // HELPER FUNCTIONS
 /**
@@ -179,6 +178,9 @@ export function getImg(imgUrl: string) {
     'GET',
     imgUrl,
   );
+  if (res.statusCode !== 200) {
+    throw HTTPError(400, 'imgUrl does not return a valid file');
+  }
   const body = res.getBody();
   const timeNow: number = Math.floor((new Date()).getTime() / 1000);
   const thumbnail: string = (Math.floor(Math.random() * timeNow)).toString();
@@ -193,28 +195,4 @@ export function getImg(imgUrl: string) {
   fs.writeFileSync(`./static/${thumbnail}.${fileType}`, body, { flag: 'w' });
   return `./static/${thumbnail}.${fileType}`;
 }
-
-// export function urlExists(url, callback) {
-//   fetch(url, { method: 'head' })
-//   .then(function(status) {
-//     callback(status.ok)
-//   });
-// }
-
-// export function urlExists(url)
-// {
-//     var http = new XMLHttpRequest();
-//     http.open('HEAD', url, false);
-//     http.send();
-//     return http.status!=404;
-// }
-
-// export async function urlExists(url) {
-//   try {
-//     const response = await fetch(url);
-//     return response.status === 404;
-//   } catch (error) {
-//     return false; // An error occurred, so we can't determine if it's a 404 or not
-//   }
-// }
 

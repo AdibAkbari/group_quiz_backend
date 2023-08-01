@@ -15,8 +15,6 @@ import {
   urlExists,
 } from './helper';
 import HTTPError from 'http-errors';
-import isUrl from 'is-url'
-const isImageURL = require('image-url-validator').default;
 
 /**
    * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -861,36 +859,9 @@ export function updateQuizThumbnail(quizId: number, token: string, imgUrl: strin
     throw HTTPError(400, 'Invalid QuizId');
   }
 
-  // let isValid = false;
-  // (async () => {
-  //   isValid = await isURLValid(imgUrl); // true (if the URL exists and returns a successful response)
-  // })();
-  // if (isValid === false) {
-  //   throw HTTPError(400, 'imgUrl does not return a valid file')
-  // }
-  // if (!(await isURLValid(imgUrl))) {
-  //   throw HTTPError(400, 'imgUrl does not return a valid file');
-  // }
-  
-
-  // (async () => {
-  //   const isValid = await urlExists(imgUrl);
-  //   if (!isValid) {
-  //     throw HTTPError(400, 'imgUrl does not return a valid file');
-  //   }
-  // })
-  // if (!urlExists(imgUrl)) {
-  //   throw HTTPError(400, 'imgUrl does not return a valid file');
-  // }
-  
   if (imgUrl.match(/\.(jpeg|jpg|png)$/) === null) {
     throw HTTPError(400, 'imgUrl must be a jpg or png image')
   }
-
-  // let isValid = 0;
-  // isImageURL(imgUrl).then(is_image => {
-  //   isValid = 1;
-  // });
 
   const newUrl = getImg(imgUrl);
 
