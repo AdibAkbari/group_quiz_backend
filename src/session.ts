@@ -4,10 +4,10 @@ import { Session } from './interfaces';
 import HTTPError from 'http-errors';
 
 /**
- * 
- * @param {number} quizId 
- * @param {string} token 
- * @param {number} autoStartNum 
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {number} autoStartNum
  * @returns {sessionId: number}
  */
 export function startSession(quizId: number, token: string, autoStartNum: number): { sessionId: number} {
