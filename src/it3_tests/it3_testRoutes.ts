@@ -508,6 +508,10 @@ export function startSessionRequest(quizId: number, token: string, autoStartNum:
   return requestHelper('POST', `/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
 }
 
+export function updateSessionStateRequest(quizId: number, sessionId: number, token: string, action: string) {
+  return requestHelper('PUT', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
+}
+
 export function sessionStatusRequest(token: string, quizId: number, sessionId: number) {
   return requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
 }
@@ -524,4 +528,12 @@ export function playerSendChatRequest(playerId: number, message: string) {
 export function playerStatusRequest(playerId: number) {
   return requestHelper('GET', `/v1/player/${playerId}`, {});
 
+}
+
+export function playerCurrentQuestionInfoRequest(playerId: number, questionPosition: number) {
+  return requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}`, {});
+}
+
+export function playerSubmitAnswerRequest(answerIds: number[], playerId: number, questionposition: number) {
+  return requestHelper('PUT', `/v1/player/${playerId}/question/${questionposition}/answer`, { answerIds });
 }

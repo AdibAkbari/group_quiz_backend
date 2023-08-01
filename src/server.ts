@@ -32,11 +32,17 @@ import {
   updateQuizQuestion,
   moveQuizQuestion
 } from './quiz';
-import { playerJoin, playerSendChat, playerStatus } from './player';
-import { clear } from './other';
+import {
+  playerJoin,
+  playerStatus,
+  playerSubmitAnswer,
+  playerCurrentQuestionInfo,
+  playerSendChat,
+} from './player';
 import {
   startSession,
   sessionStatus,
+  updateSessionState
 } from './session';
 
 // Set up web app
@@ -593,6 +599,15 @@ app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) =
   res.json(response);
 });
 
+// updateSessionState //
+app.put('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const sessionId = parseInt(req.params.sessionid);
+  const token = req.headers.token as string;
+  const response = updateSessionState(quizId, sessionId, token, req.body.action);
+  res.json(response);
+});
+
 // sessionStatus //
 app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
@@ -614,6 +629,23 @@ app.post('/v1/player/join', (req: Request, res: Response) => {
 app.get('/v1/player/:playerid', (req: Request, res: Response) => {
   const playerid = parseInt(req.params.playerid);
   const response = playerStatus(playerid);
+  res.json(response);
+});
+
+// playerCurrentQuestionInfo //
+app.get('/v1/player/:playerid/question/:questionposition', (req: Request, res: Response) => {
+  const playerid = parseInt(req.params.playerid);
+  const questionposition = parseInt(req.params.questionposition);
+  const response = playerCurrentQuestionInfo(playerid, questionposition);
+  res.json(response);
+});
+
+// playerSubmitAnswer //
+app.put('/v1/player/:playerid/question/:questionposition/answer', (req: Request, res: Response) => {
+  const answerIds = req.body.answerIds;
+  const playerid = parseInt(req.params.playerid);
+  const questionposition = parseInt(req.params.questionposition);
+  const response = playerSubmitAnswer(answerIds, playerid, questionposition);
   res.json(response);
 });
 

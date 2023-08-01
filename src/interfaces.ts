@@ -101,14 +101,14 @@ export interface Session {
   currentQuestionStartTime?: number;
   players: string[];
   metadata: Quizzes;
-  timer?: ReturnType<typeof setTimeout>,
+  timer?: ReturnType<typeof setTimeout>;
   messages: Message[];
 }
 
 export interface SessionStatus {
-  state: number,
-  atQuestion: string,
-  players: Players[];
+  state: string,
+  atQuestion: number,
+  players: string[];
   metadata: QuizInfo;
 }
 
@@ -151,4 +151,24 @@ export interface QuizList {
 export interface Answers {
   answer: string,
   correct: boolean
+}
+
+export interface Timers {
+  sessionId: number,
+  timer: ReturnType<typeof setTimeout>
+}
+
+
+export interface AnswerInfo {
+  answerId: number;
+  answer: string;
+  colour: string;
+}
+
+export interface QuestionInfo {
+  questionId: number;
+  question: string;
+  duration: number;
+  points: number;
+  answers: AnswerInfo[];
 }
