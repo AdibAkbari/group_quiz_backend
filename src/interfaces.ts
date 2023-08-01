@@ -79,6 +79,13 @@ interface Players {
   score: number
 }
 
+interface Message {
+  messageBody: string;
+  playerId: number;
+  playerName: string;
+  timeSent: number;
+}
+
 export interface Session {
   sessionId: number,
   sessionState: string;
@@ -88,7 +95,8 @@ export interface Session {
   players: Players[];
   playerIdCount: number;
   metadata: Quizzes;
-  timer?: ReturnType<typeof setTimeout>
+  timer?: ReturnType<typeof setTimeout>,
+  messages: Message[];
 }
 
 export interface Data {

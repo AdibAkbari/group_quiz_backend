@@ -34,3 +34,11 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
 
   return { playerId: playerId };
 }
+
+/**
+ * Send a chat message
+ *
+ * @param {number} playerId
+ * @param {string} message
+ * @returns {} empty object
+ */
