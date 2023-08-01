@@ -208,7 +208,7 @@ export function giveError(isv2: boolean, errorMessage: string, statusCode: numbe
 }
 
 /**
- * Helper function to generate a random string 
+ * Helper function to generate a random string
  *
  * @param {} - no params
  * @returns {string} - playerName

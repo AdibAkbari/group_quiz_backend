@@ -112,7 +112,7 @@ describe('Success cases', () => {
     answerId2 = playerCurrentQuestionInfoRequest(playerId, SECOND_POS).answers[0].answerId;
     answerId3 = playerCurrentQuestionInfoRequest(playerId, SECOND_POS).answers[1].answerId;
 
-    playerSubmitAnswerRequest([answerId2], playerId, SECOND_POS)
+    playerSubmitAnswerRequest([answerId2], playerId, SECOND_POS);
     expect(playerSubmitAnswerRequest([answerId2, answerId3], playerId, SECOND_POS)).toStrictEqual({});
   });
 });
