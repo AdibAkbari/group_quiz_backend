@@ -67,7 +67,6 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
 
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
-  console.log(session.sessionState);
 
   // action: next_question
   if (action === 'NEXT_QUESTION') {
@@ -111,8 +110,10 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
     if (session.sessionState !== 'QUESTION_CLOSE' && session.sessionState !== 'ANSWER_SHOW') {
       throw HTTPError(400, 'Action enum cannot be applied in current state');
     }
+    if(session.sessionState === "QUESTION_CLOSE") {
+      calculateQuestionPoints(sessionId, data);
+    }
     session.sessionState = 'FINAL_RESULTS';
-    calculateQuestionPoints(sessionId, data);
   }
 
   // action: end
