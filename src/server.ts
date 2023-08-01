@@ -44,6 +44,7 @@ import {
   sessionStatus,
   updateSessionState
 } from './session';
+import { clear } from './other'
 
 // Set up web app
 const app = express();

@@ -45,29 +45,34 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
  * @returns {} empty object
  */
 export function playerSendChat (playerId: number, message: string): Record<string, never> {
-  const data = getData;
-
-  console.log(data);
+  const data = getData();
+  //console.log(data);
+  
   if (data.players.find(id => id.playerId === playerId) === undefined) {
     throw HTTPError(400, 'player does not exist');
   }
 
-  if (messsage.length < 1 | message.length > 100) {
+  if (message.length < 1 | message.length > 100) {
     throw HTTPError(400, 'message must be between 1 and 100 characters')
   }
 
   const player = data.players.find(id => id.playerId === playerId);
   const sessionIndex = data.sessions.findIndex(id => id.sessionId === player.sessionId);
   const timeNow: number = Math.floor((new Date()).getTime() / 1000);
-  const message: Message = {
+  const messageObject: Message = {
     messageBody: message,
     playerId: playerId,
     playerName: player.playerName,
     timeSent: timeNow,
   }
 
-  data.sessions[sessionIndex].messages.push(message);
+  if (data.sessions[sessionIndex].messages === undefined) {
+    data.sessions[sessionIndex].messages = [];
+  }
+  data.sessions[sessionIndex].messages.push(messageObject);
   setData(data);
+
+  return {};
 }
 
 export function playerStatus(playerId: number): PlayerStatus {
