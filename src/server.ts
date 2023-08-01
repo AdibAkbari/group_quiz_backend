@@ -33,6 +33,15 @@ import {
   moveQuizQuestion,
   updateQuizThumbnail,
 } from './quiz';
+import {
+  playerJoin,
+  playerStatus
+} from './player';
+import {
+  startSession,
+  sessionStatus,
+  updateSessionState
+} from './session';
 import { clear } from './other';
 
 // Set up web app
@@ -57,6 +66,10 @@ app.use('static', express.static('static'));
 
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
+// ====================================================================
+
+// ====================================================================
+//  ================= IT 2 TEST ROUTES (NEW) ==========================
 // ====================================================================
 
 // adminQuizDescriptionUpdate //
@@ -573,6 +586,52 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
       return res.status(400).json(response);
     }
   }
+  res.json(response);
+});
+
+// ====================================================================
+//  =================== IT 3 TEST ROUTES ==============================
+// ====================================================================
+
+// startSession //
+app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const { autoStartNum } = req.body;
+  const token = req.headers.token as string;
+  const response = startSession(quizId, token, autoStartNum);
+  res.json(response);
+});
+
+// updateSessionState //
+app.put('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const sessionId = parseInt(req.params.sessionid);
+  const token = req.headers.token as string;
+  const response = updateSessionState(quizId, sessionId, token, req.body.action);
+  res.json(response);
+});
+
+// sessionStatus //
+app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const sessionId = parseInt(req.params.sessionid);
+  const token = req.headers.token as string;
+  const response = sessionStatus(token, quizId, sessionId);
+  res.json(response);
+});
+
+// playerJoin //
+app.post('/v1/player/join', (req: Request, res: Response) => {
+  const sessionId = parseInt(req.body.sessionId);
+  const playerName = req.body.name as string;
+  const response = playerJoin(sessionId, playerName);
+  res.json(response);
+});
+
+// playerStatus //
+app.get('/v1/player/:playerid', (req: Request, res: Response) => {
+  const playerid = parseInt(req.params.playerid);
+  const response = playerStatus(playerid);
   res.json(response);
 });
 

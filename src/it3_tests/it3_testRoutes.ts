@@ -159,10 +159,6 @@ export function quizTrashEmptyRequest(token: string, quizIds: number[]) {
   return requestHelper('DELETE', '/v2/admin/quiz/trash/empty', { quizIds: JSON.stringify(quizIds) }, { token });
 }
 
-export function updateQuizThumbnailRequest(quizid: number, token: string, imgUrl: string) {
-  return requestHelper('PUT', `/v1/admin/quiz/${quizid}/thumbnail`, { quizid, imgUrl }, { token });
-}
-
 // QUESTION ROUTES //
 
 export function createQuizQuestionRequest(quizId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
@@ -501,4 +497,34 @@ export function authLogoutRequestV1(tokenId: string) {
     body: JSON.parse(res.body.toString()),
     statusCode: JSON.parse(res.statusCode.toString())
   };
+}
+
+// ====================================================================
+//  ================= IT 3 TEST ROUTES (NEW) ==========================
+// ====================================================================
+
+// Session routes
+export function startSessionRequest(quizId: number, token: string, autoStartNum: number) {
+  return requestHelper('POST', `/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
+}
+
+export function updateSessionStateRequest(quizId: number, sessionId: number, token: string, action: string) {
+  return requestHelper('PUT', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
+}
+
+export function sessionStatusRequest(token: string, quizId: number, sessionId: number) {
+  return requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
+}
+
+// PLAYER ROUTES //
+export function playerJoinRequest(sessionId: number, name: string) {
+  return requestHelper('POST', '/v1/player/join', { sessionId, name });
+}
+
+export function playerStatusRequest(playerId: number) {
+  return requestHelper('GET', `/v1/player/${playerId}`, {});
+}
+
+export function updateQuizThumbnailRequest(quizid: number, token: string, imgUrl: string) {
+  return requestHelper('PUT', `/v1/admin/quiz/${quizid}/thumbnail`, { quizid, imgUrl }, { token });
 }

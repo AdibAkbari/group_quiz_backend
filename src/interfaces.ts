@@ -65,12 +65,53 @@ export interface Token {
   userId: number;
 }
 
+export interface QuestionResponse {
+  questionId: number;
+  playerAnswers: {answerId: number}[];
+  answerTime: number;
+  points: number;
+}
+
+export interface Players {
+  sessionId: number;
+  name: string;
+  playerId: number;
+  questionResponse: QuestionResponse[];
+  score: number
+}
+
+export interface PlayerStatus {
+  state: string;
+  numQuestions: number;
+  atQuestion: number;
+}
+
+export interface Session {
+  sessionId: number,
+  sessionState: string;
+  autoStartNum: number;
+  atQuestion: number;
+  currentQuestionStartTime?: number;
+  players: string[];
+  metadata: Quizzes;
+}
+
+export interface SessionStatus {
+  state: string,
+  atQuestion: number,
+  players: string[];
+  metadata: QuizInfo;
+}
+
 export interface Data {
   users: Users[];
   quizzes: Quizzes[];
   quizCount: number;
   tokens: Token[];
   trash: Quizzes[];
+  sessions: Session[];
+  players: Players[];
+  playerIdCount: number;
 }
 
 export interface Error {
@@ -101,4 +142,9 @@ export interface QuizList {
 export interface Answers {
   answer: string,
   correct: boolean
+}
+
+export interface Timers {
+  sessionId: number,
+  timer: ReturnType<typeof setTimeout>
 }

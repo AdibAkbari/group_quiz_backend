@@ -93,6 +93,25 @@ export function isValidQuestionId(quizId: number, questionId: number): boolean {
 }
 
 /**
+ * Helper function to determine if session Id is a valid session
+ *
+ * @param {number} quizId
+ * @param {number} sessionId
+ * @returns {boolean} - returns true if sessionId is a valid session within this quiz, false otherwise
+ */
+export function isValidSessionId(sessionId: number, quizId: number): boolean {
+  const data = getData();
+  const session = data.sessions.find(id => id.sessionId === sessionId);
+  if (session === undefined) {
+    return false;
+  }
+  if (session.metadata.quizId !== quizId) {
+    return false;
+  }
+  return true;
+}
+
+/**
    * Helper function for adminQuizCreate to check if a quiz name is valid
    *
    * @param {number} authUserId
@@ -194,4 +213,46 @@ export function getImg(imgUrl: string) {
 
   fs.writeFileSync(`./static/${thumbnail}.${fileType}`, body, { flag: 'w' });
   return `${thumbnail}.${fileType}`;
+}
+  
+/**
+ * Helper function to generate a random name if user didnt enter a name
+ *
+ * @param {} - no params
+ * @returns {string} - playerName
+ */
+export function generateName() {
+  const letters = 'abcdefghijklmnopqrstuvwxyz';
+  const numbers = '0123456789';
+
+  function randomString(str: string) {
+    const array = str.split('');
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array.join('');
+  }
+
+  const nameChar = randomString(letters).slice(0, 5);
+  const nameNum = randomString(numbers).slice(0, 3);
+
+  const playerName = nameChar + nameNum;
+
+  return playerName;
+}
+
+/**
+   * Helper function to determine if the playerId exist
+   *
+   * @param {number} playerId
+   * @returns {boolean} - returns true if does exist
+   * @returns {boolean} - returns false if it dosn't exist
+   */
+export function isValidPlayerId(playerId: number): boolean {
+  const data: Data = getData();
+  if (data.players.find(id => id.playerId === playerId) === undefined) {
+    return false;
+  }
+  return true;
 }
