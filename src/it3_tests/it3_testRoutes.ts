@@ -512,6 +512,10 @@ export function sessionResultsRequest(quizId: number, sessionId: number, token: 
   return requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}/results`, { }, { token });
 }
 
+export function sessionResultsCSVRequest(quizId: number, sessionId: number, token: string) {
+  return requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}/results/csv`, { }, { token });
+}
+
 export function updateSessionStateRequest(quizId: number, sessionId: number, token: string, action: string) {
   return requestHelper('PUT', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
 }
