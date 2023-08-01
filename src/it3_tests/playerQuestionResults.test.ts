@@ -61,11 +61,13 @@ describe('Error cases', () => {
 
   test('Session is not yet up to this question', () => {
     createQuizQuestionRequest(quizId, token, 'Question 2', 1, 6, validAnswers);
-    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
+    const sessionId2 = startSessionRequest(quizId, token, 1).sessionId;
+    const playerId2 = playerJoinRequest(sessionId2, 'Player2').playerId;
+    updateSessionStateRequest(quizId, sessionId2, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);
     sleepSync(duration * 1000);
-    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
-    expect(() => playerQuestionResultsRequest(playerId, questionPosition + 1)).toThrow(HTTPError[400]);
+    updateSessionStateRequest(quizId, sessionId2, token, 'GO_TO_ANSWER');
+    expect(() => playerQuestionResultsRequest(playerId2, questionPosition + 1)).toThrow(HTTPError[400]);
   });
 });
 
