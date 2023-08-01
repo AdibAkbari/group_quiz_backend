@@ -1,7 +1,6 @@
 import { getData, setData } from './dataStore';
 import { Data } from './interfaces';
 import { clearTimers } from './session';
-import fs from 'fs';
 
 /**
  * Reset the state of the application back to the start.
@@ -26,13 +25,6 @@ export function clear (): Record<string, never> {
   clearTimers();
 
   setData(data);
-
-  fs.readdirSync('./')
-    .filter(file => file.endsWith('_results.csv'))
-    .forEach(file => {
-      fs.unlinkSync('./' + file);
-    }
-    );
 
   return { };
 }
