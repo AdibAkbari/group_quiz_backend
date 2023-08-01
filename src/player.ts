@@ -3,9 +3,19 @@ import { generateName, isValidPlayerId, isValidQuestionPosition } from './helper
 import { Players, PlayerStatus, QuestionResponse, QuestionInfo, AnswerInfo } from './interfaces';
 import HTTPError from 'http-errors';
 
+/**
+ * Allow player to join a session
+ *
+ * @param {number} sessionId
+ * @param {string} playerName
+ * @returns {playerId: number}
+ */
 export function playerJoin(sessionId: number, playerName: string): { playerId: number } {
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
+  if (session === undefined) {
+    throw HTTPError(400, 'Invalid: Session Id');
+  }
 
   if (session.sessionState !== 'LOBBY') {
     throw HTTPError(400, 'Session is not in LOBBY state');
@@ -37,6 +47,12 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
   return { playerId: playerId };
 }
 
+/**
+ * Allow player to join a session
+ *
+ * @param {number} playerId
+ * @returns {PlayerStatus}
+ */
 export function playerStatus(playerId: number): PlayerStatus {
   if (!isValidPlayerId(playerId)) {
     throw HTTPError(400, 'Invalid: PlayerId');
@@ -74,7 +90,7 @@ export function playerCurrentQuestionInfo(playerId: number, questionPosition: nu
 
   const currentQuestion = session.metadata.questions[questionPosition];
   for (const answer of currentQuestion.answers) {
-    delete answer.correct
+    delete answer.correct;
   }
 
   return {
@@ -125,7 +141,7 @@ export function playerSubmitAnswer(answerIds: number[], playerId: number, questi
   }
 
   const timeNow: number = Math.floor(Date.now() / 1000);
-  const answerTime: number = session.timer - timeNow;
+  const answerTime: number = timeNow - session.currentQuestionStartTime;
 
   const response: QuestionResponse = {
     questionId: currentQuestion.questionId,

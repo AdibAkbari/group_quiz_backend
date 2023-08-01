@@ -411,7 +411,7 @@ export function adminQuizTransfer (token: string, quizId: number, userEmail: str
       throw HTTPError(400, 'Quiz is not in END state');
     }
   }
-  
+
   if (!isValidTokenStructure(token)) {
     return giveError(isv2, 'Invalid Token Structure', 401);
   }
@@ -743,7 +743,7 @@ export function deleteQuizQuestion (token: string, quizId: number, questionId: n
       throw HTTPError(400, 'Quiz is not in END state');
     }
   }
-  
+
   if (!isValidTokenStructure(token)) {
     return giveError(isv2, 'invalid token structure', 401);
   }

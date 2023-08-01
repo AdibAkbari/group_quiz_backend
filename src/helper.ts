@@ -90,6 +90,13 @@ export function isValidQuestionId(quizId: number, questionId: number): boolean {
   return true;
 }
 
+/**
+ * Helper function to determine if session Id is a valid session
+ *
+ * @param {number} quizId
+ * @param {number} sessionId
+ * @returns {boolean} - returns true if sessionId is a valid session within this quiz, false otherwise
+ */
 export function isValidSessionId(sessionId: number, quizId: number): boolean {
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
@@ -107,10 +114,10 @@ export function isValidQuestionPosition(playerId: number, questionPosition: numb
   const player = data.players.find(id => id.playerId === playerId);
   const session = data.sessions.find(id => id.sessionId === player.sessionId);
 
-  if(questionPosition > session.metadata.numQuestions) {
+  if (questionPosition > session.metadata.numQuestions) {
     return false;
   }
-  if(questionPosition < 0) {
+  if (questionPosition < 0) {
     return false;
   }
   if (questionPosition !== session.atQuestion - 1) {
@@ -247,7 +254,7 @@ export function isEndState(quizId: number): boolean {
   const data: Data = getData();
   const quiz = data.quizzes.find(id => id.quizId === quizId);
   const session = data.sessions.find(session => session.metadata.quizId === quizId);
-  
+
   if (session === undefined) {
     return true;
   }
