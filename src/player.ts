@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
-import { generateName, getSessionResults, isValidPlayerId, isValidQuestionPosition, questionResult } from './helper';
-import { Players, PlayerStatus, QuestionResult, SessionResults, QuestionResponse, QuestionInfo } from './interfaces';
+import { generateName, isValidPlayerId, isValidQuestionPosition } from './helper';
+import { Players, PlayerStatus, QuestionResponse, QuestionInfo } from './interfaces';
 import HTTPError from 'http-errors';
 
 export function playerJoin(sessionId: number, playerName: string): { playerId: number } {
@@ -84,48 +84,6 @@ export function playerCurrentQuestionInfo(playerId: number, questionPosition: nu
     points: currentQuestion.points,
     answers: currentQuestion.answers,
   };
-}
-
-export function playerResults(playerId: number): SessionResults {
-  if (!isValidPlayerId(playerId)) {
-    throw HTTPError(400, 'Invalid: PlayerId');
-  }
-
-  const data = getData();
-  const player = data.players.find(id => id.playerId === playerId);
-  const session = data.sessions.find(id => id.sessionId === player.sessionId);
-
-  if (session.sessionState !== 'FINAL_RESULTS') {
-    throw HTTPError(400, 'Session is not in FINAL_RESULTS state');
-  }
-
-  return getSessionResults(session);
-}
-
-export function playerQuestionResults(playerId: number, questionPosition: number): QuestionResult {
-  if (!isValidPlayerId(playerId)) {
-    throw HTTPError(400, 'Invalid: PlayerId');
-  }
-
-  const data = getData();
-  const player = data.players.find(id => id.playerId === playerId);
-  const session = data.sessions.find(id => id.sessionId === player.sessionId);
-
-  if (questionPosition > session.metadata.numQuestions - 1) {
-    throw HTTPError(400, 'Question position is not valid');
-  }
-
-  if (session.sessionState !== 'ANSWER_SHOW') {
-    throw HTTPError(400, 'Session is not in ANSWER_SHOW state');
-  }
-
-  if (!isValidQuestionPosition(playerId, questionPosition)) {
-    throw HTTPError(400, 'Session not yet up to this question');
-  }
-
-  const playerList = data.players.filter(player => session.players.includes(player.name));
-
-  return questionResult(questionPosition, session, playerList);
 }
 
 export function playerSubmitAnswer(answerIds: number[], playerId: number, questionPosition: number): Record<string, never> {
