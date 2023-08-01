@@ -6,6 +6,14 @@ import HTTPError from 'http-errors';
 const COUNTDOWN = 150;
 let timers:Timers[] = [];
 
+/**
+ *This copies the quiz, so that any edits whilst a session is running does not affect active session
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {number} autoStartNum
+ * @returns {sessionId: number}
+ */
 export function startSession(quizId: number, token: string, autoStartNum: number): { sessionId: number} {
   if (!isValidTokenStructure(token)) {
     throw HTTPError(401, 'Token is not a valid structure');
@@ -195,6 +203,14 @@ export function clearTimers() {
     }
 }
 
+/**
+ * Update the state of a particular session by sending an action command
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {number} sessionId
+ * @returns {SessionStatus}
+ */
 export function sessionStatus(token: string, quizId: number, sessionId: number): SessionStatus {
   if (!isValidTokenStructure(token)) {
     throw HTTPError(401, 'Token is not a valid structure');
@@ -224,5 +240,3 @@ export function sessionStatus(token: string, quizId: number, sessionId: number):
     metadata: metaData,
   };
 }
-
-

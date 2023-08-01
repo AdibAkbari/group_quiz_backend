@@ -3,9 +3,19 @@ import { generateName, isValidPlayerId, isValidQuestionPosition } from './helper
 import { Players, PlayerStatus, QuestionResponse, QuestionInfo, AnswerInfo } from './interfaces';
 import HTTPError from 'http-errors';
 
+/**
+ * Allow player to join a session
+ *
+ * @param {number} sessionId
+ * @param {string} playerName
+ * @returns {playerId: number}
+ */
 export function playerJoin(sessionId: number, playerName: string): { playerId: number } {
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
+  if (session === undefined) {
+    throw HTTPError(400, 'Invalid: Session Id');
+  }
 
   if (session.sessionState !== 'LOBBY') {
     throw HTTPError(400, 'Session is not in LOBBY state');
@@ -37,6 +47,12 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
   return { playerId: playerId };
 }
 
+/**
+ * Allow player to join a session
+ *
+ * @param {number} playerId
+ * @returns {PlayerStatus}
+ */
 export function playerStatus(playerId: number): PlayerStatus {
   if (!isValidPlayerId(playerId)) {
     throw HTTPError(400, 'Invalid: PlayerId');
