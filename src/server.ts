@@ -222,7 +222,7 @@ app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
   const imgUrl = req.body.imgUrl;
   const response = updateQuizThumbnail(quizId, token, imgUrl);
   res.json(response);
-})
+});
 
 // ====================================================================
 //  ================= IT 2 TEST ROUTES (OLD) ==========================

@@ -176,7 +176,7 @@ export function giveError(isv2: boolean, errorMessage: string, statusCode: numbe
 export function getImg(imgUrl: string) {
   const res = request(
     'GET',
-    imgUrl,
+    imgUrl
   );
   if (res.statusCode !== 200) {
     throw HTTPError(400, 'imgUrl does not return a valid file');
@@ -186,13 +186,12 @@ export function getImg(imgUrl: string) {
   const thumbnail: string = (Math.floor(Math.random() * timeNow)).toString();
   let fileType: string;
   if (imgUrl.match(/\.(jpeg|jpg)$/) !== null) {
-    fileType = 'jpg'
+    fileType = 'jpg';
   }
   if (imgUrl.match(/\.(png)$/) !== null) {
-    fileType = 'png'
+    fileType = 'png';
   }
 
   fs.writeFileSync(`./static/${thumbnail}.${fileType}`, body, { flag: 'w' });
   return `./static/${thumbnail}.${fileType}`;
 }
-

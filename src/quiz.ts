@@ -12,7 +12,6 @@ import {
   isValidEmail,
   giveError,
   getImg,
-  urlExists,
 } from './helper';
 import HTTPError from 'http-errors';
 
@@ -829,24 +828,15 @@ export function moveQuizQuestion(token: string, quizId: number, questionId: numb
   return {};
 }
 
-async function isURLValid(url) {
-  try {
-    const response = await fetch(url);
-    return true; // Returns true if the response status is in the 200-299 range
-  } catch (error) {
-    return false; // An error occurred, so the URL is not valid
-  }
-}
-
 /**
  * Update quiz thumbnail
- * 
+ *
  * @param {number} quizId
  * @param {string} token
  * @param {string} imgUrl
- * @returns {{}} empty object
+ * @returns {} empty object
 */
-export function updateQuizThumbnail(quizId: number, token: string, imgUrl: string): {} {
+export function updateQuizThumbnail(quizId: number, token: string, imgUrl: string): Record<string, never> {
   console.log(imgUrl);
   // error checking
   if (!isValidTokenStructure(token)) {
@@ -860,12 +850,12 @@ export function updateQuizThumbnail(quizId: number, token: string, imgUrl: strin
   }
 
   if (imgUrl.match(/\.(jpeg|jpg|png)$/) === null) {
-    throw HTTPError(400, 'imgUrl must be a jpg or png image')
+    throw HTTPError(400, 'imgUrl must be a jpg or png image');
   }
 
   const newUrl = getImg(imgUrl);
 
-  let data = getData();
+  const data = getData();
   const quizIndex = data.quizzes.findIndex(id => id.quizId === quizId);
   data.quizzes[quizIndex].thumbnailUrl = newUrl;
 
