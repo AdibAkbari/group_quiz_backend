@@ -189,7 +189,7 @@ export function quizQuestionDuplicateRequest(quizid: number, questionid: number,
   return requestHelper('POST', `/v2/admin/quiz/${quizid}/question/${questionid}/duplicate`, {}, { token });
 }
 
-export function updateQuizQuestionRequest(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
+export function updateQuizQuestionRequest(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[], thumbnailUrl: string) {
   return requestHelper(
     'PUT',
     `/v2/admin/quiz/${quizId}/question/${questionId}`,
@@ -198,7 +198,8 @@ export function updateQuizQuestionRequest(quizId: number, questionId: number, to
         question,
         duration,
         points,
-        answers
+        answers,
+        thumbnailUrl,
       }
     },
     { token }
@@ -422,7 +423,7 @@ export function quizRestoreRequestV1(token: string, quizId: number) {
   };
 }
 
-export function updateQuizQuestionRequestV1(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
+export function updateQuizQuestionRequestV1(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[], thumbnailUrl: string) {
   const res = request(
     'PUT',
     SERVER_URL + `/v1/admin/quiz/${quizId}/question/${questionId}`,
@@ -433,7 +434,8 @@ export function updateQuizQuestionRequestV1(quizId: number, questionId: number, 
           question,
           duration,
           points,
-          answers
+          answers,
+          thumbnailUrl,
         }
       }
     });

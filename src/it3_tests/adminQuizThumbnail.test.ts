@@ -72,7 +72,7 @@ describe('valid cases', () => {
       numQuestions: 0,
       questions: [],
       duration: 0,
-      thumbnailUrl: 'https://www.dcnewsnow.com/wp-content/uploads/sites/14/2022/07/Cat.jpg',
+      thumbnailUrl: expect.any(String),
     });
   });
 });

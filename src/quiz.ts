@@ -569,7 +569,7 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
   };
 }
 
-export function updateQuizQuestion(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answers[], isv2: boolean): Record<string, never> | Error {
+export function updateQuizQuestion(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answers[], thumbnailUrl: string, isv2: boolean): Record<string, never> | Error {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
     return giveError(isv2, 'invalid token structure', 401);
@@ -625,10 +625,23 @@ export function updateQuizQuestion(quizId: number, questionId: number, token: st
     return giveError(isv2, 'invalid input: must be at least one correct answer', 400);
   }
 
+  // thumbnail error checking
+  if (thumbnailUrl.length === 0) {
+    return giveError(isv2, 'invalid input: url cannot be empty', 400);
+  }
+
+  if (thumbnailUrl.match(/\.(jpeg|jpg|png)$/) === null) {
+    return giveError(isv2, 'invalid input: url must be a jpg or png file type', 400);
+  }
+
+  
+
   const data = getData();
   const currentQuiz = data.quizzes.find(id => id.quizId === quizId);
   const qIndex = currentQuiz.questions.findIndex(id => id.questionId === questionId);
   const newDuration = currentQuiz.duration + duration - currentQuiz.questions[qIndex].duration;
+  const newFile = getImg(thumbnailUrl);
+  const newUrl = `${config.url}:${config.port}/static/${newFile}`;
 
   if (newDuration > 180) {
     return giveError(isv2, 'invalid input: question durations cannot exceed 3 minutes', 400);
@@ -656,7 +669,8 @@ export function updateQuizQuestion(quizId: number, questionId: number, token: st
     question: question,
     duration: duration,
     points: points,
-    answers: answerArray
+    answers: answerArray,
+    thumbnailUrl: newUrl,
   };
 
   const timeNow: number = Math.floor(Date.now() / 1000);
