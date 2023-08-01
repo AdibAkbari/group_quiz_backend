@@ -1,6 +1,1 @@
-<<<<<<< HEAD
-{"users":[],"quizzes":[],"quizCount":0,"tokens":[],"trash":[],"sessions":[],"players":[],"playerIdCount":0}
-=======
-{"users":[],"quizzes":[],"quizCount":0,"tokens":[],"trash":[],"sessions":[],"players":[],"playerIdCount":0}
-
->>>>>>> 36a9f42f230d50b98e22d7e59dbd14b82014eb3b
+{"users":[{"email":"email@gmail.com","password":"password1","nameFirst":"Firstname","nameLast":"Lastname","authUserId":1,"numSuccessfulLogins":1,"numFailedPasswordsSinceLastLogin":0}],"quizzes":[],"quizCount":0,"tokens":[{"tokenId":"1139087229","userId":1}],"trash":[],"sessions":[],"players":[],"playerIdCount":0}

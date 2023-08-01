@@ -75,7 +75,6 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
 
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
-  console.log(session.sessionState);
 
   // action: next_question
   if (action === 'NEXT_QUESTION') {
