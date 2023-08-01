@@ -32,10 +32,11 @@ import {
   updateQuizQuestion,
   moveQuizQuestion
 } from './quiz';
-import { playerJoin, playerSendChat } from './player';
+import { playerJoin, playerSendChat, playerStatus } from './player';
 import { clear } from './other';
 import {
-  startSession
+  startSession,
+  sessionStatus,
 } from './session';
 
 // Set up web app
@@ -592,11 +593,27 @@ app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) =
   res.json(response);
 });
 
+// sessionStatus //
+app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const sessionId = parseInt(req.params.sessionid);
+  const token = req.headers.token as string;
+  const response = sessionStatus(token, quizId, sessionId);
+  res.json(response);
+});
+
 // playerJoin //
 app.post('/v1/player/join', (req: Request, res: Response) => {
   const sessionId = parseInt(req.body.sessionId);
   const playerName = req.body.name as string;
   const response = playerJoin(sessionId, playerName);
+  res.json(response);
+});
+
+// playerStatus //
+app.get('/v1/player/:playerid', (req: Request, res: Response) => {
+  const playerid = parseInt(req.params.playerid);
+  const response = playerStatus(playerid);
   res.json(response);
 });
 

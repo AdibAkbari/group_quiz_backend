@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
-import { isValidTokenStructure, isTokenLoggedIn, isValidQuizId, isValidCreator } from './helper';
-import { Session } from './interfaces';
+import { isValidTokenStructure, isTokenLoggedIn, isValidQuizId, isValidCreator, isValidSessionId } from './helper';
+import { Session, SessionStatus } from './interfaces';
 import HTTPError from 'http-errors';
 
 export function startSession(quizId: number, token: string, autoStartNum: number): { sessionId: number} {
@@ -33,7 +33,6 @@ export function startSession(quizId: number, token: string, autoStartNum: number
     autoStartNum: autoStartNum,
     atQuestion: 0,
     players: [],
-    playerIdCount: 0,
     metadata: quiz,
   };
 
@@ -42,3 +41,33 @@ export function startSession(quizId: number, token: string, autoStartNum: number
 
   return { sessionId: sessionId };
 }
+
+
+export function sessionStatus(token: string, quizId: number, sessionId: number): SessionStatus {
+  if (!isValidTokenStructure(token)) {
+    throw HTTPError(401, 'Token is not a valid structure');
+  }
+  if (!isTokenLoggedIn(token)) {
+    throw HTTPError(403, 'Token is not logged in');
+  }
+  if (!isValidQuizId(quizId) || !isValidCreator(quizId, token)) {
+    throw HTTPError(400, 'Invalid QuizId');
+  }
+  if (!isValidSessionId(sessionId, quizId)) {
+    throw HTTPError(400, 'Invalid: Session Id');
+  }
+
+  const data = getData();
+  const session = data.sessions.find(id => id.sessionId === sessionId);
+
+  const playerNames = session.players.sort();
+
+  return {
+    state: session.sessionState,
+    atQuestion: session.atQuestion,
+    players: playerNames,
+    metadata: session.metadata,
+  };
+}
+
+
