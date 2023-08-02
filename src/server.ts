@@ -34,7 +34,9 @@ import {
 } from './quiz';
 import {
   playerJoin,
-  playerStatus
+  playerStatus,
+  playerSubmitAnswer,
+  playerCurrentQuestionInfo,
 } from './player';
 import {
   startSession,
@@ -619,6 +621,23 @@ app.post('/v1/player/join', (req: Request, res: Response) => {
 app.get('/v1/player/:playerid', (req: Request, res: Response) => {
   const playerid = parseInt(req.params.playerid);
   const response = playerStatus(playerid);
+  res.json(response);
+});
+
+// playerCurrentQuestionInfo //
+app.get('/v1/player/:playerid/question/:questionposition', (req: Request, res: Response) => {
+  const playerid = parseInt(req.params.playerid);
+  const questionposition = parseInt(req.params.questionposition);
+  const response = playerCurrentQuestionInfo(playerid, questionposition);
+  res.json(response);
+});
+
+// playerSubmitAnswer //
+app.put('/v1/player/:playerid/question/:questionposition/answer', (req: Request, res: Response) => {
+  const answerIds = req.body.answerIds;
+  const playerid = parseInt(req.params.playerid);
+  const questionposition = parseInt(req.params.questionposition);
+  const response = playerSubmitAnswer(answerIds, playerid, questionposition);
   res.json(response);
 });
 

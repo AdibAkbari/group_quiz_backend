@@ -66,7 +66,7 @@ export interface Token {
 
 export interface QuestionResponse {
   questionId: number;
-  playerAnswers: {answerId: number}[];
+  playerAnswers: number[];
   answerTime: number;
   points: number;
 }
@@ -146,4 +146,18 @@ export interface Answers {
 export interface Timers {
   sessionId: number,
   timer: ReturnType<typeof setTimeout>
+}
+
+export interface AnswerInfo {
+  answerId: number;
+  answer: string;
+  colour: string;
+}
+
+export interface QuestionInfo {
+  questionId: number;
+  question: string;
+  duration: number;
+  points: number;
+  answers: AnswerInfo[];
 }
