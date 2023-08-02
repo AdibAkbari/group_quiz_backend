@@ -161,7 +161,7 @@ export function quizTrashEmptyRequest(token: string, quizIds: number[]) {
 
 // QUESTION ROUTES //
 
-export function createQuizQuestionRequest(quizId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
+export function createQuizQuestionRequest(quizId: number, token: string, question: string, duration: number, points: number, answers: Answer[], thumbnail: string) {
   return requestHelper(
     'POST',
     `/v2/admin/quiz/${quizId}/question`,
@@ -170,7 +170,8 @@ export function createQuizQuestionRequest(quizId: number, token: string, questio
         question,
         duration,
         points,
-        answers
+        answers,
+        thumbnail,
       }
     },
     { token }

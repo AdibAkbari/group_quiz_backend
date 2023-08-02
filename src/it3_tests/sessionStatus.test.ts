@@ -20,7 +20,7 @@ beforeEach(() => {
   clearRequest();
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers);
+  createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
   sessionId = startSessionRequest(quizId, token, 3).sessionId;
 });
 
@@ -75,7 +75,7 @@ describe('Success cases', () => {
               questionId: 1,
               question: 'Question 1',
               duration: 5,
-              // thumbnailUrl: "http://google.com/some/image/path.jpg",
+              thumbnailUrl: expect.any(String),
               points: 6,
               answers: [
                 {
@@ -94,7 +94,6 @@ describe('Success cases', () => {
             }
           ],
           duration: 5,
-          // thumbnailUrl: "",
         }
       });
   });
@@ -124,7 +123,7 @@ describe('Success cases', () => {
               questionId: 1,
               question: 'Question 1',
               duration: 5,
-              // thumbnailUrl: "http://google.com/some/image/path.jpg",
+              thumbnailUrl: expect.any(String),
               points: 6,
               answers: [
                 {
@@ -143,7 +142,6 @@ describe('Success cases', () => {
             }
           ],
           duration: 5,
-          // thumbnailUrl: "",
         }
       });
   });

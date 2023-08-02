@@ -32,7 +32,8 @@ import {
   updateQuizQuestion,
   moveQuizQuestion,
   updateQuizThumbnail,
-  updateQuizQuestionv1
+  updateQuizQuestionv1,
+  createQuizQuestionv1,
 } from './quiz';
 import {
   playerJoin,
@@ -138,10 +139,10 @@ app.post('/v2/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
 
 // createQuizQuestion //
 app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
-  const { question, duration, points, answers } = req.body.questionBody;
+  const { question, duration, points, answers, thumbnail } = req.body.questionBody;
   const quizId = parseInt(req.params.quizid);
   const token = req.headers.token as string;
-  const response = createQuizQuestion(quizId, token, question, duration, points, answers, true);
+  const response = createQuizQuestion(quizId, token, question, duration, points, answers, thumbnail, true);
   res.json(response);
 });
 
@@ -404,7 +405,7 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const { question, duration, points, answers } = req.body.questionBody;
   const quizId = parseInt(req.params.quizid);
-  const response = createQuizQuestion(quizId, req.body.token, question, duration, points, answers, false);
+  const response = createQuizQuestionv1(quizId, req.body.token, question, duration, points, answers, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
       return res.status(401).json(response);
