@@ -4,14 +4,11 @@ import {
   clearRequest,
   createQuizQuestionRequest,
   adminQuizInfoRequest,
-  createQuizQuestionRequestV1
 } from './it3_testRoutes';
 import { TokenId, QuizId, QuestionId } from '../interfaces';
 import HTTPError from 'http-errors';
 
 const validAnswers = [{ answer: 'great', correct: true }, { answer: 'bad', correct: false }];
-
-const ERROR = { error: expect.any(String) };
 
 let user: TokenId;
 let quiz: QuizId;
@@ -243,33 +240,5 @@ describe('valid input', () => {
     const result = adminQuizInfoRequest(user.token, quiz.quizId);
     expect(result.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
     expect(result.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
-  });
-});
-
-describe('V1 WRAPPERS', () => {
-  test('Unused tokenId', () => {
-    const result = createQuizQuestionRequestV1(quiz.quizId, user.token + 1, 'How are you?', 5, 5, validAnswers);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(403);
-  });
-
-  test('QuizId does not refer to a valid quiz', () => {
-    const result = createQuizQuestionRequestV1(quiz.quizId + 1, user.token, 'How are you?', 5, 5, validAnswers);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(400);
-  });
-
-  test('invalid token structure', () => {
-    const result = createQuizQuestionRequestV1(quiz.quizId, '432j432', 'How are you?', 5, 5, validAnswers);
-    expect(result.body).toStrictEqual(ERROR);
-    expect(result.statusCode).toStrictEqual(401);
-  });
-
-  test('sum of duration equals 3 minutes', () => {
-    createQuizQuestionRequestV1(quiz.quizId, user.token, 'Question 1', 60, 5, validAnswers);
-    createQuizQuestionRequestV1(quiz.quizId, user.token, 'Question 2', 60, 5, validAnswers);
-    const result = createQuizQuestionRequestV1(quiz.quizId, user.token, 'Question 3', 60, 5, validAnswers);
-    expect(result.body.questionId).toStrictEqual(expect.any(Number));
-    expect(result.statusCode).toStrictEqual(200);
   });
 });

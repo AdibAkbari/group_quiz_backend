@@ -58,7 +58,8 @@ export interface QuizInfo {
   description: string,
   numQuestions: number,
   questions: Question[],
-  duration: number
+  duration: number,
+  thumbnailUrl?: string,
 }
 
 export interface Token {

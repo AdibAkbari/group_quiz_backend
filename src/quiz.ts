@@ -299,7 +299,7 @@ export function adminQuizInfo(token: string, quizId: number, isv2: boolean): Err
   const data: Data = getData();
   const quiz = data.quizzes.find(id => id.quizId === quizId);
 
-  if (isv2 & quiz.thumbnailUrl !== undefined) {
+  if (isv2 && quiz.thumbnailUrl !== undefined) {
     return {
       quizId: quizId,
       name: quiz.name,
