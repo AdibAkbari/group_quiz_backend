@@ -976,13 +976,25 @@ export function quizQuestionDuplicate (quizId: number, questionId: number, token
   data.quizzes[quizIndex].duration += data.quizzes[quizIndex].questions[questionIndex].duration;
   data.quizzes[quizIndex].timeLastEdited = timeNow;
 
-  const newQuestion: Question = {
-    questionId: newQuestionId,
-    question: data.quizzes[quizIndex].questions[questionIndex].question,
-    duration: data.quizzes[quizIndex].questions[questionIndex].duration,
-    points: data.quizzes[quizIndex].questions[questionIndex].points,
-    answers: data.quizzes[quizIndex].questions[questionIndex].answers,
-  };
+  if (isv2) {
+    const newQuestion: Question = {
+      questionId: newQuestionId,
+      question: data.quizzes[quizIndex].questions[questionIndex].question,
+      duration: data.quizzes[quizIndex].questions[questionIndex].duration,
+      points: data.quizzes[quizIndex].questions[questionIndex].points,
+      answers: data.quizzes[quizIndex].questions[questionIndex].answers,
+      thumbnailUrl: data.quizzes[quizIndex].questions[questionIndex].thumbnailUrl,
+    }
+  } else {
+    const newQuestion: Question = {
+      questionId: newQuestionId,
+      question: data.quizzes[quizIndex].questions[questionIndex].question,
+      duration: data.quizzes[quizIndex].questions[questionIndex].duration,
+      points: data.quizzes[quizIndex].questions[questionIndex].points,
+      answers: data.quizzes[quizIndex].questions[questionIndex].answers,
+    };
+  }
+
   data.quizzes[quizIndex].questions.splice(questionIndex + 1, 0, newQuestion);
   setData(data);
 
