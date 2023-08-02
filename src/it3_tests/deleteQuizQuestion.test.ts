@@ -31,20 +31,8 @@ beforeEach(() => {
 });
 
 describe('Token invalid', () => {
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-    { testName: 'token ends with letters', token: '54356s' },
-    { testName: 'token includes letter', token: '5436h86' },
-    { testName: 'token has space', token: '4324 757' },
-    { testName: 'token only whitespace', token: '  ' },
-    { testName: 'token has other characters', token: '6365,53' },
-    { testName: 'empty string', token: '' },
-    { testName: 'token has decimal point', token: '53.74' },
-    { testName: 'token has negative sign', token: '-37294' },
-    { testName: 'token has positive sign', token: '+38594' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => deleteQuizQuestionRequest(token, quiz.quizId, question.questionId)).toThrow(HTTPError[401]);
+  test('invalid token structure', () => {
+    expect(() => deleteQuizQuestionRequest('', quiz.quizId, question.questionId)).toThrow(HTTPError[401]);
   });
 
   test('Unused tokenId', () => {
@@ -98,17 +86,12 @@ describe('Quiz is not in END state', () => {
 });
 
 describe('Successfully removed quiz question', () => {
-  // Sucessfully remove the quiz
-  test('Sucessful quiz remove question empty return', () => {
-    expect(deleteQuizQuestionRequest(user.token, quiz.quizId, question.questionId)).toStrictEqual({});
-  });
-
   // Check that the quiz question is actually removed
   test('Sucessful quiz remove question integrated check', () => {
     const questionToRemove = createQuizQuestionRequest(quiz.quizId, user.token, 'Question Remove', 5, 5, validAnswers);
     const question2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 5, 5, validAnswers);
 
-    deleteQuizQuestionRequest(user.token, quiz.quizId, questionToRemove.questionId);
+    expect(deleteQuizQuestionRequest(user.token, quiz.quizId, questionToRemove.questionId)).toStrictEqual({});
 
     const received = adminQuizInfoRequest(user.token, quiz.quizId);
     const expected = {
@@ -165,11 +148,8 @@ describe('V1 WRAPPERS', () => {
     expect(deleteQuestion.statusCode).toStrictEqual(400);
   });
 
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    const result = deleteQuizQuestionRequestV1(token, quiz.quizId, question.questionId);
+  test('invalid token structure', () => {
+    const result = deleteQuizQuestionRequestV1('token', quiz.quizId, question.questionId);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(401);
   });

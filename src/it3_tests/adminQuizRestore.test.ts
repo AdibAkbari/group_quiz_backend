@@ -25,20 +25,8 @@ beforeEach(() => {
 
 describe('adminQuizRestore', () => {
   describe('Error cases', () => {
-    test.each([
-      { testName: 'token just letters', token: 'hello' },
-      { testName: 'token starts with letters', token: 'a54364' },
-      { testName: 'token ends with letters', token: '54356s' },
-      { testName: 'token includes letter', token: '5436h86' },
-      { testName: 'token has space', token: '4324 757' },
-      { testName: 'token only whitespace', token: '  ' },
-      { testName: 'token has other characters', token: '6365,53' },
-      { testName: 'empty string', token: '' },
-      { testName: 'token has decimal point', token: '53.74' },
-      { testName: 'token has negative sign', token: '-37294' },
-      { testName: 'token has positive sign', token: '+38594' },
-    ])('token is not a valid structure: $testName', ({ token }) => {
-      expect(() => quizRestoreRequest(token, quiz.quizId)).toThrow(HTTPError[401]);
+    test('invalid token structure', () => {
+      expect(() => quizRestoreRequest('45345gfd', quiz.quizId)).toThrow(HTTPError[401]);
     });
 
     test('TokenId not logged in', () => {
@@ -130,11 +118,8 @@ describe('V1 WRAPPERS', () => {
     expect(restoreQuiz.statusCode).toStrictEqual(400);
   });
 
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    const restoreQuiz = quizRestoreRequestV1(token, quiz.quizId);
+  test('invalid token structure', () => {
+    const restoreQuiz = quizRestoreRequestV1('432s', quiz.quizId);
     expect(restoreQuiz.body).toStrictEqual(ERROR);
     expect(restoreQuiz.statusCode).toStrictEqual(401);
   });

@@ -4,9 +4,6 @@ import {
   authRegisterRequest,
   clearRequest,
   createQuizQuestionRequest,
-  quizRemoveRequest,
-  quizNameUpdateRequest,
-  quizDescriptionUpdateRequest,
   adminQuizInfoRequestV1,
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
@@ -36,7 +33,8 @@ describe('QuizId invalid', () => {
 
 describe('Token invalid', () => {
   test('token invalid structure', () => {
-    expect(() => adminQuizInfoRequest('584935h', quiz.quizId)).toThrow(HTTPError[401]);  })
+    expect(() => adminQuizInfoRequest('584935h', quiz.quizId)).toThrow(HTTPError[401]);
+  });
 
   test('Unused tokenId', () => {
     expect(() => adminQuizInfoRequest(user.token + 1, quiz.quizId)).toThrow(HTTPError[403]);
@@ -111,7 +109,6 @@ describe('Valid inputs', () => {
     expect(result.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
     expect(result.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
   });
-
 });
 
 describe('V1 WRAPPERS', () => {
@@ -120,12 +117,12 @@ describe('V1 WRAPPERS', () => {
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(400);
   });
-    
+
   test('invalid token', () => {
     const list = adminQuizInfoRequestV1('5435h45', quiz.quizId);
     expect(list.body).toStrictEqual(ERROR);
     expect(list.statusCode).toStrictEqual(401);
-  })
+  });
 
   test('Unused tokenId', () => {
     const list = adminQuizInfoRequestV1(user.token + 1, quiz.quizId);

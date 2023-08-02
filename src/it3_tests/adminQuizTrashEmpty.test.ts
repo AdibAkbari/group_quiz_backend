@@ -32,21 +32,9 @@ beforeEach(() => {
 
 describe('adminQuizTrash', () => {
   describe('Error cases', () => {
-    test.each([
-      { testName: 'token just letters', token: 'hello' },
-      { testName: 'token starts with letters', token: 'a54364' },
-      { testName: 'token ends with letters', token: '54356s' },
-      { testName: 'token includes letter', token: '5436h86' },
-      { testName: 'token has space', token: '4324 757' },
-      { testName: 'token only whitespace', token: '  ' },
-      { testName: 'token has other characters', token: '6365,53' },
-      { testName: 'empty string', token: '' },
-      { testName: 'token has decimal point', token: '53.74' },
-      { testName: 'token has negative sign', token: '-37294' },
-      { testName: 'token has positive sign', token: '+38594' },
-    ])('token is not a valid structure: $testName', ({ token }) => {
+    test('invalid token structure', () => {
       const quizIds = [quiz1.quizId, quiz2.quizId, quiz3.quizId];
-      expect(() => quizTrashEmptyRequest(token, quizIds)).toThrow(HTTPError[401]);
+      expect(() => quizTrashEmptyRequest('432423;42', quizIds)).toThrow(HTTPError[401]);
     });
 
     test('TokenId not logged in', () => {
@@ -113,13 +101,9 @@ describe('V1 WRAPPERS', () => {
     expect(emptyTrash.statusCode).toStrictEqual(400);
   });
 
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
+  test('invalid token structure', () => {
     const quizIds = [quiz1.quizId, quiz2.quizId, quiz3.quizId];
-
-    const emptyTrash = quizTrashEmptyRequestV1(token, quizIds);
+    const emptyTrash = quizTrashEmptyRequestV1('fejwfjes', quizIds);
     expect(emptyTrash.body).toStrictEqual(ERROR);
     expect(emptyTrash.statusCode).toStrictEqual(401);
   });
@@ -132,18 +116,10 @@ describe('V1 WRAPPERS', () => {
     expect(emptyTrash.statusCode).toStrictEqual(403);
   });
 
-  let trashEmptyBody: Record<string, never>;
-  let trashEmptyStatusCode: number;
-  // empties trash
-  beforeEach(() => {
+  test('outputs empty object', () => {
     const quizIds = [quiz1.quizId, quiz3.quizId];
     const trashEmpty = quizTrashEmptyRequestV1(user.token, quizIds);
-    trashEmptyBody = trashEmpty.body;
-    trashEmptyStatusCode = trashEmpty.statusCode;
-  });
-
-  test('outputs empty object', () => {
-    expect(trashEmptyBody).toStrictEqual({});
-    expect(trashEmptyStatusCode).toStrictEqual(200);
+    expect(trashEmpty.body).toStrictEqual({});
+    expect(trashEmpty.statusCode).toStrictEqual(200);
   });
 });

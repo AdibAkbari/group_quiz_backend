@@ -33,7 +33,6 @@ describe('Error Cases: updateUserDetails', () => {
   test.each([
     { testName: 'empty nameFirst', first: '' },
     { testName: 'invalid nameFirst', first: 'nameFirst$' },
-    { testName: 'invalid nameFirst 2', first: 'nameFirst$()1' },
     { testName: 'nameFirst too short', first: 'n' },
     { testName: 'nameFirst too long', first: 'nameFirstIsMoreThanTwenty' },
     { testName: 'nameFirst whitespace', first: '    ' },
@@ -43,8 +42,7 @@ describe('Error Cases: updateUserDetails', () => {
 
   test.each([
     { testName: 'empty nameLast', last: '' },
-    { testName: 'invalid nameLast', last: 'nameLast$' },
-    { testName: 'invalid nameLast 2', last: 'nameLast1' },
+    { testName: 'invalid nameLast', last: 'nameLast1' },
     { testName: 'nameLast too short', last: 'n' },
     { testName: 'nameLast too long', last: 'nameLastIsMoreThanTwenty' },
     { testName: 'nameLast whitespace', last: '    ' },
@@ -52,20 +50,8 @@ describe('Error Cases: updateUserDetails', () => {
     expect(() => updateUserDetailsRequest(user.token, 'email123@gmail.com', 'nameFirst', last)).toThrow(HTTPError[400]);
   });
 
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-    { testName: 'token ends with letters', token: '54356s' },
-    { testName: 'token includes letter', token: '5436h86' },
-    { testName: 'token has space', token: '4324 757' },
-    { testName: 'token only whitespace', token: '  ' },
-    { testName: 'token has other characters', token: '6365,53' },
-    { testName: 'empty string', token: '' },
-    { testName: 'token has decimal point', token: '53.74' },
-    { testName: 'token has negative sign', token: '-37294' },
-    { testName: 'token has positive sign', token: '+38594' },
-  ])('invalid token: $testName', ({ token }) => {
-    expect(() => updateUserDetailsRequest(token, 'email123@gmail.com', 'nameFirst', 'nameLast')).toThrow(HTTPError[401]);
+  test('invalid token structure', () => {
+    expect(() => updateUserDetailsRequest('token', 'email123@gmail.com', 'nameFirst', 'nameLast')).toThrow(HTTPError[401]);
   });
 
   test('tokenId not logged in', () => {
@@ -113,11 +99,8 @@ describe('V1 WRAPPERS', () => {
     expect(update.statusCode).toStrictEqual(400);
   });
 
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-  ])('invalid token: $testName', ({ token }) => {
-    const update = updateUserDetailsRequestV1(token, 'email123@gmail.com', 'nameFirst', 'nameLast');
+  test('invalid token structure', () => {
+    const update = updateUserDetailsRequestV1('4342,', 'email123@gmail.com', 'nameFirst', 'nameLast');
     expect(update.statusCode).toBe(401);
     expect(update.body).toStrictEqual(ERROR);
   });

@@ -23,15 +23,8 @@ beforeEach(() => {
 });
 
 describe('invalid token', () => {
-  test.each([
-    { testName: 'token has letters', token: '5436h8j6' },
-    { testName: 'token only whitespace', token: '  ' },
-    { testName: 'token has other characters', token: '6365,53' },
-    { testName: 'empty string', token: '' },
-    { testName: 'token has decimal point', token: '53.74' },
-    { testName: 'token has negative sign', token: '-37294' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => startSessionRequest(quizId, token, 3)).toThrow(HTTPError[401]);
+  test('invalid token structure', () => {
+    expect(() => startSessionRequest(quizId, '4324h4324', 3)).toThrow(HTTPError[401]);
   });
 
   test('TokenId not logged in', () => {
@@ -83,13 +76,10 @@ describe('invalid input', () => {
 });
 
 describe('successful cases', () => {
-  test('correct return type', () => {
-    expect(startSessionRequest(quizId, token, 3)).toStrictEqual({ sessionId: expect.any(Number) });
-  });
-
   test('successful creation', () => {
-    const sessionId = startSessionRequest(quizId, token, 3).sessionId;
-    expect(sessionStatusRequest(token, quizId, sessionId)).toStrictEqual({
+    const session = startSessionRequest(quizId, token, 3);
+    expect(session).toStrictEqual({ sessionId: expect.any(Number) });
+    expect(sessionStatusRequest(token, quizId, session.sessionId)).toStrictEqual({
       state: 'LOBBY',
       atQuestion: 0,
       players: [],

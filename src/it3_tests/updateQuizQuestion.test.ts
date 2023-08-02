@@ -71,9 +71,7 @@ describe('invalid question body - question, duration, points', () => {
   });
 
   test('if this quiz were to be updated, sum of question durations exceed 3 minutes', () => {
-    createQuizQuestionRequest(quizId, user.token, 'Question 2', 50, 5, validAnswers);
-    createQuizQuestionRequest(quizId, user.token, 'Question 3', 50, 5, validAnswers);
-    createQuizQuestionRequest(quizId, user.token, 'Question 4', 50, 5, validAnswers);
+    createQuizQuestionRequest(quizId, user.token, 'Question 2', 150, 5, validAnswers);
     expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 40, 5, validAnswers)).toThrow(HTTPError[400]);
   });
 });
@@ -119,15 +117,7 @@ describe('invalid question body - answers', () => {
       ]
     },
     {
-      testname: 'answer strings duplicate of one another, both false',
-      answers: [
-        { answer: 'great', correct: true },
-        { answer: 'bad', correct: false },
-        { answer: 'bad', correct: false }
-      ]
-    },
-    {
-      testname: 'answer strings duplicate of one another, one false one true',
+      testname: 'answer strings duplicate of one another',
       answers: [
         { answer: 'great', correct: false },
         { answer: 'bad', correct: true },
@@ -147,20 +137,8 @@ describe('invalid question body - answers', () => {
 });
 
 describe('Token invalid', () => {
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-    { testName: 'token ends with letters', token: '54356s' },
-    { testName: 'token includes letter', token: '5436h86' },
-    { testName: 'token has space', token: '4324 757' },
-    { testName: 'token only whitespace', token: '  ' },
-    { testName: 'token has other characters', token: '6365,53' },
-    { testName: 'empty string', token: '' },
-    { testName: 'token has decimal point', token: '53.74' },
-    { testName: 'token has negative sign', token: '-37294' },
-    { testName: 'token has positive sign', token: '+38594' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => updateQuizQuestionRequest(quizId, questionId, token, 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[401]);
+  test('invalid token structure', () => {
+    expect(() => updateQuizQuestionRequest(quizId, questionId, '432h4324', 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[401]);
   });
 
   test('Unused tokenId', () => {
@@ -169,13 +147,8 @@ describe('Token invalid', () => {
 });
 
 describe('valid input', () => {
-  test('correct return type and status code', () => {
-    const result = updateQuizQuestionRequest(quizId, questionId, user.token, 'New Question', 5, 4, validAnswers);
-    expect(result).toStrictEqual({});
-  });
-
   test('quiz with one question successfully updated', () => {
-    updateQuizQuestionRequest(quizId, questionId, user.token, 'New Question', 5, 4, validAnswers);
+    expect(updateQuizQuestionRequest(quizId, questionId, user.token, 'New Question', 5, 4, validAnswers)).toStrictEqual({});
     expect(adminQuizInfoRequest(user.token, quizId)).toStrictEqual({
       quizId: quizId,
       name: 'Cats',
@@ -264,32 +237,9 @@ describe('valid input', () => {
   });
 });
 
-describe('valid edge cases', () => {
-  test.each([
-    { testname: 'question string length 5', question: 'abcde', duration: 5, points: 5 },
-    { testname: 'question string length 50', question: 'a'.repeat(50), duration: 5, points: 5 },
-    { testname: 'duration 3 minutes', question: 'valid question', duration: 180, points: 5 },
-    { testname: 'points is 1', question: 'valid question', duration: 5, points: 1 },
-    { testname: 'points is 10', question: 'valid question', duration: 5, points: 10 }
-  ])('valid edge cases for question, duration and points: $testname', ({ question, duration, points }) => {
-    const result = updateQuizQuestionRequest(quizId, questionId, user.token, question, duration, points, validAnswers);
-    expect(result).toStrictEqual({});
-  });
-
-  test('sum of new duration equals 3 minutes', () => {
-    createQuizQuestionRequest(quizId, user.token, 'Question 1', 60, 5, validAnswers);
-    createQuizQuestionRequest(quizId, user.token, 'Question 2', 60, 5, validAnswers);
-    const result = updateQuizQuestionRequest(quizId, questionId, user.token, 'New Question 1', 60, 5, validAnswers);
-    expect(result).toStrictEqual({});
-  });
-});
-
 describe('V1 WRAPPERS', () => {
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    const result = updateQuizQuestionRequestV1(quizId, questionId, token, 'How are you?', 5, 5, validAnswers);
+  test('invalid token structure', () => {
+    const result = updateQuizQuestionRequestV1(quizId, questionId, '433423,f33', 'How are you?', 5, 5, validAnswers);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(401);
   });

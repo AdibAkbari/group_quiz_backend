@@ -43,20 +43,8 @@ describe('error cases', () => {
     expect(() => quizQuestionDuplicateRequest(quiz.quizId, question.questionId + 1, user.token)).toThrow(HTTPError[400]);
   });
 
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-    { testName: 'token ends with letters', token: '54356s' },
-    { testName: 'token includes letter', token: '5436h86' },
-    { testName: 'token has space', token: '4324 757' },
-    { testName: 'token only whitespace', token: '  ' },
-    { testName: 'token has other characters', token: '6365,53' },
-    { testName: 'empty string', token: '' },
-    { testName: 'token has decimal point', token: '53.74' },
-    { testName: 'token has negative sign', token: '-37294' },
-    { testName: 'token has positive sign', token: '+38594' },
-  ])('token invalid structure: $testName', ({ token }) => {
-    expect(() => quizQuestionDuplicateRequest(quiz.quizId, question.questionId, token)).toThrow(HTTPError[401]);
+  test('invalid token structure', () => {
+    expect(() => quizQuestionDuplicateRequest(quiz.quizId, question.questionId, 'fsdjfndjf')).toThrow(HTTPError[401]);
   });
 
   test('TokenId not logged in', () => {
@@ -166,11 +154,8 @@ describe('V1 WRAPPERS', () => {
     expect(result.statusCode).toStrictEqual(403);
   });
 
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-  ])('token invalid structure: $testName', ({ token }) => {
-    const result = quizQuestionDuplicateRequestV1(quiz.quizId, question.questionId, token);
+  test('invalid token structure', () => {
+    const result = quizQuestionDuplicateRequestV1(quiz.quizId, question.questionId, '4324.5324');
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(401);
   });

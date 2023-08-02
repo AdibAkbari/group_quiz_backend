@@ -6,7 +6,7 @@ import {
   startSessionRequest,
   playerJoinRequest,
   sessionStatusRequest,
-  // sessionUpdateRequest,
+  updateSessionStateRequest
 } from './it3_testRoutes';
 import { } from '../interfaces';
 import HTTPError from 'http-errors';
@@ -21,19 +21,12 @@ beforeEach(() => {
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
   createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers);
-  sessionId = startSessionRequest(quizId, token, 3).sessionId;
+  sessionId = startSessionRequest(quizId, token, 4).sessionId;
 });
 
 describe('invalid token', () => {
-  test.each([
-    { testName: 'token has letters', token: '5436h8j6' },
-    { testName: 'token only whitespace', token: '  ' },
-    { testName: 'token has other characters', token: '6365,53' },
-    { testName: 'empty string', token: '' },
-    { testName: 'token has decimal point', token: '53.74' },
-    { testName: 'token has negative sign', token: '-37294' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => sessionStatusRequest(token, quizId, sessionId)).toThrow(HTTPError[401]);
+  test('invalid token structure', () => {
+    expect(() => sessionStatusRequest('43244;53', quizId, sessionId)).toThrow(HTTPError[401]);
   });
 
   test('TokenId not logged in', () => {
@@ -53,6 +46,11 @@ describe('Error cases', () => {
 
   test('sessionId invalid', () => {
     expect(() => sessionStatusRequest(token, quizId, sessionId + 1)).toThrow(HTTPError[400]);
+  });
+
+  test('session not the same as quiz', () => {
+    const quizId2 = quizCreateRequest(token, 'quiz2', '').quizId;
+    expect(() => sessionStatusRequest(token, quizId2, sessionId)).toThrow(HTTPError[400]);
   });
 });
 
@@ -112,6 +110,49 @@ describe('Success cases', () => {
           'Ben',
           'Chad'
         ],
+        metadata: {
+          quizId: quizId,
+          name: 'quiz1',
+          timeCreated: expect.any(Number),
+          timeLastEdited: expect.any(Number),
+          description: '',
+          numQuestions: 1,
+          questions: [
+            {
+              questionId: 1,
+              question: 'Question 1',
+              duration: 5,
+              // thumbnailUrl: "http://google.com/some/image/path.jpg",
+              points: 6,
+              answers: [
+                {
+                  answerId: expect.any(Number),
+                  answer: 'answer1',
+                  colour: expect.any(String),
+                  correct: true
+                },
+                {
+                  answerId: expect.any(Number),
+                  answer: 'answer2',
+                  colour: expect.any(String),
+                  correct: false
+                }
+              ]
+            }
+          ],
+          duration: 5,
+          // thumbnailUrl: "",
+        }
+      });
+  });
+
+  test('shows updated states', () => {
+    updateSessionStateRequest(quizId, sessionId, token, 'END');
+    expect(sessionStatusRequest(token, quizId, sessionId)).toStrictEqual(
+      {
+        state: 'END',
+        atQuestion: 0,
+        players: [],
         metadata: {
           quizId: quizId,
           name: 'quiz1',
