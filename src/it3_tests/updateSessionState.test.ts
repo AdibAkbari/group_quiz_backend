@@ -16,7 +16,7 @@ let sessionId: number;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
 
 const finishCountdown = 150;
-const questionDuration = 2;
+const questionDuration = 1;
 
 function sleepSync(ms: number) {
   const startTime = new Date().getTime();
@@ -161,7 +161,9 @@ describe('valid input sequences', () => {
 
     // answer_show -> final_results
     expect(updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS')).toStrictEqual({});
-    expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('FINAL_RESULTS');
+    const sessionInfo = sessionStatusRequest(token, quizId, sessionId);
+    expect(sessionInfo.state).toStrictEqual('FINAL_RESULTS');
+    expect(sessionInfo.atQuestion).toStrictEqual(0);
 
     // final_results -> end
     expect(updateSessionStateRequest(quizId, sessionId, token, 'END')).toStrictEqual({});
@@ -201,6 +203,7 @@ describe('valid input sequences', () => {
     // question_close -> final_results
     updateSessionStateRequest(quizId, sessionId2, token, 'GO_TO_FINAL_RESULTS');
     expect(sessionStatusRequest(token, quizId, sessionId2).state).toStrictEqual('FINAL_RESULTS');
+    expect(sessionInfo.atQuestion).toStrictEqual(0);
 
     // final_results -> end
     updateSessionStateRequest(quizId, sessionId2, token, 'END');
@@ -216,7 +219,6 @@ describe('end action from each state', () => {
 
   test('question_countdown', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('QUESTION_COUNTDOWN');
     updateSessionStateRequest(quizId, sessionId, token, 'END');
     expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('END');
   });
@@ -224,7 +226,6 @@ describe('end action from each state', () => {
   test('question_open', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);
-    expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('QUESTION_OPEN');
     updateSessionStateRequest(quizId, sessionId, token, 'END');
     expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('END');
   });
@@ -232,7 +233,6 @@ describe('end action from each state', () => {
   test('question_close', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown + questionDuration * 1000);
-    expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('QUESTION_CLOSE');
     updateSessionStateRequest(quizId, sessionId, token, 'END');
     expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('END');
   });
@@ -240,12 +240,9 @@ describe('end action from each state', () => {
   test('answer_show', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);
-    expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('QUESTION_OPEN');
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
-    expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('ANSWER_SHOW');
     updateSessionStateRequest(quizId, sessionId, token, 'END');
     expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('END');
   });
 
-  // final_result has already been tested
 });

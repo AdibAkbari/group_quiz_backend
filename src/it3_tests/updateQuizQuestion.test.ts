@@ -67,9 +67,7 @@ describe('invalid question body - question, duration, points', () => {
   });
 
   test('if this quiz were to be updated, sum of question durations exceed 3 minutes', () => {
-    createQuizQuestionRequest(quizId, user.token, 'Question 2', 50, 5, validAnswers);
-    createQuizQuestionRequest(quizId, user.token, 'Question 3', 50, 5, validAnswers);
-    createQuizQuestionRequest(quizId, user.token, 'Question 4', 50, 5, validAnswers);
+    createQuizQuestionRequest(quizId, user.token, 'Question 2', 145, 5, validAnswers);
     expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 40, 5, validAnswers)).toThrow(HTTPError[400]);
   });
 });
