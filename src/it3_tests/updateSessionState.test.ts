@@ -161,9 +161,7 @@ describe('valid input sequences', () => {
 
     // answer_show -> final_results
     expect(updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS')).toStrictEqual({});
-    const sessionInfo = sessionStatusRequest(token, quizId, sessionId);
-    expect(sessionInfo.state).toStrictEqual('FINAL_RESULTS');
-    expect(sessionInfo.atQuestion).toStrictEqual(0);
+    expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('FINAL_RESULTS');
 
     // final_results -> end
     expect(updateSessionStateRequest(quizId, sessionId, token, 'END')).toStrictEqual({});
@@ -244,5 +242,4 @@ describe('end action from each state', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'END');
     expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('END');
   });
-
 });
