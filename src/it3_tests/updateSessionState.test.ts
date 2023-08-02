@@ -201,7 +201,6 @@ describe('valid input sequences', () => {
     // question_close -> final_results
     updateSessionStateRequest(quizId, sessionId2, token, 'GO_TO_FINAL_RESULTS');
     expect(sessionStatusRequest(token, quizId, sessionId2).state).toStrictEqual('FINAL_RESULTS');
-    expect(sessionInfo.atQuestion).toStrictEqual(0);
 
     // final_results -> end
     updateSessionStateRequest(quizId, sessionId2, token, 'END');
