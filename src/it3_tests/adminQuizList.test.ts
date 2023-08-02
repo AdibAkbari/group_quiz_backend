@@ -7,8 +7,7 @@ import {
   adminQuizListRequestV1,
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
-
-import { TokenId, QuizId } from '../interfaces';
+import { TokenId } from '../interfaces';
 
 const ERROR = { error: expect.any(String) };
 
@@ -23,14 +22,12 @@ beforeEach(() => {
 describe('Token invalid', () => {
   test('invalid token', () => {
     expect(() => adminQuizListRequest('54893h5483')).toThrow(HTTPError[401]);
-  })
+  });
 
   test('Unused tokenId', () => {
     expect(() => adminQuizListRequest(user.token + user2.token)).toThrow(HTTPError[403]);
   });
 });
-
-
 
 describe('valid input', () => {
   test('No quizzes', () => {
@@ -78,7 +75,7 @@ describe('V1 WRAPPERS', () => {
     const list = adminQuizListRequestV1('fheufhw');
     expect(list.body).toStrictEqual(ERROR);
     expect(list.statusCode).toStrictEqual(401);
-  })
+  });
 
   test('Unused tokenId', () => {
     const list = adminQuizListRequestV1(user.token + user2.token);

@@ -39,7 +39,7 @@ describe('Error Cases', () => {
 
   test('token invalid structure', () => {
     expect(() => quizDescriptionUpdateRequest(quiz.quizId, 'fsdfsd6', 'TestQuiz')).toThrow(HTTPError[401]);
-  })
+  });
 
   test('tokenId not logged in', () => {
     expect(() => quizDescriptionUpdateRequest(quiz.quizId, '12345', 'New Description')).toThrow(HTTPError[403]);
@@ -74,7 +74,7 @@ describe('V1 WRAPPERS', () => {
     const update = quizDescriptionUpdateRequestV1(quiz.quizId, '457983yh5243', 'New Description');
     expect(update.statusCode).toBe(401);
     expect(update.body).toStrictEqual(ERROR);
-  })
+  });
 
   test('tokenId not logged in', () => {
     const update = quizDescriptionUpdateRequestV1(quiz.quizId, '12345', 'New Description');

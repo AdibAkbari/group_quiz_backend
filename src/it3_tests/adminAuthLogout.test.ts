@@ -70,5 +70,5 @@ describe('V1 WRAPPERS', () => {
     const logout = authLogoutRequestV1('hello');
     expect(logout.body).toStrictEqual(ERROR);
     expect(logout.statusCode).toStrictEqual(401);
-  })
+  });
 });
