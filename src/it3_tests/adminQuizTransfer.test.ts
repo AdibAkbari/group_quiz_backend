@@ -91,6 +91,7 @@ describe('invalid userEmail', () => {
   });
 });
 
+// END state
 describe('Quiz is not in END state', () => {
   test('quiz not in end state', () => {
     createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 6, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]);

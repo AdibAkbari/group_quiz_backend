@@ -17,9 +17,9 @@ let sessionId: number;
 let playerId: number;
 let questionOneId: number;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
-const FIRST_POS = 0;
-const SECOND_POS = 1;
-const THIRD_POS = 2;
+const FIRST_POS = 1;
+const SECOND_POS = 2;
+const THIRD_POS = 3;
 const finishCountdown = 150;
 
 function sleepSync(ms: number) {

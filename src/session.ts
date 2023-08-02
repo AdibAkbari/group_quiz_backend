@@ -121,6 +121,8 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
     if (session.sessionState === 'QUESTION_CLOSE') {
       calculateQuestionPoints(sessionId, data);
     }
+
+    session.atQuestion = 0;
     session.sessionState = 'FINAL_RESULTS';
   }
 
@@ -133,6 +135,7 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
       const timer = timers.find(id => id.sessionId === sessionId);
       clearTimeout(timer.timer);
     }
+    session.atQuestion = 0;
     session.sessionState = 'END';
   }
 

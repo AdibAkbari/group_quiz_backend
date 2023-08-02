@@ -21,9 +21,9 @@ let answerId2: number;
 let answerId3: number;
 
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
-const FIRST_POS = 0;
-const SECOND_POS = 1;
-const THIRD_POS = 2;
+const FIRST_POS = 1;
+const SECOND_POS = 2;
+const THIRD_POS = 3;
 const finishCountdown = 150;
 const questionDuration = 2;
 

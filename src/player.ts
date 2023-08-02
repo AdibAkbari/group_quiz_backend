@@ -13,7 +13,7 @@ import HTTPError from 'http-errors';
 export function playerJoin(sessionId: number, playerName: string): { playerId: number } {
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
-  if (data.sessions.find(id => id.sessionId === sessionId) === undefined) {
+  if (session === undefined) {
     throw HTTPError(400, 'Invalid: Session Id');
   }
 
@@ -88,7 +88,7 @@ export function playerCurrentQuestionInfo(playerId: number, questionPosition: nu
     throw HTTPError(400, 'Invalid: questionPosition');
   }
 
-  const currentQuestion = session.metadata.questions[questionPosition];
+  const currentQuestion = session.metadata.questions[questionPosition - 1];
   for (const answer of currentQuestion.answers) {
     delete answer.correct;
   }
@@ -119,7 +119,7 @@ export function playerSubmitAnswer(answerIds: number[], playerId: number, questi
     throw HTTPError(400, 'Session is not in QUESTION_OPEN state');
   }
 
-  const currentQuestion = session.metadata.questions[questionPosition];
+  const currentQuestion = session.metadata.questions[questionPosition - 1];
   if (!answerIds.every(answerId => currentQuestion.answers.some(answer => answer.answerId === answerId))) {
     throw HTTPError(400, 'Answer IDs are not valid for this particular question');
   }
