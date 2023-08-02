@@ -78,10 +78,15 @@ describe('invalid question body - question, duration, points', () => {
   });
 
   test('if this quiz were to be updated, sum of question durations exceed 3 minutes', () => {
+<<<<<<< HEAD
     createQuizQuestionRequest(quizId, user.token, 'Question 2', 50, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     createQuizQuestionRequest(quizId, user.token, 'Question 3', 50, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     createQuizQuestionRequest(quizId, user.token, 'Question 4', 50, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 40, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg')).toThrow(HTTPError[400]);
+=======
+    createQuizQuestionRequest(quizId, user.token, 'Question 2', 150, 5, validAnswers);
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 40, 5, validAnswers)).toThrow(HTTPError[400]);
+>>>>>>> df3427fb3ad35d2687e83669df9ee27d2ef4f37c
   });
 });
 
@@ -126,7 +131,11 @@ describe('invalid question body - answers', () => {
       ]
     },
     {
+<<<<<<< HEAD
       testname: 'answer strings duplicate of one another, one false one true',
+=======
+      testname: 'answer strings duplicate of one another',
+>>>>>>> df3427fb3ad35d2687e83669df9ee27d2ef4f37c
       answers: [
         { answer: 'great', correct: false },
         { answer: 'bad', correct: true },
@@ -146,6 +155,7 @@ describe('invalid question body - answers', () => {
 });
 
 describe('Token invalid', () => {
+<<<<<<< HEAD
   test.each([
     { testName: 'token just letters', token: 'hello' },
     { testName: 'token starts with letters', token: 'a54364' },
@@ -155,6 +165,10 @@ describe('Token invalid', () => {
     { testName: 'empty string', token: '' },
   ])('token is not a valid structure: $testName', ({ token }) => {
     expect(() => updateQuizQuestionRequest(quizId, questionId, token, 'How are you?', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg')).toThrow(HTTPError[401]);
+=======
+  test('invalid token structure', () => {
+    expect(() => updateQuizQuestionRequest(quizId, questionId, '432h4324', 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[401]);
+>>>>>>> df3427fb3ad35d2687e83669df9ee27d2ef4f37c
   });
 
   test('Unused tokenId', () => {
@@ -163,6 +177,7 @@ describe('Token invalid', () => {
 });
 
 describe('valid input', () => {
+<<<<<<< HEAD
   test('correct return type and status code', () => {
     const result = updateQuizQuestionRequest(quizId, questionId, user.token, 'New Question', 5, 4, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     expect(result).toStrictEqual({});
@@ -170,6 +185,10 @@ describe('valid input', () => {
 
   test('quiz with one question successfully updated', () => {
     updateQuizQuestionRequest(quizId, questionId, user.token, 'New Question', 5, 4, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+=======
+  test('quiz with one question successfully updated', () => {
+    expect(updateQuizQuestionRequest(quizId, questionId, user.token, 'New Question', 5, 4, validAnswers)).toStrictEqual({});
+>>>>>>> df3427fb3ad35d2687e83669df9ee27d2ef4f37c
     expect(adminQuizInfoRequest(user.token, quizId)).toStrictEqual({
       quizId: quizId,
       name: 'Cats',
@@ -254,20 +273,24 @@ describe('valid input', () => {
   });
 
   test('quiz duration only <3 minutes when old question duration no longer included', () => {
+<<<<<<< HEAD
     const q2Id = createQuizQuestionRequest(quizId, user.token, 'Question 2', 50, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
     createQuizQuestionRequest(quizId, user.token, 'Question 3', 50, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     createQuizQuestionRequest(quizId, user.token, 'Question 4', 50, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     const result = updateQuizQuestionRequest(quizId, q2Id, user.token, 'How are you?', 55, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+=======
+    const q2Id = createQuizQuestionRequest(quizId, user.token, 'Question 2', 50, 5, validAnswers).questionId;
+    createQuizQuestionRequest(quizId, user.token, 'Question 3', 50, 5, validAnswers);
+    createQuizQuestionRequest(quizId, user.token, 'Question 4', 50, 5, validAnswers);
+    const result = updateQuizQuestionRequest(quizId, q2Id, user.token, 'How are you?', 55, 5, validAnswers);
+>>>>>>> df3427fb3ad35d2687e83669df9ee27d2ef4f37c
     expect(result).toStrictEqual({});
   });
 });
 
 describe('V1 WRAPPERS', () => {
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    const result = updateQuizQuestionRequestV1(quizId, questionId, token, 'How are you?', 5, 5, validAnswers);
+  test('invalid token structure', () => {
+    const result = updateQuizQuestionRequestV1(quizId, questionId, '433423,f33', 'How are you?', 5, 5, validAnswers);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(401);
   });

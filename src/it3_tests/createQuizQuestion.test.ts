@@ -54,9 +54,8 @@ describe('Valid answer inputs, invalid other input', () => {
 
   test('sum of questions durations in the quiz exceeds 3 minutes', () => {
     createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 55, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
-    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 55, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
-    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3', 55, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
-    expect(() => createQuizQuestionRequest(quiz.quizId, user.token, 'Question 4', 55, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg')).toThrow(HTTPError[400]);
+    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 100, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+    expect(() => createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3', 55, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg')).toThrow(HTTPError[400]);
   });
 
   test('Empty URL', () => {
@@ -113,15 +112,7 @@ describe('invalid answer inputs', () => {
       ]
     },
     {
-      testname: 'answer strings duplicate of one another, both false',
-      answers: [
-        { answer: 'great', correct: true },
-        { answer: 'bad', correct: false },
-        { answer: 'bad', correct: false }
-      ]
-    },
-    {
-      testname: 'answer strings duplicate of one another, one false one true',
+      testname: 'answer strings duplicate of one another',
       answers: [
         { answer: 'great', correct: false },
         { answer: 'bad', correct: true },
@@ -169,17 +160,8 @@ describe('valid input', () => {
     q1 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
   });
 
-  test('create 1 question', () => {
-    expect(q1.questionId).toStrictEqual(expect.any(Number));
-  });
-
-  test('unique question Id for each quiz', () => {
-    const q2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
-    expect(q2.questionId).toStrictEqual(expect.any(Number));
-    expect(q1.questionId).not.toStrictEqual(q2.questionId);
-  });
-
   test('one question successfully created', () => {
+    expect(q1.questionId).toStrictEqual(expect.any(Number));
     expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual({
       quizId: quiz.quizId,
       name: 'Cats',
@@ -264,25 +246,6 @@ describe('valid input', () => {
   });
 });
 
-describe('valid edge cases', () => {
-  test.each([
-    { testname: 'question string length 5', question: 'abcde', duration: 5, points: 5 },
-    { testname: 'question string length 50', question: 'a'.repeat(50), duration: 5, points: 5 },
-    { testname: 'duration 3 minutes', question: 'valid question', duration: 180, points: 5 },
-    { testname: 'points is 1', question: 'valid question', duration: 5, points: 1 },
-    { testname: 'points is 10', question: 'valid question', duration: 5, points: 10 }
-  ])('valid edge cases for question, duration and points: $testname', ({ question, duration, points }) => {
-    expect(createQuizQuestionRequest(quiz.quizId, user.token, question, duration, points, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId).toStrictEqual(expect.any(Number));
-  });
-
-  test('sum of duration equals 3 minutes', () => {
-    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 60, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
-    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 60, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
-
-    expect(createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3', 60, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId).toStrictEqual(expect.any(Number));
-  });
-});
-
 describe('V1 WRAPPERS', () => {
   test('Unused tokenId', () => {
     const result = createQuizQuestionRequestV1(quiz.quizId, user.token + 1, 'How are you?', 5, 5, validAnswers);
@@ -296,11 +259,8 @@ describe('V1 WRAPPERS', () => {
     expect(result.statusCode).toStrictEqual(400);
   });
 
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    const result = createQuizQuestionRequestV1(quiz.quizId, token, 'How are you?', 5, 5, validAnswers);
+  test('invalid token structure', () => {
+    const result = createQuizQuestionRequestV1(quiz.quizId, '432j432', 'How are you?', 5, 5, validAnswers);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(401);
   });

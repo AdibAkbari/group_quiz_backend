@@ -111,6 +111,23 @@ export function isValidSessionId(sessionId: number, quizId: number): boolean {
   return true;
 }
 
+export function isValidQuestionPosition(playerId: number, questionPosition: number): boolean {
+  const data = getData();
+  const player = data.players.find(id => id.playerId === playerId);
+  const session = data.sessions.find(id => id.sessionId === player.sessionId);
+
+  if (questionPosition > session.metadata.numQuestions) {
+    return false;
+  }
+  if (questionPosition <= 0) {
+    return false;
+  }
+  if (questionPosition !== session.atQuestion) {
+    return false;
+  }
+  return true;
+}
+
 /**
    * Helper function for adminQuizCreate to check if a quiz name is valid
    *
@@ -179,6 +196,12 @@ export function isValidEmail (userEmail: string): boolean {
   return false;
 }
 
+/**
+ * Helper function to give error based on if it is a v1 or v2 route
+ *
+ * @param {} - no params
+ * @returns {string} - playerName
+ */
 export function giveError(isv2: boolean, errorMessage: string, statusCode: number) {
   if (isv2) {
     throw HTTPError(statusCode, errorMessage);
@@ -216,6 +239,21 @@ export function getImg(imgUrl: string) {
 }
   
 /**
+ * Helper function to generate a random string
+ *
+ * @param {} - no params
+ * @returns {string} - playerName
+ */
+export function randomString(string: string) {
+  const array = string.split('');
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array.join('');
+}
+
+/**
  * Helper function to generate a random name if user didnt enter a name
  *
  * @param {} - no params
@@ -224,15 +262,6 @@ export function getImg(imgUrl: string) {
 export function generateName() {
   const letters = 'abcdefghijklmnopqrstuvwxyz';
   const numbers = '0123456789';
-
-  function randomString(str: string) {
-    const array = str.split('');
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array.join('');
-  }
 
   const nameChar = randomString(letters).slice(0, 5);
   const nameNum = randomString(numbers).slice(0, 3);
@@ -255,4 +284,24 @@ export function isValidPlayerId(playerId: number): boolean {
     return false;
   }
   return true;
+}
+
+/**
+   * Helper function to determine if All sessions for this quiz are in END state
+   *
+   * @param {number} quizId
+   * @returns {boolean} - returns true if does exist
+   * @returns {boolean} - returns false if it dosn't exist
+   */
+export function isEndState(quizId: number): boolean {
+  const data: Data = getData();
+  const session = data.sessions.find(session => session.metadata.quizId === quizId);
+
+  if (session === undefined) {
+    return true;
+  }
+  if (session.sessionState === 'END') {
+    return true;
+  }
+  return false;
 }

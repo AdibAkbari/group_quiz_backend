@@ -12,6 +12,7 @@ import {
   isValidEmail,
   giveError,
   getImg,
+  isEndState
 } from './helper';
 import HTTPError from 'http-errors';
 import config from './config.json';
@@ -115,12 +116,15 @@ export function adminQuizCreate(token: string, name: string, description: string
  * @returns {{ }} empty object
  */
 export function adminQuizRemove(token: string, quizId: number, isv2: boolean): Record<string, never> | Error {
-  // invalid token structure
+  if (isv2) {
+    if (!isEndState(quizId)) {
+      throw HTTPError(400, 'Quiz is not in END state');
+    }
+  }
+
   if (!isValidTokenStructure(token)) {
     return giveError(isv2, 'Invalid Token Structure', 401);
   }
-
-  // token is not logged in
   if (!isTokenLoggedIn(token)) {
     return giveError(isv2, 'Token not logged in', 403);
   }
@@ -419,6 +423,12 @@ export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, des
  * @returns {{ }} empty object
  */
 export function adminQuizTransfer (token: string, quizId: number, userEmail: string, isv2: boolean): Record<string, never> | Error {
+  if (isv2) {
+    if (!isEndState(quizId)) {
+      throw HTTPError(400, 'Quiz is not in END state');
+    }
+  }
+
   if (!isValidTokenStructure(token)) {
     return giveError(isv2, 'Invalid Token Structure', 401);
   }
@@ -1010,7 +1020,12 @@ export function quizQuestionDuplicate (quizId: number, questionId: number, token
  * @returns {questionId: number}
  */
 export function deleteQuizQuestion (token: string, quizId: number, questionId: number, isv2: boolean): Record<string, never> | Error {
-  // Error checking for token
+  if (isv2) {
+    if (!isEndState(quizId)) {
+      throw HTTPError(400, 'Quiz is not in END state');
+    }
+  }
+
   if (!isValidTokenStructure(token)) {
     return giveError(isv2, 'invalid token structure', 401);
   }

@@ -530,3 +530,12 @@ export function playerStatusRequest(playerId: number) {
 export function updateQuizThumbnailRequest(quizid: number, token: string, imgUrl: string) {
   return requestHelper('PUT', `/v1/admin/quiz/${quizid}/thumbnail`, { quizid, imgUrl }, { token });
 }
+
+export function playerCurrentQuestionInfoRequest(playerId: number, questionPosition: number) {
+  return requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}`, {});
+}
+
+export function playerSubmitAnswerRequest(answerIds: number[], playerId: number, questionposition: number) {
+  return requestHelper('PUT', `/v1/player/${playerId}/question/${questionposition}/answer`, { answerIds });
+}
+

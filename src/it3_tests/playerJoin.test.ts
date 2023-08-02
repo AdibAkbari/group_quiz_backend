@@ -5,7 +5,8 @@ import {
   createQuizQuestionRequest,
   startSessionRequest,
   playerJoinRequest,
-  // updateSessionStateRequest,
+  updateSessionStateRequest,
+  playerStatusRequest
 } from './it3_testRoutes';
 import { } from '../interfaces';
 import HTTPError from 'http-errors';
@@ -20,7 +21,7 @@ beforeEach(() => {
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
   createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers);
-  sessionId = startSessionRequest(quizId, token, 3).sessionId;
+  sessionId = startSessionRequest(quizId, token, 2).sessionId;
 });
 
 describe('Error cases', () => {
@@ -29,15 +30,26 @@ describe('Error cases', () => {
     expect(() => playerJoinRequest(sessionId, 'Player One')).toThrow(HTTPError[400]);
   });
 
-  // test('Session is not in LOBBY state', () => {
-  //   updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-  //   expect(() => playerJoinRequest(sessionId, 'Player One')).toThrow(HTTPError[400]);
-  // });
+  test('Session is not in LOBBY state', () => {
+    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
+    expect(() => playerJoinRequest(sessionId, 'Player One')).toThrow(HTTPError[400]);
+  });
+
+  test('Invalid sessionId', () => {
+    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
+    expect(() => playerJoinRequest(sessionId + 1, 'Player One')).toThrow(HTTPError[400]);
+  });
 });
 
 describe('Success cases', () => {
   test('Correct Return', () => {
-    expect(playerJoinRequest(sessionId, 'Player One')).toStrictEqual({ playerId: expect.any(Number) });
+    const playerId = playerJoinRequest(sessionId, 'Player One');
+    expect(playerId).toStrictEqual({ playerId: expect.any(Number) });
+    expect(playerStatusRequest(playerId.playerId)).toStrictEqual({
+      state: 'LOBBY',
+      numQuestions: 1,
+      atQuestion: 0,
+    });
   });
 
   test('Empty name', () => {
