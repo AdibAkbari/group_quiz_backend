@@ -25,7 +25,7 @@ beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
   quiz = quizCreateRequest(user.token, 'Cats', 'A quiz about cats');
-  question = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 5, validAnswers);
+  question = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
 });
 
 describe('Token invalid', () => {
@@ -94,8 +94,8 @@ describe('Successfully removed quiz question', () => {
 
   // Check that the quiz question is actually removed
   test('Sucessful quiz remove question integrated check', () => {
-    const questionToRemove = createQuizQuestionRequest(quiz.quizId, user.token, 'Question Remove', 5, 5, validAnswers);
-    const question2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 5, 5, validAnswers);
+    const questionToRemove = createQuizQuestionRequest(quiz.quizId, user.token, 'Question Remove', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+    const question2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
 
     deleteQuizQuestionRequest(user.token, quiz.quizId, questionToRemove.questionId);
 
@@ -116,7 +116,8 @@ describe('Successfully removed quiz question', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         },
         {
           questionId: question2.questionId,
@@ -126,8 +127,9 @@ describe('Successfully removed quiz question', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
-        }
+          ],
+          thumbnailUrl: expect.any(String),
+        },
       ],
       duration: 10
     };
@@ -137,10 +139,10 @@ describe('Successfully removed quiz question', () => {
 
   // check that once a question is removed, the next question still has a unique quiz id
   test('Unique question Id once a question is removed', () => {
-    const questionToRemove = createQuizQuestionRequest(quiz.quizId, user.token, 'questionToRemove', 5, 5, validAnswers);
-    const question2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 5, 5, validAnswers);
+    const questionToRemove = createQuizQuestionRequest(quiz.quizId, user.token, 'questionToRemove', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+    const question2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     deleteQuizQuestionRequest(user.token, quiz.quizId, questionToRemove.questionId);
-    const question3 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3', 5, 5, validAnswers);
+    const question3 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
 
     expect(question3.questionId).not.toStrictEqual(question.questionId);
     expect(question3.questionId).not.toStrictEqual(question2.questionId);
