@@ -28,7 +28,7 @@ let token: string;
 let quizId: number;
 let sessionId: number;
 const duration = 2;
-const finishCountdown = 100;
+const finishCountdown = 150;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
 
 beforeEach(() => {
@@ -117,12 +117,12 @@ describe('Success cases', () => {
 
     let correctAnswerId = questionInfo.answers[0].answerId;
 
-    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);
 
     playerSubmitAnswerRequest([correctAnswerId], playerId, questionPosition);
     playerSubmitAnswerRequest([correctAnswerId], player2Id, questionPosition);
 
+    updateSessionStateRequest(quizId, session2Id, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, session2Id, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);
 
@@ -133,8 +133,8 @@ describe('Success cases', () => {
     playerSubmitAnswerRequest([incorrectAnswerId], playerId, questionPosition + 1);
     playerSubmitAnswerRequest([correctAnswerId], player2Id, questionPosition + 1);
 
-    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
-    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
+    updateSessionStateRequest(quizId, session2Id, token, 'GO_TO_ANSWER');
+    updateSessionStateRequest(quizId, session2Id, token, 'GO_TO_FINAL_RESULTS');
 
     const expected = [
       ['Player', 'question1score', 'question1rank', 'question2score', 'question2rank'],
