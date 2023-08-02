@@ -241,6 +241,14 @@ export function sessionStatus(token: string, quizId: number, sessionId: number):
   };
 }
 
+/**
+ * Returns object containing various results from a completed quiz session
+ *
+ * @param {number} quizId
+ * @param {number} sessionId
+ * @param {string} token
+ * @returns {SessionResults}
+ */
 export function sessionResults(quizId: number, sessionId: number, token: string): SessionResults {
   if (!isValidTokenStructure(token)) {
     throw HTTPError(401, 'Token is not a valid structure');
@@ -268,7 +276,15 @@ export function sessionResults(quizId: number, sessionId: number, token: string)
   return getSessionResults(session);
 }
 
-export function sessionResultsCSV(quizId: number, sessionId: number, token: string) {
+/**
+ * Creates a CSV file with results for each player and question. Returns URL to file.
+ * 
+ * @param {number} quizId 
+ * @param {number} sessionId 
+ * @param {string} token 
+ * @returns {{url: string}}
+ */
+export function sessionResultsCSV(quizId: number, sessionId: number, token: string):{url: string} {
   if (!isValidTokenStructure(token)) {
     throw HTTPError(401, 'Token is not a valid structure');
   }
@@ -314,7 +330,6 @@ export function sessionResultsCSV(quizId: number, sessionId: number, token: stri
         questionRanking.sort((player1, player2) => {
           return player2.questionResponse[col].points - player1.questionResponse[col].points;
         });
-        console.log('QUESTION RANKING\n' + questionRanking);
         const score = playerList[row].questionResponse[col].points;
         const rank = (questionRanking.findIndex(player => player.playerId === playerList[row].playerId) + 1);
         playerResults.push(score.toString());
@@ -331,7 +346,6 @@ export function sessionResultsCSV(quizId: number, sessionId: number, token: stri
 
   fs.writeFileSync(`./session${sessionId}_results.csv`, csvResults);
 
-  // Construct the URL to the file and return it
   const fileUrl = `${config.url}:${config.port}/session${sessionId}_results.csv`;
 
   return { url: fileUrl };

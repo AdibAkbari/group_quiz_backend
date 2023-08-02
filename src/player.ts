@@ -86,6 +86,12 @@ export function playerCurrentQuestionInfo(playerId: number, questionPosition: nu
   };
 }
 
+/**
+ * Returns results of completed session player is in
+ * 
+ * @param {number} playerId 
+ * @returns {SessionResults}
+ */
 export function playerResults(playerId: number): SessionResults {
   if (!isValidPlayerId(playerId)) {
     throw HTTPError(400, 'Invalid: PlayerId');
@@ -102,6 +108,13 @@ export function playerResults(playerId: number): SessionResults {
   return getSessionResults(session);
 }
 
+/**
+ * Returns results of specified question for session player is in
+ * 
+ * @param {number} playerId 
+ * @param {number} questionPosition 
+ * @returns {QuestionResult}
+ */
 export function playerQuestionResults(playerId: number, questionPosition: number): QuestionResult {
   if (!isValidPlayerId(playerId)) {
     throw HTTPError(400, 'Invalid: PlayerId');

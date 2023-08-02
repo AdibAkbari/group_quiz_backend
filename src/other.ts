@@ -32,7 +32,7 @@ export function clear (): Record<string, never> {
     .forEach(file => {
       fs.unlinkSync('./' + file);
     }
-    );
+  );
 
   return { };
 }
