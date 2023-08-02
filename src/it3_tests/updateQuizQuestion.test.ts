@@ -21,7 +21,7 @@ beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
   quizId = quizCreateRequest(user.token, 'Cats', 'A quiz about cats').quizId;
-  questionId = createQuizQuestionRequest(quizId, user.token, 'Question 1?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).questionId;
+  questionId = createQuizQuestionRequest(quizId, user.token, 'Question 1?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }], 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
 });
 
 describe('Invalid params', () => {
@@ -78,9 +78,9 @@ describe('invalid question body - question, duration, points', () => {
   });
 
   test('if this quiz were to be updated, sum of question durations exceed 3 minutes', () => {
-    createQuizQuestionRequest(quizId, user.token, 'Question 2', 50, 5, validAnswers);
-    createQuizQuestionRequest(quizId, user.token, 'Question 3', 50, 5, validAnswers);
-    createQuizQuestionRequest(quizId, user.token, 'Question 4', 50, 5, validAnswers);
+    createQuizQuestionRequest(quizId, user.token, 'Question 2', 50, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+    createQuizQuestionRequest(quizId, user.token, 'Question 3', 50, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+    createQuizQuestionRequest(quizId, user.token, 'Question 4', 50, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 40, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg')).toThrow(HTTPError[400]);
   });
 });
@@ -195,8 +195,8 @@ describe('valid input', () => {
   });
 
   test('quiz with multiple questions successfully updated', () => {
-    const q2Id = createQuizQuestionRequest(quizId, user.token, 'Question 2?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).questionId;
-    const q3Id = createQuizQuestionRequest(quizId, user.token, 'Question 3?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).questionId;
+    const q2Id = createQuizQuestionRequest(quizId, user.token, 'Question 2?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }], 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
+    const q3Id = createQuizQuestionRequest(quizId, user.token, 'Question 3?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }], 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
     updateQuizQuestionRequest(quizId, q2Id, user.token, 'New Question 2', 5, 4, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
 
     const expected = {
@@ -215,7 +215,8 @@ describe('valid input', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         },
         {
           questionId: q2Id,
@@ -236,7 +237,8 @@ describe('valid input', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         },
       ],
       duration: 17,
@@ -252,9 +254,9 @@ describe('valid input', () => {
   });
 
   test('quiz duration only <3 minutes when old question duration no longer included', () => {
-    const q2Id = createQuizQuestionRequest(quizId, user.token, 'Question 2', 50, 5, validAnswers).questionId;
-    createQuizQuestionRequest(quizId, user.token, 'Question 3', 50, 5, validAnswers);
-    createQuizQuestionRequest(quizId, user.token, 'Question 4', 50, 5, validAnswers);
+    const q2Id = createQuizQuestionRequest(quizId, user.token, 'Question 2', 50, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
+    createQuizQuestionRequest(quizId, user.token, 'Question 3', 50, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+    createQuizQuestionRequest(quizId, user.token, 'Question 4', 50, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     const result = updateQuizQuestionRequest(quizId, q2Id, user.token, 'How are you?', 55, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     expect(result).toStrictEqual({});
   });
