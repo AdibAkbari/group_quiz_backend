@@ -67,7 +67,7 @@ describe('invalid name/description edge cases', () => {
 describe('Token invalid', () => {
   test('token invalid structure', () => {
     expect(() => quizCreateRequest('84357h543', 'TestQuiz', '')).toThrow(HTTPError[401]);
-  })
+  });
 
   test('Nobody logged in', () => {
     expect(() => quizCreateRequest('7', 'TestQuiz', '')).toThrow(HTTPError[403]);
@@ -111,7 +111,7 @@ describe('V1 WRAPPERS', () => {
     const quiz = quizCreateRequestV1('54353h54', 'TestQuiz', '');
     expect(quiz.body).toStrictEqual(ERROR);
     expect(quiz.statusCode).toStrictEqual(401);
-  })
+  });
 
   test('Nobody logged in', () => {
     const quiz = quizCreateRequestV1('7', 'TestQuiz', '');

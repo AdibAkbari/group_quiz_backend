@@ -27,8 +27,7 @@ beforeEach(() => {
 describe('Token invalid', () => {
   test('invalid token structure', () => {
     expect(() => quizRemoveRequest('fhsfs', quiz.quizId)).toThrow(HTTPError[401]);
-
-  })
+  });
 
   test('Nobody logged in', () => {
     expect(() => quizRemoveRequest('7', quiz.quizId)).toThrow(HTTPError[403]);
@@ -62,7 +61,6 @@ describe('Failed to remove', () => {
 });
 
 describe('Successfully removed quiz check', () => {
-
   test('Sucessful quiz remove', () => {
     const quiz2 = quizCreateRequest(user.token, 'quiz2', '');
     const quizToRemove = quizCreateRequest(user.token, 'quizToRemove', '');
@@ -101,7 +99,6 @@ describe('Successfully removed quiz check', () => {
     quizCreateRequest(user.token, 'quiz2', '');
     expect(() => adminQuizInfoRequest(user.token, quiz.quizId)).toThrow(HTTPError[400]);
   });
-
 });
 
 describe('V1 WRAPPERS', () => {
@@ -109,8 +106,7 @@ describe('V1 WRAPPERS', () => {
     const removeQuiz = quizRemoveRequestV1('fsdjfs', quiz.quizId);
     expect(removeQuiz.body).toStrictEqual(ERROR);
     expect(removeQuiz.statusCode).toStrictEqual(401);
-  })
-
+  });
 
   test('Nobody logged in', () => {
     const removeQuiz = quizRemoveRequestV1('7', quiz.quizId);

@@ -23,7 +23,7 @@ beforeEach(() => {
 describe('Token invalid', () => {
   test('invalid token structure', () => {
     expect(() => quizNameUpdateRequest('543j', quiz.quizId, 'TestQuizUpdate')).toThrow(HTTPError[401]);
-  })
+  });
 
   test('Nobody logged in', () => {
     expect(() => quizNameUpdateRequest('7', quiz.quizId, 'TestQuizUpdate')).toThrow(HTTPError[403]);
@@ -49,7 +49,7 @@ describe('Invalid adminQuizNameUpdate', () => {
   // Output error if new name contains not alphanumeric characters
   test('name contains non-alphanumeric characters', () => {
     expect(() => quizNameUpdateRequest(user.token, quiz.quizId, 'test;!')).toThrow(HTTPError[400]);
-  })
+  });
 
   test.each([
     {
@@ -77,7 +77,6 @@ describe('Invalid adminQuizNameUpdate', () => {
 });
 
 describe('Valid adminQuizNameUpdate', () => {
-
   test('successful quiz name update', () => {
     expect(quizNameUpdateRequest(user.token, quiz.quizId, 'New Quiz')).toStrictEqual({});
 
@@ -91,7 +90,7 @@ describe('Valid adminQuizNameUpdate', () => {
       questions: [],
       duration: 0,
     });
-  })
+  });
 
   test('Correct time last edited', () => {
     const expectedTimeTransfered = Math.floor(Date.now() / 1000);
@@ -117,17 +116,17 @@ describe('V1 WRAPPERS', () => {
     const newQuiz = quizNameUpdateRequestV1('fsfsf', quiz.quizId, 'TestQuizUpdate');
     expect(newQuiz.body).toStrictEqual(ERROR);
     expect(newQuiz.statusCode).toStrictEqual(401);
-  })
+  });
 
   test('Nobody logged in', () => {
     const newQuiz = quizNameUpdateRequestV1('7', quiz.quizId, 'TestQuizUpdate');
     expect(newQuiz.body).toStrictEqual(ERROR);
     expect(newQuiz.statusCode).toStrictEqual(403);
   });
-  
+
   test('successful name update', () => {
     const newQuiz = quizNameUpdateRequestV1(user.token, quiz.quizId, 'qz1');
     expect(newQuiz.body).toStrictEqual({});
     expect(newQuiz.statusCode).toStrictEqual(200);
-  })
+  });
 });
