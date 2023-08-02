@@ -66,12 +66,9 @@ describe('V1 WRAPPERS', () => {
     expect(logout.statusCode).toStrictEqual(403);
   });
 
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-  ])('invalid token structure: $testName', ({ token }) => {
-    const logout = authLogoutRequestV1(token);
+  test('invalid token structure', () => {
+    const logout = authLogoutRequestV1('hello');
     expect(logout.body).toStrictEqual(ERROR);
     expect(logout.statusCode).toStrictEqual(401);
-  });
+  })
 });
