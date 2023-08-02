@@ -138,7 +138,7 @@ export interface QuestionCorrectBreakdown {
   playersCorrect: string[];
 }
 
-export interface QuestionResult {
+interface QuestionResult {
   questionId: number;
   questionCorrectBreakdown: QuestionCorrectBreakdown[];
   averageAnswerTime: number;
