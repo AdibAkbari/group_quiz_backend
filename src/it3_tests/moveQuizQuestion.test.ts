@@ -125,7 +125,7 @@ describe('Successful Move Question', () => {
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
           ],
-          thumbnailUrl: expect.any(String,)
+          thumbnailUrl: expect.any(String)
         },
       ],
       duration: 12

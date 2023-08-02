@@ -99,8 +99,8 @@ describe('valid input', () => {
   test('two questions, duplicate the first', () => {
     const answersQuestion2 = [{ answer: 'yum', correct: true }, { answer: 'ew', correct: false }];
     const questionTwo = createQuizQuestionRequest(quiz.quizId, user.token, 'Pineapples on pizza?', 3, 3, answersQuestion2, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
-    const result = quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user.token);
     const timeNow = Math.floor(Date.now() / 1000);
+    const result = quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user.token);
     const info = adminQuizInfoRequest(user.token, quiz.quizId);
     expect(result).toStrictEqual({ newQuestionId: expect.any(Number) });
     expect(info).toStrictEqual({

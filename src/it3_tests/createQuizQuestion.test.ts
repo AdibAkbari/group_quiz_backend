@@ -207,7 +207,7 @@ describe('valid input', () => {
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
           ],
-          thumbnailUrl: expect.any(String),  
+          thumbnailUrl: expect.any(String),
         },
         {
           questionId: q2.questionId,
@@ -218,7 +218,7 @@ describe('valid input', () => {
             { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false },
           ],
-          thumbnailUrl: expect.any(String),  
+          thumbnailUrl: expect.any(String),
         },
         {
           questionId: q3.questionId,
@@ -229,7 +229,7 @@ describe('valid input', () => {
             { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false },
           ],
-          thumbnailUrl: expect.any(String),  
+          thumbnailUrl: expect.any(String),
         },
       ],
       duration: 17

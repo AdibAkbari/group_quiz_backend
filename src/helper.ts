@@ -237,7 +237,7 @@ export function getImg(imgUrl: string) {
   fs.writeFileSync(`./static/${thumbnail}.${fileType}`, body, { flag: 'w' });
   return `${thumbnail}.${fileType}`;
 }
-  
+
 /**
  * Helper function to generate a random string
  *

@@ -538,4 +538,3 @@ export function playerCurrentQuestionInfoRequest(playerId: number, questionPosit
 export function playerSubmitAnswerRequest(answerIds: number[], playerId: number, questionposition: number) {
   return requestHelper('PUT', `/v1/player/${playerId}/question/${questionposition}/answer`, { answerIds });
 }
-

@@ -299,7 +299,7 @@ export function adminQuizInfo(token: string, quizId: number, isv2: boolean): Err
   const data: Data = getData();
   const quiz = data.quizzes.find(id => id.quizId === quizId);
 
-  if (isv2 & quiz.thumbnailUrl != undefined) {
+  if (isv2 & quiz.thumbnailUrl !== undefined) {
     return {
       quizId: quizId,
       name: quiz.name,
@@ -494,7 +494,7 @@ export function adminQuizTransfer (token: string, quizId: number, userEmail: str
  * @param {string} thumbnailUrl
  * @returns {questionId: number}
  */
-export function createQuizQuestion(quizId: number, token: string, question: string, duration: number, points: number, answers: Answers[],thumbnailUrl: string, isv2: boolean): {questionId: number} | Error {
+export function createQuizQuestion(quizId: number, token: string, question: string, duration: number, points: number, answers: Answers[], thumbnailUrl: string, isv2: boolean): {questionId: number} | Error {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
     return giveError(isv2, 'invalid token structure', 401);
@@ -790,7 +790,7 @@ export function updateQuizQuestionv1(quizId: number, questionId: number, token: 
   if (answers.find(answer => answer.correct === true) === undefined) {
     return giveError(isv2, 'invalid input: must be at least one correct answer', 400);
   }
-  
+
   const data = getData();
   const currentQuiz = data.quizzes.find(id => id.quizId === quizId);
   const qIndex = currentQuiz.questions.findIndex(id => id.questionId === questionId);
@@ -898,8 +898,6 @@ export function updateQuizQuestion(quizId: number, questionId: number, token: st
     return giveError(isv2, 'invalid input: url must be a jpg or png file type', 400);
   }
 
-  
-
   const data = getData();
   const currentQuiz = data.quizzes.find(id => id.quizId === quizId);
   const qIndex = currentQuiz.questions.findIndex(id => id.questionId === questionId);
@@ -986,17 +984,18 @@ export function quizQuestionDuplicate (quizId: number, questionId: number, token
   data.quizzes[quizIndex].duration += data.quizzes[quizIndex].questions[questionIndex].duration;
   data.quizzes[quizIndex].timeLastEdited = timeNow;
 
+  let newQuestion: Question;
   if (isv2) {
-    const newQuestion: Question = {
+    newQuestion = {
       questionId: newQuestionId,
       question: data.quizzes[quizIndex].questions[questionIndex].question,
       duration: data.quizzes[quizIndex].questions[questionIndex].duration,
       points: data.quizzes[quizIndex].questions[questionIndex].points,
       answers: data.quizzes[quizIndex].questions[questionIndex].answers,
       thumbnailUrl: data.quizzes[quizIndex].questions[questionIndex].thumbnailUrl,
-    }
+    };
   } else {
-    const newQuestion: Question = {
+    newQuestion = {
       questionId: newQuestionId,
       question: data.quizzes[quizIndex].questions[questionIndex].question,
       duration: data.quizzes[quizIndex].questions[questionIndex].duration,
@@ -1004,7 +1003,6 @@ export function quizQuestionDuplicate (quizId: number, questionId: number, token
       answers: data.quizzes[quizIndex].questions[questionIndex].answers,
     };
   }
-
   data.quizzes[quizIndex].questions.splice(questionIndex + 1, 0, newQuestion);
   setData(data);
 
