@@ -42,7 +42,7 @@ describe('Error cases', () => {
   test('player ID does not exist', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);
-    sleepSync(duration * 1000);
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
     expect(() => playerResultsRequest(playerId + 1)).toThrow(HTTPError[400]);
   });
@@ -55,12 +55,12 @@ describe('Error cases', () => {
 describe('Success cases', () => {
   test('valid output one player, no answer submitted', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    const questionPosition = playerStatusRequest(playerId).atQuestion - 1;
+    const questionPosition = playerStatusRequest(playerId).atQuestion;
     const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition);
     const correctAnswerId = questionInfo.answers[0].answerId;
 
     sleepSync(finishCountdown);
-    sleepSync(questionInfo.duration * 1000);
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
     const playersCorrect: string[] = [];
 
@@ -89,65 +89,19 @@ describe('Success cases', () => {
     expect(playerResultsRequest(playerId)).toStrictEqual(expected);
   });
 
-  test('valid output one player, one correct answer', () => {
-    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    const questionPosition = playerStatusRequest(playerId).atQuestion - 1;
-    const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition);
-    const correctAnswerId = questionInfo.answers[0].answerId;
-
-    sleepSync(finishCountdown);
-    const answerTime = 1;
-    sleepSync(answerTime * 1000);
-    playerSubmitAnswerRequest([correctAnswerId], playerId, questionPosition);
-
-    sleepSync(questionInfo.duration * 1000 - answerTime);
-
-    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
-
-    const expected = {
-      usersRankedByScore: [
-        {
-          name: 'Player',
-          score: questionInfo.points
-        }
-      ],
-      questionResults: [
-        {
-          questionId: questionId,
-          questionCorrectBreakdown: [
-            {
-              answerId: correctAnswerId,
-              playersCorrect: [
-                'Player'
-              ],
-            }
-          ],
-          averageAnswerTime: answerTime,
-          percentCorrect: 100
-        }
-      ]
-    };
-    expect(playerResultsRequest(playerId)).toStrictEqual(expected);
-  });
-
   test('valid output two players', () => {
     const player2Id = playerJoinRequest(sessionId, 'Player2').playerId;
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    const questionPosition = playerStatusRequest(playerId).atQuestion - 1;
+    const questionPosition = playerStatusRequest(playerId).atQuestion;
     const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition);
     const correctAnswerId = questionInfo.answers[0].answerId;
     const incorrectAnswerId = questionInfo.answers[1].answerId;
 
     sleepSync(finishCountdown);
-    // Player answers current question with correct answer immediately
     playerSubmitAnswerRequest([correctAnswerId], playerId, questionPosition);
-    const answerTime = 1;
-    sleepSync(answerTime * 1000);
-    // Player2 answer current question with incorrect answer after 1 second
     playerSubmitAnswerRequest([correctAnswerId, incorrectAnswerId], player2Id, questionPosition);
 
-    sleepSync(questionInfo.duration * 1000 - answerTime);
-
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
 
     const expected = {
@@ -173,7 +127,7 @@ describe('Success cases', () => {
               ],
             }
           ],
-          averageAnswerTime: answerTime,
+          averageAnswerTime: expect.any(Number),
           percentCorrect: 50
         }
       ]

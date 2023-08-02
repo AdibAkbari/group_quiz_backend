@@ -140,21 +140,17 @@ export function playerQuestionResults(playerId: number, questionPosition: number
   const player = data.players.find(id => id.playerId === playerId);
   const session = data.sessions.find(id => id.sessionId === player.sessionId);
 
-  if (questionPosition > session.metadata.numQuestions - 1) {
-    throw HTTPError(400, 'Question position is not valid');
-  }
-
   if (session.sessionState !== 'ANSWER_SHOW') {
     throw HTTPError(400, 'Session is not in ANSWER_SHOW state');
   }
 
   if (!isValidQuestionPosition(playerId, questionPosition)) {
-    throw HTTPError(400, 'Session not yet up to this question');
+    throw HTTPError(400, 'Invalid question position');
   }
 
   const playerList = data.players.filter(player => session.players.includes(player.name));
 
-  return questionResult(questionPosition, session, playerList);
+  return questionResult(questionPosition - 1, session, playerList);
 }
 
 export function playerSubmitAnswer(answerIds: number[], playerId: number, questionPosition: number): Record<string, never> {

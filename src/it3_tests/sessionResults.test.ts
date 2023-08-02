@@ -73,7 +73,7 @@ describe('Error cases', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
-    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');;
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
     expect(() => sessionResultsRequest(quizId, sessionId + 1, token)).toThrow(HTTPError[400]);
   });
 

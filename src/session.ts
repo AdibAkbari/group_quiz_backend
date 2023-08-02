@@ -188,10 +188,7 @@ function calculateQuestionPoints(sessionId: number, data: Data) {
   filteredPlayers.sort(function(a, b) {
     const timeA = a.questionResponse.find((id: any) => id.questionId === questionId).answerTime;
     const timeB = b.questionResponse.find((id: any) => id.questionId === questionId).answerTime;
-    if (timeA < timeB) {
-      return -1;
-    }
-    return 1;
+    return timeA - timeB;
   });
 
   const points = question.points;
