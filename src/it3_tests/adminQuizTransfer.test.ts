@@ -91,6 +91,7 @@ describe('invalid userEmail', () => {
   });
 });
 
+// END state
 describe('Quiz is not in END state', () => {
   test('quiz not in end state', () => {
     createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 6, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]);
@@ -103,6 +104,13 @@ describe('Quiz is not in END state', () => {
 // Success cases
 describe('Successful quiz transfer', () => {
   test('Successful transfer quiz empty object response', () => {
+    expect(quizTransferRequest(user.token, quiz.quizId, 'email2@gmail.com')).toStrictEqual({});
+  });
+
+  test('Quiz IS in END state', () => {
+    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 6, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]);
+    const sessionId = startSessionRequest(quiz.quizId, user.token, 3).sessionId;
+    updateSessionStateRequest(quiz.quizId, sessionId, user.token, 'END');
     expect(quizTransferRequest(user.token, quiz.quizId, 'email2@gmail.com')).toStrictEqual({});
   });
 

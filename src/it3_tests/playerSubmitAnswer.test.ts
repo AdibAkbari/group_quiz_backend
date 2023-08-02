@@ -21,9 +21,9 @@ let answerId2: number;
 let answerId3: number;
 
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
-const FIRST_POS = 0;
-const SECOND_POS = 1;
-const THIRD_POS = 2;
+const FIRST_POS = 1;
+const SECOND_POS = 2;
+const THIRD_POS = 3;
 const finishCountdown = 150;
 const questionDuration = 2;
 
@@ -101,6 +101,18 @@ describe('Success cases', () => {
     answerId2 = playerCurrentQuestionInfoRequest(playerId, SECOND_POS).answers[0].answerId;
     answerId3 = playerCurrentQuestionInfoRequest(playerId, SECOND_POS).answers[1].answerId;
 
+    expect(playerSubmitAnswerRequest([answerId2, answerId3], playerId, SECOND_POS)).toStrictEqual({});
+  });
+
+  test('Resubmit answer', () => {
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
+    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
+    sleepSync(finishCountdown);
+
+    answerId2 = playerCurrentQuestionInfoRequest(playerId, SECOND_POS).answers[0].answerId;
+    answerId3 = playerCurrentQuestionInfoRequest(playerId, SECOND_POS).answers[1].answerId;
+
+    playerSubmitAnswerRequest([answerId2], playerId, SECOND_POS);
     expect(playerSubmitAnswerRequest([answerId2, answerId3], playerId, SECOND_POS)).toStrictEqual({});
   });
 });
