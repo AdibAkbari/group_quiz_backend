@@ -49,6 +49,9 @@ describe('Token invalid', () => {
   ])('token is not a valid structure: $testName', ({ token }) => {
     expect(() => moveQuizQuestionRequest(token, quizId, question1Id, 1)).toThrow(HTTPError[401]);
   });
+  test('invalid token structure', () => {
+    expect(() => moveQuizQuestionRequest('432 432', quizId, question1Id, 1)).toThrow(HTTPError[401]);
+  });
 
   test('Unused tokenId', () => {
     expect(() => moveQuizQuestionRequest(user.token + 1, quizId, question1Id, 1)).toThrow(HTTPError[403]);
@@ -90,12 +93,8 @@ describe('Invalid newPosition test', () => {
 });
 
 describe('Successful Move Question', () => {
-  test('correct return', () => {
-    expect(moveQuizQuestionRequest(user.token, quizId, question1Id, 1)).toStrictEqual({});
-  });
-
   test('correct QuizInfo output', () => {
-    moveQuizQuestionRequest(user.token, quizId, question1Id, 1);
+    expect(moveQuizQuestionRequest(user.token, quizId, question1Id, 1)).toStrictEqual({});
 
     const received = adminQuizInfoRequest(user.token, quizId);
     const expected = {
@@ -220,11 +219,8 @@ describe('Successful Move Question', () => {
 });
 
 describe('V1 WRAPPERS', () => {
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    const result = moveQuizQuestionRequestV1(token, quizId, question1Id, 1);
+  test('invalid token structure', () => {
+    const result = moveQuizQuestionRequestV1('5434h432', quizId, question1Id, 1);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(401);
   });

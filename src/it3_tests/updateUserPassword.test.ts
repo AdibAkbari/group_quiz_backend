@@ -90,11 +90,8 @@ describe('V1 WRAPPERS', () => {
     expect(login.body).toStrictEqual(ERROR);
   });
 
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-  ])('invalid token: $testName', ({ token }) => {
-    const update = updateUserPasswordRequestV1(token, 'password1', 'password2');
+  test('invalid token structure', () => {
+    const update = updateUserPasswordRequestV1('432h432', 'password1', 'password2');
     expect(update.statusCode).toBe(401);
     expect(update.body).toStrictEqual(ERROR);
   });

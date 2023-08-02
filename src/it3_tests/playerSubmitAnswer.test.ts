@@ -24,7 +24,7 @@ const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2',
 const FIRST_POS = 1;
 const SECOND_POS = 2;
 const THIRD_POS = 3;
-const finishCountdown = 150;
+const finishCountdown = 100;
 const questionDuration = 2;
 
 function sleepSync(ms: number) {
@@ -51,34 +51,32 @@ beforeEach(() => {
 });
 
 describe('Error cases', () => {
-  test('PlayerId does not exist', () => {
+  beforeEach(() => {
     answerId = playerCurrentQuestionInfoRequest(playerId, FIRST_POS).answers[0].answerId;
+  });
+
+  test('PlayerId does not exist', () => {
     expect(() => playerSubmitAnswerRequest([answerId], playerId + 1, FIRST_POS)).toThrow(HTTPError[400]);
   });
 
   test('Question position is not valid for the session this player is in', () => {
-    answerId = playerCurrentQuestionInfoRequest(playerId, FIRST_POS).answers[0].answerId;
     expect(() => playerSubmitAnswerRequest([answerId], playerId, THIRD_POS)).toThrow(HTTPError[400]);
   });
 
   test('Session is not in QUESTION_OPEN', () => {
-    sleepSync(questionDuration * 1000);
-    answerId = playerCurrentQuestionInfoRequest(playerId, FIRST_POS).answers[0].answerId;
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     expect(() => playerSubmitAnswerRequest([answerId], playerId, FIRST_POS)).toThrow(HTTPError[400]);
   });
 
   test('Session is not currently on this question', () => {
-    answerId = playerCurrentQuestionInfoRequest(playerId, FIRST_POS).answers[0].answerId;
     expect(() => playerSubmitAnswerRequest([answerId], playerId, SECOND_POS)).toThrow(HTTPError[400]);
   });
 
   test('Answer IDs are not valid for this particular question', () => {
-    answerId = playerCurrentQuestionInfoRequest(playerId, FIRST_POS).answers[0].answerId;
     expect(() => playerSubmitAnswerRequest([answerId + 18282], playerId, FIRST_POS)).toThrow(HTTPError[400]);
   });
 
   test('There are duplicate answer IDs provided', () => {
-    answerId = playerCurrentQuestionInfoRequest(playerId, FIRST_POS).answers[0].answerId;
     expect(() => playerSubmitAnswerRequest([answerId, answerId], playerId, FIRST_POS)).toThrow(HTTPError[400]);
   });
 

@@ -15,8 +15,8 @@ let quizId: number;
 let sessionId: number;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
 
-const finishCountdown = 150;
-const questionDuration = 2;
+const finishCountdown = 100;
+const questionDuration = 1;
 
 function sleepSync(ms: number) {
   const startTime = new Date().getTime();
@@ -101,12 +101,10 @@ describe('action enum cannot be applied in current state', () => {
     expect(() => updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION')).toThrow(HTTPError[400]);
     expect(() => updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS')).toThrow(HTTPError[400]);
   });
+
   test('invalid action in answer_show', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-
     sleepSync(finishCountdown);
-    expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('QUESTION_OPEN');
-
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('ANSWER_SHOW');
 
@@ -117,6 +115,8 @@ describe('action enum cannot be applied in current state', () => {
     sleepSync(finishCountdown);
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
+    expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('FINAL_RESULTS');
+
     expect(() => updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION')).toThrow(HTTPError[400]);
     expect(() => updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER')).toThrow(HTTPError[400]);
     expect(() => updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS')).toThrow(HTTPError[400]);
@@ -161,7 +161,9 @@ describe('valid input sequences', () => {
 
     // answer_show -> final_results
     expect(updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS')).toStrictEqual({});
-    expect(sessionStatusRequest(token, quizId, sessionId).state).toStrictEqual('FINAL_RESULTS');
+    const sessionInfo = sessionStatusRequest(token, quizId, sessionId);
+    expect(sessionInfo.state).toStrictEqual('FINAL_RESULTS');
+    expect(sessionInfo.atQuestion).toStrictEqual(0);
 
     // final_results -> end
     expect(updateSessionStateRequest(quizId, sessionId, token, 'END')).toStrictEqual({});
@@ -204,7 +206,9 @@ describe('valid input sequences', () => {
 
     // final_results -> end
     updateSessionStateRequest(quizId, sessionId2, token, 'END');
-    expect(sessionStatusRequest(token, quizId, sessionId2).state).toStrictEqual('END');
+    const sessionInfo2 = sessionStatusRequest(token, quizId, sessionId2);
+    expect(sessionInfo2.state).toStrictEqual('END');
+    expect(sessionInfo2.atQuestion).toStrictEqual(0);
   });
 });
 
