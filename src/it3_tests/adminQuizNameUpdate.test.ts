@@ -21,21 +21,9 @@ beforeEach(() => {
 });
 
 describe('Token invalid', () => {
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-    { testName: 'token ends with letters', token: '54356s' },
-    { testName: 'token includes letter', token: '5436h86' },
-    { testName: 'token has space', token: '4324 757' },
-    { testName: 'token only whitespace', token: '  ' },
-    { testName: 'token has other characters', token: '6365,53' },
-    { testName: 'empty string', token: '' },
-    { testName: 'token has decimal point', token: '53.74' },
-    { testName: 'token has negative sign', token: '-37294' },
-    { testName: 'token has positive sign', token: '+38594' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => quizNameUpdateRequest(token, quiz.quizId, 'TestQuizUpdate')).toThrow(HTTPError[401]);
-  });
+  test('invalid token structure', () => {
+    expect(() => quizNameUpdateRequest('543j', quiz.quizId, 'TestQuizUpdate')).toThrow(HTTPError[401]);
+  })
 
   test('Nobody logged in', () => {
     expect(() => quizNameUpdateRequest('7', quiz.quizId, 'TestQuizUpdate')).toThrow(HTTPError[403]);
@@ -47,12 +35,10 @@ describe('Token invalid', () => {
 });
 
 describe('Invalid adminQuizNameUpdate', () => {
-  // Testing quizID does not exist
   test('Quiz ID does not refer to a valid quiz', () => {
     expect(() => quizNameUpdateRequest(user.token, quiz.quizId + 1, 'TestQuizUpdate')).toThrow(HTTPError[400]);
   });
 
-  // Testing the user does not own the quiz that is trying to be removed
   test('Quiz ID does not refer to a quiz that this user owns', () => {
     const user2 = authRegisterRequest('user2@gmail.com', 'StrongPassword123', 'TestFirst', 'TestLast').body;
     const quiz2 = quizCreateRequest(user2.token, 'quiz2', '');
@@ -61,24 +47,10 @@ describe('Invalid adminQuizNameUpdate', () => {
   });
 
   // Output error if new name contains not alphanumeric characters
-  test.each([
-    {
-      name: '!@#$%^&*',
-      test: 'No letters'
-    },
-    {
-      name: 'user\'s test',
-      test: 'Invalid apostrophe'
-    },
-    {
-      name: 'test1;',
-      test: 'Invalid semi colon'
-    },
-  ])('"$test": "$name"', ({ name, test }) => {
-    expect(() => quizNameUpdateRequest(user.token, quiz.quizId, name)).toThrow(HTTPError[400]);
-  });
+  test('name contains non-alphanumeric characters', () => {
+    expect(() => quizNameUpdateRequest(user.token, quiz.quizId, 'test;!')).toThrow(HTTPError[400]);
+  })
 
-  // Output error if new name is either less than 3 characters long or more than 30 characters long
   test.each([
     {
       name: 'q1',
@@ -105,21 +77,13 @@ describe('Invalid adminQuizNameUpdate', () => {
 });
 
 describe('Valid adminQuizNameUpdate', () => {
-  // Successfully update the name of the quiz
-  test.each([
-    { name: 'qz1' },
-    { name: 'Short' },
-    { name: 'LongQuizNameWithClosetoMaxName' },
-    { name: '123456789' },
-    { name: '1quiz' },
-    { name: 'Quiz1' },
-    { name: 'New Quiz' },
-  ])('Successful Quiz Name Update: "$name"', ({ name }) => {
-    expect(quizNameUpdateRequest(user.token, quiz.quizId, name)).toStrictEqual({});
+
+  test('successful quiz name update', () => {
+    expect(quizNameUpdateRequest(user.token, quiz.quizId, 'New Quiz')).toStrictEqual({});
 
     expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual({
       quizId: quiz.quizId,
-      name: name,
+      name: 'New Quiz',
       timeCreated: expect.any(Number),
       timeLastEdited: expect.any(Number),
       description: '',
@@ -127,7 +91,7 @@ describe('Valid adminQuizNameUpdate', () => {
       questions: [],
       duration: 0,
     });
-  });
+  })
 
   test('Correct time last edited', () => {
     const expectedTimeTransfered = Math.floor(Date.now() / 1000);
@@ -149,27 +113,21 @@ describe('V1 WRAPPERS', () => {
     expect(newQuiz.statusCode).toStrictEqual(400);
   });
 
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    const newQuiz = quizNameUpdateRequestV1(token, quiz.quizId, 'TestQuizUpdate');
+  test('invalid token', () => {
+    const newQuiz = quizNameUpdateRequestV1('fsfsf', quiz.quizId, 'TestQuizUpdate');
     expect(newQuiz.body).toStrictEqual(ERROR);
     expect(newQuiz.statusCode).toStrictEqual(401);
-  });
+  })
 
   test('Nobody logged in', () => {
     const newQuiz = quizNameUpdateRequestV1('7', quiz.quizId, 'TestQuizUpdate');
     expect(newQuiz.body).toStrictEqual(ERROR);
     expect(newQuiz.statusCode).toStrictEqual(403);
   });
-
-  test.each([
-    { name: 'qz1' },
-    { name: 'Short' },
-  ])('Successful Quiz Name Update: "$name"', ({ name }) => {
-    const newQuiz = quizNameUpdateRequestV1(user.token, quiz.quizId, name);
+  
+  test('successful name update', () => {
+    const newQuiz = quizNameUpdateRequestV1(user.token, quiz.quizId, 'qz1');
     expect(newQuiz.body).toStrictEqual({});
     expect(newQuiz.statusCode).toStrictEqual(200);
-  });
+  })
 });

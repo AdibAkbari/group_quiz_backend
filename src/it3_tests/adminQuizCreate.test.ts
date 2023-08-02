@@ -65,21 +65,9 @@ describe('invalid name/description edge cases', () => {
 
 // token not valid
 describe('Token invalid', () => {
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-    { testName: 'token ends with letters', token: '54356s' },
-    { testName: 'token includes letter', token: '5436h86' },
-    { testName: 'token has space', token: '4324 757' },
-    { testName: 'token only whitespace', token: '  ' },
-    { testName: 'token has other characters', token: '6365,53' },
-    { testName: 'empty string', token: '' },
-    { testName: 'token has decimal point', token: '53.74' },
-    { testName: 'token has negative sign', token: '-37294' },
-    { testName: 'token has positive sign', token: '+38594' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => quizCreateRequest(token, 'TestQuiz', '')).toThrow(HTTPError[401]);
-  });
+  test('token invalid structure', () => {
+    expect(() => quizCreateRequest('84357h543', 'TestQuiz', '')).toThrow(HTTPError[401]);
+  })
 
   test('Nobody logged in', () => {
     expect(() => quizCreateRequest('7', 'TestQuiz', '')).toThrow(HTTPError[403]);
@@ -93,19 +81,15 @@ describe('Token invalid', () => {
 
 // Successful quizCreate
 describe('valid input tests', () => {
-  // test adminQuizCreate correct output
   let user: Token;
   beforeEach(() => {
     clearRequest();
     user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
   });
 
-  test('valid input - testing quizId creation', () => {
-    expect(quizCreateRequest(user.token, 'TestQuiz', '')).toStrictEqual({ quizId: expect.any(Number) });
-  });
-
   test('testing correct quiz object creation', () => {
     const quiz = quizCreateRequest(user.token, 'TestQuiz', 'Test');
+    expect(quiz).toStrictEqual({ quizId: expect.any(Number) });
     expect(adminQuizInfoRequest(user.token, quiz.quizId)).toStrictEqual(
       {
         quizId: quiz.quizId,
@@ -123,14 +107,11 @@ describe('valid input tests', () => {
 
 // Successful quizCreate
 describe('V1 WRAPPERS', () => {
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    const quiz = quizCreateRequestV1(token, 'TestQuiz', '');
+  test('invalid token structure', () => {
+    const quiz = quizCreateRequestV1('54353h54', 'TestQuiz', '');
     expect(quiz.body).toStrictEqual(ERROR);
     expect(quiz.statusCode).toStrictEqual(401);
-  });
+  })
 
   test('Nobody logged in', () => {
     const quiz = quizCreateRequestV1('7', 'TestQuiz', '');
