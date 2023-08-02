@@ -247,6 +247,9 @@ export function sessionStatus(token: string, quizId: number, sessionId: number):
   const session = data.sessions.find(id => id.sessionId === sessionId);
 
   const playerNames = session.players.sort();
+  const metaData = session.metadata;
+  delete metaData.creator;
+  delete metaData.questionCount;
 
   return {
     state: session.sessionState,
@@ -293,10 +296,10 @@ export function sessionResults(quizId: number, sessionId: number, token: string)
 
 /**
  * Creates a CSV file with results for each player and question. Returns URL to file.
- * 
- * @param {number} quizId 
- * @param {number} sessionId 
- * @param {string} token 
+ *
+ * @param {number} quizId
+ * @param {number} sessionId
+ * @param {string} token
  * @returns {{url: string}}
  */
 export function sessionResultsCSV(quizId: number, sessionId: number, token: string):{url: string} {

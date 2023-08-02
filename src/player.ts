@@ -104,8 +104,8 @@ export function playerCurrentQuestionInfo(playerId: number, questionPosition: nu
 
 /**
  * Returns results of completed session player is in
- * 
- * @param {number} playerId 
+ *
+ * @param {number} playerId
  * @returns {SessionResults}
  */
 export function playerResults(playerId: number): SessionResults {
@@ -126,9 +126,9 @@ export function playerResults(playerId: number): SessionResults {
 
 /**
  * Returns results of specified question for session player is in
- * 
- * @param {number} playerId 
- * @param {number} questionPosition 
+ *
+ * @param {number} playerId
+ * @param {number} questionPosition
  * @returns {QuestionResult}
  */
 export function playerQuestionResults(playerId: number, questionPosition: number): QuestionResult {
