@@ -878,6 +878,22 @@ components:
           description: Names of all the players in the session, ordered in ascending order of player name
         metadata:
           $ref: '#/components/group/QuizIter3'
+    QuizSessionsList:
+      type: object
+      properties:
+        activeSessions:
+          type: array
+          description: List of active session ids (sessions that are not in the END state), sorted in ascending order
+          example: [247, 566, 629, 923]
+          items:
+            $ref: '#/components/prim/SessionId'
+        inactiveSessions:
+          type: array
+          description: List of inactive session ids (sessions that are in the END state), sorted in ascending order
+          example: [422, 817]
+          items:
+            $ref: '#/components/prim/SessionId'
+
     QuizSessionResultsCsv:
       type: object
       properties:
@@ -2294,6 +2310,27 @@ paths:
 
 
 
+  /v1/admin/quiz/{quizid}/sessions:
+    get:
+      summary: View active and inactive sessions
+      description: |
+        Retrieves active and inactive session ids (sorted in ascending order) for a quiz
+        - Active sessions are sessions that are not in the END state.
+        - Inactive sessions are sessions in the END state.
+      tags:
+        # - "By Topic: Quiz Management"
+        - "Iteration 3 (New)"
+      parameters:
+        - $ref: '#/components/header/Token'
+        - $ref: '#/components/path/QuizId'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/components/return/QuizSessionsList'
+      security:
+        - Iteration 3 Token Authentication: []
+      
   /v1/admin/quiz/{quizid}/session/start:
     post:
       summary: Start a new session for a quiz
@@ -2360,7 +2397,7 @@ paths:
             If any of the following are true:
             - Quiz ID does not refer to a valid quiz
             - Quiz ID does not refer to a quiz that this user owns
-            - Session Id does not refer to a valid question within this quiz
+            - Session Id does not refer to a valid session within this quiz
             - Action provided is not a valid Action enum
             - Action enum cannot be applied in the current state (see spec for details)
           schema:
@@ -2395,7 +2432,7 @@ paths:
             If any of the following are true:
             - Quiz ID does not refer to a valid quiz
             - Quiz ID does not refer to a quiz that this user owns
-            - Session Id does not refer to a valid question within this quiz
+            - Session Id does not refer to a valid session within this quiz
           schema:
             $ref: '#/components/return/Error'
       security:
@@ -2430,7 +2467,7 @@ paths:
             If any of the following are true:
             - Quiz ID does not refer to a valid quiz
             - Quiz ID does not refer to a quiz that this user owns
-            - Session Id does not refer to a valid question within this quiz
+            - Session Id does not refer to a valid session within this quiz
             - Session is not in FINAL_RESULTS state
           schema:
             $ref: '#/components/return/Error'
@@ -2465,7 +2502,7 @@ paths:
             If any of the following are true:
             - Quiz ID does not refer to a valid quiz
             - Quiz ID does not refer to a quiz that this user owns
-            - Session Id does not refer to a valid question within this quiz
+            - Session Id does not refer to a valid session within this quiz
             - Session is not in FINAL_RESULTS state
           schema:
             $ref: '#/components/return/Error'

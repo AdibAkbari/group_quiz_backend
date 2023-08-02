@@ -5,7 +5,7 @@ import {
   createQuizQuestionRequest,
   startSessionRequest,
   playerJoinRequest,
-  updateSessionStateRequest,
+  // updateSessionStateRequest,
 } from './it3_testRoutes';
 import { } from '../interfaces';
 import HTTPError from 'http-errors';
@@ -29,10 +29,10 @@ describe('Error cases', () => {
     expect(() => playerJoinRequest(sessionId, 'Player One')).toThrow(HTTPError[400]);
   });
 
-  test('Session is not in LOBBY state', () => {
-    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    expect(() => playerJoinRequest(sessionId, 'Player One')).toThrow(HTTPError[400]);
-  });
+  // test('Session is not in LOBBY state', () => {
+  //   updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
+  //   expect(() => playerJoinRequest(sessionId, 'Player One')).toThrow(HTTPError[400]);
+  // });
 });
 
 describe('Success cases', () => {

@@ -8,6 +8,14 @@ import config from './config.json';
 const COUNTDOWN = 150;
 const timers:Timers[] = [];
 
+/**
+ *This copies the quiz, so that any edits whilst a session is running does not affect active session
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {number} autoStartNum
+ * @returns {sessionId: number}
+ */
 export function startSession(quizId: number, token: string, autoStartNum: number): { sessionId: number} {
   if (!isValidTokenStructure(token)) {
     throw HTTPError(401, 'Token is not a valid structure');
@@ -69,7 +77,6 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
 
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
-  console.log(session.sessionState);
 
   // action: next_question
   if (action === 'NEXT_QUESTION') {
@@ -159,7 +166,7 @@ function calculateQuestionPoints(sessionId: number, data: Data) {
 
   const question = session.metadata.questions[session.atQuestion - 1];
   const questionId = question.questionId;
-  const correctAnswers = question.answers.filter(answer => answer.correct === true);
+  const correctAnswers = question.answers.filter(answer => (answer.correct === true));
 
   const sessionPlayers = data.players.filter(session => session.sessionId === sessionId);
 
@@ -214,6 +221,14 @@ export function clearTimers() {
   }
 }
 
+/**
+ * Update the state of a particular session by sending an action command
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {number} sessionId
+ * @returns {SessionStatus}
+ */
 export function sessionStatus(token: string, quizId: number, sessionId: number): SessionStatus {
   if (!isValidTokenStructure(token)) {
     throw HTTPError(401, 'Token is not a valid structure');
