@@ -78,7 +78,7 @@ describe('Invalid Questionid', () => {
 
 describe('Quiz is not in END state', () => {
   test('quiz not in end state', () => {
-    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 6, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]);
+    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 6, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }], 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     const sessionId = startSessionRequest(quiz.quizId, user.token, 3).sessionId;
     updateSessionStateRequest(quiz.quizId, sessionId, user.token, 'NEXT_QUESTION');
     expect(() => deleteQuizQuestionRequest(user.token, quiz.quizId, question.questionId)).toThrow(HTTPError[400]);

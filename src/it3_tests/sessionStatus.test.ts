@@ -163,7 +163,7 @@ describe('Success cases', () => {
               questionId: 1,
               question: 'Question 1',
               duration: 5,
-              // thumbnailUrl: "http://google.com/some/image/path.jpg",
+              thumbnailUrl: expect.any(String),
               points: 6,
               answers: [
                 {
@@ -182,7 +182,6 @@ describe('Success cases', () => {
             }
           ],
           duration: 5,
-          // thumbnailUrl: "",
         }
       });
   });
