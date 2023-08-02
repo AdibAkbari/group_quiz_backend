@@ -32,6 +32,7 @@ import {
   updateQuizQuestion,
   moveQuizQuestion,
   updateQuizThumbnail,
+  updateQuizQuestionv1
 } from './quiz';
 import {
   playerJoin,
@@ -537,10 +538,10 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
 
 // Update quiz question //
 app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Response) => {
-  const { question, duration, points, answers, thumbnailUrl } = req.body.questionBody;
+  const { question, duration, points, answers } = req.body.questionBody;
   const quizId = parseInt(req.params.quizid);
   const questionId = parseInt(req.params.questionid);
-  const response = updateQuizQuestion(quizId, questionId, req.body.token, question, duration, points, answers, thumbnailUrl, false);
+  const response = updateQuizQuestionv1(quizId, questionId, req.body.token, question, duration, points, answers, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
       return res.status(401).json(response);

@@ -294,6 +294,20 @@ export function adminQuizInfo(token: string, quizId: number, isv2: boolean): Err
   const data: Data = getData();
   const quiz = data.quizzes.find(id => id.quizId === quizId);
 
+  if (isv2 & quiz.thumbnailUrl != undefined) {
+    return {
+      quizId: quizId,
+      name: quiz.name,
+      timeCreated: quiz.timeCreated,
+      timeLastEdited: quiz.timeLastEdited,
+      description: quiz.description,
+      numQuestions: quiz.numQuestions,
+      questions: quiz.questions,
+      duration: quiz.duration,
+      thumbnailUrl: quiz.thumbnailUrl,
+    };
+  }
+
   return {
     quizId: quizId,
     name: quiz.name,
@@ -466,6 +480,7 @@ export function adminQuizTransfer (token: string, quizId: number, userEmail: str
  * @param {number} duration
  * @param {number} points
  * @param {Answers[]} answers
+ * @param {string} thumbnailUrl
  * @returns {questionId: number}
  */
 export function createQuizQuestion(quizId: number, token: string, question: string, duration: number, points: number, answers: Answers[], isv2: boolean): {questionId: number} | Error {
@@ -567,6 +582,118 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
   return {
     questionId: questionId
   };
+}
+
+/**
+ * Create a new stub question for a particular quiz.
+ * When this route is called, and a question is created, the timeLastEdited for quiz is set as the time this question was created
+ * and the colours of a question are randomly generated.
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {string} question
+ * @param {number} duration
+ * @param {number} points
+ * @param {Answers[]} answers
+ * @param {string} thumbnailUrl
+ * @returns {questionId: number}
+ */
+export function updateQuizQuestionv1(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answers[], isv2: boolean): Record<string, never> | Error {
+  // Error checking for token
+  if (!isValidTokenStructure(token)) {
+    return giveError(isv2, 'invalid token structure', 401);
+  }
+  if (!isTokenLoggedIn(token)) {
+    return giveError(isv2, 'token is not logged in', 403);
+  }
+
+  // Error checking for quizId and questionId
+  if (!isValidQuizId(quizId)) {
+    return giveError(isv2, 'invalid param: quiz Id', 400);
+  }
+  if (!isValidCreator(quizId, token)) {
+    return giveError(isv2, 'invalid param: quiz Id', 400);
+  }
+  if (!isValidQuestionId(quizId, questionId)) {
+    return giveError(isv2, 'invalid param: questionId', 400);
+  }
+
+  // Error checking for quiz question inputs
+  if (question.length < 5 || question.length > 50) {
+    return giveError(isv2, 'invalid input: question must be 5-50 characters long', 400);
+  }
+
+  // Note: assume question cannot be only whitespace
+  if (isWhiteSpace(question)) {
+    return giveError(isv2, 'invalid input: question cannot be only whitespace', 400);
+  }
+
+  if (answers.length > 6 || answers.length < 2) {
+    return giveError(isv2, 'invalid input: must have 2-6 answers', 400);
+  }
+
+  if (duration <= 0) {
+    return giveError(isv2, 'invalid input: question duration must be a positive number', 400);
+  }
+
+  if (points < 1 || points > 10) {
+    return giveError(isv2, 'invalid input: points must be between 1 and 10', 400);
+  }
+
+  if (answers.find(answer => (answer.answer.length > 30 || answer.answer.length < 1)) !== undefined) {
+    return giveError(isv2, 'invalid input: answers must be 1-30 characters long', 400);
+  }
+
+  for (const current of answers) {
+    if ((answers.filter(answer => answer.answer === current.answer)).length > 1) {
+      return giveError(isv2, 'invalid input: cannot have duplicate answer strings', 400);
+    }
+  }
+
+  if (answers.find(answer => answer.correct === true) === undefined) {
+    return giveError(isv2, 'invalid input: must be at least one correct answer', 400);
+  }
+  
+  const data = getData();
+  const currentQuiz = data.quizzes.find(id => id.quizId === quizId);
+  const qIndex = currentQuiz.questions.findIndex(id => id.questionId === questionId);
+  const newDuration = currentQuiz.duration + duration - currentQuiz.questions[qIndex].duration;
+
+  if (newDuration > 180) {
+    return giveError(isv2, 'invalid input: question durations cannot exceed 3 minutes', 400);
+  }
+
+  // Updating quiz question
+  const answerArray: Answer[] = [];
+  const colours = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink'];
+  let answerId = 0;
+
+  for (const current of answers) {
+    const colour = Math.floor(Math.random() * colours.length);
+    answerId++;
+    answerArray.push({
+      answerId: answerId,
+      answer: current.answer,
+      colour: colours[colour],
+      correct: current.correct
+    });
+    colours.splice(colour, 1);
+  }
+
+  currentQuiz.questions[qIndex] = {
+    questionId: questionId,
+    question: question,
+    duration: duration,
+    points: points,
+    answers: answerArray,
+  };
+
+  const timeNow: number = Math.floor(Date.now() / 1000);
+  currentQuiz.timeLastEdited = timeNow;
+  currentQuiz.duration = newDuration;
+  setData(data);
+
+  return {};
 }
 
 export function updateQuizQuestion(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answers[], thumbnailUrl: string, isv2: boolean): Record<string, never> | Error {

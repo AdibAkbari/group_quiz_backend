@@ -423,7 +423,7 @@ export function quizRestoreRequestV1(token: string, quizId: number) {
   };
 }
 
-export function updateQuizQuestionRequestV1(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[], thumbnailUrl: string) {
+export function updateQuizQuestionRequestV1(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
   const res = request(
     'PUT',
     SERVER_URL + `/v1/admin/quiz/${quizId}/question/${questionId}`,
@@ -435,7 +435,6 @@ export function updateQuizQuestionRequestV1(quizId: number, questionId: number, 
           duration,
           points,
           answers,
-          thumbnailUrl,
         }
       }
     });
