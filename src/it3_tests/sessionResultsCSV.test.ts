@@ -28,7 +28,7 @@ let token: string;
 let quizId: number;
 let sessionId: number;
 const duration = 2;
-const finishCountdown = 150;
+const finishCountdown = 100;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
 
 beforeEach(() => {
@@ -58,7 +58,7 @@ describe('Error cases', () => {
   test('quizId not a valid quiz', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);
-    sleepSync(duration * 1000);
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
     expect(() => sessionResultsCSVRequest(quizId + 1, sessionId, token)).toThrow(HTTPError[400]);
   });
@@ -66,7 +66,7 @@ describe('Error cases', () => {
   test('user does not own quiz', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);
-    sleepSync(duration * 1000);
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
     const token2 = authRegisterRequest('email2@gmail.com', 'password1', 'firstname', 'lastname').body.token;
     expect(() => sessionResultsCSVRequest(quizId, sessionId, token2)).toThrow(HTTPError[400]);
@@ -75,7 +75,7 @@ describe('Error cases', () => {
   test('Session Id does not refer to a valid session within this quiz', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);
-    sleepSync(duration * 1000);
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
     expect(() => sessionResultsCSVRequest(quizId, sessionId + 1, token)).toThrow(HTTPError[400]);
   });
@@ -89,7 +89,7 @@ describe('Success cases', () => {
   test('valid output one question, no player', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);
-    sleepSync(duration * 1000);
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
 
     const expected = [
@@ -112,35 +112,29 @@ describe('Success cases', () => {
     playerJoinRequest(session2Id, 'Player');
 
     updateSessionStateRequest(quizId, session2Id, token, 'NEXT_QUESTION');
-    const questionPosition = playerStatusRequest(playerId).atQuestion - 1;
+    const questionPosition = playerStatusRequest(playerId).atQuestion;
     const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition);
 
     let correctAnswerId = questionInfo.answers[0].answerId;
+
+    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);
-    const answerTime = 1;
-    sleepSync(answerTime * 1000);
+
     playerSubmitAnswerRequest([correctAnswerId], playerId, questionPosition);
     playerSubmitAnswerRequest([correctAnswerId], player2Id, questionPosition);
 
-    sleepSync(questionInfo.duration * 1000 - answerTime);
-
-    updateSessionStateRequest(quizId, session2Id, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, session2Id, token, 'NEXT_QUESTION');
+    sleepSync(finishCountdown);
 
     const question2Info = playerCurrentQuestionInfoRequest(playerId, questionPosition + 1);
     correctAnswerId = question2Info.answers[0].answerId;
     const incorrectAnswerId = question2Info.answers[1].answerId;
 
-    sleepSync(finishCountdown);
-    sleepSync(answerTime * 1000);
-
     playerSubmitAnswerRequest([incorrectAnswerId], playerId, questionPosition + 1);
     playerSubmitAnswerRequest([correctAnswerId], player2Id, questionPosition + 1);
 
-    sleepSync(questionInfo.duration * 1000 - answerTime);
-    updateSessionStateRequest(quizId, session2Id, token, 'GO_TO_ANSWER');
-
-    updateSessionStateRequest(quizId, session2Id, token, 'GO_TO_FINAL_RESULTS');
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
 
     const expected = [
       ['Player', 'question1score', 'question1rank', 'question2score', 'question2rank'],
