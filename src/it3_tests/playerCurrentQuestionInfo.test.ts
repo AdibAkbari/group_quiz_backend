@@ -20,7 +20,7 @@ const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2',
 const FIRST_POS = 1;
 const SECOND_POS = 2;
 const THIRD_POS = 3;
-const finishCountdown = 150;
+const finishCountdown = 100;
 
 function sleepSync(ms: number) {
   const startTime = new Date().getTime();
