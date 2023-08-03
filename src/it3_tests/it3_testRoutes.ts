@@ -1,5 +1,5 @@
 import { port, url } from '../config.json';
-import request, { HttpVerb } from 'sync-request';
+import request, { HttpVerb } from 'sync-request-curl';
 const SERVER_URL = `${url}:${port}`;
 import { IncomingHttpHeaders } from 'http';
 import HTTPError from 'http-errors';
