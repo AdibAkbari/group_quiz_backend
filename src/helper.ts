@@ -314,12 +314,12 @@ export function isEndState(quizId: number): boolean {
  * @param {Players[]} playerList
  * @returns {QuestionResult} - Object with results from specific question
  */
-export function questionResult(position: number, session: Session, playerList: Players[]): QuestionResult {
+export function questionResult(index: number, session: Session, playerList: Players[]): QuestionResult {
   // Reset arrays and counters for each question
   let totalAnswerTime = 0;
   let numPlayers = 0;
   let numCorrectPlayers = 0;
-  const question = session.metadata.questions[position];
+  const question = session.metadata.questions[index];
 
   const questionCorrectBreakdown = [];
   // set to keep track of which players have been added to counts already
@@ -385,7 +385,7 @@ export function getSessionResults(session: Session): SessionResults {
   });
 
   const questionResults = session.metadata.questions.map(
-    (_, position) => questionResult(position, session, playerList)
+    (_, index) => questionResult(index, session, playerList)
   );
 
   return {

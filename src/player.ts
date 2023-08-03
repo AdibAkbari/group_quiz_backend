@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
-import { generateName, isValidPlayerId, isValidQuestionPosition } from './helper';
-import { Players, PlayerStatus, QuestionResponse, QuestionInfo, Message } from './interfaces';
+import { generateName, getSessionResults, isValidPlayerId, isValidQuestionPosition, questionResult } from './helper';
+import { Players, PlayerStatus, QuestionResult, SessionResults, QuestionResponse, QuestionInfo, Message } from './interfaces';
 import HTTPError from 'http-errors';
 
 /**
@@ -138,6 +138,57 @@ export function playerCurrentQuestionInfo(playerId: number, questionPosition: nu
     points: currentQuestion.points,
     answers: currentQuestion.answers,
   };
+}
+
+/**
+ * Returns results of completed session player is in
+ *
+ * @param {number} playerId
+ * @returns {SessionResults}
+ */
+export function playerResults(playerId: number): SessionResults {
+  if (!isValidPlayerId(playerId)) {
+    throw HTTPError(400, 'Invalid: PlayerId');
+  }
+
+  const data = getData();
+  const player = data.players.find(id => id.playerId === playerId);
+  const session = data.sessions.find(id => id.sessionId === player.sessionId);
+
+  if (session.sessionState !== 'FINAL_RESULTS') {
+    throw HTTPError(400, 'Session is not in FINAL_RESULTS state');
+  }
+
+  return getSessionResults(session);
+}
+
+/**
+ * Returns results of specified question for session player is in
+ *
+ * @param {number} playerId
+ * @param {number} questionPosition
+ * @returns {QuestionResult}
+ */
+export function playerQuestionResults(playerId: number, questionPosition: number): QuestionResult {
+  if (!isValidPlayerId(playerId)) {
+    throw HTTPError(400, 'Invalid: PlayerId');
+  }
+
+  const data = getData();
+  const player = data.players.find(id => id.playerId === playerId);
+  const session = data.sessions.find(id => id.sessionId === player.sessionId);
+
+  if (session.sessionState !== 'ANSWER_SHOW') {
+    throw HTTPError(400, 'Session is not in ANSWER_SHOW state');
+  }
+
+  if (!isValidQuestionPosition(playerId, questionPosition)) {
+    throw HTTPError(400, 'Invalid question position');
+  }
+
+  const playerList = data.players.filter(player => session.players.includes(player.name));
+
+  return questionResult(questionPosition - 1, session, playerList);
 }
 
 export function playerSubmitAnswer(answerIds: number[], playerId: number, questionPosition: number): Record<string, never> {
