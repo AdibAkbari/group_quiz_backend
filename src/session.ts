@@ -3,7 +3,7 @@ import { isValidTokenStructure, isTokenLoggedIn, isValidQuizId, isValidCreator, 
 import { Session, SessionStatus, SessionResults, Timers, Data } from './interfaces';
 import HTTPError from 'http-errors';
 
-const COUNTDOWN = 150;
+const COUNTDOWN = 100;
 const timers:Timers[] = [];
 
 /**

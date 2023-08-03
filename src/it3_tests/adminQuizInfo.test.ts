@@ -5,6 +5,7 @@ import {
   clearRequest,
   createQuizQuestionRequest,
   adminQuizInfoRequestV1,
+  createQuizQuestionRequestV1,
 } from './it3_testRoutes';
 import HTTPError from 'http-errors';
 
@@ -56,9 +57,9 @@ describe('Valid inputs', () => {
   });
 
   test('quiz with questions created', () => {
-    const questionId = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).questionId;
-    const q2Id = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).questionId;
-    const q3Id = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).questionId;
+    const questionId = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }], 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
+    const q2Id = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }], 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
+    const q3Id = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }], 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
     const timeNow = Math.floor(Date.now() / 1000);
 
     const expectedQuestions = [
@@ -70,7 +71,8 @@ describe('Valid inputs', () => {
         answers: [
           { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true },
           { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false },
-        ]
+        ],
+        thumbnailUrl: expect.any(String),
       },
       {
         questionId: q2Id,
@@ -80,7 +82,8 @@ describe('Valid inputs', () => {
         answers: [
           { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true },
           { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false },
-        ]
+        ],
+        thumbnailUrl: expect.any(String),
       },
       {
         questionId: q3Id,
@@ -90,7 +93,8 @@ describe('Valid inputs', () => {
         answers: [
           { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true },
           { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false },
-        ]
+        ],
+        thumbnailUrl: expect.any(String),
       }
     ];
 
@@ -131,7 +135,7 @@ describe('V1 WRAPPERS', () => {
   });
 
   test('one question created', () => {
-    const questionId = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).questionId;
+    const questionId = createQuizQuestionRequestV1(quiz.quizId, user.token, 'Question 1', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).body.questionId;
     expect(adminQuizInfoRequestV1(user.token, quiz.quizId).body).toStrictEqual({
       quizId: quiz.quizId,
       name: 'Cats',
@@ -158,7 +162,7 @@ describe('V1 WRAPPERS', () => {
               colour: expect.any(String),
               correct: false
             }
-          ]
+          ],
         }
       ],
       duration: 6
