@@ -35,8 +35,8 @@ beforeEach(() => {
   clearRequest();
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  createQuizQuestionRequest(quizId, token, 'Question 1', duration, 6, validAnswers, 
-  'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+  createQuizQuestionRequest(quizId, token, 'Question 1', duration, 6, validAnswers,
+    'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
   sessionId = startSessionRequest(quizId, token, 1).sessionId;
 });
 
@@ -97,7 +97,7 @@ describe('Success cases', () => {
   });
 
   test('valid output 3 players, two questions', () => {
-    createQuizQuestionRequest(quizId, token, 'Question 2', duration, 6, validAnswers, 
+    createQuizQuestionRequest(quizId, token, 'Question 2', duration, 6, validAnswers,
       'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     const session2Id = startSessionRequest(quizId, token, 3).sessionId;
 

@@ -33,8 +33,8 @@ beforeEach(() => {
   clearRequest();
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  questionId = createQuizQuestionRequest(quizId, token, 'Question 1', duration, 6, validAnswers, 
-  'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
+  questionId = createQuizQuestionRequest(quizId, token, 'Question 1', duration, 6, validAnswers,
+    'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
   sessionId = startSessionRequest(quizId, token, 1).sessionId;
   playerId = playerJoinRequest(sessionId, 'Player').playerId;
 });
@@ -60,7 +60,7 @@ describe('Error cases', () => {
 
   test('Session is not yet up to this question', () => {
     createQuizQuestionRequest(quizId, token, 'Question 2', 1, 6, validAnswers,
-    'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+      'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     const sessionId2 = startSessionRequest(quizId, token, 1).sessionId;
     const playerId2 = playerJoinRequest(sessionId2, 'Player2').playerId;
 
