@@ -27,7 +27,7 @@ let token: string;
 let quizId: number;
 let sessionId: number;
 const duration = 2;
-const finishCountdown = 150;
+const finishCountdown = 100;
 const questionPosition = 1;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
 
