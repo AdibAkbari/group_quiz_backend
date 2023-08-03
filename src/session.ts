@@ -2,6 +2,8 @@ import { getData, setData } from './dataStore';
 import { isValidTokenStructure, isTokenLoggedIn, isValidQuizId, isValidCreator, getSessionResults, isValidSessionId } from './helper';
 import { Session, SessionStatus, SessionResults, Timers, Data } from './interfaces';
 import HTTPError from 'http-errors';
+import fs from 'fs';
+import config from './config.json'
 
 const COUNTDOWN = 100;
 const timers:Timers[] = [];

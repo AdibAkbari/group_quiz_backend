@@ -40,12 +40,15 @@ import {
   playerStatus,
   playerSubmitAnswer,
   playerCurrentQuestionInfo,
+  playerResults,
+  playerQuestionResults,
 } from './player';
 import {
   startSession,
   sessionStatus,
   sessionResults,
   updateSessionState,
+  sessionResultsCSV,
 } from './session';
 import { clear } from './other';
 
@@ -634,6 +637,15 @@ app.get('/v1/admin/quiz/:quizid/session/:sessionid/results', (req: Request, res:
   res.json(response);
 });
 
+// sessionResultsCSV //
+app.get('/v1/admin/quiz/:quizid/session/:sessionid/results/csv', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const sessionId = parseInt(req.params.sessionid);
+  const token = req.headers.token as string;
+  const response = sessionResultsCSV(quizId, sessionId, token);
+  res.json(response);
+});
+
 // playerJoin //
 app.post('/v1/player/join', (req: Request, res: Response) => {
   const sessionId = parseInt(req.body.sessionId);
@@ -663,6 +675,21 @@ app.put('/v1/player/:playerid/question/:questionposition/answer', (req: Request,
   const playerid = parseInt(req.params.playerid);
   const questionposition = parseInt(req.params.questionposition);
   const response = playerSubmitAnswer(answerIds, playerid, questionposition);
+  res.json(response);
+});
+
+// playerResults //
+app.get('/v1/player/:playerid/results', (req: Request, res: Response) => {
+  const playerid = parseInt(req.params.playerid);
+  const response = playerResults(playerid);
+  res.json(response);
+});
+
+// playerQuestionResults //
+app.get('/v1/player/:playerid/question/:questionposition/results', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const questionPosition = parseInt(req.params.questionposition);
+  const response = playerQuestionResults(playerId, questionPosition);
   res.json(response);
 });
 

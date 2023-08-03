@@ -26,14 +26,16 @@ let sessionId: number;
 let questionId: number;
 let playerId: number;
 const duration = 2;
-const finishCountdown = 150;
+const finishCountdown = 100;
+const questionPoints = 6;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
 
 beforeEach(() => {
   clearRequest();
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  questionId = createQuizQuestionRequest(quizId, token, 'Question 1', duration, 6, validAnswers).questionId;
+  questionId = createQuizQuestionRequest(quizId, token, 'Question 1', duration, questionPoints, validAnswers, 
+    'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
   sessionId = startSessionRequest(quizId, token, 1).sessionId;
   playerId = playerJoinRequest(sessionId, 'Player').playerId;
 });
@@ -92,14 +94,12 @@ describe('Success cases', () => {
   test('valid output two players', () => {
     const player2Id = playerJoinRequest(sessionId, 'Player2').playerId;
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    const questionPosition = playerStatusRequest(playerId).atQuestion;
-    const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition);
-    const correctAnswerId = questionInfo.answers[0].answerId;
-    const incorrectAnswerId = questionInfo.answers[1].answerId;
+    const correctAnswerId = playerCurrentQuestionInfoRequest(playerId, 1).answers[0].answerId;
 
     sleepSync(finishCountdown);
-    playerSubmitAnswerRequest([correctAnswerId], playerId, questionPosition);
-    playerSubmitAnswerRequest([correctAnswerId, incorrectAnswerId], player2Id, questionPosition);
+    // both players correct - player 1 should have higher score since answered first
+    playerSubmitAnswerRequest([correctAnswerId], playerId, 1);
+    playerSubmitAnswerRequest([correctAnswerId], player2Id, 1);
 
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
@@ -108,11 +108,11 @@ describe('Success cases', () => {
       usersRankedByScore: [
         {
           name: 'Player',
-          score: questionInfo.points
+          score: questionPoints
         },
         {
           name: 'Player2',
-          score: 0
+          score: questionPoints / 2
         }
       ],
       questionResults: [
@@ -128,7 +128,7 @@ describe('Success cases', () => {
             }
           ],
           averageAnswerTime: expect.any(Number),
-          percentCorrect: 50
+          percentCorrect: 100
         }
       ]
     };

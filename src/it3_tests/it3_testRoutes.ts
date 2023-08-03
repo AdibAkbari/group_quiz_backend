@@ -514,6 +514,10 @@ export function sessionResultsRequest(quizId: number, sessionId: number, token: 
   return requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}/results`, { }, { token });
 }
 
+export function sessionResultsCSVRequest(quizId: number, sessionId: number, token: string) {
+  return requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}/results/csv`, { }, { token });
+}
+
 export function updateSessionStateRequest(quizId: number, sessionId: number, token: string, action: string) {
   return requestHelper('PUT', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
 }
@@ -542,3 +546,12 @@ export function playerCurrentQuestionInfoRequest(playerId: number, questionPosit
 export function playerSubmitAnswerRequest(answerIds: number[], playerId: number, questionposition: number) {
   return requestHelper('PUT', `/v1/player/${playerId}/question/${questionposition}/answer`, { answerIds });
 }
+
+export function playerResultsRequest(playerId: number) {
+  return requestHelper('GET', `/v1/player/${playerId}/results`, { }, { });
+}
+
+export function playerQuestionResultsRequest(playerId: number, questionPosition: number) {
+  return requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}/results`, { }, { });
+}
+
