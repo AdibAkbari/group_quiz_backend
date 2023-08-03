@@ -193,3 +193,28 @@ export function playerSubmitAnswer(answerIds: number[], playerId: number, questi
 
   return {};
 }
+
+/**
+ * View Messages in Session
+ *
+ * @param {number} playerId
+ * @returns {array} Message
+ */
+export function playerViewChat (playerId: number): {messages: Message[]} | {messages: [] } {
+  const data = getData();
+  // console.log(data);
+
+  if (data.players.find(id => id.playerId === playerId) === undefined) {
+    throw HTTPError(400, 'player does not exist');
+  }
+
+  const player = data.players.find(id => id.playerId === playerId);
+  const sessionIndex = data.sessions.findIndex(id => id.sessionId === player.sessionId);
+  const messages = data.sessions[sessionIndex].messages;
+
+  if (messages !== undefined) {
+    return { messages: messages };
+  } else {
+    return { messages: [] };
+  }
+}
