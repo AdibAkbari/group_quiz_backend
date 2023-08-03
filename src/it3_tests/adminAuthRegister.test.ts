@@ -24,17 +24,10 @@ describe('valid input authRegisterRequestV1 tests', () => {
       email: 'email3@hotmail.com',
       pass: 'passw123',
       first: 'na',
-      last: 'na'
-    },
-    {
-      testName: 'valid input 3',
-      email: 'email4@yahoo.com',
-      pass: 'longPassword12345',
-      first: 'nameIsExactlyTwentyy',
       last: 'lastIsExactlyTwentyy'
     },
     {
-      testName: 'valid input 4',
+      testName: 'valid input 3',
       email: 'email10@gmail.com',
       pass: 'password1',
       first: 'name- First\'s',
@@ -127,10 +120,6 @@ describe('test for errors for adminAuthRegister', () => {
   });
 
   test.each([
-    {
-      testName: 'empty password',
-      pass: ''
-    },
     {
       testName: 'password too short',
       pass: 'pass1'

@@ -18,6 +18,7 @@
 * 23/07: Fixed mistake in trash swagger; Replaced "c + 1" with "c" in marking criteria for iter3
 * 24/07: Aligned comments on `tsc` in iteration 3 to match lecture instructions
 * 25/07: Clarification on FINISH_COUNTDOWN length; Clarified some language in the requirements iteration 3 section; `/v1/admin/quiz/{quizid}/session/{sessionid}` removed double token. Typo fix on password update route. Typos fixed in 4 spots e.g. "Session Id does not refer to a valid question within this quiz"
+* 02/08: Route `/v1/admin/quiz/{quizid}/sessions` added to spec. Clarified that for iteration 3 requirements modifying the swagger is encouraged but not required.
 
 ## 🫡 0. Aims:
 
@@ -1273,7 +1274,7 @@ With your completed use case work, reach out to the 2-3 people you interviewed o
 
 Now that we've established our *problem* (described as requirements), it's time to think about our *solution* in terms of what capabilities would be necessary. You will specify these capabilities as HTTP endpoints, similar to what is described in `6.2`. There is no minimum or maximum of what is needed - it will depend on what problem you're solving.
 
-**You are also required to update your `swagger.yaml` file to include the routes associated with your new work.**
+**You are also encouraged to update your `swagger.yaml` file to include the routes associated with your new work.**
 
 #### [Design] Conceptual Modelling - State Diagrams
 

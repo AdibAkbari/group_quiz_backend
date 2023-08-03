@@ -10,8 +10,12 @@ import {
   findUserFromToken,
   isValidQuestionId,
   isValidEmail,
-  giveError
+  giveError,
+  getImg,
+  isEndState
 } from './helper';
+import HTTPError from 'http-errors';
+import config from './config.json';
 
 /**
    * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -103,6 +107,7 @@ export function adminQuizCreate(token: string, name: string, description: string
     quizId: id,
   };
 }
+
 /**
  * Given a particular quizId, send the quiz to trash
  *
@@ -111,12 +116,15 @@ export function adminQuizCreate(token: string, name: string, description: string
  * @returns {{ }} empty object
  */
 export function adminQuizRemove(token: string, quizId: number, isv2: boolean): Record<string, never> | Error {
-  // invalid token structure
+  if (isv2) {
+    if (!isEndState(quizId)) {
+      throw HTTPError(400, 'Quiz is not in END state');
+    }
+  }
+
   if (!isValidTokenStructure(token)) {
     return giveError(isv2, 'Invalid Token Structure', 401);
   }
-
-  // token is not logged in
   if (!isTokenLoggedIn(token)) {
     return giveError(isv2, 'Token not logged in', 403);
   }
@@ -291,6 +299,20 @@ export function adminQuizInfo(token: string, quizId: number, isv2: boolean): Err
   const data: Data = getData();
   const quiz = data.quizzes.find(id => id.quizId === quizId);
 
+  if (isv2 && quiz.thumbnailUrl !== undefined) {
+    return {
+      quizId: quizId,
+      name: quiz.name,
+      timeCreated: quiz.timeCreated,
+      timeLastEdited: quiz.timeLastEdited,
+      description: quiz.description,
+      numQuestions: quiz.numQuestions,
+      questions: quiz.questions,
+      duration: quiz.duration,
+      thumbnailUrl: quiz.thumbnailUrl,
+    };
+  }
+
   return {
     quizId: quizId,
     name: quiz.name,
@@ -401,6 +423,12 @@ export function adminQuizDescriptionUpdate (quizId: number, tokenId: string, des
  * @returns {{ }} empty object
  */
 export function adminQuizTransfer (token: string, quizId: number, userEmail: string, isv2: boolean): Record<string, never> | Error {
+  if (isv2) {
+    if (!isEndState(quizId)) {
+      throw HTTPError(400, 'Quiz is not in END state');
+    }
+  }
+
   if (!isValidTokenStructure(token)) {
     return giveError(isv2, 'Invalid Token Structure', 401);
   }
@@ -463,9 +491,136 @@ export function adminQuizTransfer (token: string, quizId: number, userEmail: str
  * @param {number} duration
  * @param {number} points
  * @param {Answers[]} answers
+ * @param {string} thumbnailUrl
  * @returns {questionId: number}
  */
-export function createQuizQuestion(quizId: number, token: string, question: string, duration: number, points: number, answers: Answers[], isv2: boolean): {questionId: number} | Error {
+export function createQuizQuestion(quizId: number, token: string, question: string, duration: number, points: number, answers: Answers[], thumbnailUrl: string, isv2: boolean): {questionId: number} | Error {
+  // Error checking for token
+  if (!isValidTokenStructure(token)) {
+    return giveError(isv2, 'invalid token structure', 401);
+  }
+  if (!isTokenLoggedIn(token)) {
+    return giveError(isv2, 'token is not logged in', 403);
+  }
+
+  // Error checking for quizId
+  if (!isValidQuizId(quizId)) {
+    return giveError(isv2, 'invalid quiz Id', 400);
+  }
+
+  if (!isValidCreator(quizId, token)) {
+    return giveError(isv2, 'invalid quiz Id', 400);
+  }
+
+  // Error checking for quiz question inputs
+  if (question.length < 5 || question.length > 50) {
+    return giveError(isv2, 'invalid input: question must be 5-50 characters long', 400);
+  }
+
+  // Note: assume question cannot be only whitespace
+  if (isWhiteSpace(question)) {
+    return giveError(isv2, 'invalid input: question cannot be only whitespace', 400);
+  }
+
+  if (answers.length > 6 || answers.length < 2) {
+    return giveError(isv2, 'invalid input: must have 2-6 answers', 400);
+  }
+
+  if (duration <= 0) {
+    return giveError(isv2, 'invalid input: question duration must be a positive number', 400);
+  }
+
+  if (points < 1 || points > 10) {
+    return giveError(isv2, 'invalid input: points must be between 1 and 10', 400);
+  }
+
+  if (answers.find(answer => (answer.answer.length > 30 || answer.answer.length < 1)) !== undefined) {
+    return giveError(isv2, 'invalid input: answers must be 1-30 characters long', 400);
+  }
+
+  for (const current of answers) {
+    if ((answers.filter(answer => answer.answer === current.answer)).length > 1) {
+      return giveError(isv2, 'invalid input: cannot have duplicate answer strings', 400);
+    }
+  }
+
+  if (answers.find(answer => answer.correct === true) === undefined) {
+    return giveError(isv2, 'invalid input: must be at least one correct answer', 400);
+  }
+
+  const data = getData();
+  const index = data.quizzes.findIndex(id => id.quizId === quizId);
+
+  if (data.quizzes[index].duration + duration > 180) {
+    return giveError(isv2, 'invalid input: question durations cannot exceed 3 minutes', 400);
+  }
+
+  // thumbnail error checking
+  if (thumbnailUrl.length === 0) {
+    return giveError(isv2, 'invalid input: url cannot be empty', 400);
+  }
+
+  if (thumbnailUrl.match(/\.(jpeg|jpg|png)$/) === null) {
+    return giveError(isv2, 'invalid input: url must be a jpg or png file type', 400);
+  }
+
+  // Creating new quiz question
+  data.quizzes[index].questionCount++;
+  const questionId: number = data.quizzes[index].questionCount;
+  const newFile = getImg(thumbnailUrl);
+  const newUrl = `${config.url}:${config.port}/static/${newFile}`;
+
+  const answerArray: Answer[] = [];
+  const colours = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'brown'];
+  let answerId = 0;
+
+  for (const current of answers) {
+    const colour = Math.floor(Math.random() * colours.length);
+    answerId++;
+    answerArray.push({
+      answerId: answerId,
+      answer: current.answer,
+      colour: colours[colour],
+      correct: current.correct
+    });
+    colours.splice(colour, 1);
+  }
+
+  data.quizzes[index].questions.push({
+    questionId: questionId,
+    question: question,
+    duration: duration,
+    points: points,
+    answers: answerArray,
+    thumbnailUrl: newUrl,
+  });
+
+  const timeNow: number = Math.floor(Date.now() / 1000);
+  data.quizzes[index].timeLastEdited = timeNow;
+  data.quizzes[index].duration += duration;
+  data.quizzes[index].numQuestions++;
+
+  setData(data);
+
+  return {
+    questionId: questionId
+  };
+}
+
+/**
+ * Create a new stub question for a particular quiz.
+ * When this route is called, and a question is created, the timeLastEdited for quiz is set as the time this question was created
+ * and the colours of a question are randomly generated.
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {string} question
+ * @param {number} duration
+ * @param {number} points
+ * @param {Answers[]} answers
+ * @returns {questionId: number}
+ */
+export function createQuizQuestionv1(quizId: number, token: string, question: string, duration: number, points: number, answers: Answers[], isv2: boolean): {questionId: number} | Error {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
     return giveError(isv2, 'invalid token structure', 401);
@@ -566,7 +721,21 @@ export function createQuizQuestion(quizId: number, token: string, question: stri
   };
 }
 
-export function updateQuizQuestion(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answers[], isv2: boolean): Record<string, never> | Error {
+/**
+ * Create a new stub question for a particular quiz.
+ * When this route is called, and a question is created, the timeLastEdited for quiz is set as the time this question was created
+ * and the colours of a question are randomly generated.
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {string} question
+ * @param {number} duration
+ * @param {number} points
+ * @param {Answers[]} answers
+ * @param {string} thumbnailUrl
+ * @returns {questionId: number}
+ */
+export function updateQuizQuestionv1(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answers[], isv2: boolean): Record<string, never> | Error {
   // Error checking for token
   if (!isValidTokenStructure(token)) {
     return giveError(isv2, 'invalid token structure', 401);
@@ -653,7 +822,117 @@ export function updateQuizQuestion(quizId: number, questionId: number, token: st
     question: question,
     duration: duration,
     points: points,
-    answers: answerArray
+    answers: answerArray,
+  };
+
+  const timeNow: number = Math.floor(Date.now() / 1000);
+  currentQuiz.timeLastEdited = timeNow;
+  currentQuiz.duration = newDuration;
+  setData(data);
+
+  return {};
+}
+
+export function updateQuizQuestion(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answers[], thumbnailUrl: string, isv2: boolean): Record<string, never> | Error {
+  // Error checking for token
+  if (!isValidTokenStructure(token)) {
+    return giveError(isv2, 'invalid token structure', 401);
+  }
+  if (!isTokenLoggedIn(token)) {
+    return giveError(isv2, 'token is not logged in', 403);
+  }
+
+  // Error checking for quizId and questionId
+  if (!isValidQuizId(quizId)) {
+    return giveError(isv2, 'invalid param: quiz Id', 400);
+  }
+  if (!isValidCreator(quizId, token)) {
+    return giveError(isv2, 'invalid param: quiz Id', 400);
+  }
+  if (!isValidQuestionId(quizId, questionId)) {
+    return giveError(isv2, 'invalid param: questionId', 400);
+  }
+
+  // Error checking for quiz question inputs
+  if (question.length < 5 || question.length > 50) {
+    return giveError(isv2, 'invalid input: question must be 5-50 characters long', 400);
+  }
+
+  // Note: assume question cannot be only whitespace
+  if (isWhiteSpace(question)) {
+    return giveError(isv2, 'invalid input: question cannot be only whitespace', 400);
+  }
+
+  if (answers.length > 6 || answers.length < 2) {
+    return giveError(isv2, 'invalid input: must have 2-6 answers', 400);
+  }
+
+  if (duration <= 0) {
+    return giveError(isv2, 'invalid input: question duration must be a positive number', 400);
+  }
+
+  if (points < 1 || points > 10) {
+    return giveError(isv2, 'invalid input: points must be between 1 and 10', 400);
+  }
+
+  if (answers.find(answer => (answer.answer.length > 30 || answer.answer.length < 1)) !== undefined) {
+    return giveError(isv2, 'invalid input: answers must be 1-30 characters long', 400);
+  }
+
+  for (const current of answers) {
+    if ((answers.filter(answer => answer.answer === current.answer)).length > 1) {
+      return giveError(isv2, 'invalid input: cannot have duplicate answer strings', 400);
+    }
+  }
+
+  if (answers.find(answer => answer.correct === true) === undefined) {
+    return giveError(isv2, 'invalid input: must be at least one correct answer', 400);
+  }
+
+  // thumbnail error checking
+  if (thumbnailUrl.length === 0) {
+    return giveError(isv2, 'invalid input: url cannot be empty', 400);
+  }
+
+  if (thumbnailUrl.match(/\.(jpeg|jpg|png)$/) === null) {
+    return giveError(isv2, 'invalid input: url must be a jpg or png file type', 400);
+  }
+
+  const data = getData();
+  const currentQuiz = data.quizzes.find(id => id.quizId === quizId);
+  const qIndex = currentQuiz.questions.findIndex(id => id.questionId === questionId);
+  const newDuration = currentQuiz.duration + duration - currentQuiz.questions[qIndex].duration;
+  const newFile = getImg(thumbnailUrl);
+  const newUrl = `${config.url}:${config.port}/static/${newFile}`;
+
+  if (newDuration > 180) {
+    return giveError(isv2, 'invalid input: question durations cannot exceed 3 minutes', 400);
+  }
+
+  // Updating quiz question
+  const answerArray: Answer[] = [];
+  const colours = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink'];
+  let answerId = 0;
+
+  for (const current of answers) {
+    const colour = Math.floor(Math.random() * colours.length);
+    answerId++;
+    answerArray.push({
+      answerId: answerId,
+      answer: current.answer,
+      colour: colours[colour],
+      correct: current.correct
+    });
+    colours.splice(colour, 1);
+  }
+
+  currentQuiz.questions[qIndex] = {
+    questionId: questionId,
+    question: question,
+    duration: duration,
+    points: points,
+    answers: answerArray,
+    thumbnailUrl: newUrl,
   };
 
   const timeNow: number = Math.floor(Date.now() / 1000);
@@ -705,13 +984,25 @@ export function quizQuestionDuplicate (quizId: number, questionId: number, token
   data.quizzes[quizIndex].duration += data.quizzes[quizIndex].questions[questionIndex].duration;
   data.quizzes[quizIndex].timeLastEdited = timeNow;
 
-  const newQuestion: Question = {
-    questionId: newQuestionId,
-    question: data.quizzes[quizIndex].questions[questionIndex].question,
-    duration: data.quizzes[quizIndex].questions[questionIndex].duration,
-    points: data.quizzes[quizIndex].questions[questionIndex].points,
-    answers: data.quizzes[quizIndex].questions[questionIndex].answers,
-  };
+  let newQuestion: Question;
+  if (isv2) {
+    newQuestion = {
+      questionId: newQuestionId,
+      question: data.quizzes[quizIndex].questions[questionIndex].question,
+      duration: data.quizzes[quizIndex].questions[questionIndex].duration,
+      points: data.quizzes[quizIndex].questions[questionIndex].points,
+      answers: data.quizzes[quizIndex].questions[questionIndex].answers,
+      thumbnailUrl: data.quizzes[quizIndex].questions[questionIndex].thumbnailUrl,
+    };
+  } else {
+    newQuestion = {
+      questionId: newQuestionId,
+      question: data.quizzes[quizIndex].questions[questionIndex].question,
+      duration: data.quizzes[quizIndex].questions[questionIndex].duration,
+      points: data.quizzes[quizIndex].questions[questionIndex].points,
+      answers: data.quizzes[quizIndex].questions[questionIndex].answers,
+    };
+  }
   data.quizzes[quizIndex].questions.splice(questionIndex + 1, 0, newQuestion);
   setData(data);
 
@@ -727,7 +1018,12 @@ export function quizQuestionDuplicate (quizId: number, questionId: number, token
  * @returns {questionId: number}
  */
 export function deleteQuizQuestion (token: string, quizId: number, questionId: number, isv2: boolean): Record<string, never> | Error {
-  // Error checking for token
+  if (isv2) {
+    if (!isEndState(quizId)) {
+      throw HTTPError(400, 'Quiz is not in END state');
+    }
+  }
+
   if (!isValidTokenStructure(token)) {
     return giveError(isv2, 'invalid token structure', 401);
   }
@@ -820,6 +1116,42 @@ export function moveQuizQuestion(token: string, quizId: number, questionId: numb
 
   const timeNow: number = Math.floor((new Date()).getTime() / 1000);
   currentQuiz.timeLastEdited = timeNow;
+
+  setData(data);
+
+  return {};
+}
+
+/**
+ * Update quiz thumbnail
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {string} imgUrl
+ * @returns {} empty object
+*/
+export function updateQuizThumbnail(quizId: number, token: string, imgUrl: string): Record<string, never> {
+  console.log(imgUrl);
+  // error checking
+  if (!isValidTokenStructure(token)) {
+    throw HTTPError(401, 'Token is not a valid structure');
+  }
+  if (!isTokenLoggedIn(token)) {
+    throw HTTPError(403, 'Token is not logged in');
+  }
+  if (!isValidQuizId(quizId) || !isValidCreator(quizId, token)) {
+    throw HTTPError(400, 'Invalid QuizId');
+  }
+
+  if (imgUrl.match(/\.(jpeg|jpg|png)$/) === null) {
+    throw HTTPError(400, 'imgUrl must be a jpg or png image');
+  }
+
+  const newUrl = getImg(imgUrl);
+
+  const data = getData();
+  const quizIndex = data.quizzes.findIndex(id => id.quizId === quizId);
+  data.quizzes[quizIndex].thumbnailUrl = `${config.url}:${config.port}/static/${newUrl}`;
 
   setData(data);
 
