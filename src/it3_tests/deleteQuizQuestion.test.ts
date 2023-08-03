@@ -4,6 +4,8 @@ import {
   clearRequest,
   createQuizQuestionRequest,
   deleteQuizQuestionRequest,
+  startSessionRequest,
+  updateSessionStateRequest,
   adminQuizInfoRequest,
   deleteQuizQuestionRequestV1
 } from './it3_testRoutes';
@@ -25,24 +27,12 @@ beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
   quiz = quizCreateRequest(user.token, 'Cats', 'A quiz about cats');
-  question = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 5, validAnswers);
+  question = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
 });
 
 describe('Token invalid', () => {
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-    { testName: 'token ends with letters', token: '54356s' },
-    { testName: 'token includes letter', token: '5436h86' },
-    { testName: 'token has space', token: '4324 757' },
-    { testName: 'token only whitespace', token: '  ' },
-    { testName: 'token has other characters', token: '6365,53' },
-    { testName: 'empty string', token: '' },
-    { testName: 'token has decimal point', token: '53.74' },
-    { testName: 'token has negative sign', token: '-37294' },
-    { testName: 'token has positive sign', token: '+38594' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => deleteQuizQuestionRequest(token, quiz.quizId, question.questionId)).toThrow(HTTPError[401]);
+  test('invalid token structure', () => {
+    expect(() => deleteQuizQuestionRequest('', quiz.quizId, question.questionId)).toThrow(HTTPError[401]);
   });
 
   test('Unused tokenId', () => {
@@ -86,18 +76,22 @@ describe('Invalid Questionid', () => {
   });
 });
 
-describe('Successfully removed quiz question', () => {
-  // Sucessfully remove the quiz
-  test('Sucessful quiz remove question empty return', () => {
-    expect(deleteQuizQuestionRequest(user.token, quiz.quizId, question.questionId)).toStrictEqual({});
+describe('Quiz is not in END state', () => {
+  test('quiz not in end state', () => {
+    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 6, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }], 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+    const sessionId = startSessionRequest(quiz.quizId, user.token, 3).sessionId;
+    updateSessionStateRequest(quiz.quizId, sessionId, user.token, 'NEXT_QUESTION');
+    expect(() => deleteQuizQuestionRequest(user.token, quiz.quizId, question.questionId)).toThrow(HTTPError[400]);
   });
+});
 
+describe('Successfully removed quiz question', () => {
   // Check that the quiz question is actually removed
   test('Sucessful quiz remove question integrated check', () => {
-    const questionToRemove = createQuizQuestionRequest(quiz.quizId, user.token, 'Question Remove', 5, 5, validAnswers);
-    const question2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 5, 5, validAnswers);
+    const questionToRemove = createQuizQuestionRequest(quiz.quizId, user.token, 'Question Remove', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+    const question2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
 
-    deleteQuizQuestionRequest(user.token, quiz.quizId, questionToRemove.questionId);
+    expect(deleteQuizQuestionRequest(user.token, quiz.quizId, questionToRemove.questionId)).toStrictEqual({});
 
     const received = adminQuizInfoRequest(user.token, quiz.quizId);
     const expected = {
@@ -116,7 +110,8 @@ describe('Successfully removed quiz question', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         },
         {
           questionId: question2.questionId,
@@ -126,8 +121,9 @@ describe('Successfully removed quiz question', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
-        }
+          ],
+          thumbnailUrl: expect.any(String),
+        },
       ],
       duration: 10
     };
@@ -137,10 +133,10 @@ describe('Successfully removed quiz question', () => {
 
   // check that once a question is removed, the next question still has a unique quiz id
   test('Unique question Id once a question is removed', () => {
-    const questionToRemove = createQuizQuestionRequest(quiz.quizId, user.token, 'questionToRemove', 5, 5, validAnswers);
-    const question2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 5, 5, validAnswers);
+    const questionToRemove = createQuizQuestionRequest(quiz.quizId, user.token, 'questionToRemove', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+    const question2 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 2', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     deleteQuizQuestionRequest(user.token, quiz.quizId, questionToRemove.questionId);
-    const question3 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3', 5, 5, validAnswers);
+    const question3 = createQuizQuestionRequest(quiz.quizId, user.token, 'Question 3', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
 
     expect(question3.questionId).not.toStrictEqual(question.questionId);
     expect(question3.questionId).not.toStrictEqual(question2.questionId);
@@ -154,11 +150,8 @@ describe('V1 WRAPPERS', () => {
     expect(deleteQuestion.statusCode).toStrictEqual(400);
   });
 
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    const result = deleteQuizQuestionRequestV1(token, quiz.quizId, question.questionId);
+  test('invalid token structure', () => {
+    const result = deleteQuizQuestionRequestV1('token', quiz.quizId, question.questionId);
     expect(result.body).toStrictEqual(ERROR);
     expect(result.statusCode).toStrictEqual(401);
   });

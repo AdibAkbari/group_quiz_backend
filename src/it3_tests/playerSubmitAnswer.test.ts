@@ -8,7 +8,6 @@ import {
   playerSubmitAnswerRequest,
   playerCurrentQuestionInfoRequest,
   updateSessionStateRequest,
-  sessionStatusRequest,
 } from './it3_testRoutes';
 import { } from '../interfaces';
 import HTTPError from 'http-errors';
@@ -22,10 +21,10 @@ let answerId2: number;
 let answerId3: number;
 
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
-const FIRST_POS = 0;
-const SECOND_POS = 1;
-const THIRD_POS = 2;
-const finishCountdown = 150;
+const FIRST_POS = 1;
+const SECOND_POS = 2;
+const THIRD_POS = 3;
+const finishCountdown = 100;
 const questionDuration = 2;
 
 function sleepSync(ms: number) {
@@ -40,8 +39,8 @@ beforeEach(() => {
   // Create a user and quiz with questions
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  createQuizQuestionRequest(quizId, token, 'Question 1', questionDuration, 6, validAnswers);
-  createQuizQuestionRequest(quizId, token, 'Question 2', questionDuration, 6, validAnswers);
+  createQuizQuestionRequest(quizId, token, 'Question 1', questionDuration, 6, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+  createQuizQuestionRequest(quizId, token, 'Question 2', questionDuration, 6, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
   // Start a session
   sessionId = startSessionRequest(quizId, token, 3).sessionId;
   // Player joins session
@@ -52,34 +51,32 @@ beforeEach(() => {
 });
 
 describe('Error cases', () => {
-  test('PlayerId does not exist', () => {
+  beforeEach(() => {
     answerId = playerCurrentQuestionInfoRequest(playerId, FIRST_POS).answers[0].answerId;
+  });
+
+  test('PlayerId does not exist', () => {
     expect(() => playerSubmitAnswerRequest([answerId], playerId + 1, FIRST_POS)).toThrow(HTTPError[400]);
   });
 
   test('Question position is not valid for the session this player is in', () => {
-    answerId = playerCurrentQuestionInfoRequest(playerId, FIRST_POS).answers[0].answerId;
     expect(() => playerSubmitAnswerRequest([answerId], playerId, THIRD_POS)).toThrow(HTTPError[400]);
   });
 
   test('Session is not in QUESTION_OPEN', () => {
-    sleepSync(questionDuration * 1000);
-    answerId = playerCurrentQuestionInfoRequest(playerId, FIRST_POS).answers[0].answerId;
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     expect(() => playerSubmitAnswerRequest([answerId], playerId, FIRST_POS)).toThrow(HTTPError[400]);
   });
 
   test('Session is not currently on this question', () => {
-    answerId = playerCurrentQuestionInfoRequest(playerId, FIRST_POS).answers[0].answerId;
     expect(() => playerSubmitAnswerRequest([answerId], playerId, SECOND_POS)).toThrow(HTTPError[400]);
   });
 
   test('Answer IDs are not valid for this particular question', () => {
-    answerId = playerCurrentQuestionInfoRequest(playerId, FIRST_POS).answers[0].answerId;
     expect(() => playerSubmitAnswerRequest([answerId + 18282], playerId, FIRST_POS)).toThrow(HTTPError[400]);
   });
 
   test('There are duplicate answer IDs provided', () => {
-    answerId = playerCurrentQuestionInfoRequest(playerId, FIRST_POS).answers[0].answerId;
     expect(() => playerSubmitAnswerRequest([answerId, answerId], playerId, FIRST_POS)).toThrow(HTTPError[400]);
   });
 
@@ -102,6 +99,18 @@ describe('Success cases', () => {
     answerId2 = playerCurrentQuestionInfoRequest(playerId, SECOND_POS).answers[0].answerId;
     answerId3 = playerCurrentQuestionInfoRequest(playerId, SECOND_POS).answers[1].answerId;
 
+    expect(playerSubmitAnswerRequest([answerId2, answerId3], playerId, SECOND_POS)).toStrictEqual({});
+  });
+
+  test('Resubmit answer', () => {
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
+    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
+    sleepSync(finishCountdown);
+
+    answerId2 = playerCurrentQuestionInfoRequest(playerId, SECOND_POS).answers[0].answerId;
+    answerId3 = playerCurrentQuestionInfoRequest(playerId, SECOND_POS).answers[1].answerId;
+
+    playerSubmitAnswerRequest([answerId2], playerId, SECOND_POS);
     expect(playerSubmitAnswerRequest([answerId2, answerId3], playerId, SECOND_POS)).toStrictEqual({});
   });
 });

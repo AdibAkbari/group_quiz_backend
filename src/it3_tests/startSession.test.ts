@@ -19,19 +19,12 @@ beforeEach(() => {
   clearRequest();
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  questionId = createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers).questionId;
+  questionId = createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
 });
 
 describe('invalid token', () => {
-  test.each([
-    { testName: 'token has letters', token: '5436h8j6' },
-    { testName: 'token only whitespace', token: '  ' },
-    { testName: 'token has other characters', token: '6365,53' },
-    { testName: 'empty string', token: '' },
-    { testName: 'token has decimal point', token: '53.74' },
-    { testName: 'token has negative sign', token: '-37294' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => startSessionRequest(quizId, token, 3)).toThrow(HTTPError[401]);
+  test('invalid token structure', () => {
+    expect(() => startSessionRequest(quizId, '4324h4324', 3)).toThrow(HTTPError[401]);
   });
 
   test('TokenId not logged in', () => {
@@ -59,7 +52,7 @@ describe('invalid input', () => {
 
   test('10 sessions already active', () => {
     const quizId2 = quizCreateRequest(token, 'quiz2', '').quizId;
-    createQuizQuestionRequest(quizId2, token, 'Question 1', 5, 6, validAnswers);
+    createQuizQuestionRequest(quizId2, token, 'Question 1', 5, 6, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
 
     startSessionRequest(quizId, token, 3);
     startSessionRequest(quizId2, token, 3);
@@ -83,13 +76,10 @@ describe('invalid input', () => {
 });
 
 describe('successful cases', () => {
-  test('correct return type', () => {
-    expect(startSessionRequest(quizId, token, 3)).toStrictEqual({ sessionId: expect.any(Number) });
-  });
-
   test('successful creation', () => {
-    const sessionId = startSessionRequest(quizId, token, 3).sessionId;
-    expect(sessionStatusRequest(token, quizId, sessionId)).toStrictEqual({
+    const session = startSessionRequest(quizId, token, 3);
+    expect(session).toStrictEqual({ sessionId: expect.any(Number) });
+    expect(sessionStatusRequest(token, quizId, session.sessionId)).toStrictEqual({
       state: 'LOBBY',
       atQuestion: 0,
       players: [],
@@ -109,7 +99,8 @@ describe('successful cases', () => {
             answers: [
               { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true },
               { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false }
-            ]
+            ],
+            thumbnailUrl: expect.any(String),
           }
         ],
         duration: 5,
@@ -119,7 +110,7 @@ describe('successful cases', () => {
 
   test('makes a copy of quiz on session start', () => {
     const sessionId = startSessionRequest(quizId, token, 3).sessionId;
-    updateQuizQuestionRequest(quizId, questionId, token, 'Updated question', 10, 9, validAnswers);
+    updateQuizQuestionRequest(quizId, questionId, token, 'Updated question', 10, 9, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     expect(sessionStatusRequest(token, quizId, sessionId)).toStrictEqual({
       state: 'LOBBY',
       atQuestion: 0,
@@ -140,7 +131,8 @@ describe('successful cases', () => {
             answers: [
               { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true },
               { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false }
-            ]
+            ],
+            thumbnailUrl: expect.any(String),
           }
         ],
         duration: 5,

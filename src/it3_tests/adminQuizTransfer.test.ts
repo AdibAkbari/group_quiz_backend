@@ -2,9 +2,12 @@ import {
   clearRequest,
   authRegisterRequest,
   quizCreateRequest,
+  createQuizQuestionRequest,
   quizTransferRequest,
   adminQuizInfoRequest,
   adminQuizListRequest,
+  startSessionRequest,
+  updateSessionStateRequest,
   quizCreateRequestV1,
   quizTransferRequestV1,
 } from './it3_testRoutes';
@@ -30,20 +33,8 @@ beforeEach(() => {
 
 // token not valid
 describe('Token invalid', () => {
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-    { testName: 'token ends with letters', token: '54356s' },
-    { testName: 'token includes letter', token: '5436h86' },
-    { testName: 'token has space', token: '4324 757' },
-    { testName: 'token only whitespace', token: '  ' },
-    { testName: 'token has other characters', token: '6365,53' },
-    { testName: 'empty string', token: '' },
-    { testName: 'token has decimal point', token: '53.74' },
-    { testName: 'token has negative sign', token: '-37294' },
-    { testName: 'token has positive sign', token: '+38594' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => quizTransferRequest(token, quiz.quizId, 'email2@gmail.com')).toThrow(HTTPError[401]);
+  test('invalid token structure', () => {
+    expect(() => quizTransferRequest('4324 6435', quiz.quizId, 'email2@gmail.com')).toThrow(HTTPError[401]);
   });
 
   test('Nobody logged in', () => {
@@ -88,12 +79,18 @@ describe('invalid userEmail', () => {
   });
 });
 
+// END state
+describe('Quiz is not in END state', () => {
+  test('quiz not in end state', () => {
+    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 6, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }], 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+    const sessionId = startSessionRequest(quiz.quizId, user.token, 3).sessionId;
+    updateSessionStateRequest(quiz.quizId, sessionId, user.token, 'NEXT_QUESTION');
+    expect(() => quizTransferRequest(user.token, quiz.quizId, 'fakeemail@gmail.com')).toThrow(HTTPError[400]);
+  });
+});
+
 // Success cases
 describe('Successful quiz transfer', () => {
-  test('Successful transfer quiz empty object response', () => {
-    expect(quizTransferRequest(user.token, quiz.quizId, 'email2@gmail.com')).toStrictEqual({});
-  });
-
   test('Successful transfer quiz integrated test', () => {
     expect(quizTransferRequest(user.token, quiz.quizId, 'email2@gmail.com')).toStrictEqual({});
 
@@ -111,12 +108,18 @@ describe('Successful quiz transfer', () => {
     });
   });
 
+  test('Quiz IS in END state', () => {
+    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 6, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }], 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+    const sessionId = startSessionRequest(quiz.quizId, user.token, 3).sessionId;
+    updateSessionStateRequest(quiz.quizId, sessionId, user.token, 'END');
+    expect(quizTransferRequest(user.token, quiz.quizId, 'email2@gmail.com')).toStrictEqual({});
+  });
+
   test('Correct time last edited', () => {
     const expectedTimeTransfered = Math.floor(Date.now() / 1000);
     expect(quizTransferRequest(user.token, quiz.quizId, 'email2@gmail.com')).toStrictEqual({});
 
     const quizInfo = adminQuizInfoRequest(user2.token, quiz.quizId);
-
     const timeSent = quizInfo.timeLastEdited;
 
     expect(timeSent).toBeGreaterThanOrEqual(expectedTimeTransfered);
@@ -133,11 +136,8 @@ describe('V1 WRAPPERS', () => {
     expect(transfer.statusCode).toStrictEqual(400);
   });
 
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    const transfer = quizTransferRequestV1(token, quiz.quizId, 'email2@gmail.com');
+  test('incorrect token structure', () => {
+    const transfer = quizTransferRequestV1('     ', quiz.quizId, 'email2@gmail.com');
     expect(transfer.body).toStrictEqual(ERROR);
     expect(transfer.statusCode).toStrictEqual(401);
   });

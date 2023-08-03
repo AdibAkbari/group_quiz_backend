@@ -1,11 +1,19 @@
 import { getData, setData } from './dataStore';
 import { isValidTokenStructure, isTokenLoggedIn, isValidQuizId, isValidCreator, isValidSessionId } from './helper';
-import { Session, SessionStatus, Timers } from './interfaces';
+import { Session, SessionStatus, Timers, Data } from './interfaces';
 import HTTPError from 'http-errors';
 
-const COUNTDOWN = 150;
-let timers:Timers[] = [];
+const COUNTDOWN = 100;
+const timers:Timers[] = [];
 
+/**
+ *This copies the quiz, so that any edits whilst a session is running does not affect active session
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {number} autoStartNum
+ * @returns {sessionId: number}
+ */
 export function startSession(quizId: number, token: string, autoStartNum: number): { sessionId: number} {
   if (!isValidTokenStructure(token)) {
     throw HTTPError(401, 'Token is not a valid structure');
@@ -67,7 +75,6 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
 
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
-  console.log(session.sessionState);
 
   // action: next_question
   if (action === 'NEXT_QUESTION') {
@@ -80,16 +87,16 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
 
     session.sessionState = 'QUESTION_COUNTDOWN';
     session.atQuestion++;
-    
+
     const timer = timers.find(id => id.sessionId === sessionId);
     const timerId = setTimeout(questionOpen, COUNTDOWN, sessionId);
-    if(timer !== undefined) {
-      timer.timer = timerId; 
+    if (timer !== undefined) {
+      timer.timer = timerId;
     } else {
       timers.push({
         sessionId: sessionId,
         timer: timerId
-      })
+      });
     }
   }
 
@@ -103,7 +110,7 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
       clearTimeout(timer.timer);
     }
     session.sessionState = 'ANSWER_SHOW';
-    calculateQuestionPoints(sessionId);
+    calculateQuestionPoints(sessionId, data);
   }
 
   // action: go_to_final_results
@@ -111,6 +118,11 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
     if (session.sessionState !== 'QUESTION_CLOSE' && session.sessionState !== 'ANSWER_SHOW') {
       throw HTTPError(400, 'Action enum cannot be applied in current state');
     }
+    if (session.sessionState === 'QUESTION_CLOSE') {
+      calculateQuestionPoints(sessionId, data);
+    }
+
+    session.atQuestion = 0;
     session.sessionState = 'FINAL_RESULTS';
   }
 
@@ -123,6 +135,7 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
       const timer = timers.find(id => id.sessionId === sessionId);
       clearTimeout(timer.timer);
     }
+    session.atQuestion = 0;
     session.sessionState = 'END';
   }
 
@@ -139,8 +152,8 @@ function questionOpen(sessionId: number) {
   const duration = session.metadata.questions[session.atQuestion - 1].duration;
 
   const timerId = setTimeout(questionClose, duration * 1000, sessionId);
-  let timer = timers.find(id => id.sessionId === sessionId);
-  timer.timer = timerId; 
+  const timer = timers.find(id => id.sessionId === sessionId);
+  timer.timer = timerId;
   setData(data);
 }
 
@@ -151,26 +164,28 @@ function questionClose(sessionId: number) {
   setData(data);
 }
 
-function calculateQuestionPoints(sessionId: number) {
-  const data = getData();
-  const session = data.sessions.find(id => id.sessionId === sessionId);
+function calculateQuestionPoints(sessionId: number, data: Data) {
+  const session = data.sessions.find((id: any) => id.sessionId === sessionId);
 
   const question = session.metadata.questions[session.atQuestion - 1];
   const questionId = question.questionId;
-  const correctAnswers = question.answers.filter(answer => answer.correct === true);
+  const correctAnswers = question.answers.filter((answer: any) => answer.correct === true);
 
-  const sessionPlayers = data.players.filter(session => session.sessionId === sessionId);
+  const sessionPlayers = data.players.filter((session: any) => session.sessionId === sessionId);
 
-  for (const player in sessionPlayers) {
-    const currentAnswer = sessionPlayers[player].questionResponse.find(id => id.questionId === questionId);
-    if (currentAnswer.playerAnswers !== correctAnswers) {
-      sessionPlayers.splice(parseInt(player), 1);
+  const filteredPlayers = [];
+  for (const player of sessionPlayers) {
+    const currentAnswer = player.questionResponse.find((id: any) => id.questionId === questionId);
+    if (currentAnswer && currentAnswer.playerAnswers.length > 0) {
+      if (arraysContainSameElements(currentAnswer.playerAnswers, correctAnswers.map((answer: any) => answer.answerId))) {
+        filteredPlayers.push(player);
+      }
     }
   }
 
-  sessionPlayers.sort(function(a, b) {
-    const timeA = a.questionResponse.find(id => id.questionId === questionId).answerTime;
-    const timeB = b.questionResponse.find(id => id.questionId === questionId).answerTime;
+  filteredPlayers.sort(function(a, b) {
+    const timeA = a.questionResponse.find((id: any) => id.questionId === questionId).answerTime;
+    const timeB = b.questionResponse.find((id: any) => id.questionId === questionId).answerTime;
     if (timeA < timeB) {
       return -1;
     }
@@ -179,22 +194,44 @@ function calculateQuestionPoints(sessionId: number) {
 
   const points = question.points;
   let counter = 1;
-  for (const player of sessionPlayers) {
-    const playerInfo = data.players.find(id => id.playerId === player.playerId);
+  for (const player of filteredPlayers) {
+    const playerInfo = data.players.find((id: any) => id.playerId === player.playerId);
     const point = points * 1 / counter;
     playerInfo.score += point;
-    playerInfo.questionResponse.find(id => id.questionId === questionId).points = point;
+    playerInfo.questionResponse.find((id: any) => id.questionId === questionId).points = point;
     counter++;
   }
   setData(data);
 }
 
-export function clearTimers() {
-    for (const timer of timers) {
-      clearTimeout(timer.timer);
-    }
+function arraysContainSameElements(arr1: number[], arr2: number[]): boolean {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+
+  const set1 = new Set(arr1);
+  const set2 = new Set(arr2);
+
+  return (
+    arr1.every(element => set2.has(element)) &&
+    arr2.every(element => set1.has(element))
+  );
 }
 
+export function clearTimers() {
+  for (const timer of timers) {
+    clearTimeout(timer.timer);
+  }
+}
+
+/**
+ * Update the state of a particular session by sending an action command
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @param {number} sessionId
+ * @returns {SessionStatus}
+ */
 export function sessionStatus(token: string, quizId: number, sessionId: number): SessionStatus {
   if (!isValidTokenStructure(token)) {
     throw HTTPError(401, 'Token is not a valid structure');
@@ -224,5 +261,3 @@ export function sessionStatus(token: string, quizId: number, sessionId: number):
     metadata: metaData,
   };
 }
-
-

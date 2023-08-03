@@ -161,7 +161,7 @@ export function quizTrashEmptyRequest(token: string, quizIds: number[]) {
 
 // QUESTION ROUTES //
 
-export function createQuizQuestionRequest(quizId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
+export function createQuizQuestionRequest(quizId: number, token: string, question: string, duration: number, points: number, answers: Answer[], thumbnail: string) {
   return requestHelper(
     'POST',
     `/v2/admin/quiz/${quizId}/question`,
@@ -170,7 +170,8 @@ export function createQuizQuestionRequest(quizId: number, token: string, questio
         question,
         duration,
         points,
-        answers
+        answers,
+        thumbnail,
       }
     },
     { token }
@@ -189,7 +190,7 @@ export function quizQuestionDuplicateRequest(quizid: number, questionid: number,
   return requestHelper('POST', `/v2/admin/quiz/${quizid}/question/${questionid}/duplicate`, {}, { token });
 }
 
-export function updateQuizQuestionRequest(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
+export function updateQuizQuestionRequest(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[], thumbnailUrl: string) {
   return requestHelper(
     'PUT',
     `/v2/admin/quiz/${quizId}/question/${questionId}`,
@@ -198,7 +199,8 @@ export function updateQuizQuestionRequest(quizId: number, questionId: number, to
         question,
         duration,
         points,
-        answers
+        answers,
+        thumbnailUrl,
       }
     },
     { token }
@@ -433,7 +435,7 @@ export function updateQuizQuestionRequestV1(quizId: number, questionId: number, 
           question,
           duration,
           points,
-          answers
+          answers,
         }
       }
     });
@@ -528,6 +530,10 @@ export function playerSendChatRequest(playerId: number, message: string) {
 export function playerStatusRequest(playerId: number) {
   return requestHelper('GET', `/v1/player/${playerId}`, {});
 
+}
+
+export function updateQuizThumbnailRequest(quizid: number, token: string, imgUrl: string) {
+  return requestHelper('PUT', `/v1/admin/quiz/${quizid}/thumbnail`, { quizid, imgUrl }, { token });
 }
 
 export function playerCurrentQuestionInfoRequest(playerId: number, questionPosition: number) {
