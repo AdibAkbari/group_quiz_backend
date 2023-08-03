@@ -48,6 +48,44 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
 }
 
 /**
+ * Send a chat message
+ *
+ * @param {number} playerId
+ * @param {string} message
+ * @returns {} empty object
+ */
+export function playerSendChat (playerId: number, message: string): Record<string, never> {
+  const data = getData();
+  // console.log(data);
+
+  if (data.players.find(id => id.playerId === playerId) === undefined) {
+    throw HTTPError(400, 'player does not exist');
+  }
+
+  if (message.length < 1 || message.length > 100) {
+    throw HTTPError(400, 'message must be between 1 and 100 characters');
+  }
+
+  const player = data.players.find(id => id.playerId === playerId);
+  const sessionIndex = data.sessions.findIndex(id => id.sessionId === player.sessionId);
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  const messageObject: Message = {
+    messageBody: message,
+    playerId: playerId,
+    playerName: player.name,
+    timeSent: timeNow,
+  };
+
+  if (data.sessions[sessionIndex].messages === undefined) {
+    data.sessions[sessionIndex].messages = [];
+  }
+  data.sessions[sessionIndex].messages.push(messageObject);
+  setData(data);
+
+  return {};
+}
+
+/**
  * Allow player to join a session
  *
  * @param {number} playerId
@@ -205,4 +243,29 @@ export function playerSubmitAnswer(answerIds: number[], playerId: number, questi
   setData(data);
 
   return {};
+}
+
+/**
+ * View Messages in Session
+ *
+ * @param {number} playerId
+ * @returns {array} Message
+ */
+export function playerViewChat (playerId: number): {messages: Message[]} | {messages: [] } {
+  const data = getData();
+  // console.log(data);
+
+  if (data.players.find(id => id.playerId === playerId) === undefined) {
+    throw HTTPError(400, 'player does not exist');
+  }
+
+  const player = data.players.find(id => id.playerId === playerId);
+  const sessionIndex = data.sessions.findIndex(id => id.sessionId === player.sessionId);
+  const messages = data.sessions[sessionIndex].messages;
+
+  if (messages !== undefined) {
+    return { messages: messages };
+  } else {
+    return { messages: [] };
+  }
 }

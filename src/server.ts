@@ -40,6 +40,8 @@ import {
   playerStatus,
   playerSubmitAnswer,
   playerCurrentQuestionInfo,
+  playerSendChat,
+  playerViewChat,
   playerResults,
   playerQuestionResults,
 } from './player';
@@ -233,6 +235,21 @@ app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
   const questionId = parseInt(req.params.questionid);
   const token = req.headers.token as string;
   const response = quizQuestionDuplicate(quizId, questionId, token, true);
+  res.json(response);
+});
+
+// playerSendChat //
+app.post('/v1/player/:playerid/chat', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const message = req.body.message;
+  const response = playerSendChat(playerId, message);
+  res.json(response);
+});
+
+// playerViewChat //
+app.get('/v1/player/:playerid/chat', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const response = playerViewChat(playerId);
   res.json(response);
 });
 

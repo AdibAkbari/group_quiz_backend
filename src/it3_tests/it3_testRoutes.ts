@@ -1,5 +1,5 @@
 import { port, url } from '../config.json';
-import request, { HttpVerb } from 'sync-request';
+import request, { HttpVerb } from 'sync-request-curl';
 const SERVER_URL = `${url}:${port}`;
 import { IncomingHttpHeaders } from 'http';
 import HTTPError from 'http-errors';
@@ -531,6 +531,10 @@ export function playerJoinRequest(sessionId: number, name: string) {
   return requestHelper('POST', '/v1/player/join', { sessionId, name });
 }
 
+export function playerSendChatRequest(playerId: number, message: string) {
+  return requestHelper('POST', `/v1/player/${playerId}/chat`, { message });
+}
+
 export function playerStatusRequest(playerId: number) {
   return requestHelper('GET', `/v1/player/${playerId}`, {});
 }
@@ -553,4 +557,8 @@ export function playerResultsRequest(playerId: number) {
 
 export function playerQuestionResultsRequest(playerId: number, questionPosition: number) {
   return requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}/results`, { }, { });
+}
+
+export function playerViewChatRequest(playerId: number) {
+  return requestHelper('GET', `/v1/player/${playerId}/chat`, {});
 }
