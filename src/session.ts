@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
-import { isValidTokenStructure, isTokenLoggedIn, isValidQuizId, isValidCreator, isValidSessionId } from './helper';
-import { Session, SessionStatus, Timers, Data } from './interfaces';
+import { isValidTokenStructure, isTokenLoggedIn, isValidQuizId, isValidCreator, getSessionResults, isValidSessionId } from './helper';
+import { Session, SessionStatus, SessionResults, Timers, Data } from './interfaces';
 import HTTPError from 'http-errors';
 
 const COUNTDOWN = 100;
@@ -258,6 +258,41 @@ export function sessionStatus(token: string, quizId: number, sessionId: number):
     state: session.sessionState,
     atQuestion: session.atQuestion,
     players: playerNames,
-    metadata: metaData,
+    metadata: session.metadata,
   };
+}
+
+/**
+ * Returns object containing various results from a completed quiz session
+ *
+ * @param {number} quizId
+ * @param {number} sessionId
+ * @param {string} token
+ * @returns {SessionResults}
+ */
+export function sessionResults(quizId: number, sessionId: number, token: string): SessionResults {
+  if (!isValidTokenStructure(token)) {
+    throw HTTPError(401, 'Token is not a valid structure');
+  }
+  if (!isTokenLoggedIn(token)) {
+    throw HTTPError(403, 'Token is not logged in');
+  }
+  if (!isValidQuizId(quizId)) {
+    throw HTTPError(400, 'invalid quiz Id');
+  }
+  if (!isValidCreator(quizId, token)) {
+    throw HTTPError(400, 'quizId does not refer to a quiz that this user owns');
+  }
+  if (!isValidSessionId(sessionId, quizId)) {
+    throw HTTPError(400, 'Session Id does not refer to a valid session within this quiz');
+  }
+
+  const data = getData();
+  const session = data.sessions.find(session => session.sessionId === sessionId);
+
+  if (session.sessionState !== 'FINAL_RESULTS') {
+    throw HTTPError(400, 'Session is not in FINAL_RESULTS state');
+  }
+
+  return getSessionResults(session);
 }

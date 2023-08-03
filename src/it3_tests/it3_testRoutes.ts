@@ -1,5 +1,5 @@
 import { port, url } from '../config.json';
-import request, { HttpVerb } from 'sync-request';
+import request, { HttpVerb } from 'sync-request-curl';
 const SERVER_URL = `${url}:${port}`;
 import { IncomingHttpHeaders } from 'http';
 import HTTPError from 'http-errors';
@@ -508,6 +508,10 @@ export function authLogoutRequestV1(tokenId: string) {
 // Session routes
 export function startSessionRequest(quizId: number, token: string, autoStartNum: number) {
   return requestHelper('POST', `/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
+}
+
+export function sessionResultsRequest(quizId: number, sessionId: number, token: string) {
+  return requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}/results`, { }, { token });
 }
 
 export function updateSessionStateRequest(quizId: number, sessionId: number, token: string, action: string) {

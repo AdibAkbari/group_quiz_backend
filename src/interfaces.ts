@@ -145,6 +145,22 @@ export interface NewQuestionId {
   newQuestionId: number;
 }
 
+export interface QuestionCorrectBreakdown {
+  answerId: number;
+  playersCorrect: string[];
+}
+
+export interface QuestionResult {
+  questionId: number;
+  questionCorrectBreakdown: QuestionCorrectBreakdown[];
+  averageAnswerTime: number;
+  percentCorrect: number;
+}
+export interface SessionResults {
+  usersRankedByScore: {name: string, score: number}[];
+  questionResults: QuestionResult[];
+}
+
 export interface QuizList {
   quizId: number,
   name: string

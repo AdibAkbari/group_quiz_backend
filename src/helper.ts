@@ -1,5 +1,5 @@
 import { getData } from './dataStore';
-import { Data, Quizzes } from './interfaces';
+import { Data, Players, QuestionResult, Quizzes, Session, SessionResults } from './interfaces';
 import HTTPError from 'http-errors';
 import request from 'sync-request';
 import fs from 'fs';
@@ -304,4 +304,92 @@ export function isEndState(quizId: number): boolean {
     return true;
   }
   return false;
+}
+
+/**
+ * Returns the results object for the specified question in the given session
+ *
+ * @param {number} position
+ * @param {Session} session
+ * @param {Players[]} playerList
+ * @returns {QuestionResult} - Object with results from specific question
+ */
+export function questionResult(position: number, session: Session, playerList: Players[]): QuestionResult {
+  // Reset arrays and counters for each question
+  let totalAnswerTime = 0;
+  let numPlayers = 0;
+  let numCorrectPlayers = 0;
+  const question = session.metadata.questions[position];
+
+  const questionCorrectBreakdown = [];
+  // set to keep track of which players have been added to counts already
+  const addedPlayers = new Set();
+
+  for (const answer of question.answers) {
+    const playersCorrect = [];
+
+    for (const player of playerList) {
+      const questionResponse = player.questionResponse.find(
+        (questionResponse) => questionResponse.questionId === question.questionId
+      );
+
+      if (questionResponse !== undefined) {
+        if (answer.correct && questionResponse.playerAnswers.includes(answer.answerId)) {
+          playersCorrect.push(player.name);
+        }
+        if (!addedPlayers.has(player.name)) {
+          totalAnswerTime += questionResponse.answerTime;
+          numPlayers++;
+          addedPlayers.add(player.name);
+
+          if (questionResponse.points !== 0) {
+            numCorrectPlayers++;
+          }
+        }
+      } else if (!addedPlayers.has(player.name)) {
+        numPlayers++;
+        addedPlayers.add(player.name);
+      }
+    }
+    // pushes to list for each correct answer after adding all correct players to playerCorrect
+    if (answer.correct) {
+      questionCorrectBreakdown.push({
+        answerId: answer.answerId,
+        playersCorrect: playersCorrect
+      });
+    }
+  }
+  const averageAnswerTime = numPlayers === 0 ? 0 : Math.round(totalAnswerTime / numPlayers);
+  const percentCorrect = numPlayers === 0 ? 0 : Math.round((100 * numCorrectPlayers) / numPlayers);
+
+  return {
+    questionId: question.questionId,
+    questionCorrectBreakdown: questionCorrectBreakdown,
+    averageAnswerTime: averageAnswerTime,
+    percentCorrect: percentCorrect
+  };
+}
+/**
+ * Returns full results from a completed quiz session
+ *
+ * @param session
+ * @returns {SessionResults} - object containing results of quiz session
+ */
+export function getSessionResults(session: Session): SessionResults {
+  const data = getData();
+  const playerList = data.players.filter(player => session.players.includes(player.name));
+
+  const mappedPlayers = playerList.map(({ name, score }) => ({ name, score }));
+  const rankedPlayers = mappedPlayers.sort((player1, player2) => {
+    return player2.score - player1.score;
+  });
+
+  const questionResults = session.metadata.questions.map(
+    (_, position) => questionResult(position, session, playerList)
+  );
+
+  return {
+    usersRankedByScore: rankedPlayers,
+    questionResults: questionResults
+  };
 }
