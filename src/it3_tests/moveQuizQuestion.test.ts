@@ -29,8 +29,8 @@ beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
   quizId = quizCreateRequest(user.token, 'Cats', 'A quiz about cats').quizId;
-  question1Id = createQuizQuestionRequest(quizId, user.token, 'Question 1?', 6, 3, validAnswers).questionId;
-  question2Id = createQuizQuestionRequest(quizId, user.token, 'Question 2?', 6, 3, validAnswers).questionId;
+  question1Id = createQuizQuestionRequest(quizId, user.token, 'Question 1?', 6, 3, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
+  question2Id = createQuizQuestionRequest(quizId, user.token, 'Question 2?', 6, 3, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
 });
 
 describe('Token invalid', () => {
@@ -113,7 +113,8 @@ describe('Successful Move Question', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         },
         {
           questionId: question1Id,
@@ -123,7 +124,8 @@ describe('Successful Move Question', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String)
         },
       ],
       duration: 12
@@ -133,9 +135,9 @@ describe('Successful Move Question', () => {
   });
 
   test('correct QuizInfo output: multiple questions', () => {
-    question3Id = createQuizQuestionRequest(quizId, user.token, 'Question 3?', 6, 3, validAnswers).questionId;
-    question4Id = createQuizQuestionRequest(quizId, user.token, 'Question 4?', 6, 3, validAnswers).questionId;
-    question5Id = createQuizQuestionRequest(quizId, user.token, 'Question 5?', 6, 3, validAnswers).questionId;
+    question3Id = createQuizQuestionRequest(quizId, user.token, 'Question 3?', 6, 3, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
+    question4Id = createQuizQuestionRequest(quizId, user.token, 'Question 4?', 6, 3, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
+    question5Id = createQuizQuestionRequest(quizId, user.token, 'Question 5?', 6, 3, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
 
     moveQuizQuestionRequest(user.token, quizId, question1Id, 1);
 
@@ -156,7 +158,8 @@ describe('Successful Move Question', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         },
         {
           questionId: question1Id,
@@ -166,7 +169,8 @@ describe('Successful Move Question', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         },
         {
           questionId: question3Id,
@@ -176,7 +180,8 @@ describe('Successful Move Question', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         },
         {
           questionId: question4Id,
@@ -186,7 +191,8 @@ describe('Successful Move Question', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         },
         {
           questionId: question5Id,
@@ -196,7 +202,8 @@ describe('Successful Move Question', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         },
       ],
       duration: 30

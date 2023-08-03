@@ -33,6 +33,7 @@ export interface Question {
   duration: number;
   points: number;
   answers: Answer[];
+  thumbnailUrl?: string;
 }
 
 export interface Quizzes {
@@ -45,6 +46,7 @@ export interface Quizzes {
   questions: Question[];
   creator: number;
   duration: number;
+  thumbnailUrl?: string;
   questionCount: number;
 }
 
@@ -56,7 +58,8 @@ export interface QuizInfo {
   description: string,
   numQuestions: number,
   questions: Question[],
-  duration: number
+  duration: number,
+  thumbnailUrl?: string,
 }
 
 export interface Token {
@@ -79,6 +82,13 @@ export interface Players {
   score: number
 }
 
+export interface Message {
+  messageBody: string;
+  playerId: number;
+  playerName: string;
+  timeSent: number;
+}
+
 export interface PlayerStatus {
   state: string;
   numQuestions: number;
@@ -93,6 +103,8 @@ export interface Session {
   currentQuestionStartTime?: number;
   players: string[];
   metadata: Quizzes;
+  timer?: ReturnType<typeof setTimeout>;
+  messages?: Message[];
 }
 
 export interface SessionStatus {
@@ -131,6 +143,22 @@ export interface QuestionId {
 
 export interface NewQuestionId {
   newQuestionId: number;
+}
+
+export interface QuestionCorrectBreakdown {
+  answerId: number;
+  playersCorrect: string[];
+}
+
+export interface QuestionResult {
+  questionId: number;
+  questionCorrectBreakdown: QuestionCorrectBreakdown[];
+  averageAnswerTime: number;
+  percentCorrect: number;
+}
+export interface SessionResults {
+  usersRankedByScore: {name: string, score: number}[];
+  questionResults: QuestionResult[];
 }
 
 export interface QuizList {

@@ -39,8 +39,8 @@ beforeEach(() => {
   // Create a user and quiz with questions
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  createQuizQuestionRequest(quizId, token, 'Question 1', questionDuration, 6, validAnswers);
-  createQuizQuestionRequest(quizId, token, 'Question 2', questionDuration, 6, validAnswers);
+  createQuizQuestionRequest(quizId, token, 'Question 1', questionDuration, 6, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+  createQuizQuestionRequest(quizId, token, 'Question 2', questionDuration, 6, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
   // Start a session
   sessionId = startSessionRequest(quizId, token, 3).sessionId;
   // Player joins session

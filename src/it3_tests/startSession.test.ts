@@ -19,7 +19,7 @@ beforeEach(() => {
   clearRequest();
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  questionId = createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers).questionId;
+  questionId = createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
 });
 
 describe('invalid token', () => {
@@ -52,7 +52,7 @@ describe('invalid input', () => {
 
   test('10 sessions already active', () => {
     const quizId2 = quizCreateRequest(token, 'quiz2', '').quizId;
-    createQuizQuestionRequest(quizId2, token, 'Question 1', 5, 6, validAnswers);
+    createQuizQuestionRequest(quizId2, token, 'Question 1', 5, 6, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
 
     startSessionRequest(quizId, token, 3);
     startSessionRequest(quizId2, token, 3);
@@ -99,7 +99,8 @@ describe('successful cases', () => {
             answers: [
               { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true },
               { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false }
-            ]
+            ],
+            thumbnailUrl: expect.any(String),
           }
         ],
         duration: 5,
@@ -109,7 +110,7 @@ describe('successful cases', () => {
 
   test('makes a copy of quiz on session start', () => {
     const sessionId = startSessionRequest(quizId, token, 3).sessionId;
-    updateQuizQuestionRequest(quizId, questionId, token, 'Updated question', 10, 9, validAnswers);
+    updateQuizQuestionRequest(quizId, questionId, token, 'Updated question', 10, 9, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     expect(sessionStatusRequest(token, quizId, sessionId)).toStrictEqual({
       state: 'LOBBY',
       atQuestion: 0,
@@ -130,7 +131,8 @@ describe('successful cases', () => {
             answers: [
               { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true },
               { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false }
-            ]
+            ],
+            thumbnailUrl: expect.any(String),
           }
         ],
         duration: 5,

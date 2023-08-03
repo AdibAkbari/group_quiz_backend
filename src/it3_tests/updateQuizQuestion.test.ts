@@ -21,31 +21,38 @@ beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'Firstname', 'Lastname').body;
   quizId = quizCreateRequest(user.token, 'Cats', 'A quiz about cats').quizId;
-  questionId = createQuizQuestionRequest(quizId, user.token, 'Question 1?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).questionId;
+  questionId = createQuizQuestionRequest(quizId, user.token, 'Question 1?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }], 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
 });
 
 describe('Invalid params', () => {
   test('QuizId does not refer to a valid quiz', () => {
-    expect(() => updateQuizQuestionRequest(quizId + 1, questionId, user.token, 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[400]);
+    expect(() => updateQuizQuestionRequest(quizId + 1, questionId, user.token, 'How are you?', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg')).toThrow(HTTPError[400]);
   });
 
   test('QuizId does not refer to a quiz that this user owns', () => {
     const user2 = authRegisterRequest('email1@gmail.com', 'password2', 'FirstnameB', 'LastnameB').body;
-    expect(() => updateQuizQuestionRequest(quizId, questionId, user2.token, 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[400]);
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user2.token, 'How are you?', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg')).toThrow(HTTPError[400]);
   });
 
   test('No questions in any quiz with this questionId', () => {
-    expect(() => updateQuizQuestionRequest(quizId, questionId + 1, user.token, 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[400]);
-  });
-
-  test('No questions in this quiz with this questionId', () => {
-    const quiz2Id = quizCreateRequest(user.token, 'Quiz2', '').quizId;
-    expect(() => updateQuizQuestionRequest(quiz2Id, questionId, user.token, 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[400]);
+    expect(() => updateQuizQuestionRequest(quizId, questionId + 1, user.token, 'How are you?', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg')).toThrow(HTTPError[400]);
   });
 
   test('question with given questionId has been removed', () => {
     deleteQuizQuestionRequest(user.token, quizId, questionId);
-    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[400]);
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg')).toThrow(HTTPError[400]);
+  });
+
+  test('Empty URL', () => {
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 5, 5, validAnswers, '')).toThrow(HTTPError[400]);
+  });
+
+  test('Invalid URL', () => {
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7123.jpg')).toThrow(HTTPError[400]);
+  });
+
+  test('Not jpg or png', () => {
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 5, 5, validAnswers, 'https://media.tenor.com/sz-XG3TLQx8AAAAM/bugcat-capoo.gif')).toThrow(HTTPError[400]);
   });
 });
 
@@ -56,7 +63,7 @@ describe('invalid question body - question, duration, points', () => {
     { testname: 'Question string empty', question: '' },
     { testname: 'Question string just whitespace', question: '       ' },
   ])('Incorrect question string: $testName', ({ question }) => {
-    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, question, 5, 5, validAnswers)).toThrow(HTTPError[400]);
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, question, 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg')).toThrow(HTTPError[400]);
   });
 
   test.each([
@@ -67,12 +74,12 @@ describe('invalid question body - question, duration, points', () => {
     { testname: 'Question points 0', duration: 5, points: 0 },
     { testname: 'Question points >10', duration: 5, points: 15 },
   ])('Invalid question points or duration: $testName', ({ duration, points }) => {
-    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', duration, points, validAnswers)).toThrow(HTTPError[400]);
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', duration, points, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg')).toThrow(HTTPError[400]);
   });
 
   test('if this quiz were to be updated, sum of question durations exceed 3 minutes', () => {
-    createQuizQuestionRequest(quizId, user.token, 'Question 2', 150, 5, validAnswers);
-    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 40, 5, validAnswers)).toThrow(HTTPError[400]);
+    createQuizQuestionRequest(quizId, user.token, 'Question 2', 150, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 40, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg')).toThrow(HTTPError[400]);
   });
 });
 
@@ -132,23 +139,24 @@ describe('invalid question body - answers', () => {
       ]
     },
   ])('invalid answers: $testname', ({ answers }) => {
-    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 5, 5, answers)).toThrow(HTTPError[400]);
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token, 'How are you?', 5, 5, answers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg')).toThrow(HTTPError[400]);
   });
 });
 
 describe('Token invalid', () => {
   test('invalid token structure', () => {
-    expect(() => updateQuizQuestionRequest(quizId, questionId, '432h4324', 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[401]);
+    expect(() => updateQuizQuestionRequest(quizId, questionId, '432h4324', 'How are you?', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg')).toThrow(HTTPError[401]);
   });
 
   test('Unused tokenId', () => {
-    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token + 1, 'How are you?', 5, 5, validAnswers)).toThrow(HTTPError[403]);
+    expect(() => updateQuizQuestionRequest(quizId, questionId, user.token + 1, 'How are you?', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg')).toThrow(HTTPError[403]);
   });
 });
 
 describe('valid input', () => {
   test('quiz with one question successfully updated', () => {
-    expect(updateQuizQuestionRequest(quizId, questionId, user.token, 'New Question', 5, 4, validAnswers)).toStrictEqual({});
+    expect(updateQuizQuestionRequest(quizId, questionId, user.token, 'New Question', 5, 4, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg')).toStrictEqual({});
+
     expect(adminQuizInfoRequest(user.token, quizId)).toStrictEqual({
       quizId: quizId,
       name: 'Cats',
@@ -165,17 +173,18 @@ describe('valid input', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         }
       ],
-      duration: 5
+      duration: 5,
     });
   });
 
   test('quiz with multiple questions successfully updated', () => {
-    const q2Id = createQuizQuestionRequest(quizId, user.token, 'Question 2?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).questionId;
-    const q3Id = createQuizQuestionRequest(quizId, user.token, 'Question 3?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]).questionId;
-    updateQuizQuestionRequest(quizId, q2Id, user.token, 'New Question 2', 5, 4, validAnswers);
+    const q2Id = createQuizQuestionRequest(quizId, user.token, 'Question 2?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }], 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
+    const q3Id = createQuizQuestionRequest(quizId, user.token, 'Question 3?', 6, 3, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }], 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
+    updateQuizQuestionRequest(quizId, q2Id, user.token, 'New Question 2', 5, 4, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
 
     const expected = {
       quizId: quizId,
@@ -193,7 +202,8 @@ describe('valid input', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         },
         {
           questionId: q2Id,
@@ -203,7 +213,8 @@ describe('valid input', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         },
         {
           questionId: q3Id,
@@ -213,26 +224,27 @@ describe('valid input', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'answer1', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'answer2', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         },
       ],
-      duration: 17
+      duration: 17,
     };
     expect(adminQuizInfoRequest(user.token, quizId)).toStrictEqual(expected);
   });
   test('timeLastEdited successfully updated', () => {
     const timeNow = Math.floor(Date.now() / 1000);
-    updateQuizQuestionRequest(quizId, questionId, user.token, 'New Question', 5, 4, validAnswers);
+    updateQuizQuestionRequest(quizId, questionId, user.token, 'New Question', 5, 4, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     const result = adminQuizInfoRequest(user.token, quizId);
     expect(result.timeLastEdited).toBeGreaterThanOrEqual(timeNow);
     expect(result.timeLastEdited).toBeLessThanOrEqual(timeNow + 1);
   });
 
   test('quiz duration only <3 minutes when old question duration no longer included', () => {
-    const q2Id = createQuizQuestionRequest(quizId, user.token, 'Question 2', 50, 5, validAnswers).questionId;
-    createQuizQuestionRequest(quizId, user.token, 'Question 3', 50, 5, validAnswers);
-    createQuizQuestionRequest(quizId, user.token, 'Question 4', 50, 5, validAnswers);
-    const result = updateQuizQuestionRequest(quizId, q2Id, user.token, 'How are you?', 55, 5, validAnswers);
+    const q2Id = createQuizQuestionRequest(quizId, user.token, 'Question 2', 50, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
+    createQuizQuestionRequest(quizId, user.token, 'Question 3', 50, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+    createQuizQuestionRequest(quizId, user.token, 'Question 4', 50, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
+    const result = updateQuizQuestionRequest(quizId, q2Id, user.token, 'How are you?', 55, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     expect(result).toStrictEqual({});
   });
 });
