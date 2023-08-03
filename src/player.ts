@@ -200,7 +200,7 @@ export function playerSubmitAnswer(answerIds: number[], playerId: number, questi
  * @param {number} playerId
  * @returns {array} Message
  */
-export function playerViewChat (playerId: number): Message[] {
+export function playerViewChat (playerId: number): {messages: Message[]} | {messages: [] } {
   const data = getData();
   // console.log(data);
 
@@ -210,10 +210,11 @@ export function playerViewChat (playerId: number): Message[] {
 
   const player = data.players.find(id => id.playerId === playerId);
   const sessionIndex = data.sessions.findIndex(id => id.sessionId === player.sessionId);
+  const messages = data.sessions[sessionIndex].messages;
 
-  if (data.sessions[sessionIndex].messages === undefined) {
+  if (messages !== undefined) {
+    return { messages: messages };
+  } else {
     return { messages: [] };
   }
-
-  return { messages: data.sessions[sessionIndex].messages };
 }

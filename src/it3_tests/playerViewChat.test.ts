@@ -24,7 +24,7 @@ beforeEach(() => {
   clearRequest();
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers);
+  createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
   sessionId = startSessionRequest(quizId, token, 3).sessionId;
   player = playerJoinRequest(sessionId, 'Player One');
   playerId = player.playerId;
@@ -35,11 +35,11 @@ test('Error Case: playerId does not exist', () => {
 });
 
 describe('Success Cases', () => {
-	test('no messages sent', () => {
-		expect(playerViewChatRequest(playerId)).toStrictEqual({
-			messages: []
-		});
-	});
+  test('no messages sent', () => {
+    expect(playerViewChatRequest(playerId)).toStrictEqual({
+      messages: []
+    });
+  });
 
   test('one message sent', () => {
     playerSendChatRequest(playerId, 'hello its me');
