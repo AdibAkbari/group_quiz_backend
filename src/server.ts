@@ -237,7 +237,7 @@ app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
 // playerSendChat //
 app.post('/v1/player/:playerid/chat', (req: Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
-  const message = req.body.message;
+  const message = req.body.message.messageBody;
   const response = playerSendChat(playerId, message);
   res.json(response);
 });

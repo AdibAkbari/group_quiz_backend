@@ -62,7 +62,7 @@ export function playerSendChat (playerId: number, message: string): Record<strin
     throw HTTPError(400, 'player does not exist');
   }
 
-  if (message.length < 1 | message.length > 100) {
+  if (message.length < 1 || message.length > 100) {
     throw HTTPError(400, 'message must be between 1 and 100 characters');
   }
 
