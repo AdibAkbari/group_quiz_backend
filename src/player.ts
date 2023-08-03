@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
 import { generateName, isValidPlayerId, isValidQuestionPosition } from './helper';
-import { Players, PlayerStatus, QuestionResponse, QuestionInfo } from './interfaces';
+import { Players, PlayerStatus, QuestionResponse, QuestionInfo, Message } from './interfaces';
 import HTTPError from 'http-errors';
 
 /**
@@ -45,6 +45,44 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
   setData(data);
 
   return { playerId: playerId };
+}
+
+/**
+ * Send a chat message
+ *
+ * @param {number} playerId
+ * @param {string} message
+ * @returns {} empty object
+ */
+export function playerSendChat (playerId: number, message: string): Record<string, never> {
+  const data = getData();
+  // console.log(data);
+
+  if (data.players.find(id => id.playerId === playerId) === undefined) {
+    throw HTTPError(400, 'player does not exist');
+  }
+
+  if (message.length < 1 || message.length > 100) {
+    throw HTTPError(400, 'message must be between 1 and 100 characters');
+  }
+
+  const player = data.players.find(id => id.playerId === playerId);
+  const sessionIndex = data.sessions.findIndex(id => id.sessionId === player.sessionId);
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  const messageObject: Message = {
+    messageBody: message,
+    playerId: playerId,
+    playerName: player.name,
+    timeSent: timeNow,
+  };
+
+  if (data.sessions[sessionIndex].messages === undefined) {
+    data.sessions[sessionIndex].messages = [];
+  }
+  data.sessions[sessionIndex].messages.push(messageObject);
+  setData(data);
+
+  return {};
 }
 
 /**

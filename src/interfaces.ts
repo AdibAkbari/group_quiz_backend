@@ -82,6 +82,13 @@ export interface Players {
   score: number
 }
 
+export interface Message {
+  messageBody: string;
+  playerId: number;
+  playerName: string;
+  timeSent: number;
+}
+
 export interface PlayerStatus {
   state: string;
   numQuestions: number;
@@ -96,6 +103,8 @@ export interface Session {
   currentQuestionStartTime?: number;
   players: string[];
   metadata: Quizzes;
+  timer?: ReturnType<typeof setTimeout>;
+  messages?: Message[];
 }
 
 export interface SessionStatus {

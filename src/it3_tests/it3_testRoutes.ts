@@ -527,6 +527,10 @@ export function playerJoinRequest(sessionId: number, name: string) {
   return requestHelper('POST', '/v1/player/join', { sessionId, name });
 }
 
+export function playerSendChatRequest(playerId: number, message: string) {
+  return requestHelper('POST', `/v1/player/${playerId}/chat`, { message });
+}
+
 export function playerStatusRequest(playerId: number) {
   return requestHelper('GET', `/v1/player/${playerId}`, {});
 }
