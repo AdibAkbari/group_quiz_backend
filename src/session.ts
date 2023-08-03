@@ -77,6 +77,16 @@ export function startSession(quizId: number, token: string, autoStartNum: number
   return { sessionId: sessionId };
 }
 
+
+/**
+ * Update the session state for an active session
+ *
+ * @param {number} quizId
+ * @param {number} sessionId
+ * @param {string} token
+ * @param {string} action
+ * @returns {}
+ */
 export function updateSessionState(quizId: number, sessionId: number, token: string, action: string): Record<string, never> {
   // error checking
   if (!isValidTokenStructure(token)) {
