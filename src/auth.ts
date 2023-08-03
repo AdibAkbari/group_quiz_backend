@@ -288,9 +288,9 @@ export function adminAuthLogout (tokenId: string, isv2: boolean): Record<string,
 
 /**
  * Generates the hash of the given string
- * 
- * @param plaintext 
- * @returns 
+ *
+ * @param plaintext
+ * @returns
  */
 function getHashOf(plaintext: string): string {
   return crypto.createHash('sha256').update(plaintext).digest('hex');

@@ -1,5 +1,5 @@
 import { port, url } from '../config.json';
-import request, { HttpVerb } from 'sync-request';
+import request, { HttpVerb } from 'sync-request-curl';
 const SERVER_URL = `${url}:${port}`;
 import { IncomingHttpHeaders } from 'http';
 import HTTPError from 'http-errors';
@@ -161,7 +161,7 @@ export function quizTrashEmptyRequest(token: string, quizIds: number[]) {
 
 // QUESTION ROUTES //
 
-export function createQuizQuestionRequest(quizId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
+export function createQuizQuestionRequest(quizId: number, token: string, question: string, duration: number, points: number, answers: Answer[], thumbnail: string) {
   return requestHelper(
     'POST',
     `/v2/admin/quiz/${quizId}/question`,
@@ -170,7 +170,8 @@ export function createQuizQuestionRequest(quizId: number, token: string, questio
         question,
         duration,
         points,
-        answers
+        answers,
+        thumbnail,
       }
     },
     { token }
@@ -189,7 +190,7 @@ export function quizQuestionDuplicateRequest(quizid: number, questionid: number,
   return requestHelper('POST', `/v2/admin/quiz/${quizid}/question/${questionid}/duplicate`, {}, { token });
 }
 
-export function updateQuizQuestionRequest(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[]) {
+export function updateQuizQuestionRequest(quizId: number, questionId: number, token: string, question: string, duration: number, points: number, answers: Answer[], thumbnailUrl: string) {
   return requestHelper(
     'PUT',
     `/v2/admin/quiz/${quizId}/question/${questionId}`,
@@ -198,7 +199,8 @@ export function updateQuizQuestionRequest(quizId: number, questionId: number, to
         question,
         duration,
         points,
-        answers
+        answers,
+        thumbnailUrl,
       }
     },
     { token }
@@ -433,7 +435,7 @@ export function updateQuizQuestionRequestV1(quizId: number, questionId: number, 
           question,
           duration,
           points,
-          answers
+          answers,
         }
       }
     });
@@ -512,6 +514,10 @@ export function sessionResultsRequest(quizId: number, sessionId: number, token: 
   return requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}/results`, { }, { token });
 }
 
+export function sessionResultsCSVRequest(quizId: number, sessionId: number, token: string) {
+  return requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}/results/csv`, { }, { token });
+}
+
 export function updateSessionStateRequest(quizId: number, sessionId: number, token: string, action: string) {
   return requestHelper('PUT', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
 }
@@ -520,13 +526,25 @@ export function sessionStatusRequest(token: string, quizId: number, sessionId: n
   return requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
 }
 
+export function sessionViewRequest(token: string, quizId: number) {
+  return requestHelper('GET', `/v1/admin/quiz/${quizId}/sessions`, {}, { token });
+}
+
 // PLAYER ROUTES //
 export function playerJoinRequest(sessionId: number, name: string) {
   return requestHelper('POST', '/v1/player/join', { sessionId, name });
 }
 
+export function playerSendChatRequest(playerId: number, message: string) {
+  return requestHelper('POST', `/v1/player/${playerId}/chat`, { message });
+}
+
 export function playerStatusRequest(playerId: number) {
   return requestHelper('GET', `/v1/player/${playerId}`, {});
+}
+
+export function updateQuizThumbnailRequest(quizid: number, token: string, imgUrl: string) {
+  return requestHelper('PUT', `/v1/admin/quiz/${quizid}/thumbnail`, { quizid, imgUrl }, { token });
 }
 
 export function playerCurrentQuestionInfoRequest(playerId: number, questionPosition: number) {
@@ -542,10 +560,9 @@ export function playerResultsRequest(playerId: number) {
 }
 
 export function playerQuestionResultsRequest(playerId: number, questionPosition: number) {
-  return requestHelper(
-    'GET',
-    `/v1/player/${playerId}/question/${questionPosition}/results`,
-    { },
-    { }
-  );
+  return requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}/results`, { }, { });
+}
+
+export function playerViewChatRequest(playerId: number) {
+  return requestHelper('GET', `/v1/player/${playerId}/chat`, {});
 }

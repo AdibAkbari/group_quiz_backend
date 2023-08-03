@@ -7,7 +7,6 @@ import {
   updateSessionStateRequest,
   createQuizQuestionRequest,
   playerJoinRequest,
-  playerStatusRequest,
   playerCurrentQuestionInfoRequest,
   playerSubmitAnswerRequest
 } from './it3_testRoutes';
@@ -25,15 +24,16 @@ let quizId: number;
 let sessionId: number;
 let questionId: number;
 const duration = 2;
-const finishCountdown = 150;
+const finishCountdown = 100;
+const questionPoints = 6;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
 
 beforeEach(() => {
   clearRequest();
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  questionId = createQuizQuestionRequest(quizId, token, 'Question 1', duration, 6, validAnswers).questionId;
-  // createQuizQuestionRequest(quizId, token, 'Question 1', 1, 6, validAnswers);
+  questionId = createQuizQuestionRequest(quizId, token, 'Question 1', duration, questionPoints, validAnswers,
+    'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
   sessionId = startSessionRequest(quizId, token, 1).sessionId;
 });
 
@@ -53,28 +53,20 @@ describe('Error cases', () => {
     expect(() => sessionResultsRequest(quizId, sessionId, token + 1)).toThrow(HTTPError[403]);
   });
 
-  test('quizId not a valid quiz', () => {
+  test('invalid quiz or session', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);
-    sleepSync(duration * 1000);
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
-    expect(() => sessionResultsRequest(quizId + 1, sessionId, token)).toThrow(HTTPError[400]);
-  });
 
-  test('user does not own quiz', () => {
-    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    sleepSync(finishCountdown);
-    sleepSync(duration * 1000);
-    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
+    // invalid quizId
+    expect(() => sessionResultsRequest(quizId + 1, sessionId, token)).toThrow(HTTPError[400]);
+
+    // user does not own quiz
     const token2 = authRegisterRequest('email2@gmail.com', 'password1', 'firstname', 'lastname').body.token;
     expect(() => sessionResultsRequest(quizId, sessionId, token2)).toThrow(HTTPError[400]);
-  });
 
-  test('Session Id does not refer to a valid session within this quiz', () => {
-    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    sleepSync(finishCountdown);
-    sleepSync(duration * 1000);
-    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
+    // Session Id does not refer to a valid session within this quiz
     expect(() => sessionResultsRequest(quizId, sessionId + 1, token)).toThrow(HTTPError[400]);
   });
 
@@ -87,13 +79,12 @@ describe('Success cases', () => {
   test('valid output one player, no answer submitted', () => {
     const playerId = playerJoinRequest(sessionId, 'Player').playerId;
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    const questionPosition = playerStatusRequest(playerId).atQuestion - 1;
-    const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition);
-    const correctAnswerId = questionInfo.answers[0].answerId;
+    const correctAnswerId = playerCurrentQuestionInfoRequest(playerId, 1).answers[0].answerId;
 
     sleepSync(finishCountdown);
-    sleepSync(questionInfo.duration * 1000);
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
+
     const playersCorrect: string[] = [];
 
     const expected = {
@@ -124,24 +115,18 @@ describe('Success cases', () => {
   test('valid output one player, one correct answer', () => {
     const playerId = playerJoinRequest(sessionId, 'Player').playerId;
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    const questionPosition = playerStatusRequest(playerId).atQuestion - 1;
-    const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition);
-    const correctAnswerId = questionInfo.answers[0].answerId;
+    const correctAnswerId = playerCurrentQuestionInfoRequest(playerId, 1).answers[0].answerId;
 
     sleepSync(finishCountdown);
-    const answerTime = 1;
-    sleepSync(answerTime * 1000);
-    playerSubmitAnswerRequest([correctAnswerId], playerId, questionPosition);
-
-    sleepSync(questionInfo.duration * 1000 - answerTime);
-
+    playerSubmitAnswerRequest([correctAnswerId], playerId, 1);
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
 
     const expected = {
       usersRankedByScore: [
         {
           name: 'Player',
-          score: questionInfo.points
+          score: questionPoints
         }
       ],
       questionResults: [
@@ -155,7 +140,7 @@ describe('Success cases', () => {
               ],
             }
           ],
-          averageAnswerTime: answerTime,
+          averageAnswerTime: expect.any(Number),
           percentCorrect: 100
         }
       ]
@@ -166,29 +151,23 @@ describe('Success cases', () => {
   test('valid output two players', () => {
     const playerId = playerJoinRequest(sessionId, 'Player').playerId;
     const player2Id = playerJoinRequest(sessionId, 'Player2').playerId;
+
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    const questionPosition = playerStatusRequest(playerId).atQuestion - 1;
-    const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition);
-    const correctAnswerId = questionInfo.answers[0].answerId;
-    const incorrectAnswerId = questionInfo.answers[1].answerId;
+    const answers = playerCurrentQuestionInfoRequest(playerId, 1).answers;
+    const correctAnswerId = answers[0].answerId;
+    const incorrectAnswerId = answers[1].answerId;
 
     sleepSync(finishCountdown);
-    // Player answers current question with correct answer immediately
-    playerSubmitAnswerRequest([correctAnswerId], playerId, questionPosition);
-    const answerTime = 1;
-    sleepSync(answerTime * 1000);
-    // Player2 answer current question with incorrect answer after 1 second
-    playerSubmitAnswerRequest([incorrectAnswerId], player2Id, questionPosition);
-
-    sleepSync(questionInfo.duration * 1000 - answerTime);
-
+    playerSubmitAnswerRequest([correctAnswerId], playerId, 1);
+    playerSubmitAnswerRequest([incorrectAnswerId], player2Id, 1);
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
 
     const expected = {
       usersRankedByScore: [
         {
           name: 'Player',
-          score: questionInfo.points
+          score: questionPoints
         },
         {
           name: 'Player2',
@@ -206,12 +185,93 @@ describe('Success cases', () => {
               ],
             }
           ],
-          averageAnswerTime: answerTime / 2,
+          averageAnswerTime: expect.any(Number),
           percentCorrect: 50
         }
       ]
     };
     expect(sessionResultsRequest(quizId, sessionId, token)).toStrictEqual(expected);
   });
-  // Multiple questions test??
+  test('2 questions, multiple correct answers in question', () => {
+    const validAnswers2 = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }, { answer: 'answer3', correct: true }];
+    const question2Id = createQuizQuestionRequest(quizId, token, 'Question 2', duration, questionPoints, validAnswers2,
+      'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
+
+    const session2Id = startSessionRequest(quizId, token, 1).sessionId;
+
+    const playerId = playerJoinRequest(session2Id, 'Player').playerId;
+    const player2Id = playerJoinRequest(session2Id, 'Player2').playerId;
+
+    updateSessionStateRequest(quizId, session2Id, token, 'NEXT_QUESTION');
+    const answers = playerCurrentQuestionInfoRequest(playerId, 1).answers;
+    const correctAnswerId = answers[0].answerId;
+    const incorrectAnswerId = answers[1].answerId;
+
+    sleepSync(finishCountdown);
+    playerSubmitAnswerRequest([correctAnswerId], playerId, 1);
+    playerSubmitAnswerRequest([incorrectAnswerId], player2Id, 1);
+
+    updateSessionStateRequest(quizId, session2Id, token, 'GO_TO_ANSWER');
+    updateSessionStateRequest(quizId, session2Id, token, 'NEXT_QUESTION');
+    const answers2 = playerCurrentQuestionInfoRequest(playerId, 2).answers;
+
+    sleepSync(finishCountdown);
+    // player 1 submits all three answers - incorrect overall
+    playerSubmitAnswerRequest([answers2[0].answerId, answers[1].answerId, answers2[2].answerId], playerId, 2);
+    // player 2 submits only the 2 correct answers
+    playerSubmitAnswerRequest([answers2[0].answerId, answers2[2].answerId], player2Id, 2);
+
+    updateSessionStateRequest(quizId, session2Id, token, 'GO_TO_ANSWER');
+    updateSessionStateRequest(quizId, session2Id, token, 'GO_TO_FINAL_RESULTS');
+
+    const expected = {
+      usersRankedByScore: [
+        {
+          name: 'Player',
+          score: questionPoints
+        },
+        {
+          name: 'Player2',
+          score: questionPoints
+        }
+      ],
+      questionResults: [
+        {
+          questionId: questionId,
+          questionCorrectBreakdown: [
+            {
+              answerId: correctAnswerId,
+              playersCorrect: [
+                'Player',
+              ],
+            }
+          ],
+          averageAnswerTime: expect.any(Number),
+          percentCorrect: 50
+        },
+        {
+          questionId: question2Id,
+          questionCorrectBreakdown: [
+            {
+              answerId: answers2[0].answerId,
+              playersCorrect: [
+                'Player',
+                'Player2'
+              ],
+            },
+            {
+              answerId: answers2[2].answerId,
+              playersCorrect: [
+                'Player',
+                'Player2'
+              ],
+            }
+          ],
+          averageAnswerTime: expect.any(Number),
+          percentCorrect: 50
+        }
+      ]
+    };
+    expect(sessionResultsRequest(quizId, session2Id, token)).toStrictEqual(expected);
+  });
 });

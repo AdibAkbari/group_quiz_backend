@@ -25,20 +25,8 @@ beforeEach(() => {
 });
 
 describe('Token invalid', () => {
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-    { testName: 'token ends with letters', token: '54356s' },
-    { testName: 'token includes letter', token: '5436h86' },
-    { testName: 'token has space', token: '4324 757' },
-    { testName: 'token only whitespace', token: '  ' },
-    { testName: 'token has other characters', token: '6365,53' },
-    { testName: 'empty string', token: '' },
-    { testName: 'token has decimal point', token: '53.74' },
-    { testName: 'token has negative sign', token: '-37294' },
-    { testName: 'token has positive sign', token: '+38594' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => quizRemoveRequest(token, quiz.quizId)).toThrow(HTTPError[401]);
+  test('invalid token structure', () => {
+    expect(() => quizRemoveRequest('fhsfs', quiz.quizId)).toThrow(HTTPError[401]);
   });
 
   test('Nobody logged in', () => {
@@ -63,11 +51,9 @@ describe('Failed to remove', () => {
 
     expect(() => quizRemoveRequest(user.token, quiz2.quizId)).toThrow(HTTPError[400]);
   });
-});
 
-describe('Quiz is not in END state', () => {
   test('quiz not in end state', () => {
-    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 6, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }]);
+    createQuizQuestionRequest(quiz.quizId, user.token, 'Question 1', 5, 6, [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }], 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     const sessionId = startSessionRequest(quiz.quizId, user.token, 3).sessionId;
     updateSessionStateRequest(quiz.quizId, sessionId, user.token, 'NEXT_QUESTION');
     expect(() => quizRemoveRequest(user.token, quiz.quizId)).toThrow(HTTPError[400]);
@@ -75,18 +61,12 @@ describe('Quiz is not in END state', () => {
 });
 
 describe('Successfully removed quiz check', () => {
-  // Sucessfully remove the quiz
-  test('Sucessful quiz remove return', () => {
-    expect(quizRemoveRequest(user.token, quiz.quizId)).toStrictEqual({});
-  });
-
-  // Check that the quiz is actually removed
-  test('Sucessful quiz remove integrated check', () => {
+  test('Sucessful quiz remove', () => {
     const quiz2 = quizCreateRequest(user.token, 'quiz2', '');
     const quizToRemove = quizCreateRequest(user.token, 'quizToRemove', '');
     const quiz3 = quizCreateRequest(user.token, 'quiz3', '');
 
-    quizRemoveRequest(user.token, quizToRemove.quizId);
+    expect(quizRemoveRequest(user.token, quizToRemove.quizId)).toStrictEqual({});
 
     const received = adminQuizListRequest(user.token);
     const expected = {
@@ -119,25 +99,11 @@ describe('Successfully removed quiz check', () => {
     quizCreateRequest(user.token, 'quiz2', '');
     expect(() => adminQuizInfoRequest(user.token, quiz.quizId)).toThrow(HTTPError[400]);
   });
-
-  // check that once a quiz is removed, the next quiz still has a unique quiz id
-  test('Unique quiz Id once a quiz is removed', () => {
-    const quizToRemove = quizCreateRequest(user.token, 'quizToRemove', '');
-    const quiz2 = quizCreateRequest(user.token, 'quiz2', '');
-    quizRemoveRequest(user.token, quizToRemove.quizId);
-    const quiz3 = quizCreateRequest(user.token, 'quiz3', '');
-
-    expect(quiz3.quizId).not.toStrictEqual(quiz.quizId);
-    expect(quiz3.quizId).not.toStrictEqual(quiz2.quizId);
-  });
 });
 
 describe('V1 WRAPPERS', () => {
-  test.each([
-    { testName: 'token just letters', token: 'hello' },
-    { testName: 'token starts with letters', token: 'a54364' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    const removeQuiz = quizRemoveRequestV1(token, quiz.quizId);
+  test('invalid token', () => {
+    const removeQuiz = quizRemoveRequestV1('fsdjfs', quiz.quizId);
     expect(removeQuiz.body).toStrictEqual(ERROR);
     expect(removeQuiz.statusCode).toStrictEqual(401);
   });

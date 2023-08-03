@@ -30,21 +30,28 @@ import {
   adminQuizTransfer,
   deleteQuizQuestion,
   updateQuizQuestion,
-  moveQuizQuestion
+  moveQuizQuestion,
+  updateQuizThumbnail,
+  updateQuizQuestionv1,
+  createQuizQuestionv1,
 } from './quiz';
 import {
   playerJoin,
   playerStatus,
   playerSubmitAnswer,
   playerCurrentQuestionInfo,
+  playerSendChat,
+  playerViewChat,
   playerResults,
   playerQuestionResults,
 } from './player';
 import {
   startSession,
   sessionStatus,
+  updateSessionState,
+  sessionView,
   sessionResults,
-  updateSessionState
+  sessionResultsCSV,
 } from './session';
 import { clear } from './other';
 
@@ -64,6 +71,9 @@ const HOST: string = process.env.IP || 'localhost';
 
 // for logging errors (print to terminal)
 app.use(morgan('dev'));
+
+// access static folder if using /static/
+app.use('static', express.static('static'));
 
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
@@ -138,10 +148,10 @@ app.post('/v2/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
 
 // createQuizQuestion //
 app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
-  const { question, duration, points, answers } = req.body.questionBody;
+  const { question, duration, points, answers, thumbnail } = req.body.questionBody;
   const quizId = parseInt(req.params.quizid);
   const token = req.headers.token as string;
-  const response = createQuizQuestion(quizId, token, question, duration, points, answers, true);
+  const response = createQuizQuestion(quizId, token, question, duration, points, answers, thumbnail, true);
   res.json(response);
 });
 
@@ -206,10 +216,10 @@ app.delete('/v2/admin/quiz/trash/empty', (req: Request, res: Response) => {
 // Update quiz question //
 app.put('/v2/admin/quiz/:quizid/question/:questionid', (req: Request, res: Response) => {
   const token = req.headers.token as string;
-  const { question, duration, points, answers } = req.body.questionBody;
+  const { question, duration, points, answers, thumbnailUrl } = req.body.questionBody;
   const quizId = parseInt(req.params.quizid);
   const questionId = parseInt(req.params.questionid);
-  const response = updateQuizQuestion(quizId, questionId, token, question, duration, points, answers, true);
+  const response = updateQuizQuestion(quizId, questionId, token, question, duration, points, answers, thumbnailUrl, true);
   res.json(response);
 });
 
@@ -226,6 +236,30 @@ app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
   const questionId = parseInt(req.params.questionid);
   const token = req.headers.token as string;
   const response = quizQuestionDuplicate(quizId, questionId, token, true);
+  res.json(response);
+});
+
+// playerSendChat //
+app.post('/v1/player/:playerid/chat', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const message = req.body.message;
+  const response = playerSendChat(playerId, message);
+  res.json(response);
+});
+
+// playerViewChat //
+app.get('/v1/player/:playerid/chat', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const response = playerViewChat(playerId);
+  res.json(response);
+});
+
+// updateQuizThumbnail //
+app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const token = req.headers.token as string;
+  const imgUrl = req.body.imgUrl;
+  const response = updateQuizThumbnail(quizId, token, imgUrl);
   res.json(response);
 });
 
@@ -395,7 +429,7 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const { question, duration, points, answers } = req.body.questionBody;
   const quizId = parseInt(req.params.quizid);
-  const response = createQuizQuestion(quizId, req.body.token, question, duration, points, answers, false);
+  const response = createQuizQuestionv1(quizId, req.body.token, question, duration, points, answers, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
       return res.status(401).json(response);
@@ -532,7 +566,7 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Respo
   const { question, duration, points, answers } = req.body.questionBody;
   const quizId = parseInt(req.params.quizid);
   const questionId = parseInt(req.params.questionid);
-  const response = updateQuizQuestion(quizId, questionId, req.body.token, question, duration, points, answers, false);
+  const response = updateQuizQuestionv1(quizId, questionId, req.body.token, question, duration, points, answers, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
       return res.status(401).json(response);
@@ -612,12 +646,29 @@ app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Respons
   res.json(response);
 });
 
+// sessionView //
+app.get('/v1/admin/quiz/:quizid/sessions', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const token = req.headers.token as string;
+  const response = sessionView(token, quizId);
+  res.json(response);
+});
+
 // sessionResults //
 app.get('/v1/admin/quiz/:quizid/session/:sessionid/results', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const sessionId = parseInt(req.params.sessionid);
   const token = req.headers.token as string;
   const response = sessionResults(quizId, sessionId, token);
+  res.json(response);
+});
+
+// sessionResultsCSV //
+app.get('/v1/admin/quiz/:quizid/session/:sessionid/results/csv', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const sessionId = parseInt(req.params.sessionid);
+  const token = req.headers.token as string;
+  const response = sessionResultsCSV(quizId, sessionId, token);
   res.json(response);
 });
 

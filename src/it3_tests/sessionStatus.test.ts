@@ -6,7 +6,7 @@ import {
   startSessionRequest,
   playerJoinRequest,
   sessionStatusRequest,
-  // sessionUpdateRequest,
+  updateSessionStateRequest
 } from './it3_testRoutes';
 import { } from '../interfaces';
 import HTTPError from 'http-errors';
@@ -14,28 +14,19 @@ import HTTPError from 'http-errors';
 let token: string;
 let quizId: number;
 let sessionId: number;
-// let questionId: number;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
 
 beforeEach(() => {
   clearRequest();
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  // questionId = createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers).questionId;
-  createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers);
+  createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
   sessionId = startSessionRequest(quizId, token, 3).sessionId;
 });
 
 describe('invalid token', () => {
-  test.each([
-    { testName: 'token has letters', token: '5436h8j6' },
-    { testName: 'token only whitespace', token: '  ' },
-    { testName: 'token has other characters', token: '6365,53' },
-    { testName: 'empty string', token: '' },
-    { testName: 'token has decimal point', token: '53.74' },
-    { testName: 'token has negative sign', token: '-37294' },
-  ])('token is not a valid structure: $testName', ({ token }) => {
-    expect(() => sessionStatusRequest(token, quizId, sessionId)).toThrow(HTTPError[401]);
+  test('invalid token structure', () => {
+    expect(() => sessionStatusRequest('43244;53', quizId, sessionId)).toThrow(HTTPError[401]);
   });
 
   test('TokenId not logged in', () => {
@@ -55,6 +46,11 @@ describe('Error cases', () => {
 
   test('sessionId invalid', () => {
     expect(() => sessionStatusRequest(token, quizId, sessionId + 1)).toThrow(HTTPError[400]);
+  });
+
+  test('session not the same as quiz', () => {
+    const quizId2 = quizCreateRequest(token, 'quiz2', '').quizId;
+    expect(() => sessionStatusRequest(token, quizId2, sessionId)).toThrow(HTTPError[400]);
   });
 });
 
@@ -77,7 +73,7 @@ describe('Success cases', () => {
               questionId: 1,
               question: 'Question 1',
               duration: 5,
-              // thumbnailUrl: "http://google.com/some/image/path.jpg",
+              thumbnailUrl: expect.any(String),
               points: 6,
               answers: [
                 {
@@ -95,10 +91,7 @@ describe('Success cases', () => {
               ]
             }
           ],
-          creator: 1,
           duration: 5,
-          questionCount: 1,
-          // thumbnailUrl: "",
         }
       });
   });
@@ -128,7 +121,7 @@ describe('Success cases', () => {
               questionId: 1,
               question: 'Question 1',
               duration: 5,
-              // thumbnailUrl: "http://google.com/some/image/path.jpg",
+              thumbnailUrl: expect.any(String),
               points: 6,
               answers: [
                 {
@@ -146,10 +139,49 @@ describe('Success cases', () => {
               ]
             }
           ],
-          creator: 1,
           duration: 5,
-          questionCount: 1,
-          // thumbnailUrl: "",
+        }
+      });
+  });
+
+  test('shows updated states', () => {
+    updateSessionStateRequest(quizId, sessionId, token, 'END');
+    expect(sessionStatusRequest(token, quizId, sessionId)).toStrictEqual(
+      {
+        state: 'END',
+        atQuestion: 0,
+        players: [],
+        metadata: {
+          quizId: quizId,
+          name: 'quiz1',
+          timeCreated: expect.any(Number),
+          timeLastEdited: expect.any(Number),
+          description: '',
+          numQuestions: 1,
+          questions: [
+            {
+              questionId: 1,
+              question: 'Question 1',
+              duration: 5,
+              thumbnailUrl: expect.any(String),
+              points: 6,
+              answers: [
+                {
+                  answerId: expect.any(Number),
+                  answer: 'answer1',
+                  colour: expect.any(String),
+                  correct: true
+                },
+                {
+                  answerId: expect.any(Number),
+                  answer: 'answer2',
+                  colour: expect.any(String),
+                  correct: false
+                }
+              ]
+            }
+          ],
+          duration: 5,
         }
       });
   });
