@@ -109,6 +109,13 @@ export function playerStatus(playerId: number): PlayerStatus {
   };
 }
 
+/**
+ * Get the info of the question a player is currently on
+ *
+ * @param {number} playerId
+ * @param {number} questionPosition
+ * @returns {QuestionInfo}
+ */
 export function playerCurrentQuestionInfo(playerId: number, questionPosition: number): QuestionInfo {
   if (!isValidPlayerId(playerId)) {
     throw HTTPError(400, 'Invalid: PlayerId');
@@ -191,6 +198,14 @@ export function playerQuestionResults(playerId: number, questionPosition: number
   return questionResult(questionPosition - 1, session, playerList);
 }
 
+/**
+ * Allow a player to submit an answer
+ *
+ * @param {number} answerIds
+ * @param {number} playerId
+ * @param {number} questionPosition
+ * @returns {}
+ */
 export function playerSubmitAnswer(answerIds: number[], playerId: number, questionPosition: number): Record<string, never> {
   if (!isValidPlayerId(playerId)) {
     throw HTTPError(400, 'Invalid: PlayerId');

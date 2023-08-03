@@ -9,6 +9,28 @@ const COUNTDOWN = 100;
 const timers:Timers[] = [];
 
 /**
+ * View inactive and active sessions
+ *
+ * @param {number} quizId
+ * @param {string} token
+ * @returns {sessionId: number}
+ */
+export function sessionView(token: string, quizId: number): {activeSessions: number[], inactiveSessions: number[]} {
+  const data = getData();
+  const quizSessions = data.sessions.filter(session => session.metadata.quizId === quizId);
+
+  const activeSessions = quizSessions.filter(session => session.sessionState !== 'END').map(session => session.sessionId);
+  const inactiveSessions = quizSessions.filter(session => session.sessionState === 'END').map(session => session.sessionId);
+  activeSessions.sort(function(a, b) { return a - b; });
+  inactiveSessions.sort(function(a, b) { return a - b; });
+
+  return {
+    activeSessions: activeSessions,
+    inactiveSessions: inactiveSessions
+  };
+}
+
+/**
  *This copies the quiz, so that any edits whilst a session is running does not affect active session
  *
  * @param {number} quizId
@@ -55,6 +77,15 @@ export function startSession(quizId: number, token: string, autoStartNum: number
   return { sessionId: sessionId };
 }
 
+/**
+ * Update the session state for an active session
+ *
+ * @param {number} quizId
+ * @param {number} sessionId
+ * @param {string} token
+ * @param {string} action
+ * @returns {}
+ */
 export function updateSessionState(quizId: number, sessionId: number, token: string, action: string): Record<string, never> {
   // error checking
   if (!isValidTokenStructure(token)) {

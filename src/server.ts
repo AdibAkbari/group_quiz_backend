@@ -48,8 +48,9 @@ import {
 import {
   startSession,
   sessionStatus,
-  sessionResults,
   updateSessionState,
+  sessionView,
+  sessionResults,
   sessionResultsCSV,
 } from './session';
 import { clear } from './other';
@@ -642,6 +643,14 @@ app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Respons
   const sessionId = parseInt(req.params.sessionid);
   const token = req.headers.token as string;
   const response = sessionStatus(token, quizId, sessionId);
+  res.json(response);
+});
+
+// sessionView //
+app.get('/v1/admin/quiz/:quizid/sessions', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const token = req.headers.token as string;
+  const response = sessionView(token, quizId);
   res.json(response);
 });
 
