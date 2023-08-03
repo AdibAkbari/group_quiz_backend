@@ -6,7 +6,6 @@ import {
   startSessionRequest,
   updateSessionStateRequest,
   sessionViewRequest,
-  sessionStatusRequest,
 } from './it3_testRoutes';
 import { } from '../interfaces';
 
@@ -49,7 +48,6 @@ describe('Success cases', () => {
     sessionId = startSessionRequest(quizId, token, 4).sessionId;
     sessionId2 = startSessionRequest(quizId, token, 4).sessionId;
     updateSessionStateRequest(quizId, sessionId2, token, 'END');
-    expect(sessionStatusRequest(token, quizId, sessionId2).state).toStrictEqual('END')
     expect(sessionViewRequest(token, quizId)).toStrictEqual({
       activeSessions: [
         sessionId

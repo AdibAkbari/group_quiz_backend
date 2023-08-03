@@ -13,18 +13,18 @@ const timers:Timers[] = [];
  * @param {string} token
  * @returns {sessionId: number}
  */
- export function sessionView(token: string, quizId: number): {activeSession: number[], inactiveSessions: number[]} {
+export function sessionView(token: string, quizId: number): {activeSessions: number[], inactiveSessions: number[]} {
   const data = getData();
   const quizSessions = data.sessions.filter(session => session.metadata.quizId === quizId);
 
-  let activeSessions = quizSessions.filter(session => session.sessionState !== "END").map(session => session.sessionId);
-  let inactiveSessions = quizSessions.filter(session => session.sessionState === "END").map(session => session.sessionId);
-  activeSessions.sort(function(a,b){return a - b});
-  inactiveSessions.sort(function(a,b){return a - b});
+  const activeSessions = quizSessions.filter(session => session.sessionState !== 'END').map(session => session.sessionId);
+  const inactiveSessions = quizSessions.filter(session => session.sessionState === 'END').map(session => session.sessionId);
+  activeSessions.sort(function(a, b) { return a - b; });
+  inactiveSessions.sort(function(a, b) { return a - b; });
 
-  return { 
+  return {
     activeSessions: activeSessions,
-    inactiveSessions: inactiveSessions 
+    inactiveSessions: inactiveSessions
   };
 }
 
