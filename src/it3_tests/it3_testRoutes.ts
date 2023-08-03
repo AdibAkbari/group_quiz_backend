@@ -516,6 +516,10 @@ export function sessionStatusRequest(token: string, quizId: number, sessionId: n
   return requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
 }
 
+export function sessionViewRequest(token: string, quizId: number) {
+  return requestHelper('GET', `/v1/admin/quiz/${quizId}/sessions`, {}, { token });
+}
+
 // PLAYER ROUTES //
 export function playerJoinRequest(sessionId: number, name: string) {
   return requestHelper('POST', '/v1/player/join', { sessionId, name });
