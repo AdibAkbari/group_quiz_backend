@@ -33,6 +33,7 @@ export interface Question {
   duration: number;
   points: number;
   answers: Answer[];
+  thumbnailUrl?: string;
 }
 
 export interface Quizzes {
@@ -45,6 +46,7 @@ export interface Quizzes {
   questions: Question[];
   creator: number;
   duration: number;
+  thumbnailUrl?: string;
   questionCount: number;
 }
 
@@ -56,7 +58,8 @@ export interface QuizInfo {
   description: string,
   numQuestions: number,
   questions: Question[],
-  duration: number
+  duration: number,
+  thumbnailUrl?: string,
 }
 
 export interface Token {

@@ -26,7 +26,7 @@ beforeEach(() => {
   clearRequest();
   user = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body;
   quiz = quizCreateRequest(user.token, 'My Quiz', 'This is my quiz');
-  question = createQuizQuestionRequest(quiz.quizId, user.token, 'How are you?', 5, 5, validAnswers);
+  question = createQuizQuestionRequest(quiz.quizId, user.token, 'How are you?', 5, 5, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
 });
 
 describe('error cases', () => {
@@ -74,7 +74,8 @@ describe('valid input', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         },
         {
           questionId: result.newQuestionId,
@@ -84,7 +85,8 @@ describe('valid input', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         }
       ],
       duration: 10,
@@ -96,9 +98,9 @@ describe('valid input', () => {
   // whitebox testing, assuming questions appear in the order they were created
   test('two questions, duplicate the first', () => {
     const answersQuestion2 = [{ answer: 'yum', correct: true }, { answer: 'ew', correct: false }];
-    const questionTwo = createQuizQuestionRequest(quiz.quizId, user.token, 'Pineapples on pizza?', 3, 3, answersQuestion2);
-    const result = quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user.token);
+    const questionTwo = createQuizQuestionRequest(quiz.quizId, user.token, 'Pineapples on pizza?', 3, 3, answersQuestion2, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     const timeNow = Math.floor(Date.now() / 1000);
+    const result = quizQuestionDuplicateRequest(quiz.quizId, question.questionId, user.token);
     const info = adminQuizInfoRequest(user.token, quiz.quizId);
     expect(result).toStrictEqual({ newQuestionId: expect.any(Number) });
     expect(info).toStrictEqual({
@@ -117,7 +119,8 @@ describe('valid input', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         },
         {
           questionId: result.newQuestionId,
@@ -127,7 +130,8 @@ describe('valid input', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'great', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'bad', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         },
         {
           questionId: questionTwo.questionId,
@@ -137,7 +141,8 @@ describe('valid input', () => {
           answers: [
             { answerId: expect.any(Number), answer: 'yum', colour: expect.any(String), correct: true },
             { answerId: expect.any(Number), answer: 'ew', colour: expect.any(String), correct: false },
-          ]
+          ],
+          thumbnailUrl: expect.any(String),
         }
       ],
       duration: 13,
