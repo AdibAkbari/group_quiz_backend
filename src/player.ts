@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
 import { generateName, getSessionResults, isValidPlayerId, isValidQuestionPosition, questionResult } from './helper';
-import { Players, PlayerStatus, QuestionResult, SessionResults, QuestionResponse, QuestionInfo } from './interfaces';
+import { Players, PlayerStatus, QuestionResult, SessionResults, QuestionResponse, QuestionInfo, Message } from './interfaces';
 import HTTPError from 'http-errors';
 
 /**
