@@ -7,7 +7,6 @@ import {
   updateSessionStateRequest,
   createQuizQuestionRequest,
   playerJoinRequest,
-  playerStatusRequest,
   playerCurrentQuestionInfoRequest,
   playerSubmitAnswerRequest
 } from './it3_testRoutes';
@@ -29,13 +28,15 @@ let quizId: number;
 let sessionId: number;
 const duration = 2;
 const finishCountdown = 150;
+const questionPosition = 1;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
 
 beforeEach(() => {
   clearRequest();
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  createQuizQuestionRequest(quizId, token, 'Question 1', duration, 6, validAnswers);
+  createQuizQuestionRequest(quizId, token, 'Question 1', duration, 6, validAnswers, 
+  'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
   sessionId = startSessionRequest(quizId, token, 1).sessionId;
 });
 
@@ -55,28 +56,20 @@ describe('Error cases', () => {
     expect(() => sessionResultsCSVRequest(quizId, sessionId, token + 1)).toThrow(HTTPError[403]);
   });
 
-  test('quizId not a valid quiz', () => {
+  test('invalid quiz or session', () => {
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     sleepSync(finishCountdown);
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
-    expect(() => sessionResultsCSVRequest(quizId + 1, sessionId, token)).toThrow(HTTPError[400]);
-  });
 
-  test('user does not own quiz', () => {
-    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    sleepSync(finishCountdown);
-    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
-    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
+    // invalid quizId
+    expect(() => sessionResultsCSVRequest(quizId + 1, sessionId, token)).toThrow(HTTPError[400]);
+
+    // user does not own quiz
     const token2 = authRegisterRequest('email2@gmail.com', 'password1', 'firstname', 'lastname').body.token;
     expect(() => sessionResultsCSVRequest(quizId, sessionId, token2)).toThrow(HTTPError[400]);
-  });
 
-  test('Session Id does not refer to a valid session within this quiz', () => {
-    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    sleepSync(finishCountdown);
-    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
-    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
+    // Session Id does not refer to a valid session within this quiz
     expect(() => sessionResultsCSVRequest(quizId, sessionId + 1, token)).toThrow(HTTPError[400]);
   });
 
@@ -104,7 +97,8 @@ describe('Success cases', () => {
   });
 
   test('valid output 3 players, two questions', () => {
-    createQuizQuestionRequest(quizId, token, 'Question 2', duration, 6, validAnswers);
+    createQuizQuestionRequest(quizId, token, 'Question 2', duration, 6, validAnswers, 
+      'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
     const session2Id = startSessionRequest(quizId, token, 3).sessionId;
 
     const playerId = playerJoinRequest(session2Id, 'Chicken').playerId;
@@ -112,7 +106,6 @@ describe('Success cases', () => {
     playerJoinRequest(session2Id, 'Player');
 
     updateSessionStateRequest(quizId, session2Id, token, 'NEXT_QUESTION');
-    const questionPosition = playerStatusRequest(playerId).atQuestion;
     const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition);
 
     let correctAnswerId = questionInfo.answers[0].answerId;

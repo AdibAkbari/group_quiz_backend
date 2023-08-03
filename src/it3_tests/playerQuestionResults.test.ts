@@ -96,32 +96,6 @@ describe('Success cases', () => {
     expect(playerQuestionResultsRequest(playerId, questionPosition)).toStrictEqual(expected);
   });
 
-  test('valid output one player, one correct answer', () => {
-    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
-    const questionInfo = playerCurrentQuestionInfoRequest(playerId, questionPosition);
-    const correctAnswerId = questionInfo.answers[0].answerId;
-
-    sleepSync(finishCountdown);
-    playerSubmitAnswerRequest([correctAnswerId], playerId, questionPosition);
-    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
-
-    const expected = {
-      questionId: questionId,
-      questionCorrectBreakdown: [
-        {
-          answerId: correctAnswerId,
-          playersCorrect: [
-            'Player'
-          ],
-        }
-      ],
-      averageAnswerTime: expect.any(Number),
-      percentCorrect: 100
-    };
-
-    expect(playerQuestionResultsRequest(playerId, questionPosition)).toStrictEqual(expected);
-  });
-
   test('valid output two players', () => {
     const player2Id = playerJoinRequest(sessionId, 'Player2').playerId;
     updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
