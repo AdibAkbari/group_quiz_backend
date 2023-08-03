@@ -1,6 +1,6 @@
 import { getData, setData } from './dataStore';
 import { generateName, isValidPlayerId, isValidQuestionPosition } from './helper';
-import { Players, PlayerStatus, QuestionResponse, QuestionInfo, AnswerInfo, Message } from './interfaces';
+import { Players, PlayerStatus, QuestionResponse, QuestionInfo, Message } from './interfaces';
 import HTTPError from 'http-errors';
 
 /**
@@ -56,14 +56,14 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
  */
 export function playerSendChat (playerId: number, message: string): Record<string, never> {
   const data = getData();
-  //console.log(data);
-  
+  // console.log(data);
+
   if (data.players.find(id => id.playerId === playerId) === undefined) {
     throw HTTPError(400, 'player does not exist');
   }
 
-  if (message.length < 1 | message.length > 100) {
-    throw HTTPError(400, 'message must be between 1 and 100 characters')
+  if (message.length < 1 || message.length > 100) {
+    throw HTTPError(400, 'message must be between 1 and 100 characters');
   }
 
   const player = data.players.find(id => id.playerId === playerId);
@@ -72,9 +72,9 @@ export function playerSendChat (playerId: number, message: string): Record<strin
   const messageObject: Message = {
     messageBody: message,
     playerId: playerId,
-    playerName: player.playerName,
+    playerName: player.name,
     timeSent: timeNow,
-  }
+  };
 
   if (data.sessions[sessionIndex].messages === undefined) {
     data.sessions[sessionIndex].messages = [];
