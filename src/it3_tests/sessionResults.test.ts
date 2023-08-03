@@ -7,7 +7,6 @@ import {
   updateSessionStateRequest,
   createQuizQuestionRequest,
   playerJoinRequest,
-  playerStatusRequest,
   playerCurrentQuestionInfoRequest,
   playerSubmitAnswerRequest
 } from './it3_testRoutes';
@@ -25,7 +24,7 @@ let quizId: number;
 let sessionId: number;
 let questionId: number;
 const duration = 2;
-const finishCountdown = 150;
+const finishCountdown = 100;
 const questionPoints = 6;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
 
@@ -33,7 +32,8 @@ beforeEach(() => {
   clearRequest();
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  questionId = createQuizQuestionRequest(quizId, token, 'Question 1', duration, questionPoints, validAnswers).questionId;
+  questionId = createQuizQuestionRequest(quizId, token, 'Question 1', duration, questionPoints, validAnswers,
+    'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
   sessionId = startSessionRequest(quizId, token, 1).sessionId;
 });
 
@@ -194,7 +194,8 @@ describe('Success cases', () => {
   });
   test('2 questions, multiple correct answers in question', () => {
     const validAnswers2 = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }, { answer: 'answer3', correct: true }];
-    const question2Id = createQuizQuestionRequest(quizId, token, 'Question 2', duration, questionPoints, validAnswers2).questionId;
+    const question2Id = createQuizQuestionRequest(quizId, token, 'Question 2', duration, questionPoints, validAnswers2,
+      'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
 
     const session2Id = startSessionRequest(quizId, token, 1).sessionId;
 
