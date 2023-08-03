@@ -30,22 +30,22 @@ import {
   adminQuizTransfer,
   deleteQuizQuestion,
   updateQuizQuestion,
-  moveQuizQuestion
+  moveQuizQuestion,
+  updateQuizThumbnail,
+  updateQuizQuestionv1,
+  createQuizQuestionv1,
 } from './quiz';
 import {
   playerJoin,
   playerStatus,
   playerSubmitAnswer,
   playerCurrentQuestionInfo,
-  playerResults,
-  playerQuestionResults,
 } from './player';
 import {
   startSession,
   sessionStatus,
   sessionResults,
   updateSessionState,
-  sessionResultsCSV
 } from './session';
 import { clear } from './other';
 
@@ -65,6 +65,9 @@ const HOST: string = process.env.IP || 'localhost';
 
 // for logging errors (print to terminal)
 app.use(morgan('dev'));
+
+// access static folder if using /static/
+app.use('static', express.static('static'));
 
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
@@ -139,10 +142,10 @@ app.post('/v2/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
 
 // createQuizQuestion //
 app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
-  const { question, duration, points, answers } = req.body.questionBody;
+  const { question, duration, points, answers, thumbnail } = req.body.questionBody;
   const quizId = parseInt(req.params.quizid);
   const token = req.headers.token as string;
-  const response = createQuizQuestion(quizId, token, question, duration, points, answers, true);
+  const response = createQuizQuestion(quizId, token, question, duration, points, answers, thumbnail, true);
   res.json(response);
 });
 
@@ -207,10 +210,10 @@ app.delete('/v2/admin/quiz/trash/empty', (req: Request, res: Response) => {
 // Update quiz question //
 app.put('/v2/admin/quiz/:quizid/question/:questionid', (req: Request, res: Response) => {
   const token = req.headers.token as string;
-  const { question, duration, points, answers } = req.body.questionBody;
+  const { question, duration, points, answers, thumbnailUrl } = req.body.questionBody;
   const quizId = parseInt(req.params.quizid);
   const questionId = parseInt(req.params.questionid);
-  const response = updateQuizQuestion(quizId, questionId, token, question, duration, points, answers, true);
+  const response = updateQuizQuestion(quizId, questionId, token, question, duration, points, answers, thumbnailUrl, true);
   res.json(response);
 });
 
@@ -227,6 +230,15 @@ app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
   const questionId = parseInt(req.params.questionid);
   const token = req.headers.token as string;
   const response = quizQuestionDuplicate(quizId, questionId, token, true);
+  res.json(response);
+});
+
+// updateQuizThumbnail //
+app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const token = req.headers.token as string;
+  const imgUrl = req.body.imgUrl;
+  const response = updateQuizThumbnail(quizId, token, imgUrl);
   res.json(response);
 });
 
@@ -396,7 +408,7 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const { question, duration, points, answers } = req.body.questionBody;
   const quizId = parseInt(req.params.quizid);
-  const response = createQuizQuestion(quizId, req.body.token, question, duration, points, answers, false);
+  const response = createQuizQuestionv1(quizId, req.body.token, question, duration, points, answers, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
       return res.status(401).json(response);
@@ -533,7 +545,7 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Respo
   const { question, duration, points, answers } = req.body.questionBody;
   const quizId = parseInt(req.params.quizid);
   const questionId = parseInt(req.params.questionid);
-  const response = updateQuizQuestion(quizId, questionId, req.body.token, question, duration, points, answers, false);
+  const response = updateQuizQuestionv1(quizId, questionId, req.body.token, question, duration, points, answers, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
       return res.status(401).json(response);
@@ -622,15 +634,6 @@ app.get('/v1/admin/quiz/:quizid/session/:sessionid/results', (req: Request, res:
   res.json(response);
 });
 
-// sessionResultsCSV //
-app.get('/v1/admin/quiz/:quizid/session/:sessionid/results/csv', (req: Request, res: Response) => {
-  const quizId = parseInt(req.params.quizid);
-  const sessionId = parseInt(req.params.sessionid);
-  const token = req.headers.token as string;
-  const response = sessionResultsCSV(quizId, sessionId, token);
-  res.json(response);
-});
-
 // playerJoin //
 app.post('/v1/player/join', (req: Request, res: Response) => {
   const sessionId = parseInt(req.body.sessionId);
@@ -660,21 +663,6 @@ app.put('/v1/player/:playerid/question/:questionposition/answer', (req: Request,
   const playerid = parseInt(req.params.playerid);
   const questionposition = parseInt(req.params.questionposition);
   const response = playerSubmitAnswer(answerIds, playerid, questionposition);
-  res.json(response);
-});
-
-// playerResults //
-app.get('/v1/player/:playerid/results', (req: Request, res: Response) => {
-  const playerid = parseInt(req.params.playerid);
-  const response = playerResults(playerid);
-  res.json(response);
-});
-
-// playerQuestionResults //
-app.get('/v1/player/:playerid/question/:questionposition/results', (req: Request, res: Response) => {
-  const playerId = parseInt(req.params.playerid);
-  const questionPosition = parseInt(req.params.questionposition);
-  const response = playerQuestionResults(playerId, questionPosition);
   res.json(response);
 });
 

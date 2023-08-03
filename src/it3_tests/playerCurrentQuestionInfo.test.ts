@@ -20,7 +20,7 @@ const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2',
 const FIRST_POS = 1;
 const SECOND_POS = 2;
 const THIRD_POS = 3;
-const finishCountdown = 150;
+const finishCountdown = 100;
 
 function sleepSync(ms: number) {
   const startTime = new Date().getTime();
@@ -33,7 +33,7 @@ beforeEach(() => {
   clearRequest();
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  questionOneId = createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers).questionId;
+  questionOneId = createQuizQuestionRequest(quizId, token, 'Question 1', 5, 6, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg').questionId;
   sessionId = startSessionRequest(quizId, token, 3).sessionId;
   playerId = playerJoinRequest(sessionId, 'Joe').playerId;
 });

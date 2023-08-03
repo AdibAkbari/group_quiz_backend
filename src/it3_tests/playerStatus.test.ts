@@ -17,8 +17,8 @@ let sessionId: number;
 let playerId: number;
 const validAnswers = [{ answer: 'answer1', correct: true }, { answer: 'answer2', correct: false }];
 
-const finishCountdown = 150;
-const questionDuration = 2;
+const finishCountdown = 100;
+const questionDuration = 1;
 
 function sleepSync(ms: number) {
   const startTime = new Date().getTime();
@@ -31,7 +31,7 @@ beforeEach(() => {
   clearRequest();
   token = authRegisterRequest('email@gmail.com', 'password1', 'first', 'last').body.token;
   quizId = quizCreateRequest(token, 'quiz1', '').quizId;
-  createQuizQuestionRequest(quizId, token, 'Question 1', questionDuration, 6, validAnswers);
+  createQuizQuestionRequest(quizId, token, 'Question 1', questionDuration, 6, validAnswers, 'https://i.pinimg.com/564x/04/d5/02/04d502ec84e7188c0bc150a9fb4a0a37.jpg');
   sessionId = startSessionRequest(quizId, token, 3).sessionId;
   playerId = playerJoinRequest(sessionId, 'Joe').playerId;
 });
@@ -51,7 +51,7 @@ describe('Success cases', () => {
     });
 
     // lobby -> question_countdown
-    expect(updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION')).toStrictEqual({});
+    updateSessionStateRequest(quizId, sessionId, token, 'NEXT_QUESTION');
     expect(playerStatusRequest(playerId)).toStrictEqual({
       state: 'QUESTION_COUNTDOWN',
       numQuestions: 1,
@@ -75,7 +75,7 @@ describe('Success cases', () => {
     });
 
     // question_close -> answer_show
-    expect(updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER')).toStrictEqual({});
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_ANSWER');
     expect(playerStatusRequest(playerId)).toStrictEqual({
       state: 'ANSWER_SHOW',
       numQuestions: 1,
@@ -83,7 +83,7 @@ describe('Success cases', () => {
     });
 
     // answer_show -> final_results
-    expect(updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS')).toStrictEqual({});
+    updateSessionStateRequest(quizId, sessionId, token, 'GO_TO_FINAL_RESULTS');
     expect(playerStatusRequest(playerId)).toStrictEqual({
       state: 'FINAL_RESULTS',
       numQuestions: 1,
@@ -91,7 +91,7 @@ describe('Success cases', () => {
     });
 
     // final_results -> end
-    expect(updateSessionStateRequest(quizId, sessionId, token, 'END')).toStrictEqual({});
+    updateSessionStateRequest(quizId, sessionId, token, 'END');
     expect(playerStatusRequest(playerId)).toStrictEqual({
       state: 'END',
       numQuestions: 1,

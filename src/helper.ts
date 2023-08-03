@@ -1,6 +1,8 @@
 import { getData } from './dataStore';
 import { Data, Players, QuestionResult, Quizzes, Session, SessionResults } from './interfaces';
 import HTTPError from 'http-errors';
+import request from 'sync-request';
+import fs from 'fs';
 
 // HELPER FUNCTIONS
 /**
@@ -205,6 +207,35 @@ export function giveError(isv2: boolean, errorMessage: string, statusCode: numbe
     throw HTTPError(statusCode, errorMessage);
   }
   return { error: errorMessage };
+}
+
+/**
+   * Helper function to download and save an image
+   *
+   * @param {string} imgUrl
+   * @returns {string} thumbnailUrl
+   */
+export function getImg(imgUrl: string) {
+  const res = request(
+    'GET',
+    imgUrl
+  );
+  if (res.statusCode !== 200) {
+    throw HTTPError(400, 'imgUrl does not return a valid file');
+  }
+  const body = res.getBody();
+  const timeNow: number = Math.floor((new Date()).getTime() / 1000);
+  const thumbnail: string = (Math.floor(Math.random() * timeNow)).toString();
+  let fileType: string;
+  if (imgUrl.match(/\.(jpeg|jpg)$/) !== null) {
+    fileType = 'jpg';
+  }
+  if (imgUrl.match(/\.(png)$/) !== null) {
+    fileType = 'png';
+  }
+
+  fs.writeFileSync(`./static/${thumbnail}.${fileType}`, body, { flag: 'w' });
+  return `${thumbnail}.${fileType}`;
 }
 
 /**
