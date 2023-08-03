@@ -77,7 +77,6 @@ export function startSession(quizId: number, token: string, autoStartNum: number
   return { sessionId: sessionId };
 }
 
-
 /**
  * Update the session state for an active session
  *

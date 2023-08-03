@@ -109,7 +109,6 @@ export function playerStatus(playerId: number): PlayerStatus {
   };
 }
 
-
 /**
  * Get the info of the question a player is currently on
  *
@@ -198,7 +197,6 @@ export function playerQuestionResults(playerId: number, questionPosition: number
 
   return questionResult(questionPosition - 1, session, playerList);
 }
-
 
 /**
  * Allow a player to submit an answer
