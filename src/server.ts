@@ -41,6 +41,7 @@ import {
   playerSubmitAnswer,
   playerCurrentQuestionInfo,
   playerSendChat,
+  playerViewChat,
 } from './player';
 import {
   startSession,
@@ -238,6 +239,13 @@ app.post('/v1/player/:playerid/chat', (req: Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
   const message = req.body.message;
   const response = playerSendChat(playerId, message);
+  res.json(response);
+});
+
+// playerViewChat //
+app.get('/v1/player/:playerid/chat', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const response = playerViewChat(playerId);
   res.json(response);
 });
 
