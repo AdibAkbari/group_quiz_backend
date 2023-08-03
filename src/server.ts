@@ -51,7 +51,6 @@ import {
   updateSessionState,
   sessionView,
   sessionResults,
-  updateSessionState,
   sessionResultsCSV,
 } from './session';
 import { clear } from './other';
