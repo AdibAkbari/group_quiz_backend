@@ -358,6 +358,7 @@ export function questionResult(index: number, session: Session, playerList: Play
         addedPlayers.add(player.name);
       }
     }
+    playersCorrect.sort((a, b) => a.localeCompare(b));
     // pushes to list for each correct answer after adding all correct players to playerCorrect
     if (answer.correct) {
       questionCorrectBreakdown.push({
