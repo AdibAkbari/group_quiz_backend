@@ -4,6 +4,11 @@ import HTTPError from 'http-errors';
 import request from 'sync-request';
 import fs from 'fs';
 
+const BAD_REQUEST = 400;
+
+const minQuizNameLength = 3;
+const maxQuizNameLength = 30;
+
 // HELPER FUNCTIONS
 /**
    * Helper function to determine whether token is a valid structure
@@ -137,7 +142,7 @@ export function isValidQuestionPosition(playerId: number, questionPosition: numb
    */
 export function checkNameValidity(name: string, authUserId: number): boolean {
   // length must be between 3 and 30 characters
-  if (name.length < 3 || name.length > 30) {
+  if (name.length < minQuizNameLength || name.length > maxQuizNameLength) {
     return false;
   }
   // only alpha-numeric characters
@@ -199,8 +204,10 @@ export function isValidEmail (userEmail: string): boolean {
 /**
  * Helper function to give error based on if it is a v1 or v2 route
  *
- * @param {} - no params
- * @returns {string} - playerName
+ * @param {boolean} isv2
+ * @param {string } errorMessage
+ * @param {number} statusCode
+ * @returns {{error: string}}
  */
 export function giveError(isv2: boolean, errorMessage: string, statusCode: number) {
   if (isv2) {
@@ -221,7 +228,7 @@ export function getImg(imgUrl: string) {
     imgUrl
   );
   if (res.statusCode !== 200) {
-    throw HTTPError(400, 'imgUrl does not return a valid file');
+    throw HTTPError(BAD_REQUEST, 'imgUrl does not return a valid file');
   }
   const body = res.getBody();
   const timeNow: number = Math.floor((new Date()).getTime() / 1000);
@@ -351,6 +358,7 @@ export function questionResult(index: number, session: Session, playerList: Play
         addedPlayers.add(player.name);
       }
     }
+    playersCorrect.sort((a, b) => a.localeCompare(b));
     // pushes to list for each correct answer after adding all correct players to playerCorrect
     if (answer.correct) {
       questionCorrectBreakdown.push({

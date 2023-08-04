@@ -3,6 +3,11 @@ import { generateName, getSessionResults, isValidPlayerId, isValidQuestionPositi
 import { Players, PlayerStatus, QuestionResult, SessionResults, QuestionResponse, QuestionInfo, Message } from './interfaces';
 import HTTPError from 'http-errors';
 
+const BAD_REQUEST = 400;
+
+const minMessageLength = 1;
+const maxMessageLength = 100;
+
 /**
  * Allow player to join a session
  *
@@ -14,11 +19,11 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
   const data = getData();
   const session = data.sessions.find(id => id.sessionId === sessionId);
   if (session === undefined) {
-    throw HTTPError(400, 'Invalid: Session Id');
+    throw HTTPError(BAD_REQUEST, 'Invalid: Session Id');
   }
 
   if (session.sessionState !== 'LOBBY') {
-    throw HTTPError(400, 'Session is not in LOBBY state');
+    throw HTTPError(BAD_REQUEST, 'Session is not in LOBBY state');
   }
 
   if (playerName === '') {
@@ -26,7 +31,7 @@ export function playerJoin(sessionId: number, playerName: string): { playerId: n
   }
 
   if (session.players.find(name => name === playerName)) {
-    throw HTTPError(400, 'Name of user entered is not unique');
+    throw HTTPError(BAD_REQUEST, 'Name of user entered is not unique');
   }
 
   data.playerIdCount++;
@@ -59,11 +64,11 @@ export function playerSendChat (playerId: number, message: string): Record<strin
   // console.log(data);
 
   if (data.players.find(id => id.playerId === playerId) === undefined) {
-    throw HTTPError(400, 'player does not exist');
+    throw HTTPError(BAD_REQUEST, 'player does not exist');
   }
 
-  if (message.length < 1 || message.length > 100) {
-    throw HTTPError(400, 'message must be between 1 and 100 characters');
+  if (message.length < minMessageLength || message.length > maxMessageLength) {
+    throw HTTPError(BAD_REQUEST, 'message must be between 1 and 100 characters');
   }
 
   const player = data.players.find(id => id.playerId === playerId);
@@ -93,7 +98,7 @@ export function playerSendChat (playerId: number, message: string): Record<strin
  */
 export function playerStatus(playerId: number): PlayerStatus {
   if (!isValidPlayerId(playerId)) {
-    throw HTTPError(400, 'Invalid: PlayerId');
+    throw HTTPError(BAD_REQUEST, 'Invalid: PlayerId');
   }
 
   const data = getData();
@@ -118,7 +123,7 @@ export function playerStatus(playerId: number): PlayerStatus {
  */
 export function playerCurrentQuestionInfo(playerId: number, questionPosition: number): QuestionInfo {
   if (!isValidPlayerId(playerId)) {
-    throw HTTPError(400, 'Invalid: PlayerId');
+    throw HTTPError(BAD_REQUEST, 'Invalid: PlayerId');
   }
 
   const data = getData();
@@ -126,11 +131,11 @@ export function playerCurrentQuestionInfo(playerId: number, questionPosition: nu
   const session = data.sessions.find(id => id.sessionId === player.sessionId);
 
   if (session.sessionState === 'LOBBY' || session.sessionState === 'END') {
-    throw HTTPError(400, 'Invalid: State');
+    throw HTTPError(BAD_REQUEST, 'Invalid: State');
   }
 
   if (!isValidQuestionPosition(playerId, questionPosition)) {
-    throw HTTPError(400, 'Invalid: questionPosition');
+    throw HTTPError(BAD_REQUEST, 'Invalid: questionPosition');
   }
 
   const currentQuestion = session.metadata.questions[questionPosition - 1];
@@ -155,7 +160,7 @@ export function playerCurrentQuestionInfo(playerId: number, questionPosition: nu
  */
 export function playerResults(playerId: number): SessionResults {
   if (!isValidPlayerId(playerId)) {
-    throw HTTPError(400, 'Invalid: PlayerId');
+    throw HTTPError(BAD_REQUEST, 'Invalid: PlayerId');
   }
 
   const data = getData();
@@ -163,7 +168,7 @@ export function playerResults(playerId: number): SessionResults {
   const session = data.sessions.find(id => id.sessionId === player.sessionId);
 
   if (session.sessionState !== 'FINAL_RESULTS') {
-    throw HTTPError(400, 'Session is not in FINAL_RESULTS state');
+    throw HTTPError(BAD_REQUEST, 'Session is not in FINAL_RESULTS state');
   }
 
   return getSessionResults(session);
@@ -178,7 +183,7 @@ export function playerResults(playerId: number): SessionResults {
  */
 export function playerQuestionResults(playerId: number, questionPosition: number): QuestionResult {
   if (!isValidPlayerId(playerId)) {
-    throw HTTPError(400, 'Invalid: PlayerId');
+    throw HTTPError(BAD_REQUEST, 'Invalid: PlayerId');
   }
 
   const data = getData();
@@ -186,11 +191,11 @@ export function playerQuestionResults(playerId: number, questionPosition: number
   const session = data.sessions.find(id => id.sessionId === player.sessionId);
 
   if (session.sessionState !== 'ANSWER_SHOW') {
-    throw HTTPError(400, 'Session is not in ANSWER_SHOW state');
+    throw HTTPError(BAD_REQUEST, 'Session is not in ANSWER_SHOW state');
   }
 
   if (!isValidQuestionPosition(playerId, questionPosition)) {
-    throw HTTPError(400, 'Invalid question position');
+    throw HTTPError(BAD_REQUEST, 'Invalid question position');
   }
 
   const playerList = data.players.filter(player => session.players.includes(player.name));
@@ -208,11 +213,11 @@ export function playerQuestionResults(playerId: number, questionPosition: number
  */
 export function playerSubmitAnswer(answerIds: number[], playerId: number, questionPosition: number): Record<string, never> {
   if (!isValidPlayerId(playerId)) {
-    throw HTTPError(400, 'Invalid: PlayerId');
+    throw HTTPError(BAD_REQUEST, 'Invalid: PlayerId');
   }
 
   if (!isValidQuestionPosition(playerId, questionPosition)) {
-    throw HTTPError(400, 'Invalid: questionPosition');
+    throw HTTPError(BAD_REQUEST, 'Invalid: questionPosition');
   }
 
   const data = getData();
@@ -220,22 +225,22 @@ export function playerSubmitAnswer(answerIds: number[], playerId: number, questi
   const session = data.sessions.find(id => id.sessionId === player.sessionId);
 
   if (session.sessionState !== 'QUESTION_OPEN') {
-    throw HTTPError(400, 'Session is not in QUESTION_OPEN state');
+    throw HTTPError(BAD_REQUEST, 'Session is not in QUESTION_OPEN state');
   }
 
   const currentQuestion = session.metadata.questions[questionPosition - 1];
   if (!answerIds.every(answerId => currentQuestion.answers.some(answer => answer.answerId === answerId))) {
-    throw HTTPError(400, 'Answer IDs are not valid for this particular question');
+    throw HTTPError(BAD_REQUEST, 'Answer IDs are not valid for this particular question');
   }
 
   for (const current of answerIds) {
     if ((answerIds.filter(answer => answer === current)).length > 1) {
-      throw HTTPError(400, 'There are duplicate answer IDs provided');
+      throw HTTPError(BAD_REQUEST, 'There are duplicate answer IDs provided');
     }
   }
 
   if (answerIds.length < 1) {
-    throw HTTPError(400, 'Less than 1 answer ID was submitted');
+    throw HTTPError(BAD_REQUEST, 'Less than 1 answer ID was submitted');
   }
 
   // If answer exist, delete exisiting and submit new one
@@ -271,7 +276,7 @@ export function playerViewChat (playerId: number): {messages: Message[]} | {mess
   // console.log(data);
 
   if (data.players.find(id => id.playerId === playerId) === undefined) {
-    throw HTTPError(400, 'player does not exist');
+    throw HTTPError(BAD_REQUEST, 'player does not exist');
   }
 
   const player = data.players.find(id => id.playerId === playerId);
