@@ -4,6 +4,14 @@ import validator from 'validator';
 import { isValidTokenStructure, isTokenLoggedIn, findUserFromToken, isWhiteSpace, giveError } from './helper';
 import crypto from 'crypto';
 
+const BAD_REQUEST = 400;
+const FORBIDDEN = 403;
+const UNAUTHORIZED = 401;
+
+const maxNameLength = 20;
+const minNameLength = 2;
+const minPasswordLength = 8;
+
 /**
  * Register a user with an email, password, and names, then returns their
  * token value.
@@ -25,7 +33,7 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
     return { error: 'Email already in use' };
   }
 
-  if (nameFirst.length < 2 || nameFirst.length > 20) {
+  if (nameFirst.length < minNameLength || nameFirst.length > maxNameLength) {
     return { error: 'First name must be 2 to 20 characters' };
   }
 
@@ -34,7 +42,7 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
     return { error: 'First name must only contain letters, spaces, hyphens or apostrophes' };
   }
 
-  if (nameLast.length < 2 || nameLast.length > 20) {
+  if (nameLast.length < minNameLength || nameLast.length > maxNameLength) {
     return { error: 'Last name must be 2 to 20 characters' };
   }
 
@@ -46,7 +54,7 @@ export function adminAuthRegister (email: string, password: string, nameFirst: s
     return { error: 'First name and Last name cannot be solely white space' };
   }
 
-  if (password.length < 8) {
+  if (password.length < minPasswordLength) {
     return { error: 'Password must be at least 8 characters' };
   }
 
@@ -129,11 +137,11 @@ export function adminUserDetails(token: string, isv2: boolean): User | Error {
   const data: Data = getData();
 
   if (!isValidTokenStructure(token)) {
-    return giveError(isv2, 'token is an invalid structure', 401);
+    return giveError(isv2, 'token is an invalid structure', UNAUTHORIZED);
   }
 
   if (!isTokenLoggedIn(token)) {
-    return giveError(isv2, 'token is not logged in', 403);
+    return giveError(isv2, 'token is not logged in', FORBIDDEN);
   }
 
   const userId = findUserFromToken(token);
@@ -164,11 +172,11 @@ export function updateUserPassword(token: string, oldPassword: string, newPasswo
   const data: Data = getData();
 
   if (!isValidTokenStructure(token)) {
-    return giveError(isv2, 'Token is an invalid structure', 401);
+    return giveError(isv2, 'Token is an invalid structure', UNAUTHORIZED);
   }
 
   if (!isTokenLoggedIn(token)) {
-    return giveError(isv2, 'Token is not logged in', 403);
+    return giveError(isv2, 'Token is not logged in', FORBIDDEN);
   }
 
   const hashedOldPassword = getHashOf(oldPassword);
@@ -176,25 +184,25 @@ export function updateUserPassword(token: string, oldPassword: string, newPasswo
   const userId = findUserFromToken(token);
   const index = data.users.findIndex(id => id.authUserId === userId);
   if (data.users[index].password !== hashedOldPassword) {
-    return giveError(isv2, 'Old password is incorrect', 400);
+    return giveError(isv2, 'Old password is incorrect', BAD_REQUEST);
   }
 
   if (data.users[index].oldPasswords !== undefined) {
     if (data.users[index].oldPasswords.includes(hashedNewPassword)) {
-      return giveError(isv2, 'New password has been used previously', 400);
+      return giveError(isv2, 'New password has been used previously', BAD_REQUEST);
     }
   } else {
     data.users[index].oldPasswords = [];
   }
 
-  if (newPassword.length < 8) {
-    return giveError(isv2, 'New password must be at least 8 characters', 400);
+  if (newPassword.length < minPasswordLength) {
+    return giveError(isv2, 'New password must be at least 8 characters', BAD_REQUEST);
   }
 
   const letters = /[a-zA-Z]/;
   const numbers = /\d/;
   if (!letters.test(newPassword) || !numbers.test(newPassword)) {
-    return giveError(isv2, 'New password must contain at least one letter and one number', 400);
+    return giveError(isv2, 'New password must contain at least one letter and one number', BAD_REQUEST);
   }
 
   data.users[index].oldPasswords.push(hashedOldPassword);
@@ -217,42 +225,42 @@ export function updateUserDetails(token: string, email: string, nameFirst: strin
   const data: Data = getData();
 
   if (!isValidTokenStructure(token)) {
-    return giveError(isv2, 'Token is an invalid structure', 401);
+    return giveError(isv2, 'Token is an invalid structure', UNAUTHORIZED);
   }
 
   if (!isTokenLoggedIn(token)) {
-    return giveError(isv2, 'Token is not logged in', 403);
+    return giveError(isv2, 'Token is not logged in', FORBIDDEN);
   }
 
   const userId = findUserFromToken(token);
   const index = data.users.findIndex(id => id.authUserId === userId);
   if (data.users[index].email !== email && data.users.filter(mail => mail.email === email).length > 0) {
-    return giveError(isv2, 'Email is currently used by another user', 400);
+    return giveError(isv2, 'Email is currently used by another user', BAD_REQUEST);
   }
 
   if (!validator.isEmail(email)) {
-    return giveError(isv2, 'Email is Invalid', 400);
+    return giveError(isv2, 'Email is Invalid', BAD_REQUEST);
   }
 
   const expressionName = /^[A-Za-z\s'-]+$/;
   if (!expressionName.test(nameFirst)) {
-    return giveError(isv2, 'First name must only contain letters, spaces, hyphens or apostrophes', 400);
+    return giveError(isv2, 'First name must only contain letters, spaces, hyphens or apostrophes', BAD_REQUEST);
   }
 
-  if (nameFirst.length < 2 || nameFirst.length > 20) {
-    return giveError(isv2, 'First name must be 2 to 20 characters', 400);
+  if (nameFirst.length < minNameLength || nameFirst.length > maxNameLength) {
+    return giveError(isv2, 'First name must be 2 to 20 characters', BAD_REQUEST);
   }
 
   if (!expressionName.test(nameLast)) {
-    return giveError(isv2, 'Last name must only contain letters, spaces, hyphens or apostrophes', 400);
+    return giveError(isv2, 'Last name must only contain letters, spaces, hyphens or apostrophes', BAD_REQUEST);
   }
 
-  if (nameLast.length < 2 || nameLast.length > 20) {
-    return giveError(isv2, 'Last name must be 2 to 20 characters', 400);
+  if (nameLast.length < minNameLength || nameLast.length > maxNameLength) {
+    return giveError(isv2, 'Last name must be 2 to 20 characters', BAD_REQUEST);
   }
 
   if (isWhiteSpace(nameFirst) || isWhiteSpace(nameLast)) {
-    return giveError(isv2, 'First name and Last name cannot be solely white space', 400);
+    return giveError(isv2, 'First name and Last name cannot be solely white space', BAD_REQUEST);
   }
 
   data.users[index].email = email;
@@ -273,11 +281,11 @@ export function adminAuthLogout (tokenId: string, isv2: boolean): Record<string,
   const data: Data = getData();
 
   if (!isValidTokenStructure(tokenId)) {
-    return giveError(isv2, 'Token is not a valid structure', 401);
+    return giveError(isv2, 'Token is not a valid structure', UNAUTHORIZED);
   }
 
   if (!isTokenLoggedIn(tokenId)) {
-    return giveError(isv2, 'This token is for a user who has already logged out', 403);
+    return giveError(isv2, 'This token is for a user who has already logged out', FORBIDDEN);
   }
 
   const index: number = data.tokens.findIndex(token => token.tokenId === tokenId);

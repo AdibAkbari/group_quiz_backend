@@ -5,8 +5,15 @@ import HTTPError from 'http-errors';
 import fs from 'fs';
 import config from './config.json';
 
+const BAD_REQUEST = 400;
+const FORBIDDEN = 403;
+const UNAUTHORIZED = 401;
+
 const COUNTDOWN = 100;
 const timers:Timers[] = [];
+const maxAutoStart = 50
+const minAutoStart = 0;
+const maxNumSessions = 10;
 
 /**
  * View inactive and active sessions
@@ -40,25 +47,25 @@ export function sessionView(token: string, quizId: number): {activeSessions: num
  */
 export function startSession(quizId: number, token: string, autoStartNum: number): { sessionId: number} {
   if (!isValidTokenStructure(token)) {
-    throw HTTPError(401, 'Token is not a valid structure');
+    throw HTTPError(UNAUTHORIZED, 'Token is not a valid structure');
   }
   if (!isTokenLoggedIn(token)) {
-    throw HTTPError(403, 'Token is not logged in');
+    throw HTTPError(FORBIDDEN, 'Token is not logged in');
   }
   if (!isValidQuizId(quizId) || !isValidCreator(quizId, token)) {
-    throw HTTPError(400, 'Invalid QuizId');
+    throw HTTPError(BAD_REQUEST, 'Invalid QuizId');
   }
-  if (autoStartNum > 50 || autoStartNum < 0) {
-    throw HTTPError(400, 'Invalid autostart number');
+  if (autoStartNum > maxAutoStart || autoStartNum < minAutoStart) {
+    throw HTTPError(BAD_REQUEST, 'Invalid autostart number');
   }
   const data = getData();
-  if (data.sessions.filter(state => state.sessionState !== 'END').length >= 10) {
-    throw HTTPError(400, 'Too many sessions currently running');
+  if (data.sessions.filter(state => state.sessionState !== 'END').length >= maxNumSessions) {
+    throw HTTPError(BAD_REQUEST, 'Too many sessions currently running');
   }
 
   const quiz = data.quizzes.find(id => id.quizId === quizId);
   if (quiz.numQuestions === 0) {
-    throw HTTPError(400, 'No questions in quiz');
+    throw HTTPError(BAD_REQUEST, 'No questions in quiz');
   }
   const sessionId = data.sessions.length + 1;
 
@@ -89,21 +96,21 @@ export function startSession(quizId: number, token: string, autoStartNum: number
 export function updateSessionState(quizId: number, sessionId: number, token: string, action: string): Record<string, never> {
   // error checking
   if (!isValidTokenStructure(token)) {
-    throw HTTPError(401, 'Token is not a valid structure');
+    throw HTTPError(UNAUTHORIZED, 'Token is not a valid structure');
   }
   if (!isTokenLoggedIn(token)) {
-    throw HTTPError(403, 'Token is not logged in');
+    throw HTTPError(FORBIDDEN, 'Token is not logged in');
   }
   if (!isValidQuizId(quizId) || !isValidCreator(quizId, token)) {
-    throw HTTPError(400, 'Invalid QuizId');
+    throw HTTPError(BAD_REQUEST, 'Invalid QuizId');
   }
   if (!isValidSessionId(sessionId, quizId)) {
-    throw HTTPError(400, 'Invalid Session Id');
+    throw HTTPError(BAD_REQUEST, 'Invalid Session Id');
   }
 
   const actions = ['NEXT_QUESTION', 'GO_TO_ANSWER', 'GO_TO_FINAL_RESULTS', 'END'];
   if (actions.find(actions => actions === action) === undefined) {
-    throw HTTPError(400, 'Invalid action');
+    throw HTTPError(BAD_REQUEST, 'Invalid action');
   }
 
   const data = getData();
@@ -112,10 +119,10 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
   // action: next_question
   if (action === 'NEXT_QUESTION') {
     if (session.sessionState !== 'LOBBY' && session.sessionState !== 'QUESTION_CLOSE' && session.sessionState !== 'ANSWER_SHOW') {
-      throw HTTPError(400, 'Action enum cannot be applied in current state');
+      throw HTTPError(BAD_REQUEST, 'Action enum cannot be applied in current state');
     }
     if (session.atQuestion === session.metadata.numQuestions) {
-      throw HTTPError(400, 'No more questions');
+      throw HTTPError(BAD_REQUEST, 'No more questions');
     }
 
     session.sessionState = 'QUESTION_COUNTDOWN';
@@ -136,7 +143,7 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
   // action: go_to_answer
   if (action === 'GO_TO_ANSWER') {
     if (session.sessionState !== 'QUESTION_OPEN' && session.sessionState !== 'QUESTION_CLOSE') {
-      throw HTTPError(400, 'Action enum cannot be applied in current state');
+      throw HTTPError(BAD_REQUEST, 'Action enum cannot be applied in current state');
     }
     if (session.sessionState === 'QUESTION_OPEN') {
       const timer = timers.find(id => id.sessionId === sessionId);
@@ -149,7 +156,7 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
   // action: go_to_final_results
   if (action === 'GO_TO_FINAL_RESULTS') {
     if (session.sessionState !== 'QUESTION_CLOSE' && session.sessionState !== 'ANSWER_SHOW') {
-      throw HTTPError(400, 'Action enum cannot be applied in current state');
+      throw HTTPError(BAD_REQUEST, 'Action enum cannot be applied in current state');
     }
     if (session.sessionState === 'QUESTION_CLOSE') {
       calculateQuestionPoints(sessionId, data);
@@ -162,7 +169,7 @@ export function updateSessionState(quizId: number, sessionId: number, token: str
   // action: end
   if (action === 'END') {
     if (session.sessionState === 'END') {
-      throw HTTPError(400, 'Action enum cannot be applied in current state');
+      throw HTTPError(BAD_REQUEST, 'Action enum cannot be applied in current state');
     }
     if (session.sessionState === 'QUESTION_OPEN' || session.sessionState === 'QUESTION_COUNTDOWN') {
       const timer = timers.find(id => id.sessionId === sessionId);
@@ -264,16 +271,16 @@ export function clearTimers() {
  */
 export function sessionStatus(token: string, quizId: number, sessionId: number): SessionStatus {
   if (!isValidTokenStructure(token)) {
-    throw HTTPError(401, 'Token is not a valid structure');
+    throw HTTPError(UNAUTHORIZED, 'Token is not a valid structure');
   }
   if (!isTokenLoggedIn(token)) {
-    throw HTTPError(403, 'Token is not logged in');
+    throw HTTPError(FORBIDDEN, 'Token is not logged in');
   }
   if (!isValidQuizId(quizId) || !isValidCreator(quizId, token)) {
-    throw HTTPError(400, 'Invalid QuizId');
+    throw HTTPError(BAD_REQUEST, 'Invalid QuizId');
   }
   if (!isValidSessionId(sessionId, quizId)) {
-    throw HTTPError(400, 'Invalid: Session Id');
+    throw HTTPError(BAD_REQUEST, 'Invalid: Session Id');
   }
 
   const data = getData();
@@ -302,26 +309,26 @@ export function sessionStatus(token: string, quizId: number, sessionId: number):
  */
 export function sessionResults(quizId: number, sessionId: number, token: string): SessionResults {
   if (!isValidTokenStructure(token)) {
-    throw HTTPError(401, 'Token is not a valid structure');
+    throw HTTPError(UNAUTHORIZED, 'Token is not a valid structure');
   }
   if (!isTokenLoggedIn(token)) {
-    throw HTTPError(403, 'Token is not logged in');
+    throw HTTPError(FORBIDDEN, 'Token is not logged in');
   }
   if (!isValidQuizId(quizId)) {
-    throw HTTPError(400, 'invalid quiz Id');
+    throw HTTPError(BAD_REQUEST, 'invalid quiz Id');
   }
   if (!isValidCreator(quizId, token)) {
-    throw HTTPError(400, 'quizId does not refer to a quiz that this user owns');
+    throw HTTPError(BAD_REQUEST, 'quizId does not refer to a quiz that this user owns');
   }
   if (!isValidSessionId(sessionId, quizId)) {
-    throw HTTPError(400, 'Session Id does not refer to a valid session within this quiz');
+    throw HTTPError(BAD_REQUEST, 'Session Id does not refer to a valid session within this quiz');
   }
 
   const data = getData();
   const session = data.sessions.find(session => session.sessionId === sessionId);
 
   if (session.sessionState !== 'FINAL_RESULTS') {
-    throw HTTPError(400, 'Session is not in FINAL_RESULTS state');
+    throw HTTPError(BAD_REQUEST, 'Session is not in FINAL_RESULTS state');
   }
 
   return getSessionResults(session);
@@ -337,26 +344,26 @@ export function sessionResults(quizId: number, sessionId: number, token: string)
  */
 export function sessionResultsCSV(quizId: number, sessionId: number, token: string):{url: string} {
   if (!isValidTokenStructure(token)) {
-    throw HTTPError(401, 'Token is not a valid structure');
+    throw HTTPError(UNAUTHORIZED, 'Token is not a valid structure');
   }
   if (!isTokenLoggedIn(token)) {
-    throw HTTPError(403, 'Token is not logged in');
+    throw HTTPError(FORBIDDEN, 'Token is not logged in');
   }
   if (!isValidQuizId(quizId)) {
-    throw HTTPError(400, 'invalid quiz Id');
+    throw HTTPError(BAD_REQUEST, 'invalid quiz Id');
   }
   if (!isValidCreator(quizId, token)) {
-    throw HTTPError(400, 'quizId does not refer to a quiz that this user owns');
+    throw HTTPError(BAD_REQUEST, 'quizId does not refer to a quiz that this user owns');
   }
   if (!isValidSessionId(sessionId, quizId)) {
-    throw HTTPError(400, 'Session Id does not refer to a valid session within this quiz');
+    throw HTTPError(BAD_REQUEST, 'Session Id does not refer to a valid session within this quiz');
   }
 
   const data = getData();
   const session = data.sessions.find(session => session.sessionId === sessionId);
 
   if (session.sessionState !== 'FINAL_RESULTS') {
-    throw HTTPError(400, 'Session is not in FINAL_RESULTS state');
+    throw HTTPError(BAD_REQUEST, 'Session is not in FINAL_RESULTS state');
   }
 
   const playerList = data.players.filter(player => session.players.includes(player.name));

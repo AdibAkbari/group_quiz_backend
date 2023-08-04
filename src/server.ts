@@ -73,11 +73,15 @@ const HOST: string = process.env.IP || 'localhost';
 app.use(morgan('dev'));
 
 // access static folder if using /static/
-app.use('static', express.static('static'));
+app.use('/static', express.static('./static'));
 
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
+
+const BAD_REQUEST = 400;
+const FORBIDDEN = 403;
+const UNAUTHORIZED = 401;
 
 // ====================================================================
 //  ================= IT 2 TEST ROUTES (NEW) ==========================
@@ -281,11 +285,11 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
 
   if ('error' in response) {
     if (response.error.includes('structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     } else if (response.error.includes('quizId') || response.error.includes('description')) {
-      return res.status(400).json(response);
+      return res.status(BAD_REQUEST).json(response);
     }
   }
   res.json(response);
@@ -296,7 +300,7 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   // const { email, password, nameFirst, nameLast } = req.body;
   const result = adminAuthRegister(req.body.email, req.body.password, req.body.nameFirst, req.body.nameLast);
   if ('error' in result) {
-    res.status(400);
+    res.status(BAD_REQUEST);
   }
   res.json(result);
 });
@@ -307,9 +311,9 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
   const response = adminUserDetails(token, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     }
   }
   res.json(response);
@@ -321,11 +325,11 @@ app.put('/v1/admin/user/details', (req: Request, res: Response) => {
   const response = updateUserDetails(token, email, nameFirst, nameLast, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     } else if (response.error.includes('Email') || response.error.includes('name')) {
-      return res.status(400).json(response);
+      return res.status(BAD_REQUEST).json(response);
     }
   }
   res.json(response);
@@ -336,7 +340,7 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
   const { email, password } = req.body;
   const response = adminAuthLogin(email, password);
   if ('error' in response) {
-    return res.status(400).json(response);
+    return res.status(BAD_REQUEST).json(response);
   }
   res.json(response);
 });
@@ -347,9 +351,9 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   const response = adminQuizList(token, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     }
   }
   res.json(response);
@@ -360,11 +364,11 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const response = adminQuizCreate(req.body.token, req.body.name, req.body.description, false);
   if ('error' in response) {
     if (response.error.includes('Structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     } else if (response.error.includes('Name') || response.error.includes('Description')) {
-      return res.status(400).json(response);
+      return res.status(BAD_REQUEST).json(response);
     }
   }
   res.json(response);
@@ -376,11 +380,11 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
   const response = updateUserPassword(token, oldPassword, newPassword, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     } else if (response.error.includes('password')) {
-      return res.status(400).json(response);
+      return res.status(BAD_REQUEST).json(response);
     }
   }
   res.json(response);
@@ -395,12 +399,12 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
 
   if ('error' in response) {
     if (response.error.includes('Structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     } else if (response.error.includes('Name') || response.error.includes('QuizId') ||
                  response.error.includes('own') || response.error.includes('white space')) {
-      return res.status(400).json(response);
+      return res.status(BAD_REQUEST).json(response);
     }
   }
 
@@ -414,12 +418,12 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   const response = adminQuizTransfer(token, parseInt(req.params.quizid), userEmail, false);
   if ('error' in response) {
     if (response.error.includes('Structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     } else if (response.error.includes('QuizId') || response.error.includes('own') ||
                  response.error.includes('name') || response.error.includes('Email')) {
-      return res.status(400).json(response);
+      return res.status(BAD_REQUEST).json(response);
     }
   }
   res.json(response);
@@ -432,11 +436,11 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const response = createQuizQuestionv1(quizId, req.body.token, question, duration, points, answers, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     } else if (response.error.includes('input') || response.error.includes('quiz Id')) {
-      return res.status(400).json(response);
+      return res.status(BAD_REQUEST).json(response);
     }
   }
   res.json(response);
@@ -451,12 +455,12 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: 
   const response = moveQuizQuestion(token, quizid, questionid, newPosition, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     } else if (response.error.includes('quiz Id') || response.error.includes('questionId') ||
                  response.error.includes('newPosition')) {
-      return res.status(400).json(response);
+      return res.status(BAD_REQUEST).json(response);
     }
   }
   res.json(response);
@@ -470,11 +474,11 @@ app.delete('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Re
   const response = deleteQuizQuestion(token, quizId, questionid, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     } else if (response.error.includes('param:') || response.error.includes('quiz Id')) {
-      return res.status(400).json(response);
+      return res.status(BAD_REQUEST).json(response);
     }
   }
   res.json(response);
@@ -486,9 +490,9 @@ app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
   const response = adminQuizTrash(token, false);
   if ('error' in response) {
     if (response.error.includes('Structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     }
   }
   res.json(response);
@@ -501,11 +505,11 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const response = adminQuizInfo(token, quizId, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     } else if (response.error.includes('quizId')) {
-      return res.status(400).json(response);
+      return res.status(BAD_REQUEST).json(response);
     }
   }
   res.json(response);
@@ -517,11 +521,11 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const response = adminQuizRemove(token, parseInt(req.params.quizid), false);
   if ('error' in response) {
     if (response.error.includes('Structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     } else if (response.error.includes('QuizId') || response.error.includes('own')) {
-      return res.status(400).json(response);
+      return res.status(BAD_REQUEST).json(response);
     }
   }
   res.json(response);
@@ -533,11 +537,11 @@ app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
   const response = adminQuizRestore(req.body.token, quizId, false);
   if ('error' in response) {
     if (response.error.includes('Structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     } else if (response.error.includes('quiz')) {
-      return res.status(400).json(response);
+      return res.status(BAD_REQUEST).json(response);
     }
   }
   res.json(response);
@@ -551,11 +555,11 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
   const response = adminQuizTrashEmpty(token, quizIds, false);
   if ('error' in response) {
     if (response.error.includes('Structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     } else if (response.error.includes('quizIds')) {
-      return res.status(400).json(response);
+      return res.status(BAD_REQUEST).json(response);
     }
   }
   res.json(response);
@@ -569,11 +573,11 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Respo
   const response = updateQuizQuestionv1(quizId, questionId, req.body.token, question, duration, points, answers, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     } else if (response.error.includes('input') || response.error.includes('param')) {
-      return res.status(400).json(response);
+      return res.status(BAD_REQUEST).json(response);
     }
   }
   res.json(response);
@@ -589,9 +593,9 @@ app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
   const response = adminAuthLogout(req.body.token, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     }
   }
   res.json(response);
@@ -605,11 +609,11 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
   const response = quizQuestionDuplicate(quizId, questionId, token, false);
   if ('error' in response) {
     if (response.error.includes('structure')) {
-      return res.status(401).json(response);
+      return res.status(UNAUTHORIZED).json(response);
     } else if (response.error.includes('logged')) {
-      return res.status(403).json(response);
+      return res.status(FORBIDDEN).json(response);
     } else if (response.error.includes('invalid')) {
-      return res.status(400).json(response);
+      return res.status(BAD_REQUEST).json(response);
     }
   }
   res.json(response);

@@ -199,8 +199,10 @@ export function isValidEmail (userEmail: string): boolean {
 /**
  * Helper function to give error based on if it is a v1 or v2 route
  *
- * @param {} - no params
- * @returns {string} - playerName
+ * @param {boolean} isv2
+ * @param {string } errorMessage
+ * @param {number} statusCode
+ * @returns {{error: string}}
  */
 export function giveError(isv2: boolean, errorMessage: string, statusCode: number) {
   if (isv2) {
