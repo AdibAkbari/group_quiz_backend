@@ -889,7 +889,7 @@ export function updateQuizQuestion(quizId: number, questionId: number, token: st
     return giveError(isv2, 'invalid input: points must be between 1 and 10', BAD_REQUEST);
   }
 
-  if (answers.find(answer => (answer.answer.length > maxAnswerLength || answer.answer.length < maxAnswerLength)) !== undefined) {
+  if (answers.find(answer => (answer.answer.length > maxAnswerLength || answer.answer.length < minAnswerLength)) !== undefined) {
     return giveError(isv2, 'invalid input: answers must be 1-30 characters long', BAD_REQUEST);
   }
 

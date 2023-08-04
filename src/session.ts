@@ -11,7 +11,7 @@ const UNAUTHORIZED = 401;
 
 const COUNTDOWN = 100;
 const timers:Timers[] = [];
-const maxAutoStart = 50
+const maxAutoStart = 50;
 const minAutoStart = 0;
 const maxNumSessions = 10;
 
@@ -233,7 +233,8 @@ function calculateQuestionPoints(sessionId: number, data: Data) {
   let counter = 1;
   for (const player of filteredPlayers) {
     const playerInfo = data.players.find((id: any) => id.playerId === player.playerId);
-    const point = points * 1 / counter;
+    let point = points * 1 / counter;
+    point = Math.round(point * 10) / 10;
     playerInfo.score += point;
     playerInfo.questionResponse.find((id: any) => id.questionId === questionId).points = point;
     counter++;
@@ -384,12 +385,15 @@ export function sessionResultsCSV(quizId: number, sessionId: number, token: stri
         playerResults.push('0');
         playerResults.push('0');
       } else {
-        const questionRanking = playerList.filter(player => player.questionResponse[col] !== undefined);
-        questionRanking.sort((player1, player2) => {
-          return player2.questionResponse[col].points - player1.questionResponse[col].points;
-        });
         const score = playerList[row].questionResponse[col].points;
-        const rank = (questionRanking.findIndex(player => player.playerId === playerList[row].playerId) + 1);
+
+        const questionRanking = playerList
+          .filter(player => player.questionResponse[col] !== undefined)
+          .sort((player1, player2) => player2.questionResponse[col].points - player1.questionResponse[col].points);
+
+        // finds index of first player in ranking with same score as current player - so same score will have same rank
+        const rank = questionRanking.findIndex(player => player.questionResponse[col].points === score) + 1;
+
         playerResults.push(score.toString());
         playerResults.push(rank.toString());
       }

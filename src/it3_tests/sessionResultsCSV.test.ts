@@ -122,17 +122,17 @@ describe('Success cases', () => {
     const question2Info = playerCurrentQuestionInfoRequest(playerId, questionPosition + 1);
     correctAnswerId = question2Info.answers[0].answerId;
     const incorrectAnswerId = question2Info.answers[1].answerId;
-
+    // both answer incorrectly - should have same rank of 1 since same score
     playerSubmitAnswerRequest([incorrectAnswerId], playerId, questionPosition + 1);
-    playerSubmitAnswerRequest([correctAnswerId], player2Id, questionPosition + 1);
+    playerSubmitAnswerRequest([incorrectAnswerId], player2Id, questionPosition + 1);
 
     updateSessionStateRequest(quizId, session2Id, token, 'GO_TO_ANSWER');
     updateSessionStateRequest(quizId, session2Id, token, 'GO_TO_FINAL_RESULTS');
 
     const expected = [
       ['Player', 'question1score', 'question1rank', 'question2score', 'question2rank'],
-      ['Chicken', '6', '1', '0', '2'],
-      ['Dog', '3', '2', '6', '1'],
+      ['Chicken', '6', '1', '0', '1'],
+      ['Dog', '3', '2', '0', '1'],
       ['Player', '0', '0', '0', '0']
     ];
 
