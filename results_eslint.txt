@@ -1,0 +1,35 @@
+
+src/auth.ts
+  0:0  passing  No linting issues  success
+
+src/dataStore.ts
+  0:0  passing  No linting issues  success
+
+src/echo.test.ts
+  0:0  passing  No linting issues  success
+
+src/echo.ts
+  0:0  passing  No linting issues  success
+
+src/helper.ts
+  0:0  passing  No linting issues  success
+
+src/interfaces.ts
+  0:0  passing  No linting issues  success
+
+src/other.ts
+  0:0  passing  No linting issues  success
+
+src/player.ts
+  0:0  passing  No linting issues  success
+
+src/quiz.ts
+  0:0  passing  No linting issues  success
+
+src/server.ts
+  0:0  passing  No linting issues  success
+
+src/session.ts
+  0:0  passing  No linting issues  success
+
+✔ 11 files successfully linted.

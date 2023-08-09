@@ -1,0 +1,2969 @@
+
+> test
+> jest httpTests/
+
+FAIL httpTests/adminQuizSession/adminQuizSessionProgress.test.ts
+  ● Test successful session progress, NEXT_QUESTION, first question
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: "LOBBY"
+    Received: undefined
+
+      64 | iter3test('Test successful session progress, NEXT_QUESTION, first question', () => {
+      65 |   // checks if in countdown state, before autoStart expires
+    > 66 |   expect(getSessionState(token, quizId, sessionId)).toStrictEqual("LOBBY");
+         |                                                     ^
+      67 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+      68 |   expect(res).toStrictEqual({});
+      69 |   expect(getSessionState(token, quizId, sessionId)).toStrictEqual("QUESTION_COUNTDOWN");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:66:53)
+
+  ● Test successful session progress, NEXT_QUESTION with 2 questions
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: "QUESTION_COUNTDOWN"
+    Received: undefined
+
+      78 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      79 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+    > 80 |   expect(getSessionState(token, quizId, sessionId)).toStrictEqual("QUESTION_COUNTDOWN");
+         |                                                     ^
+      81 |   expect(res).toStrictEqual({});
+      82 | });
+      83 |
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:80:53)
+
+  ● Test successful session progress, QUESTION_OPEN state
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      85 |   // checks if in countdown state ended and in question open state
+      86 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+    > 87 |   expect(res).toStrictEqual({});
+         |               ^
+      88 |   while (getSessionState(token, quizId, sessionId) === 'QUESTION_COUNTDOWN') {
+      89 |     continue;
+      90 |   }
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:87:15)
+
+  ● Test successful session progress, QUESTION_CLOSE state after timeout
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+       95 |   // checks if in question close state after duration ends
+       96 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+    >  97 |   expect(res).toStrictEqual({});
+          |               ^
+       98 |   while (getSessionState(token, quizId, sessionId) === 'QUESTION_COUNTDOWN') {
+       99 |     continue;
+      100 |   }
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:97:15)
+
+  ● Test successful session progress, GO_TO_ANSWER
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      112 |   }
+      113 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+    > 114 |   expect(res).toStrictEqual({});
+          |               ^
+      115 |   expect(getSessionState(token, quizId, sessionId)).toBe("ANSWER_SHOW");
+      116 | });
+      117 |
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:114:15)
+
+  ● Test successful session progress, GO_TO_FINAL_RESULTS
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      122 |     continue;
+      123 |   }
+    > 124 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      125 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      126 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+      127 |   while (getSessionState(token, quizId, sessionId) === 'QUESTION_COUNTDOWN') {
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:124:53)
+
+  ● Test successful session progress, END
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      153 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_FINAL_RESULTS");
+      154 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "END");
+    > 155 |   expect(res).toStrictEqual({});
+          |               ^
+      156 |   expect(getSessionState(token, quizId, sessionId)).toBe("END");
+      157 | });
+      158 |
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:155:15)
+
+  ● Test unsuccessful session progress, cant go to next question while QUESTION_OPEN
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      168 |     continue;
+      169 |   }
+    > 170 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      171 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+      172 |   expect(res).toBe(400);
+      173 | });
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:170:53)
+
+  ● Test unsuccessful session progress, cant go to next question while FINAL_RESULTS
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      178 |     continue;
+      179 |   }
+    > 180 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      181 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      182 |   expect(getSessionState(token, quizId, sessionId)).toBe("ANSWER_SHOW");
+      183 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:180:53)
+
+  ● Test unsuccessful session progress, cant go to next question while END
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      199 |     continue;
+      200 |   }
+    > 201 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      202 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      203 |   expect(getSessionState(token, quizId, sessionId)).toBe("ANSWER_SHOW");
+      204 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:201:53)
+
+  ● Test unsuccessful session progress, cant go to answer while LOBBY
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "LOBBY"
+    Received: undefined
+
+      217 |
+      218 | iter3test('Test unsuccessful session progress, cant go to answer while LOBBY', () => {
+    > 219 |   expect(getSessionState(token, quizId, sessionId)).toBe("LOBBY");
+          |                                                     ^
+      220 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      221 |   expect(res).toBe(400);
+      222 | });
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:219:53)
+
+  ● Test unsuccessful session progress, cant go to answer while QUESTION_COUNTDOWN
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_COUNTDOWN"
+    Received: undefined
+
+      224 | iter3test('Test unsuccessful session progress, cant go to answer while QUESTION_COUNTDOWN', () => {
+      225 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+    > 226 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_COUNTDOWN");
+          |                                                     ^
+      227 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      228 |   expect(res).toBe(400);
+      229 | });
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:226:53)
+
+  ● Test unsuccessful session progress, cant go to answer while FINAL_RESULTS
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      234 |     continue;
+      235 |   }
+    > 236 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      237 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      238 |   expect(getSessionState(token, quizId, sessionId)).toBe("ANSWER_SHOW");
+      239 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:236:53)
+
+  ● Test unsuccessful session progress, cant go to answer while END
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      255 |     continue;
+      256 |   }
+    > 257 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      258 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      259 |   expect(getSessionState(token, quizId, sessionId)).toBe("ANSWER_SHOW");
+      260 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:257:53)
+
+  ● Test unsuccessful session progress, cant go to answer while ANSWER_SHOW
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      279 |     continue;
+      280 |   }
+    > 281 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      282 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      283 |   expect(getSessionState(token, quizId, sessionId)).toBe("ANSWER_SHOW");
+      284 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:281:53)
+
+  ● Test unsuccessful session progress, cant go to final results while LOBBY
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "LOBBY"
+    Received: undefined
+
+      287 |
+      288 | iter3test('Test unsuccessful session progress, cant go to final results while LOBBY', () => {
+    > 289 |   expect(getSessionState(token, quizId, sessionId)).toBe("LOBBY");
+          |                                                     ^
+      290 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_FINAL_RESULTS");
+      291 |   expect(res).toBe(400);
+      292 | });
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:289:53)
+
+  ● Test unsuccessful session progress, cant go to final results while QUESTION_COUNTDOWN
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_COUNTDOWN"
+    Received: undefined
+
+      294 | iter3test('Test unsuccessful session progress, cant go to final results while QUESTION_COUNTDOWN', () => {
+      295 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+    > 296 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_COUNTDOWN");
+          |                                                     ^
+      297 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_FINAL_RESULTS");
+      298 |   expect(res).toBe(400);
+      299 | });
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:296:53)
+
+  ● Test unsuccessful session progress, cant go to final results while QUESTION_OPEN, one question left
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      304 |     continue;
+      305 |   }
+    > 306 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      307 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_FINAL_RESULTS");
+      308 |   expect(res).toBe(400);
+      309 | });
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:306:53)
+
+  ● Test unsuccessful session progress, cant go to final results while QUESTION_OPEN, no questions left
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      314 |     continue;
+      315 |   }
+    > 316 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      317 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_FINAL_RESULTS");
+      318 |   expect(res).toBe(400);
+      319 | });
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:316:53)
+
+  ● Test unsuccessful session progress, cant go to final results while END
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      335 |     continue;
+      336 |   }
+    > 337 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      338 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      339 |   expect(getSessionState(token, quizId, sessionId)).toBe("ANSWER_SHOW");
+      340 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:337:53)
+
+  ● Test unsuccessful session progress, cant go to final results while in FINAL_RESULTS
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      359 |     continue;
+      360 |   }
+    > 361 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      362 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      363 |   expect(getSessionState(token, quizId, sessionId)).toBe("ANSWER_SHOW");
+      364 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:361:53)
+
+FAIL httpTests/player/playerQuestionData.test.ts
+  ● Successful question information for player - first question
+
+    TypeError: Cannot read properties of undefined (reading 'answers')
+
+      110 |   const quiz = adminQuizInfo(token, quizId);
+      111 |   const answerInfo: any[] = [];
+    > 112 |   for (let answer of quiz.questions[0].answers) {
+          |                                        ^
+      113 |     answerInfo.push({
+      114 |       answerId: answer.answerId,
+      115 |       answer: answer.answer,
+
+      at Object.<anonymous> (httpTests/player/playerQuestionData.test.ts:112:40)
+
+  ● Successful question information for player - last question
+
+    TypeError: Cannot read properties of undefined (reading 'answers')
+
+      142 |   const quiz = adminQuizInfo(token, quizId);
+      143 |   const answerInfo: any[] = [];
+    > 144 |   for (let answer of quiz.questions[1].answers) {
+          |                                        ^
+      145 |     answerInfo.push({
+      146 |       answerId: answer.answerId,
+      147 |       answer: answer.answer,
+
+      at Object.<anonymous> (httpTests/player/playerQuestionData.test.ts:144:40)
+
+  ● Successful question information for player - question edit has no impact
+
+    TypeError: Cannot read properties of undefined (reading 'answers')
+
+      169 |   const res = playerQuestionData(playerId, 1);
+      170 |   const answerInfo: any[] = [];
+    > 171 |   for (let answer of quiz.questions[0].answers) {
+          |                                        ^
+      172 |     answerInfo.push({
+      173 |       answerId: answer.answerId,
+      174 |       answer: answer.answer,
+
+      at Object.<anonymous> (httpTests/player/playerQuestionData.test.ts:171:40)
+
+  ● Successful question information for player - different players get the same info
+
+    TypeError: Cannot read properties of undefined (reading 'answers')
+
+      196 |   const quiz = adminQuizInfo(token, quizId);
+      197 |   const answerInfo: any[] = [];
+    > 198 |   for (let answer of quiz.questions[0].answers) {
+          |                                        ^
+      199 |     answerInfo.push({
+      200 |       answerId: answer.answerId,
+      201 |       answer: answer.answer,
+
+      at Object.<anonymous> (httpTests/player/playerQuestionData.test.ts:198:40)
+
+FAIL httpTests/player/playerQuestionAnswer.test.ts
+  ● Test successful question answer for single player
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      54 |     continue;
+      55 |   }
+    > 56 |   expect(getSessionState(token, quizId, sessionId)).toBe('QUESTION_OPEN');
+         |                                                     ^
+      57 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+      58 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      59 |   playerQuestionAnswer(playerId, 1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:56:53)
+
+  ● Test successful re-submission of question answer for single player
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      65 |     continue;
+      66 |   }
+    > 67 |   expect(getSessionState(token, quizId, sessionId)).toBe('QUESTION_OPEN');
+         |                                                     ^
+      68 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+      69 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      70 |   playerQuestionAnswer(playerId, 1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:67:53)
+
+  ● Test successful question answer for two players
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      83 |     continue;
+      84 |   }
+    > 85 |   expect(getSessionState(token, quizId, sessionId)).toBe('QUESTION_OPEN');
+         |                                                     ^
+      86 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+      87 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      88 |   playerQuestionAnswer(playerId, 1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:85:53)
+
+  ● Test unsuccessful question answer - playerId does not exist
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+       95 |     continue;
+       96 |   }
+    >  97 |   expect(getSessionState(token, quizId, sessionId)).toBe('QUESTION_OPEN');
+          |                                                     ^
+       98 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+       99 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      100 |   const res = playerQuestionAnswer(playerId+1, 1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:97:53)
+
+  ● Test unsuccessful question answer - questionId not valid for session player is in
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      107 |     continue;
+      108 |   }
+    > 109 |   expect(getSessionState(token, quizId, sessionId)).toBe('QUESTION_OPEN');
+          |                                                     ^
+      110 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+      111 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      112 |   const res = playerQuestionAnswer(playerId, 1+1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:109:53)
+
+  ● Test unsuccessful question answer - session in END state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      125 |     continue;
+      126 |   }
+    > 127 |   expect(getSessionState(token, quizId, sessionId)).toBe('QUESTION_OPEN');
+          |                                                     ^
+      128 |   adminQuizSessionProgress(token, quizId, sessionId, 'GO_TO_ANSWER');
+      129 |   expect(getSessionState(token, quizId, sessionId)).toBe('ANSWER_SHOW');
+      130 |   adminQuizSessionProgress(token, quizId, sessionId, 'GO_TO_FINAL_RESULTS');
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:127:53)
+
+  ● Test unsuccessful question answer - session in QUESTION_COUNTDOWN state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_COUNTDOWN"
+    Received: undefined
+
+      140 | iter3test('Test unsuccessful question answer - session in QUESTION_COUNTDOWN state', () => {
+      141 |   adminQuizSessionProgress(token, quizId, sessionId, 'NEXT_QUESTION');
+    > 142 |   expect(getSessionState(token, quizId, sessionId)).toBe('QUESTION_COUNTDOWN');
+          |                                                     ^
+      143 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+      144 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      145 |   const res = playerQuestionAnswer(playerId, 1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:142:53)
+
+  ● Test unsuccessful question answer - session in QUESTION_CLOSE state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_CLOSE"
+    Received: undefined
+
+      155 |     continue;
+      156 |   }
+    > 157 |   expect(getSessionState(token, quizId, sessionId)).toBe('QUESTION_CLOSE');
+          |                                                     ^
+      158 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+      159 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      160 |   const res = playerQuestionAnswer(playerId, 1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:157:53)
+
+  ● Test unsuccessful question answer - session in ANSWER_SHOW state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "ANSWER_SHOW"
+    Received: undefined
+
+      168 |   }
+      169 |   adminQuizSessionProgress(token, quizId, sessionId, 'GO_TO_ANSWER');
+    > 170 |   expect(getSessionState(token, quizId, sessionId)).toBe('ANSWER_SHOW');
+          |                                                     ^
+      171 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+      172 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      173 |   const res = playerQuestionAnswer(playerId, 1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:170:53)
+
+  ● Test unsuccessful question answer - session in FINAL_RESULTS state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "FINAL_RESULTS"
+    Received: undefined
+
+      182 |   adminQuizSessionProgress(token, quizId, sessionId, 'GO_TO_ANSWER');
+      183 |   adminQuizSessionProgress(token, quizId, sessionId, 'GO_TO_FINAL_RESULTS');
+    > 184 |   expect(getSessionState(token, quizId, sessionId)).toBe('FINAL_RESULTS');
+          |                                                     ^
+      185 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+      186 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      187 |   const res = playerQuestionAnswer(playerId, 1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:184:53)
+
+FAIL httpTests/player/playerStatus.test.ts
+  ● Successful status - LOBBY
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      47 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      48 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 49 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      50 |   playerId = playerJoin(sessionId, NAME).playerId;
+      51 | });
+      52 |
+
+      at Object.<anonymous> (httpTests/player/playerStatus.test.ts:49:71)
+
+  ● Successful status - QUESTION_COUNTDOWN
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      47 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      48 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 49 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      50 |   playerId = playerJoin(sessionId, NAME).playerId;
+      51 | });
+      52 |
+
+      at Object.<anonymous> (httpTests/player/playerStatus.test.ts:49:71)
+
+  ● Successful status - QUESTION_OPEN
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      47 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      48 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 49 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      50 |   playerId = playerJoin(sessionId, NAME).playerId;
+      51 | });
+      52 |
+
+      at Object.<anonymous> (httpTests/player/playerStatus.test.ts:49:71)
+
+  ● Successful status - QUESTION_CLOSE
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      47 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      48 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 49 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      50 |   playerId = playerJoin(sessionId, NAME).playerId;
+      51 | });
+      52 |
+
+      at Object.<anonymous> (httpTests/player/playerStatus.test.ts:49:71)
+
+  ● Successful status - ANSWER_SHOW
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      47 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      48 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 49 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      50 |   playerId = playerJoin(sessionId, NAME).playerId;
+      51 | });
+      52 |
+
+      at Object.<anonymous> (httpTests/player/playerStatus.test.ts:49:71)
+
+  ● Successful status - FINAL_RESULTS
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      47 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      48 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 49 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      50 |   playerId = playerJoin(sessionId, NAME).playerId;
+      51 | });
+      52 |
+
+      at Object.<anonymous> (httpTests/player/playerStatus.test.ts:49:71)
+
+  ● Successful status - END
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      47 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      48 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 49 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      50 |   playerId = playerJoin(sessionId, NAME).playerId;
+      51 | });
+      52 |
+
+      at Object.<anonymous> (httpTests/player/playerStatus.test.ts:49:71)
+
+  ● Unsuccessful player status - playerId does not exist
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      47 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      48 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 49 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      50 |   playerId = playerJoin(sessionId, NAME).playerId;
+      51 | });
+      52 |
+
+      at Object.<anonymous> (httpTests/player/playerStatus.test.ts:49:71)
+
+FAIL httpTests/player/playerQuestionResults.test.ts
+  ● Successful particular question results for players - single player single answer correct
+
+    TypeError: answers is not iterable
+
+      84 |   }
+      85 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 86 |   for (const answer of answers) {
+         |                        ^
+      87 |     if (answer.answer === "Prince Charles") {
+      88 |       answerIds.push(answer.answerId);
+      89 |     }
+
+      at Object.<anonymous> (httpTests/player/playerQuestionResults.test.ts:86:24)
+
+  ● Successful particular question results for players - two players single answer correct
+
+    TypeError: answers is not iterable
+
+      114 |   }
+      115 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 116 |   for (const answer of answers) {
+          |                        ^
+      117 |     if (answer.answer === "Prince Charles") {
+      118 |       answerIds.push(answer.answerId);
+      119 |     }
+
+      at Object.<anonymous> (httpTests/player/playerQuestionResults.test.ts:116:24)
+
+  ● Successful particular question results for players - single player multiple answers correct
+
+    TypeError: answers is not iterable
+
+      146 |   }
+      147 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 148 |   for (const answer of answers) {
+          |                        ^
+      149 |     if (answer.answer === "Prince Charles") {
+      150 |       answerIds.push(answer.answerId);
+      151 |     }
+
+      at Object.<anonymous> (httpTests/player/playerQuestionResults.test.ts:148:24)
+
+  ● Successful particular question results for players - two players multiple answers correct
+
+    TypeError: answers is not iterable
+
+      196 |   }
+      197 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 198 |   for (const answer of answers) {
+          |                        ^
+      199 |     if (answer.answer === "Prince Charles") {
+      200 |       answerIds.push(answer.answerId);
+      201 |     }
+
+      at Object.<anonymous> (httpTests/player/playerQuestionResults.test.ts:198:24)
+
+  ● Unsuccessful particular question results for players - playerId does not exist
+
+    TypeError: answers is not iterable
+
+      249 |   }
+      250 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 251 |   for (const answer of answers) {
+          |                        ^
+      252 |     if (answer.answer === "Prince Charles") {
+      253 |       answerIds.push(answer.answerId);
+      254 |     }
+
+      at Object.<anonymous> (httpTests/player/playerQuestionResults.test.ts:251:24)
+
+  ● Unsuccessful particular question results for players - questionId does not exist
+
+    TypeError: answers is not iterable
+
+      267 |   }
+      268 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 269 |   for (const answer of answers) {
+          |                        ^
+      270 |     if (answer.answer === "Prince Charles") {
+      271 |       answerIds.push(answer.answerId);
+      272 |     }
+
+      at Object.<anonymous> (httpTests/player/playerQuestionResults.test.ts:269:24)
+
+  ● Unsuccessful particular question results for players - session not up to question yet
+
+    TypeError: answers is not iterable
+
+      285 |   }
+      286 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 287 |   for (const answer of answers) {
+          |                        ^
+      288 |     if (answer.answer === "Prince Charles") {
+      289 |       answerIds.push(answer.answerId);
+      290 |     }
+
+      at Object.<anonymous> (httpTests/player/playerQuestionResults.test.ts:287:24)
+
+FAIL httpTests/adminQuizSession/adminQuizSessionStatus.test.ts
+  ● Test successful session status, before quiz in progress
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status, quiz in progress, question 2
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status, single quiz ended
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status, single quiz in final results
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status with quiz name update during doesnt affect session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status with quiz description update during doesnt affect session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status with quiz thumbnail add during doesnt affect session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status with new session created during during doesnt affect session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status with question edit during doesnt affect session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status with question delete during doesnt affect session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status with question add during doesnt affect session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test quizId invalid error, cannot progress session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test unauthorised quiz to progress session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test invalid token session, session to progress
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+FAIL httpTests/adminQuizSession/adminQuizSessionResults.test.ts
+  ● Successful final results for whole session - admin with one player
+
+    TypeError: Cannot read properties of undefined (reading 'answers')
+
+      78 |     continue;
+      79 |   }
+    > 80 |   const getAnswers = adminQuizInfo(token, quizId).questions[0].answers;
+         |                                                               ^
+      81 |   const answers = getAnswers.filter((a) => a.answer === "Prince Charles");
+      82 |   const answerIds = answers.map((a) => a.answerId);
+      83 |   expect(getSessionState(token, quizId, sessionId)).toStrictEqual('QUESTION_OPEN')
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionResults.test.ts:80:63)
+
+  ● Successful final results for whole session - admin with 2 players
+
+    TypeError: Cannot read properties of undefined (reading 'answers')
+
+      150 |     continue;
+      151 |   }
+    > 152 |   const getAnswers = adminQuizInfo(token, quizId).questions[0].answers;
+          |                                                               ^
+      153 |   const answers = getAnswers.filter((a) => a.answer === "Prince Charles");
+      154 |   const answerIds = answers.map((a) => a.answerId);
+      155 |   expect(getSessionState(token, quizId, sessionId)).toStrictEqual('QUESTION_OPEN')
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionResults.test.ts:152:63)
+
+FAIL httpTests/adminQuiz/adminQuizThumbnail.test.ts
+  ● Test successful quiz thumnail change, jpg
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "http://127.0.0.1:48237/"
+    Received string:    "http://localhost:48237/static/674661553.jpg"
+
+      23 |   expect(res).toStrictEqual({});
+      24 |   const quiz = adminQuizInfo(token, quizId);
+    > 25 |   expect(quiz.thumbnailUrl).toContain(`${url}:${port}/`);
+         |                             ^
+      26 | });
+      27 |
+      28 | iter3test('Test successful quiz thumnail change, png', () => {
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizThumbnail.test.ts:25:29)
+
+  ● Test successful quiz thumnail change, png
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "http://127.0.0.1:48237/"
+    Received string:    "http://localhost:48237/static/938328326.png"
+
+      31 |   expect(res).toStrictEqual({});
+      32 |   const quiz = adminQuizInfo(token, quizId);
+    > 33 |   expect(quiz.thumbnailUrl).toContain(`${url}:${port}/`);
+         |                             ^
+      34 | });
+      35 |
+      36 | iter3test('Test unsuccessful quiz thumnail change - invalid imgUrl, non JPEG ', () => {
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizThumbnail.test.ts:33:29)
+
+FAIL httpTests/player/playerResults.test.ts
+  ● Successful final results for whole session - player 1
+
+    TypeError: answers is not iterable
+
+      81 |   }
+      82 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 83 |   for (const answer of answers) {
+         |                        ^
+      84 |     if (answer.answer === "Prince Charles") {
+      85 |       answerIds.push(answer.answerId);
+      86 |     }
+
+      at Object.<anonymous> (httpTests/player/playerResults.test.ts:83:24)
+
+  ● Successful final results for whole session - player 2
+
+    TypeError: answers is not iterable
+
+      159 |   }
+      160 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 161 |   for (const answer of answers) {
+          |                        ^
+      162 |     if (answer.answer === "Prince Charles") {
+      163 |       answerIds.push(answer.answerId);
+      164 |     }
+
+      at Object.<anonymous> (httpTests/player/playerResults.test.ts:161:24)
+
+FAIL httpTests/player/playerPostChat.test.ts
+  ● Successful for one message, same player - chat post
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      56 |   // TODO get unix timestamp
+      57 |   const timestamp = Math.round(Date.now() / 1000);
+    > 58 |   expect(res).toStrictEqual({});
+         |               ^
+      59 |   const message = playerGetChat(playerId);
+      60 |   expect(message.messages[0]).toStrictEqual({
+      61 |     messageBody,
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:58:15)
+
+  ● Successful for multiple messages, same player, same body - chat post
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      71 |   const msg2 = playerPostChat(playerId, messageBody);
+      72 |   const timestamp = Math.round(Date.now() / 1000);
+    > 73 |   expect(msg1).toStrictEqual({});
+         |                ^
+      74 |   expect(msg2).toStrictEqual({});
+      75 |   const message = playerGetChat(playerId);
+      76 |   expect(message.messages[0]).toStrictEqual({
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:73:16)
+
+  ● Successful for multiple messages, different players - chat post
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+       95 |   const msg2 = playerPostChat(playerId2, messageBody);
+       96 |   const timestamp = Math.round(Date.now() / 1000);
+    >  97 |   expect(msg1).toStrictEqual({});
+          |                ^
+       98 |   expect(msg2).toStrictEqual({});
+       99 |   const message = playerGetChat(playerId);
+      100 |   expect(message.messages[0]).toStrictEqual({
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:97:16)
+
+  ● Invalid messageBody after a valid one - chat post
+
+    TypeError: Cannot read properties of undefined (reading 'length')
+
+      134 |   expect(res).toBe(400);
+      135 |   const message = playerGetChat(playerId);
+    > 136 |   expect(message.messages.length).toBe(1);
+          |                           ^
+      137 |   expect(message.messages[0]).toStrictEqual({
+      138 |     messageBody,
+      139 |     playerId,
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:136:27)
+
+FAIL httpTests/adminQuiz/adminQuizQuestionDuplicate.test.ts
+  ● Successful quiz question duplicate
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {"newQuestionId": Any<Number>}
+    Received: 400
+
+      42 | test('Successful quiz question duplicate', () => {
+      43 |   const res = adminQuizQuestionDuplicate(token, quizId, questionId);
+    > 44 |   expect(res).toStrictEqual({ newQuestionId: expect.any(Number)} );
+         |               ^
+      45 |   const quiz = adminQuizInfo(token, quizId);
+      46 |   expect(quiz.questions.length).toEqual(2);
+      47 |   expect(quiz.questions[1].questionId).not.toEqual(questionId);
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQuestionDuplicate.test.ts:44:15)
+
+FAIL httpTests/player/playerGetChat.test.ts
+  ● Successful get chat - conversation fetched by player 2
+
+    TypeError: Cannot read properties of undefined (reading '0')
+
+      60 |   const timestamp = Math.round(Date.now() / 1000);
+      61 |   const message = playerGetChat(playerId2);
+    > 62 |   expect(message.messages[0]).toStrictEqual({
+         |                          ^
+      63 |     messageBody,
+      64 |     playerId: playerId1,
+      65 |     playerName: playerName1,
+
+      at Object.<anonymous> (httpTests/player/playerGetChat.test.ts:62:26)
+
+  ● Messages from other sessions player isnt in arent returned - chat get for playerId1
+
+    TypeError: Cannot read properties of undefined (reading '0')
+
+      82 |   const timestamp = Math.round(Date.now() / 1000);
+      83 |   const message = playerGetChat(playerId1);
+    > 84 |   expect(message.messages[0]).toStrictEqual({
+         |                          ^
+      85 |     messageBody,
+      86 |     playerId: playerId1,
+      87 |     playerName: playerName1,
+
+      at Object.<anonymous> (httpTests/player/playerGetChat.test.ts:84:26)
+
+FAIL httpTests/adminQuiz/adminQuizQUestionEdit.test.ts
+  ● Test successful question edit
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      64 | test('Test successful question edit', () => {
+      65 |   const res = adminQuizQuestionEdit(token, quizId, questionId, { question, duration, points, answers });
+    > 66 |   expect(res).toStrictEqual({});
+         |               ^
+      67 |   const quiz = adminQuizInfo(token, quizId);
+      68 |   expect(quiz.questions.length).toEqual(1);
+      69 |   expect(quiz.questions[0].questionId).toEqual(questionId);
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQUestionEdit.test.ts:66:15)
+
+  ● Test successful question edit - multiple correct
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      102 |     }
+      103 |   ]});
+    > 104 |   expect(res).toStrictEqual({});
+          |               ^
+      105 |   const quiz = adminQuizInfo(token, quizId);
+      106 |   for (let answer of quiz.questions[0].answers) {
+      107 |     expect(colours).toContain(answer.colour);
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQUestionEdit.test.ts:104:15)
+
+FAIL httpTests/adminQuiz/adminQuizQuestionAdd.test.ts
+  ● Test successful question add - all details are correctly stored and retrieved by quiz info
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: Any<Number>
+    Received: undefined
+
+      38 | test('Test successful question add - all details are correctly stored and retrieved by quiz info', () => {
+      39 |   const questionId = adminQuizQuestionAdd(token, quizId, { question, duration, points, answers } ).questionId;
+    > 40 |   expect(questionId).toStrictEqual(expect.any(Number));
+         |                      ^
+      41 |   const quiz = adminQuizInfo(token, quizId);
+      42 |   expect(quiz.questions.length).toEqual(1);
+      43 |   expect(quiz.questions[0].questionId).toEqual(questionId);
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQuestionAdd.test.ts:40:22)
+
+  ● Test successful question add - multiple correct
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: Any<Number>
+    Received: undefined
+
+      76 |     }
+      77 |   ]} ).questionId;
+    > 78 |   expect(questionId).toStrictEqual(expect.any(Number));
+         |                      ^
+      79 |   const quiz = adminQuizInfo(token, quizId);
+      80 |   for (let answer of quiz.questions[0].answers) {
+      81 |     expect(colours).toContain(answer.colour);
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQuestionAdd.test.ts:78:22)
+
+  ● Test unsuccessful question add - question duration too long with another questin
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: 400
+    Received: 500
+
+      185 |   adminQuizQuestionAdd(token, quizId, { question, duration: 100, points, answers } );
+      186 |   const res = adminQuizQuestionAdd(token, quizId, { question, duration: 81, points, answers } );
+    > 187 |   expect(res).toStrictEqual(400);
+          |               ^
+      188 | });
+      189 |
+      190 | test('Test unsuccessful question add - question answer less than 1', () => {
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQuestionAdd.test.ts:187:15)
+
+FAIL httpTests/adminQuizSession/adminQuizSessionStart.test.ts
+  ● Test successful session start, quiz with questions
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: Any<Number>
+    Received: undefined
+
+      50 | iter3test('Test successful session start, quiz with questions', () => {
+      51 |   const sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 52 |   expect(sessionId).toStrictEqual(expect.any(Number));
+         |                     ^
+      53 |   const status = adminQuizSessionStatus(token, quizId, sessionId);
+      54 |   expect(status.state).toBe("LOBBY");
+      55 |   expect(status.metadata.questions[0].questionId).toBe(questionId1);
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStart.test.ts:52:21)
+
+  ● Test successful session start, same quiz twice, different sessions
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: Any<Number>
+    Received: undefined
+
+      60 |   const sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+      61 |   const sessionId2 = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 62 |   expect(sessionId).toStrictEqual(expect.any(Number));
+         |                     ^
+      63 |   expect(sessionId2).toStrictEqual(expect.any(Number));
+      64 |   expect(sessionId).not.toBe(sessionId2);
+      65 |   expect(getSessionState(token, quizId, sessionId)).toBe("LOBBY");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStart.test.ts:62:21)
+
+  ● Test successful session start, two different quizzes, different sessions
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: Any<Number>
+    Received: undefined
+
+      70 |   const sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+      71 |   const sessionId2 = adminQuizSessionStart(token, quizId2, autoStartNum).sessionId;
+    > 72 |   expect(sessionId).toStrictEqual(expect.any(Number));
+         |                     ^
+      73 |   expect(sessionId2).toStrictEqual(expect.any(Number));
+      74 |   expect(sessionId).not.toBe(sessionId2);
+      75 |   expect(getSessionState(token, quizId, sessionId)).toBe("LOBBY");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStart.test.ts:72:21)
+
+  ● Test successful session progress to question after autostart time ends
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: "QUESTION_COUNTDOWN"
+    Received: undefined
+
+      100 |   playerJoin(sessionId, 'Yuchao');
+      101 |   playerJoin(sessionId, 'Giuliana');
+    > 102 |   expect(getSessionState(token, quizId, sessionId)).toStrictEqual("QUESTION_COUNTDOWN");
+          |                                                     ^
+      103 | });
+      104 |
+      105 | /* iter3test('Test invalid token structure, quiz to read', () => {
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStart.test.ts:102:53)
+
+PASS httpTests/adminAuth/adminAuthRegister.test.ts
+PASS httpTests/adminUser/adminUserDetailsPut.test.ts
+PASS httpTests/adminQuiz/adminQuizTrashEmpty.test.ts
+FAIL httpTests/adminQuiz/adminQuizQuestionDelete.test.ts
+  ● Successful quiz question delete
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      40 | test('Successful quiz question delete', () => {
+      41 |   const res = adminQuizQuestionDelete(token, quizId, questionId);
+    > 42 |   expect(res).toStrictEqual({});
+         |               ^
+      43 |   const questions = adminQuizInfo(token, quizId).questions;
+      44 |   expect(questions).not.toContain(question)
+      45 |
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQuestionDelete.test.ts:42:15)
+
+FAIL httpTests/adminQuiz/adminQuizQuestionMove.test.ts
+  ● Successful quiz question move
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      44 |   adminQuizQuestionDuplicate(token, quizId, questionId);
+      45 |   const res = adminQuizQuestionMove(token, quizId, questionId, newPosition);
+    > 46 |   expect(res).toStrictEqual({});
+         |               ^
+      47 |   const quizInfo = adminQuizInfo(token, quizId);
+      48 |   expect(quizInfo.questions[newPosition].questionId).toEqual(questionId);
+      49 |   expect(quizInfo.questions[newPosition].question).toEqual(question.question);
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQuestionMove.test.ts:46:15)
+
+PASS httpTests/adminQuiz/adminQuizList.test.ts
+PASS httpTests/adminQuiz/adminQuizTransfer.test.ts
+PASS httpTests/adminQuiz/adminQuizNameUpdate.test.ts
+PASS httpTests/adminQuiz/adminQuizDescriptionUpdate.test.ts
+PASS httpTests/adminQuiz/adminQuizTrash.test.ts
+FAIL httpTests/adminAuth/adminAuthLogout.test.ts
+  ● token is for a user who has already logged out
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: 400
+    Received: 403
+
+      30 |   adminAuthLogout(token);
+      31 |   const res = adminAuthLogout(token);
+    > 32 |   expect(res).toStrictEqual(400);
+         |               ^
+      33 | });
+      34 |
+      35 | test('Cant perform action after logout', () => {
+
+      at Object.<anonymous> (httpTests/adminAuth/adminAuthLogout.test.ts:32:15)
+
+PASS httpTests/adminUser/adminUserDetails.test.ts
+PASS httpTests/adminQuiz/adminQuizInfo.test.ts
+PASS httpTests/adminQuiz/adminQuizDelete.test.ts
+PASS httpTests/adminQuiz/adminQuizRestore.test.ts
+PASS httpTests/adminQuiz/adminQuizNew.test.ts
+FAIL httpTests/player/playerJoin.test.ts
+  ● Successful player join
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      46 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      47 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 48 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      49 | });
+      50 |
+      51 | iter3test('Successful player join', () => {
+
+      at Object.<anonymous> (httpTests/player/playerJoin.test.ts:48:71)
+
+  ● Successful second player join
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      46 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      47 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 48 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      49 | });
+      50 |
+      51 | iter3test('Successful player join', () => {
+
+      at Object.<anonymous> (httpTests/player/playerJoin.test.ts:48:71)
+
+  ● Unsuccessful player join - session not in LOBBY state
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      46 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      47 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 48 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      49 | });
+      50 |
+      51 | iter3test('Successful player join', () => {
+
+      at Object.<anonymous> (httpTests/player/playerJoin.test.ts:48:71)
+
+  ● Unsuccessful second player join - name is not unique
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      46 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      47 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 48 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      49 | });
+      50 |
+      51 | iter3test('Successful player join', () => {
+
+      at Object.<anonymous> (httpTests/player/playerJoin.test.ts:48:71)
+
+PASS httpTests/adminUser/adminUserPassword.test.ts
+PASS httpTests/adminAuth/adminAuthLogin.test.ts
+PASS httpTests/other/clear.test.ts
+
+Summary of all failing tests
+FAIL httpTests/adminQuizSession/adminQuizSessionProgress.test.ts
+  ● Test successful session progress, NEXT_QUESTION, first question
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: "LOBBY"
+    Received: undefined
+
+      64 | iter3test('Test successful session progress, NEXT_QUESTION, first question', () => {
+      65 |   // checks if in countdown state, before autoStart expires
+    > 66 |   expect(getSessionState(token, quizId, sessionId)).toStrictEqual("LOBBY");
+         |                                                     ^
+      67 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+      68 |   expect(res).toStrictEqual({});
+      69 |   expect(getSessionState(token, quizId, sessionId)).toStrictEqual("QUESTION_COUNTDOWN");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:66:53)
+
+  ● Test successful session progress, NEXT_QUESTION with 2 questions
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: "QUESTION_COUNTDOWN"
+    Received: undefined
+
+      78 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      79 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+    > 80 |   expect(getSessionState(token, quizId, sessionId)).toStrictEqual("QUESTION_COUNTDOWN");
+         |                                                     ^
+      81 |   expect(res).toStrictEqual({});
+      82 | });
+      83 |
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:80:53)
+
+  ● Test successful session progress, QUESTION_OPEN state
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      85 |   // checks if in countdown state ended and in question open state
+      86 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+    > 87 |   expect(res).toStrictEqual({});
+         |               ^
+      88 |   while (getSessionState(token, quizId, sessionId) === 'QUESTION_COUNTDOWN') {
+      89 |     continue;
+      90 |   }
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:87:15)
+
+  ● Test successful session progress, QUESTION_CLOSE state after timeout
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+       95 |   // checks if in question close state after duration ends
+       96 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+    >  97 |   expect(res).toStrictEqual({});
+          |               ^
+       98 |   while (getSessionState(token, quizId, sessionId) === 'QUESTION_COUNTDOWN') {
+       99 |     continue;
+      100 |   }
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:97:15)
+
+  ● Test successful session progress, GO_TO_ANSWER
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      112 |   }
+      113 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+    > 114 |   expect(res).toStrictEqual({});
+          |               ^
+      115 |   expect(getSessionState(token, quizId, sessionId)).toBe("ANSWER_SHOW");
+      116 | });
+      117 |
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:114:15)
+
+  ● Test successful session progress, GO_TO_FINAL_RESULTS
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      122 |     continue;
+      123 |   }
+    > 124 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      125 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      126 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+      127 |   while (getSessionState(token, quizId, sessionId) === 'QUESTION_COUNTDOWN') {
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:124:53)
+
+  ● Test successful session progress, END
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      153 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_FINAL_RESULTS");
+      154 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "END");
+    > 155 |   expect(res).toStrictEqual({});
+          |               ^
+      156 |   expect(getSessionState(token, quizId, sessionId)).toBe("END");
+      157 | });
+      158 |
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:155:15)
+
+  ● Test unsuccessful session progress, cant go to next question while QUESTION_OPEN
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      168 |     continue;
+      169 |   }
+    > 170 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      171 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+      172 |   expect(res).toBe(400);
+      173 | });
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:170:53)
+
+  ● Test unsuccessful session progress, cant go to next question while FINAL_RESULTS
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      178 |     continue;
+      179 |   }
+    > 180 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      181 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      182 |   expect(getSessionState(token, quizId, sessionId)).toBe("ANSWER_SHOW");
+      183 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:180:53)
+
+  ● Test unsuccessful session progress, cant go to next question while END
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      199 |     continue;
+      200 |   }
+    > 201 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      202 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      203 |   expect(getSessionState(token, quizId, sessionId)).toBe("ANSWER_SHOW");
+      204 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:201:53)
+
+  ● Test unsuccessful session progress, cant go to answer while LOBBY
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "LOBBY"
+    Received: undefined
+
+      217 |
+      218 | iter3test('Test unsuccessful session progress, cant go to answer while LOBBY', () => {
+    > 219 |   expect(getSessionState(token, quizId, sessionId)).toBe("LOBBY");
+          |                                                     ^
+      220 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      221 |   expect(res).toBe(400);
+      222 | });
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:219:53)
+
+  ● Test unsuccessful session progress, cant go to answer while QUESTION_COUNTDOWN
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_COUNTDOWN"
+    Received: undefined
+
+      224 | iter3test('Test unsuccessful session progress, cant go to answer while QUESTION_COUNTDOWN', () => {
+      225 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+    > 226 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_COUNTDOWN");
+          |                                                     ^
+      227 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      228 |   expect(res).toBe(400);
+      229 | });
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:226:53)
+
+  ● Test unsuccessful session progress, cant go to answer while FINAL_RESULTS
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      234 |     continue;
+      235 |   }
+    > 236 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      237 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      238 |   expect(getSessionState(token, quizId, sessionId)).toBe("ANSWER_SHOW");
+      239 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:236:53)
+
+  ● Test unsuccessful session progress, cant go to answer while END
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      255 |     continue;
+      256 |   }
+    > 257 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      258 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      259 |   expect(getSessionState(token, quizId, sessionId)).toBe("ANSWER_SHOW");
+      260 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:257:53)
+
+  ● Test unsuccessful session progress, cant go to answer while ANSWER_SHOW
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      279 |     continue;
+      280 |   }
+    > 281 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      282 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      283 |   expect(getSessionState(token, quizId, sessionId)).toBe("ANSWER_SHOW");
+      284 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:281:53)
+
+  ● Test unsuccessful session progress, cant go to final results while LOBBY
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "LOBBY"
+    Received: undefined
+
+      287 |
+      288 | iter3test('Test unsuccessful session progress, cant go to final results while LOBBY', () => {
+    > 289 |   expect(getSessionState(token, quizId, sessionId)).toBe("LOBBY");
+          |                                                     ^
+      290 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_FINAL_RESULTS");
+      291 |   expect(res).toBe(400);
+      292 | });
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:289:53)
+
+  ● Test unsuccessful session progress, cant go to final results while QUESTION_COUNTDOWN
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_COUNTDOWN"
+    Received: undefined
+
+      294 | iter3test('Test unsuccessful session progress, cant go to final results while QUESTION_COUNTDOWN', () => {
+      295 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+    > 296 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_COUNTDOWN");
+          |                                                     ^
+      297 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_FINAL_RESULTS");
+      298 |   expect(res).toBe(400);
+      299 | });
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:296:53)
+
+  ● Test unsuccessful session progress, cant go to final results while QUESTION_OPEN, one question left
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      304 |     continue;
+      305 |   }
+    > 306 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      307 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_FINAL_RESULTS");
+      308 |   expect(res).toBe(400);
+      309 | });
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:306:53)
+
+  ● Test unsuccessful session progress, cant go to final results while QUESTION_OPEN, no questions left
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      314 |     continue;
+      315 |   }
+    > 316 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      317 |   const res = adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_FINAL_RESULTS");
+      318 |   expect(res).toBe(400);
+      319 | });
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:316:53)
+
+  ● Test unsuccessful session progress, cant go to final results while END
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      335 |     continue;
+      336 |   }
+    > 337 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      338 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      339 |   expect(getSessionState(token, quizId, sessionId)).toBe("ANSWER_SHOW");
+      340 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:337:53)
+
+  ● Test unsuccessful session progress, cant go to final results while in FINAL_RESULTS
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      359 |     continue;
+      360 |   }
+    > 361 |   expect(getSessionState(token, quizId, sessionId)).toBe("QUESTION_OPEN");
+          |                                                     ^
+      362 |   adminQuizSessionProgress(token, quizId, sessionId, "GO_TO_ANSWER");
+      363 |   expect(getSessionState(token, quizId, sessionId)).toBe("ANSWER_SHOW");
+      364 |   adminQuizSessionProgress(token, quizId, sessionId, "NEXT_QUESTION");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionProgress.test.ts:361:53)
+
+FAIL httpTests/player/playerQuestionData.test.ts
+  ● Successful question information for player - first question
+
+    TypeError: Cannot read properties of undefined (reading 'answers')
+
+      110 |   const quiz = adminQuizInfo(token, quizId);
+      111 |   const answerInfo: any[] = [];
+    > 112 |   for (let answer of quiz.questions[0].answers) {
+          |                                        ^
+      113 |     answerInfo.push({
+      114 |       answerId: answer.answerId,
+      115 |       answer: answer.answer,
+
+      at Object.<anonymous> (httpTests/player/playerQuestionData.test.ts:112:40)
+
+  ● Successful question information for player - last question
+
+    TypeError: Cannot read properties of undefined (reading 'answers')
+
+      142 |   const quiz = adminQuizInfo(token, quizId);
+      143 |   const answerInfo: any[] = [];
+    > 144 |   for (let answer of quiz.questions[1].answers) {
+          |                                        ^
+      145 |     answerInfo.push({
+      146 |       answerId: answer.answerId,
+      147 |       answer: answer.answer,
+
+      at Object.<anonymous> (httpTests/player/playerQuestionData.test.ts:144:40)
+
+  ● Successful question information for player - question edit has no impact
+
+    TypeError: Cannot read properties of undefined (reading 'answers')
+
+      169 |   const res = playerQuestionData(playerId, 1);
+      170 |   const answerInfo: any[] = [];
+    > 171 |   for (let answer of quiz.questions[0].answers) {
+          |                                        ^
+      172 |     answerInfo.push({
+      173 |       answerId: answer.answerId,
+      174 |       answer: answer.answer,
+
+      at Object.<anonymous> (httpTests/player/playerQuestionData.test.ts:171:40)
+
+  ● Successful question information for player - different players get the same info
+
+    TypeError: Cannot read properties of undefined (reading 'answers')
+
+      196 |   const quiz = adminQuizInfo(token, quizId);
+      197 |   const answerInfo: any[] = [];
+    > 198 |   for (let answer of quiz.questions[0].answers) {
+          |                                        ^
+      199 |     answerInfo.push({
+      200 |       answerId: answer.answerId,
+      201 |       answer: answer.answer,
+
+      at Object.<anonymous> (httpTests/player/playerQuestionData.test.ts:198:40)
+
+FAIL httpTests/player/playerQuestionAnswer.test.ts
+  ● Test successful question answer for single player
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      54 |     continue;
+      55 |   }
+    > 56 |   expect(getSessionState(token, quizId, sessionId)).toBe('QUESTION_OPEN');
+         |                                                     ^
+      57 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+      58 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      59 |   playerQuestionAnswer(playerId, 1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:56:53)
+
+  ● Test successful re-submission of question answer for single player
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      65 |     continue;
+      66 |   }
+    > 67 |   expect(getSessionState(token, quizId, sessionId)).toBe('QUESTION_OPEN');
+         |                                                     ^
+      68 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+      69 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      70 |   playerQuestionAnswer(playerId, 1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:67:53)
+
+  ● Test successful question answer for two players
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      83 |     continue;
+      84 |   }
+    > 85 |   expect(getSessionState(token, quizId, sessionId)).toBe('QUESTION_OPEN');
+         |                                                     ^
+      86 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+      87 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      88 |   playerQuestionAnswer(playerId, 1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:85:53)
+
+  ● Test unsuccessful question answer - playerId does not exist
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+       95 |     continue;
+       96 |   }
+    >  97 |   expect(getSessionState(token, quizId, sessionId)).toBe('QUESTION_OPEN');
+          |                                                     ^
+       98 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+       99 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      100 |   const res = playerQuestionAnswer(playerId+1, 1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:97:53)
+
+  ● Test unsuccessful question answer - questionId not valid for session player is in
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      107 |     continue;
+      108 |   }
+    > 109 |   expect(getSessionState(token, quizId, sessionId)).toBe('QUESTION_OPEN');
+          |                                                     ^
+      110 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+      111 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      112 |   const res = playerQuestionAnswer(playerId, 1+1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:109:53)
+
+  ● Test unsuccessful question answer - session in END state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_OPEN"
+    Received: undefined
+
+      125 |     continue;
+      126 |   }
+    > 127 |   expect(getSessionState(token, quizId, sessionId)).toBe('QUESTION_OPEN');
+          |                                                     ^
+      128 |   adminQuizSessionProgress(token, quizId, sessionId, 'GO_TO_ANSWER');
+      129 |   expect(getSessionState(token, quizId, sessionId)).toBe('ANSWER_SHOW');
+      130 |   adminQuizSessionProgress(token, quizId, sessionId, 'GO_TO_FINAL_RESULTS');
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:127:53)
+
+  ● Test unsuccessful question answer - session in QUESTION_COUNTDOWN state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_COUNTDOWN"
+    Received: undefined
+
+      140 | iter3test('Test unsuccessful question answer - session in QUESTION_COUNTDOWN state', () => {
+      141 |   adminQuizSessionProgress(token, quizId, sessionId, 'NEXT_QUESTION');
+    > 142 |   expect(getSessionState(token, quizId, sessionId)).toBe('QUESTION_COUNTDOWN');
+          |                                                     ^
+      143 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+      144 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      145 |   const res = playerQuestionAnswer(playerId, 1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:142:53)
+
+  ● Test unsuccessful question answer - session in QUESTION_CLOSE state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "QUESTION_CLOSE"
+    Received: undefined
+
+      155 |     continue;
+      156 |   }
+    > 157 |   expect(getSessionState(token, quizId, sessionId)).toBe('QUESTION_CLOSE');
+          |                                                     ^
+      158 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+      159 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      160 |   const res = playerQuestionAnswer(playerId, 1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:157:53)
+
+  ● Test unsuccessful question answer - session in ANSWER_SHOW state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "ANSWER_SHOW"
+    Received: undefined
+
+      168 |   }
+      169 |   adminQuizSessionProgress(token, quizId, sessionId, 'GO_TO_ANSWER');
+    > 170 |   expect(getSessionState(token, quizId, sessionId)).toBe('ANSWER_SHOW');
+          |                                                     ^
+      171 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+      172 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      173 |   const res = playerQuestionAnswer(playerId, 1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:170:53)
+
+  ● Test unsuccessful question answer - session in FINAL_RESULTS state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "FINAL_RESULTS"
+    Received: undefined
+
+      182 |   adminQuizSessionProgress(token, quizId, sessionId, 'GO_TO_ANSWER');
+      183 |   adminQuizSessionProgress(token, quizId, sessionId, 'GO_TO_FINAL_RESULTS');
+    > 184 |   expect(getSessionState(token, quizId, sessionId)).toBe('FINAL_RESULTS');
+          |                                                     ^
+      185 |   const answers = adminQuizInfo(token, quizId).questions[0].answers;
+      186 |   const answerIds = answers.filter((a) => a.answer === "Prince Charles");
+      187 |   const res = playerQuestionAnswer(playerId, 1, answerIds);
+
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:184:53)
+
+FAIL httpTests/player/playerStatus.test.ts
+  ● Successful status - LOBBY
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      47 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      48 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 49 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      50 |   playerId = playerJoin(sessionId, NAME).playerId;
+      51 | });
+      52 |
+
+      at Object.<anonymous> (httpTests/player/playerStatus.test.ts:49:71)
+
+  ● Successful status - QUESTION_COUNTDOWN
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      47 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      48 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 49 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      50 |   playerId = playerJoin(sessionId, NAME).playerId;
+      51 | });
+      52 |
+
+      at Object.<anonymous> (httpTests/player/playerStatus.test.ts:49:71)
+
+  ● Successful status - QUESTION_OPEN
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      47 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      48 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 49 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      50 |   playerId = playerJoin(sessionId, NAME).playerId;
+      51 | });
+      52 |
+
+      at Object.<anonymous> (httpTests/player/playerStatus.test.ts:49:71)
+
+  ● Successful status - QUESTION_CLOSE
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      47 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      48 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 49 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      50 |   playerId = playerJoin(sessionId, NAME).playerId;
+      51 | });
+      52 |
+
+      at Object.<anonymous> (httpTests/player/playerStatus.test.ts:49:71)
+
+  ● Successful status - ANSWER_SHOW
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      47 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      48 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 49 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      50 |   playerId = playerJoin(sessionId, NAME).playerId;
+      51 | });
+      52 |
+
+      at Object.<anonymous> (httpTests/player/playerStatus.test.ts:49:71)
+
+  ● Successful status - FINAL_RESULTS
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      47 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      48 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 49 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      50 |   playerId = playerJoin(sessionId, NAME).playerId;
+      51 | });
+      52 |
+
+      at Object.<anonymous> (httpTests/player/playerStatus.test.ts:49:71)
+
+  ● Successful status - END
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      47 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      48 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 49 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      50 |   playerId = playerJoin(sessionId, NAME).playerId;
+      51 | });
+      52 |
+
+      at Object.<anonymous> (httpTests/player/playerStatus.test.ts:49:71)
+
+  ● Unsuccessful player status - playerId does not exist
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      47 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      48 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 49 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      50 |   playerId = playerJoin(sessionId, NAME).playerId;
+      51 | });
+      52 |
+
+      at Object.<anonymous> (httpTests/player/playerStatus.test.ts:49:71)
+
+FAIL httpTests/player/playerQuestionResults.test.ts
+  ● Successful particular question results for players - single player single answer correct
+
+    TypeError: answers is not iterable
+
+      84 |   }
+      85 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 86 |   for (const answer of answers) {
+         |                        ^
+      87 |     if (answer.answer === "Prince Charles") {
+      88 |       answerIds.push(answer.answerId);
+      89 |     }
+
+      at Object.<anonymous> (httpTests/player/playerQuestionResults.test.ts:86:24)
+
+  ● Successful particular question results for players - two players single answer correct
+
+    TypeError: answers is not iterable
+
+      114 |   }
+      115 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 116 |   for (const answer of answers) {
+          |                        ^
+      117 |     if (answer.answer === "Prince Charles") {
+      118 |       answerIds.push(answer.answerId);
+      119 |     }
+
+      at Object.<anonymous> (httpTests/player/playerQuestionResults.test.ts:116:24)
+
+  ● Successful particular question results for players - single player multiple answers correct
+
+    TypeError: answers is not iterable
+
+      146 |   }
+      147 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 148 |   for (const answer of answers) {
+          |                        ^
+      149 |     if (answer.answer === "Prince Charles") {
+      150 |       answerIds.push(answer.answerId);
+      151 |     }
+
+      at Object.<anonymous> (httpTests/player/playerQuestionResults.test.ts:148:24)
+
+  ● Successful particular question results for players - two players multiple answers correct
+
+    TypeError: answers is not iterable
+
+      196 |   }
+      197 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 198 |   for (const answer of answers) {
+          |                        ^
+      199 |     if (answer.answer === "Prince Charles") {
+      200 |       answerIds.push(answer.answerId);
+      201 |     }
+
+      at Object.<anonymous> (httpTests/player/playerQuestionResults.test.ts:198:24)
+
+  ● Unsuccessful particular question results for players - playerId does not exist
+
+    TypeError: answers is not iterable
+
+      249 |   }
+      250 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 251 |   for (const answer of answers) {
+          |                        ^
+      252 |     if (answer.answer === "Prince Charles") {
+      253 |       answerIds.push(answer.answerId);
+      254 |     }
+
+      at Object.<anonymous> (httpTests/player/playerQuestionResults.test.ts:251:24)
+
+  ● Unsuccessful particular question results for players - questionId does not exist
+
+    TypeError: answers is not iterable
+
+      267 |   }
+      268 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 269 |   for (const answer of answers) {
+          |                        ^
+      270 |     if (answer.answer === "Prince Charles") {
+      271 |       answerIds.push(answer.answerId);
+      272 |     }
+
+      at Object.<anonymous> (httpTests/player/playerQuestionResults.test.ts:269:24)
+
+  ● Unsuccessful particular question results for players - session not up to question yet
+
+    TypeError: answers is not iterable
+
+      285 |   }
+      286 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 287 |   for (const answer of answers) {
+          |                        ^
+      288 |     if (answer.answer === "Prince Charles") {
+      289 |       answerIds.push(answer.answerId);
+      290 |     }
+
+      at Object.<anonymous> (httpTests/player/playerQuestionResults.test.ts:287:24)
+
+FAIL httpTests/adminQuizSession/adminQuizSessionStatus.test.ts
+  ● Test successful session status, before quiz in progress
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status, quiz in progress, question 2
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status, single quiz ended
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status, single quiz in final results
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status with quiz name update during doesnt affect session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status with quiz description update during doesnt affect session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status with quiz thumbnail add during doesnt affect session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status with new session created during during doesnt affect session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status with question edit during doesnt affect session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status with question delete during doesnt affect session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test successful session status with question add during doesnt affect session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test quizId invalid error, cannot progress session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test unauthorised quiz to progress session
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+  ● Test invalid token session, session to progress
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      91 |   questionId2 = adminQuizQuestionAdd(token, quizId, question2).questionId;
+      92 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 93 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      94 | });
+      95 |
+      96 | // for each one check that the details haven't been changed and that timeEdited hasn't changed
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:93:71)
+
+FAIL httpTests/adminQuizSession/adminQuizSessionResults.test.ts
+  ● Successful final results for whole session - admin with one player
+
+    TypeError: Cannot read properties of undefined (reading 'answers')
+
+      78 |     continue;
+      79 |   }
+    > 80 |   const getAnswers = adminQuizInfo(token, quizId).questions[0].answers;
+         |                                                               ^
+      81 |   const answers = getAnswers.filter((a) => a.answer === "Prince Charles");
+      82 |   const answerIds = answers.map((a) => a.answerId);
+      83 |   expect(getSessionState(token, quizId, sessionId)).toStrictEqual('QUESTION_OPEN')
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionResults.test.ts:80:63)
+
+  ● Successful final results for whole session - admin with 2 players
+
+    TypeError: Cannot read properties of undefined (reading 'answers')
+
+      150 |     continue;
+      151 |   }
+    > 152 |   const getAnswers = adminQuizInfo(token, quizId).questions[0].answers;
+          |                                                               ^
+      153 |   const answers = getAnswers.filter((a) => a.answer === "Prince Charles");
+      154 |   const answerIds = answers.map((a) => a.answerId);
+      155 |   expect(getSessionState(token, quizId, sessionId)).toStrictEqual('QUESTION_OPEN')
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionResults.test.ts:152:63)
+
+FAIL httpTests/adminQuiz/adminQuizThumbnail.test.ts
+  ● Test successful quiz thumnail change, jpg
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "http://127.0.0.1:48237/"
+    Received string:    "http://localhost:48237/static/674661553.jpg"
+
+      23 |   expect(res).toStrictEqual({});
+      24 |   const quiz = adminQuizInfo(token, quizId);
+    > 25 |   expect(quiz.thumbnailUrl).toContain(`${url}:${port}/`);
+         |                             ^
+      26 | });
+      27 |
+      28 | iter3test('Test successful quiz thumnail change, png', () => {
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizThumbnail.test.ts:25:29)
+
+  ● Test successful quiz thumnail change, png
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "http://127.0.0.1:48237/"
+    Received string:    "http://localhost:48237/static/938328326.png"
+
+      31 |   expect(res).toStrictEqual({});
+      32 |   const quiz = adminQuizInfo(token, quizId);
+    > 33 |   expect(quiz.thumbnailUrl).toContain(`${url}:${port}/`);
+         |                             ^
+      34 | });
+      35 |
+      36 | iter3test('Test unsuccessful quiz thumnail change - invalid imgUrl, non JPEG ', () => {
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizThumbnail.test.ts:33:29)
+
+FAIL httpTests/player/playerResults.test.ts
+  ● Successful final results for whole session - player 1
+
+    TypeError: answers is not iterable
+
+      81 |   }
+      82 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 83 |   for (const answer of answers) {
+         |                        ^
+      84 |     if (answer.answer === "Prince Charles") {
+      85 |       answerIds.push(answer.answerId);
+      86 |     }
+
+      at Object.<anonymous> (httpTests/player/playerResults.test.ts:83:24)
+
+  ● Successful final results for whole session - player 2
+
+    TypeError: answers is not iterable
+
+      159 |   }
+      160 |   const answers = playerQuestionData(playerId, 1).answers;
+    > 161 |   for (const answer of answers) {
+          |                        ^
+      162 |     if (answer.answer === "Prince Charles") {
+      163 |       answerIds.push(answer.answerId);
+      164 |     }
+
+      at Object.<anonymous> (httpTests/player/playerResults.test.ts:161:24)
+
+FAIL httpTests/player/playerPostChat.test.ts
+  ● Successful for one message, same player - chat post
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      56 |   // TODO get unix timestamp
+      57 |   const timestamp = Math.round(Date.now() / 1000);
+    > 58 |   expect(res).toStrictEqual({});
+         |               ^
+      59 |   const message = playerGetChat(playerId);
+      60 |   expect(message.messages[0]).toStrictEqual({
+      61 |     messageBody,
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:58:15)
+
+  ● Successful for multiple messages, same player, same body - chat post
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      71 |   const msg2 = playerPostChat(playerId, messageBody);
+      72 |   const timestamp = Math.round(Date.now() / 1000);
+    > 73 |   expect(msg1).toStrictEqual({});
+         |                ^
+      74 |   expect(msg2).toStrictEqual({});
+      75 |   const message = playerGetChat(playerId);
+      76 |   expect(message.messages[0]).toStrictEqual({
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:73:16)
+
+  ● Successful for multiple messages, different players - chat post
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+       95 |   const msg2 = playerPostChat(playerId2, messageBody);
+       96 |   const timestamp = Math.round(Date.now() / 1000);
+    >  97 |   expect(msg1).toStrictEqual({});
+          |                ^
+       98 |   expect(msg2).toStrictEqual({});
+       99 |   const message = playerGetChat(playerId);
+      100 |   expect(message.messages[0]).toStrictEqual({
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:97:16)
+
+  ● Invalid messageBody after a valid one - chat post
+
+    TypeError: Cannot read properties of undefined (reading 'length')
+
+      134 |   expect(res).toBe(400);
+      135 |   const message = playerGetChat(playerId);
+    > 136 |   expect(message.messages.length).toBe(1);
+          |                           ^
+      137 |   expect(message.messages[0]).toStrictEqual({
+      138 |     messageBody,
+      139 |     playerId,
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:136:27)
+
+FAIL httpTests/adminQuiz/adminQuizQuestionDuplicate.test.ts
+  ● Successful quiz question duplicate
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {"newQuestionId": Any<Number>}
+    Received: 400
+
+      42 | test('Successful quiz question duplicate', () => {
+      43 |   const res = adminQuizQuestionDuplicate(token, quizId, questionId);
+    > 44 |   expect(res).toStrictEqual({ newQuestionId: expect.any(Number)} );
+         |               ^
+      45 |   const quiz = adminQuizInfo(token, quizId);
+      46 |   expect(quiz.questions.length).toEqual(2);
+      47 |   expect(quiz.questions[1].questionId).not.toEqual(questionId);
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQuestionDuplicate.test.ts:44:15)
+
+FAIL httpTests/player/playerGetChat.test.ts
+  ● Successful get chat - conversation fetched by player 2
+
+    TypeError: Cannot read properties of undefined (reading '0')
+
+      60 |   const timestamp = Math.round(Date.now() / 1000);
+      61 |   const message = playerGetChat(playerId2);
+    > 62 |   expect(message.messages[0]).toStrictEqual({
+         |                          ^
+      63 |     messageBody,
+      64 |     playerId: playerId1,
+      65 |     playerName: playerName1,
+
+      at Object.<anonymous> (httpTests/player/playerGetChat.test.ts:62:26)
+
+  ● Messages from other sessions player isnt in arent returned - chat get for playerId1
+
+    TypeError: Cannot read properties of undefined (reading '0')
+
+      82 |   const timestamp = Math.round(Date.now() / 1000);
+      83 |   const message = playerGetChat(playerId1);
+    > 84 |   expect(message.messages[0]).toStrictEqual({
+         |                          ^
+      85 |     messageBody,
+      86 |     playerId: playerId1,
+      87 |     playerName: playerName1,
+
+      at Object.<anonymous> (httpTests/player/playerGetChat.test.ts:84:26)
+
+FAIL httpTests/adminQuiz/adminQuizQUestionEdit.test.ts
+  ● Test successful question edit
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      64 | test('Test successful question edit', () => {
+      65 |   const res = adminQuizQuestionEdit(token, quizId, questionId, { question, duration, points, answers });
+    > 66 |   expect(res).toStrictEqual({});
+         |               ^
+      67 |   const quiz = adminQuizInfo(token, quizId);
+      68 |   expect(quiz.questions.length).toEqual(1);
+      69 |   expect(quiz.questions[0].questionId).toEqual(questionId);
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQUestionEdit.test.ts:66:15)
+
+  ● Test successful question edit - multiple correct
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      102 |     }
+      103 |   ]});
+    > 104 |   expect(res).toStrictEqual({});
+          |               ^
+      105 |   const quiz = adminQuizInfo(token, quizId);
+      106 |   for (let answer of quiz.questions[0].answers) {
+      107 |     expect(colours).toContain(answer.colour);
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQUestionEdit.test.ts:104:15)
+
+FAIL httpTests/adminQuiz/adminQuizQuestionAdd.test.ts
+  ● Test successful question add - all details are correctly stored and retrieved by quiz info
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: Any<Number>
+    Received: undefined
+
+      38 | test('Test successful question add - all details are correctly stored and retrieved by quiz info', () => {
+      39 |   const questionId = adminQuizQuestionAdd(token, quizId, { question, duration, points, answers } ).questionId;
+    > 40 |   expect(questionId).toStrictEqual(expect.any(Number));
+         |                      ^
+      41 |   const quiz = adminQuizInfo(token, quizId);
+      42 |   expect(quiz.questions.length).toEqual(1);
+      43 |   expect(quiz.questions[0].questionId).toEqual(questionId);
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQuestionAdd.test.ts:40:22)
+
+  ● Test successful question add - multiple correct
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: Any<Number>
+    Received: undefined
+
+      76 |     }
+      77 |   ]} ).questionId;
+    > 78 |   expect(questionId).toStrictEqual(expect.any(Number));
+         |                      ^
+      79 |   const quiz = adminQuizInfo(token, quizId);
+      80 |   for (let answer of quiz.questions[0].answers) {
+      81 |     expect(colours).toContain(answer.colour);
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQuestionAdd.test.ts:78:22)
+
+  ● Test unsuccessful question add - question duration too long with another questin
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: 400
+    Received: 500
+
+      185 |   adminQuizQuestionAdd(token, quizId, { question, duration: 100, points, answers } );
+      186 |   const res = adminQuizQuestionAdd(token, quizId, { question, duration: 81, points, answers } );
+    > 187 |   expect(res).toStrictEqual(400);
+          |               ^
+      188 | });
+      189 |
+      190 | test('Test unsuccessful question add - question answer less than 1', () => {
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQuestionAdd.test.ts:187:15)
+
+FAIL httpTests/adminQuizSession/adminQuizSessionStart.test.ts
+  ● Test successful session start, quiz with questions
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: Any<Number>
+    Received: undefined
+
+      50 | iter3test('Test successful session start, quiz with questions', () => {
+      51 |   const sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 52 |   expect(sessionId).toStrictEqual(expect.any(Number));
+         |                     ^
+      53 |   const status = adminQuizSessionStatus(token, quizId, sessionId);
+      54 |   expect(status.state).toBe("LOBBY");
+      55 |   expect(status.metadata.questions[0].questionId).toBe(questionId1);
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStart.test.ts:52:21)
+
+  ● Test successful session start, same quiz twice, different sessions
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: Any<Number>
+    Received: undefined
+
+      60 |   const sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+      61 |   const sessionId2 = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 62 |   expect(sessionId).toStrictEqual(expect.any(Number));
+         |                     ^
+      63 |   expect(sessionId2).toStrictEqual(expect.any(Number));
+      64 |   expect(sessionId).not.toBe(sessionId2);
+      65 |   expect(getSessionState(token, quizId, sessionId)).toBe("LOBBY");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStart.test.ts:62:21)
+
+  ● Test successful session start, two different quizzes, different sessions
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: Any<Number>
+    Received: undefined
+
+      70 |   const sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+      71 |   const sessionId2 = adminQuizSessionStart(token, quizId2, autoStartNum).sessionId;
+    > 72 |   expect(sessionId).toStrictEqual(expect.any(Number));
+         |                     ^
+      73 |   expect(sessionId2).toStrictEqual(expect.any(Number));
+      74 |   expect(sessionId).not.toBe(sessionId2);
+      75 |   expect(getSessionState(token, quizId, sessionId)).toBe("LOBBY");
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStart.test.ts:72:21)
+
+  ● Test successful session progress to question after autostart time ends
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: "QUESTION_COUNTDOWN"
+    Received: undefined
+
+      100 |   playerJoin(sessionId, 'Yuchao');
+      101 |   playerJoin(sessionId, 'Giuliana');
+    > 102 |   expect(getSessionState(token, quizId, sessionId)).toStrictEqual("QUESTION_COUNTDOWN");
+          |                                                     ^
+      103 | });
+      104 |
+      105 | /* iter3test('Test invalid token structure, quiz to read', () => {
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStart.test.ts:102:53)
+
+FAIL httpTests/adminQuiz/adminQuizQuestionDelete.test.ts
+  ● Successful quiz question delete
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      40 | test('Successful quiz question delete', () => {
+      41 |   const res = adminQuizQuestionDelete(token, quizId, questionId);
+    > 42 |   expect(res).toStrictEqual({});
+         |               ^
+      43 |   const questions = adminQuizInfo(token, quizId).questions;
+      44 |   expect(questions).not.toContain(question)
+      45 |
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQuestionDelete.test.ts:42:15)
+
+FAIL httpTests/adminQuiz/adminQuizQuestionMove.test.ts
+  ● Successful quiz question move
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: {}
+    Received: 400
+
+      44 |   adminQuizQuestionDuplicate(token, quizId, questionId);
+      45 |   const res = adminQuizQuestionMove(token, quizId, questionId, newPosition);
+    > 46 |   expect(res).toStrictEqual({});
+         |               ^
+      47 |   const quizInfo = adminQuizInfo(token, quizId);
+      48 |   expect(quizInfo.questions[newPosition].questionId).toEqual(questionId);
+      49 |   expect(quizInfo.questions[newPosition].question).toEqual(question.question);
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQuestionMove.test.ts:46:15)
+
+FAIL httpTests/adminAuth/adminAuthLogout.test.ts
+  ● token is for a user who has already logged out
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: 400
+    Received: 403
+
+      30 |   adminAuthLogout(token);
+      31 |   const res = adminAuthLogout(token);
+    > 32 |   expect(res).toStrictEqual(400);
+         |               ^
+      33 | });
+      34 |
+      35 | test('Cant perform action after logout', () => {
+
+      at Object.<anonymous> (httpTests/adminAuth/adminAuthLogout.test.ts:32:15)
+
+FAIL httpTests/player/playerJoin.test.ts
+  ● Successful player join
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      46 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      47 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 48 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      49 | });
+      50 |
+      51 | iter3test('Successful player join', () => {
+
+      at Object.<anonymous> (httpTests/player/playerJoin.test.ts:48:71)
+
+  ● Successful second player join
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      46 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      47 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 48 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      49 | });
+      50 |
+      51 | iter3test('Successful player join', () => {
+
+      at Object.<anonymous> (httpTests/player/playerJoin.test.ts:48:71)
+
+  ● Unsuccessful player join - session not in LOBBY state
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      46 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      47 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 48 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      49 | });
+      50 |
+      51 | iter3test('Successful player join', () => {
+
+      at Object.<anonymous> (httpTests/player/playerJoin.test.ts:48:71)
+
+  ● Unsuccessful second player join - name is not unique
+
+    TypeError: Cannot read properties of undefined (reading 'timeEdited')
+
+      46 |   questionId1 = adminQuizQuestionAdd(token, quizId, question1).questionId;
+      47 |   sessionId = adminQuizSessionStart(token, quizId, autoStartNum).sessionId;
+    > 48 |   editTime = adminQuizSessionStatus(token, quizId, sessionId).metadata.timeEdited;
+         |                                                                       ^
+      49 | });
+      50 |
+      51 | iter3test('Successful player join', () => {
+
+      at Object.<anonymous> (httpTests/player/playerJoin.test.ts:48:71)
+
+
+Test Suites: 19 failed, 16 passed, 35 total
+Tests:       93 failed, 179 passed, 272 total
+Snapshots:   0 total
+Time:        19.497 s, estimated 60 s
+Ran all test suites matching /httpTests\//i.
+npm notice 
+npm notice New minor version of npm available! 9.5.1 -> 9.8.1
+npm notice Changelog: <https://github.com/npm/cli/releases/tag/v9.8.1>
+npm notice Run `npm install -g npm@9.8.1` to update!
+npm notice 
