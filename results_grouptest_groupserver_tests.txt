@@ -4,39 +4,39 @@
 
   Invalid testPattern **/?(*.)+(test).ts supplied. Running all tests instead.
   Invalid testPattern **/?(*.)+(test).ts supplied. Running all tests instead.
-PASS src/it3_tests/updateSessionState.test.ts (10.913 s)
-PASS src/it3_tests/moveQuizQuestion.test.ts
+PASS src/it3_tests/updateSessionState.test.ts (9.923 s)
 PASS src/it3_tests/updateQuizQuestion.test.ts
+PASS src/it3_tests/moveQuizQuestion.test.ts
 PASS src/it3_tests/playerSubmitAnswer.test.ts
 PASS src/it3_tests/sessionResults.test.ts
 PASS src/it3_tests/createQuizQuestion.test.ts
-PASS src/it3_tests/sessionResultsCSV.test.ts
 PASS src/it3_tests/playerStatus.test.ts
+PASS src/it3_tests/sessionResultsCSV.test.ts
 PASS src/it3_tests/deleteQuizQuestion.test.ts
 PASS src/it3_tests/playerQuestionResults.test.ts
-PASS src/echo.test.ts
-PASS src/it3_tests/playerCurrentQuestionInfo.test.ts
-PASS src/it3_tests/quizQuestionDuplicate.test.ts
-PASS src/it3_tests/startSession.test.ts
 PASS src/it3_tests/adminQuizThumbnail.test.ts
+PASS src/it3_tests/playerCurrentQuestionInfo.test.ts
 PASS src/it3_tests/updateQuizQuestionv1.test.ts
-PASS src/it3_tests/playerResults.test.ts
+PASS src/it3_tests/startSession.test.ts
+PASS src/it3_tests/quizQuestionDuplicate.test.ts
 PASS src/it3_tests/sessionStatus.test.ts
+PASS src/it3_tests/playerResults.test.ts
 PASS src/it3_tests/createQuizQuestionv1.test.ts
-PASS src/it3_tests/adminQuizTrashEmpty.test.ts
 PASS src/it3_tests/adminQuizTransfer.test.ts
+PASS src/echo.test.ts
+PASS src/it3_tests/adminQuizTrashEmpty.test.ts
 PASS src/it3_tests/adminQuizRestore.test.ts
-PASS src/it3_tests/playerViewChat.test.ts
-PASS src/it3_tests/playerJoin.test.ts
 PASS src/it3_tests/adminQuizInfo.test.ts
-PASS src/it3_tests/updateUserPassword.test.ts
-PASS src/it3_tests/adminQuizRemove.test.ts
-PASS src/it3_tests/playerSendChat.test.ts
 PASS src/it3_tests/adminQuizNameUpdate.test.ts
-PASS src/it3_tests/sessionView.test.ts
+PASS src/it3_tests/updateUserPassword.test.ts
+PASS src/it3_tests/playerViewChat.test.ts
 PASS src/it3_tests/updateUserDetails.test.ts
-PASS src/it3_tests/adminQuizCreate.test.ts
+PASS src/it3_tests/adminQuizRemove.test.ts
+PASS src/it3_tests/playerJoin.test.ts
+PASS src/it3_tests/playerSendChat.test.ts
+PASS src/it3_tests/sessionView.test.ts
 PASS src/it3_tests/adminQuizDescriptionUpdate.test.ts
+PASS src/it3_tests/adminQuizCreate.test.ts
 PASS src/it3_tests/adminQuizTrash.test.ts
 PASS src/it3_tests/adminAuthLogout.test.ts
 PASS src/it3_tests/adminQuizList.test.ts
@@ -48,7 +48,7 @@ PASS src/it3_tests/other.test.ts
 Test Suites: 40 passed, 40 total
 Tests:       535 passed, 535 total
 Snapshots:   0 total
-Time:        56.758 s
+Time:        50.836 s, estimated 53 s
 Ran all test suites.
 
 > posttest
