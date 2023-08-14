@@ -34,11 +34,11 @@ describe('error cases tests', () => {
     const user = authRegisterRequest('email@gmail.com', 'password1', 'nameFirst', 'nameLast').body;
     const userToken = user.token;
     authLogoutRequest(userToken);
-    expect(() => authLogoutRequest(userToken)).toThrow(HTTPError[403]);
+    expect(() => authLogoutRequest(userToken)).toThrow(HTTPError[400]);
   });
 
   test('token never created', () => {
-    expect(() => authLogoutRequest('12345')).toThrow(HTTPError[403]);
+    expect(() => authLogoutRequest('12345')).toThrow(HTTPError[400]);
   });
 });
 

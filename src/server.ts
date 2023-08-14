@@ -152,10 +152,10 @@ app.post('/v2/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
 
 // createQuizQuestion //
 app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
-  const { question, duration, points, answers, thumbnail } = req.body.questionBody;
+  const { question, duration, points, answers, thumbnailUrl } = req.body.questionBody;
   const quizId = parseInt(req.params.quizid);
   const token = req.headers.token as string;
-  const response = createQuizQuestion(quizId, token, question, duration, points, answers, thumbnail, true);
+  const response = createQuizQuestion(quizId, token, question, duration, points, answers, thumbnailUrl, true);
   res.json(response);
 });
 

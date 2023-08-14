@@ -68,6 +68,7 @@ export function startSession(quizId: number, token: string, autoStartNum: number
     throw HTTPError(BAD_REQUEST, 'No questions in quiz');
   }
   const sessionId = data.sessions.length + 1;
+  console.log(sessionId)
 
   const session: Session = {
     sessionId: sessionId,

@@ -285,7 +285,7 @@ export function adminAuthLogout (tokenId: string, isv2: boolean): Record<string,
   }
 
   if (!isTokenLoggedIn(tokenId)) {
-    return giveError(isv2, 'This token is for a user who has already logged out', FORBIDDEN);
+    return giveError(isv2, 'This token is for a user who has already logged out', BAD_REQUEST);
   }
 
   const index: number = data.tokens.findIndex(token => token.tokenId === tokenId);
