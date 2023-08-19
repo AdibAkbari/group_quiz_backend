@@ -1,0 +1,956 @@
+
+> test
+> jest httpTests/
+
+PASS httpTests/adminQuizSession/adminQuizSessionProgress.test.ts (19.558 s)
+FAIL httpTests/adminQuiz/adminQuizQUestionEdit.test.ts
+  ● Test successful question edit
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected value: "pink"
+    Received array: ["red", "blue", "yellow", "green", "brown", "purple", "orange"]
+
+      354 |   expect(quiz.questions[0].points).toEqual(points);
+      355 |   for (let answer of quiz.questions[0].answers) {
+    > 356 |     expect(colours).toContain(answer.colour);
+          |                     ^
+      357 |     expect(answer.answerId).toEqual(expect.any(Number));
+      358 |     expect(answerNames).toContain(answer.answer);
+      359 |     if (answer.answer === "Queen Elizabeth") {
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQUestionEdit.test.ts:356:21)
+
+PASS httpTests/adminQuiz/adminQuizQuestionAdd.test.ts
+FAIL httpTests/adminQuizSession/adminQuizSessionStatus.test.ts
+  ● Test successful session status with question edit during doesnt affect session
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 12
+    + Received  + 18
+
+    @@ -1,39 +1,45 @@
+      Object {
+        "atQuestion": 0,
+        "metadata": Object {
+          "description": "this is a quiz made by automarking",
+    -     "duration": 7,
+    +     "duration": 8,
+          "name": "test quiz",
+          "numQuestions": 2,
+          "questions": Array [
+            Object {
+              "answers": Array [
+                Object {
+    -             "answer": "Chicken",
+    +             "answer": "Prince Charles",
+                  "answerId": 1,
+    -             "colour": "purple",
+    -             "correct": false,
+    +             "colour": "green",
+    +             "correct": true,
+                },
+                Object {
+    -             "answer": "Egg",
+    +             "answer": "Prince George",
+                  "answerId": 2,
+    -             "colour": "yellow",
+    +             "colour": "red",
+                  "correct": false,
+                },
+                Object {
+    -             "answer": "Who knows",
+    +             "answer": "Princess Charlotte",
+                  "answerId": 3,
+    -             "colour": "blue",
+    -             "correct": true,
+    +             "colour": "orange",
+    +             "correct": false,
+    +           },
+    +           Object {
+    +             "answer": "Prince William",
+    +             "answerId": 4,
+    +             "colour": "brown",
+    +             "correct": false,
+                },
+              ],
+    -         "duration": 3,
+    +         "duration": 4,
+              "points": 5,
+    -         "question": "What came first, the chicken or the egg?",
+    +         "question": "Who is the Monarch of England?",
+              "questionId": 1,
+    -         "thumbnailUrl": "http://localhost:48237/static/1478476862.jpg",
+    +         "thumbnailUrl": "http://localhost:48237/static/1215121650.jpg",
+            },
+            Object {
+              "answers": Array [
+                Object {
+                  "answer": "Prince Tam",
+
+      244 |   expect(res.metadata.timeLastEdited).toBe(editTime);
+      245 |   const quizInfo = adminQuizInfo(token, quizId);
+    > 246 |   expect(res).toStrictEqual({
+          |               ^
+      247 |     "state": "LOBBY",
+      248 |     "atQuestion": 0,
+      249 |     "players": [],
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:246:15)
+
+PASS httpTests/player/playerQuestionResults.test.ts
+FAIL httpTests/player/playerQuestionAnswer.test.ts (6.881 s)
+  ● Test successful question answer for two players
+
+
+          Curl request failed with code 3
+          Please look up libcurl error code!
+            - https://curl.se/libcurl/c/libcurl-errors.html
+
+          DEBUG: {
+            method: "PUT",
+            url: "http://127.0.0.1:48237/v1/player/[object Object]/question/1/answer",
+            options: {"qs":{},"json":{"answerIds":[{"answerId":1,"answer":"Prince Charles","colour":"brown","correct":true}]},"headers":{}}
+          }
+
+      17 |   }
+      18 |
+    > 19 |   const res = request(method, path, { qs, json, headers } );
+         |                      ^
+      20 |
+      21 |   if (res.statusCode !== 200) {
+      22 |     // Return error code number instead of object in case of error.
+
+          
+      at request (node_modules/sync-request-curl/src/request.ts:59:11)
+      at requestHelper (httpTests/fakepi/helpers.ts:19:22)
+      at playerQuestionAnswer (httpTests/fakepi/player.ts:29:23)
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:90:23)
+
+PASS httpTests/adminQuizSession/adminQuizSessionResults.test.ts
+  ● Console
+
+    console.log
+      [ 1, 2 ]
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionResults.test.ts:95:11)
+
+FAIL httpTests/player/playerQuestionData.test.ts (7.283 s)
+  ● Successful question information for player - first question
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 0
+
+    @@ -23,7 +23,6 @@
+        ],
+        "duration": 4,
+        "points": 5,
+        "question": "Who is the Monarch of England?",
+        "questionId": 1,
+    -   "thumbnailUrl": Any<String>,
+      }
+
+      117 |     })
+      118 |   };
+    > 119 |   expect(res).toStrictEqual({
+          |               ^
+      120 |     questionId: questionId1,
+      121 |     question: question1.question,
+      122 |     duration: question1.duration,
+
+      at Object.<anonymous> (httpTests/player/playerQuestionData.test.ts:119:15)
+
+  ● Successful question information for player - last question
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 0
+
+    @@ -23,7 +23,6 @@
+        ],
+        "duration": 4,
+        "points": 5,
+        "question": "Who is the Monarch of COMP1531?",
+        "questionId": 2,
+    -   "thumbnailUrl": Any<String>,
+      }
+
+      149 |     })
+      150 |   };
+    > 151 |   expect(res).toStrictEqual({
+          |               ^
+      152 |     questionId: questionId2,
+      153 |     question: question2.question,
+      154 |     duration: question2.duration,
+
+      at Object.<anonymous> (httpTests/player/playerQuestionData.test.ts:151:15)
+
+  ● Successful question information for player - question edit has no impact
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 3
+    + Received  + 2
+
+    @@ -19,11 +19,10 @@
+            "answer": "Prince William",
+            "answerId": 4,
+            "colour": "purple",
+          },
+        ],
+    -   "duration": 3,
+    +   "duration": 4,
+        "points": 5,
+    -   "question": "What came first, the chicken or the egg?",
+    +   "question": "Who is the Monarch of England?",
+        "questionId": 1,
+    -   "thumbnailUrl": Any<String>,
+      }
+
+      176 |     })
+      177 |   };
+    > 178 |   expect(res).toStrictEqual({
+          |               ^
+      179 |     questionId: questionId1,
+      180 |     question: editedQuestion.question,
+      181 |     duration: editedQuestion.duration,
+
+      at Object.<anonymous> (httpTests/player/playerQuestionData.test.ts:178:15)
+
+  ● Successful question information for player - different players get the same info
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 0
+
+    @@ -23,7 +23,6 @@
+        ],
+        "duration": 4,
+        "points": 5,
+        "question": "Who is the Monarch of England?",
+        "questionId": 1,
+    -   "thumbnailUrl": Any<String>,
+      }
+
+      203 |     })
+      204 |   };
+    > 205 |   expect(res).toStrictEqual({
+          |               ^
+      206 |     questionId: questionId1,
+      207 |     question: question1.question,
+      208 |     duration: question1.duration,
+
+      at Object.<anonymous> (httpTests/player/playerQuestionData.test.ts:205:15)
+
+PASS httpTests/player/playerResults.test.ts
+PASS httpTests/player/playerStatus.test.ts (5.765 s)
+PASS httpTests/adminQuiz/adminQuizQuestionMove.test.ts
+PASS httpTests/adminUser/adminUserDetailsPut.test.ts
+FAIL httpTests/player/playerPostChat.test.ts
+  ● Successful for one message, same player - chat post
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 2
+
+      Object {
+    +   "messageBody": Object {
+          "messageBody": "I am Tahook-ed on this game",
+    +   },
+        "playerId": 1,
+        "playerName": "Hayden Smith",
+        "timeSent": Any<Number>,
+      }
+
+      59 |   expect(res).toStrictEqual({});
+      60 |   const message = playerGetChat(playerId);
+    > 61 |   expect(message.messages[0]).toStrictEqual({
+         |                               ^
+      62 |     messageBody,
+      63 |     playerId,
+      64 |     playerName,
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:61:31)
+
+  ● Successful for multiple messages, same player, same body - chat post
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 2
+
+      Object {
+    +   "messageBody": Object {
+          "messageBody": "I am Tahook-ed on this game",
+    +   },
+        "playerId": 1,
+        "playerName": "Hayden Smith",
+        "timeSent": Any<Number>,
+      }
+
+      75 |   expect(msg2).toStrictEqual({});
+      76 |   const message = playerGetChat(playerId);
+    > 77 |   expect(message.messages[0]).toStrictEqual({
+         |                               ^
+      78 |     messageBody,
+      79 |     playerId,
+      80 |     playerName,
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:77:31)
+
+  ● Successful for multiple messages, different players - chat post
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 2
+
+      Object {
+    +   "messageBody": Object {
+          "messageBody": "I am Tahook-ed on this game",
+    +   },
+        "playerId": 1,
+        "playerName": "Hayden Smith",
+        "timeSent": Any<Number>,
+      }
+
+       99 |   expect(msg2).toStrictEqual({});
+      100 |   const message = playerGetChat(playerId);
+    > 101 |   expect(message.messages[0]).toStrictEqual({
+          |                               ^
+      102 |     messageBody,
+      103 |     playerId,
+      104 |     playerName,
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:101:31)
+
+  ● messageBody less than 1 character - chat post
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: {}
+
+      121 | iter3test('messageBody less than 1 character - chat post', () => {
+      122 |   const res = playerPostChat(playerId, '');
+    > 123 |   expect(res).toBe(400);
+          |               ^
+      124 | });
+      125 |
+      126 | iter3test('messageBody more than 100 characters - chat post', () => {
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:123:15)
+
+  ● messageBody more than 100 characters - chat post
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: {}
+
+      126 | iter3test('messageBody more than 100 characters - chat post', () => {
+      127 |   const res = playerPostChat(playerId, 'a'.repeat(101));
+    > 128 |   expect(res).toBe(400);
+          |               ^
+      129 | });
+      130 |
+      131 | iter3test('Invalid messageBody after a valid one - chat post', () => {
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:128:15)
+
+  ● Invalid messageBody after a valid one - chat post
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: {}
+
+      133 |   const timestamp = Math.round(Date.now() / 1000);
+      134 |   const res = playerPostChat(playerId, '');
+    > 135 |   expect(res).toBe(400);
+          |               ^
+      136 |   const message = playerGetChat(playerId);
+      137 |   expect(message.messages.length).toBe(1);
+      138 |   expect(message.messages[0]).toStrictEqual({
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:135:15)
+
+FAIL httpTests/adminQuizSession/adminQuizSessionStart.test.ts
+  ● Test quizId invalid error, cannot start session
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: 400
+    Received: {"description": "Second quiz description", "duration": 4, "name": "Second quiz", "numQuestions": 1, "questions": [{"answers": [{"answer": "Prince Charles", "answerId": 1, "colour": "blue", "correct": true}, {"answer": "Prince George", "answerId": 2, "colour": "yellow", "correct": false}, {"answer": "Princess Charlotte", "answerId": 3, "colour": "purple", "correct": false}, {"answer": "Prince William", "answerId": 4, "colour": "orange", "correct": false}], "duration": 4, "points": 5, "question": "Who is the Monarch of England?", "questionId": 1, "thumbnailUrl": "http://localhost:48237/static/60630563.jpg"}], "quizId": 2, "timeCreated": 1692466961, "timeLastEdited": 1692466961}
+
+      80 | iter3test('Test quizId invalid error, cannot start session', () => {
+      81 |   const quiz = adminQuizInfo(token, quizId+1);
+    > 82 |   expect(quiz).toStrictEqual(400);
+         |                ^
+      83 | });
+      84 |
+      85 | iter3test('Test unauthorised quiz to start session', () => {
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStart.test.ts:82:16)
+
+  ● Test successful session progress to question after autostart time ends
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: "QUESTION_COUNTDOWN"
+    Received: "LOBBY"
+
+      100 |   playerJoin(sessionId, 'Yuchao');
+      101 |   playerJoin(sessionId, 'Giuliana');
+    > 102 |   expect(getSessionState(token, quizId, sessionId)).toStrictEqual("QUESTION_COUNTDOWN");
+          |                                                     ^
+      103 | });
+      104 |
+      105 | /* iter3test('Test invalid token structure, quiz to read', () => {
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStart.test.ts:102:53)
+
+PASS httpTests/adminQuiz/adminQuizQuestionDuplicate.test.ts
+PASS httpTests/adminAuth/adminAuthRegister.test.ts
+PASS httpTests/adminQuiz/adminQuizThumbnail.test.ts
+PASS httpTests/adminQuiz/adminQuizQuestionDelete.test.ts
+FAIL httpTests/player/playerGetChat.test.ts
+  ● Successful get chat - conversation fetched by player 2
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 2
+
+      Object {
+    +   "messageBody": Object {
+          "messageBody": "I am Tahook-ed on this game",
+    +   },
+        "playerId": 1,
+        "playerName": "Hayden Smith",
+        "timeSent": Any<Number>,
+      }
+
+      61 |   const timestamp = Math.round(Date.now() / 1000);
+      62 |   const message = playerGetChat(playerId2);
+    > 63 |   expect(message.messages[0]).toStrictEqual({
+         |                               ^
+      64 |     messageBody,
+      65 |     playerId: playerId1,
+      66 |     playerName: playerName1,
+
+      at Object.<anonymous> (httpTests/player/playerGetChat.test.ts:63:31)
+
+  ● Messages from other sessions player isnt in arent returned - chat get for playerId1
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 2
+
+      Object {
+    +   "messageBody": Object {
+          "messageBody": "I am Tahook-ed on this game",
+    +   },
+        "playerId": 1,
+        "playerName": "Hayden Smith",
+        "timeSent": Any<Number>,
+      }
+
+      83 |   const timestamp = Math.round(Date.now() / 1000);
+      84 |   const message = playerGetChat(playerId1);
+    > 85 |   expect(message.messages[0]).toStrictEqual({
+         |                               ^
+      86 |     messageBody,
+      87 |     playerId: playerId1,
+      88 |     playerName: playerName1,
+
+      at Object.<anonymous> (httpTests/player/playerGetChat.test.ts:85:31)
+
+PASS httpTests/adminQuiz/adminQuizDescriptionUpdate.test.ts
+PASS httpTests/adminQuiz/adminQuizInfo.test.ts
+PASS httpTests/adminQuiz/adminQuizNameUpdate.test.ts
+PASS httpTests/adminQuiz/adminQuizTrashEmpty.test.ts
+PASS httpTests/player/playerJoin.test.ts
+PASS httpTests/adminQuiz/adminQuizNew.test.ts
+PASS httpTests/adminQuiz/adminQuizTransfer.test.ts
+PASS httpTests/adminQuiz/adminQuizList.test.ts
+PASS httpTests/adminUser/adminUserPassword.test.ts
+PASS httpTests/adminQuiz/adminQuizRestore.test.ts
+PASS httpTests/adminUser/adminUserDetails.test.ts
+PASS httpTests/adminQuiz/adminQuizTrash.test.ts
+PASS httpTests/adminQuiz/adminQuizDelete.test.ts
+PASS httpTests/adminAuth/adminAuthLogout.test.ts
+PASS httpTests/adminAuth/adminAuthLogin.test.ts
+PASS httpTests/other/clear.test.ts
+
+Summary of all failing tests
+FAIL httpTests/adminQuiz/adminQuizQUestionEdit.test.ts
+  ● Test successful question edit
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected value: "pink"
+    Received array: ["red", "blue", "yellow", "green", "brown", "purple", "orange"]
+
+      354 |   expect(quiz.questions[0].points).toEqual(points);
+      355 |   for (let answer of quiz.questions[0].answers) {
+    > 356 |     expect(colours).toContain(answer.colour);
+          |                     ^
+      357 |     expect(answer.answerId).toEqual(expect.any(Number));
+      358 |     expect(answerNames).toContain(answer.answer);
+      359 |     if (answer.answer === "Queen Elizabeth") {
+
+      at Object.<anonymous> (httpTests/adminQuiz/adminQuizQUestionEdit.test.ts:356:21)
+
+FAIL httpTests/adminQuizSession/adminQuizSessionStatus.test.ts
+  ● Test successful session status with question edit during doesnt affect session
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 12
+    + Received  + 18
+
+    @@ -1,39 +1,45 @@
+      Object {
+        "atQuestion": 0,
+        "metadata": Object {
+          "description": "this is a quiz made by automarking",
+    -     "duration": 7,
+    +     "duration": 8,
+          "name": "test quiz",
+          "numQuestions": 2,
+          "questions": Array [
+            Object {
+              "answers": Array [
+                Object {
+    -             "answer": "Chicken",
+    +             "answer": "Prince Charles",
+                  "answerId": 1,
+    -             "colour": "purple",
+    -             "correct": false,
+    +             "colour": "green",
+    +             "correct": true,
+                },
+                Object {
+    -             "answer": "Egg",
+    +             "answer": "Prince George",
+                  "answerId": 2,
+    -             "colour": "yellow",
+    +             "colour": "red",
+                  "correct": false,
+                },
+                Object {
+    -             "answer": "Who knows",
+    +             "answer": "Princess Charlotte",
+                  "answerId": 3,
+    -             "colour": "blue",
+    -             "correct": true,
+    +             "colour": "orange",
+    +             "correct": false,
+    +           },
+    +           Object {
+    +             "answer": "Prince William",
+    +             "answerId": 4,
+    +             "colour": "brown",
+    +             "correct": false,
+                },
+              ],
+    -         "duration": 3,
+    +         "duration": 4,
+              "points": 5,
+    -         "question": "What came first, the chicken or the egg?",
+    +         "question": "Who is the Monarch of England?",
+              "questionId": 1,
+    -         "thumbnailUrl": "http://localhost:48237/static/1478476862.jpg",
+    +         "thumbnailUrl": "http://localhost:48237/static/1215121650.jpg",
+            },
+            Object {
+              "answers": Array [
+                Object {
+                  "answer": "Prince Tam",
+
+      244 |   expect(res.metadata.timeLastEdited).toBe(editTime);
+      245 |   const quizInfo = adminQuizInfo(token, quizId);
+    > 246 |   expect(res).toStrictEqual({
+          |               ^
+      247 |     "state": "LOBBY",
+      248 |     "atQuestion": 0,
+      249 |     "players": [],
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStatus.test.ts:246:15)
+
+FAIL httpTests/player/playerQuestionAnswer.test.ts (6.881 s)
+  ● Test successful question answer for two players
+
+
+          Curl request failed with code 3
+          Please look up libcurl error code!
+            - https://curl.se/libcurl/c/libcurl-errors.html
+
+          DEBUG: {
+            method: "PUT",
+            url: "http://127.0.0.1:48237/v1/player/[object Object]/question/1/answer",
+            options: {"qs":{},"json":{"answerIds":[{"answerId":1,"answer":"Prince Charles","colour":"brown","correct":true}]},"headers":{}}
+          }
+
+      17 |   }
+      18 |
+    > 19 |   const res = request(method, path, { qs, json, headers } );
+         |                      ^
+      20 |
+      21 |   if (res.statusCode !== 200) {
+      22 |     // Return error code number instead of object in case of error.
+
+          
+      at request (node_modules/sync-request-curl/src/request.ts:59:11)
+      at requestHelper (httpTests/fakepi/helpers.ts:19:22)
+      at playerQuestionAnswer (httpTests/fakepi/player.ts:29:23)
+      at Object.<anonymous> (httpTests/player/playerQuestionAnswer.test.ts:90:23)
+
+FAIL httpTests/player/playerQuestionData.test.ts (7.283 s)
+  ● Successful question information for player - first question
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 0
+
+    @@ -23,7 +23,6 @@
+        ],
+        "duration": 4,
+        "points": 5,
+        "question": "Who is the Monarch of England?",
+        "questionId": 1,
+    -   "thumbnailUrl": Any<String>,
+      }
+
+      117 |     })
+      118 |   };
+    > 119 |   expect(res).toStrictEqual({
+          |               ^
+      120 |     questionId: questionId1,
+      121 |     question: question1.question,
+      122 |     duration: question1.duration,
+
+      at Object.<anonymous> (httpTests/player/playerQuestionData.test.ts:119:15)
+
+  ● Successful question information for player - last question
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 0
+
+    @@ -23,7 +23,6 @@
+        ],
+        "duration": 4,
+        "points": 5,
+        "question": "Who is the Monarch of COMP1531?",
+        "questionId": 2,
+    -   "thumbnailUrl": Any<String>,
+      }
+
+      149 |     })
+      150 |   };
+    > 151 |   expect(res).toStrictEqual({
+          |               ^
+      152 |     questionId: questionId2,
+      153 |     question: question2.question,
+      154 |     duration: question2.duration,
+
+      at Object.<anonymous> (httpTests/player/playerQuestionData.test.ts:151:15)
+
+  ● Successful question information for player - question edit has no impact
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 3
+    + Received  + 2
+
+    @@ -19,11 +19,10 @@
+            "answer": "Prince William",
+            "answerId": 4,
+            "colour": "purple",
+          },
+        ],
+    -   "duration": 3,
+    +   "duration": 4,
+        "points": 5,
+    -   "question": "What came first, the chicken or the egg?",
+    +   "question": "Who is the Monarch of England?",
+        "questionId": 1,
+    -   "thumbnailUrl": Any<String>,
+      }
+
+      176 |     })
+      177 |   };
+    > 178 |   expect(res).toStrictEqual({
+          |               ^
+      179 |     questionId: questionId1,
+      180 |     question: editedQuestion.question,
+      181 |     duration: editedQuestion.duration,
+
+      at Object.<anonymous> (httpTests/player/playerQuestionData.test.ts:178:15)
+
+  ● Successful question information for player - different players get the same info
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 0
+
+    @@ -23,7 +23,6 @@
+        ],
+        "duration": 4,
+        "points": 5,
+        "question": "Who is the Monarch of England?",
+        "questionId": 1,
+    -   "thumbnailUrl": Any<String>,
+      }
+
+      203 |     })
+      204 |   };
+    > 205 |   expect(res).toStrictEqual({
+          |               ^
+      206 |     questionId: questionId1,
+      207 |     question: question1.question,
+      208 |     duration: question1.duration,
+
+      at Object.<anonymous> (httpTests/player/playerQuestionData.test.ts:205:15)
+
+FAIL httpTests/player/playerPostChat.test.ts
+  ● Successful for one message, same player - chat post
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 2
+
+      Object {
+    +   "messageBody": Object {
+          "messageBody": "I am Tahook-ed on this game",
+    +   },
+        "playerId": 1,
+        "playerName": "Hayden Smith",
+        "timeSent": Any<Number>,
+      }
+
+      59 |   expect(res).toStrictEqual({});
+      60 |   const message = playerGetChat(playerId);
+    > 61 |   expect(message.messages[0]).toStrictEqual({
+         |                               ^
+      62 |     messageBody,
+      63 |     playerId,
+      64 |     playerName,
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:61:31)
+
+  ● Successful for multiple messages, same player, same body - chat post
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 2
+
+      Object {
+    +   "messageBody": Object {
+          "messageBody": "I am Tahook-ed on this game",
+    +   },
+        "playerId": 1,
+        "playerName": "Hayden Smith",
+        "timeSent": Any<Number>,
+      }
+
+      75 |   expect(msg2).toStrictEqual({});
+      76 |   const message = playerGetChat(playerId);
+    > 77 |   expect(message.messages[0]).toStrictEqual({
+         |                               ^
+      78 |     messageBody,
+      79 |     playerId,
+      80 |     playerName,
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:77:31)
+
+  ● Successful for multiple messages, different players - chat post
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 2
+
+      Object {
+    +   "messageBody": Object {
+          "messageBody": "I am Tahook-ed on this game",
+    +   },
+        "playerId": 1,
+        "playerName": "Hayden Smith",
+        "timeSent": Any<Number>,
+      }
+
+       99 |   expect(msg2).toStrictEqual({});
+      100 |   const message = playerGetChat(playerId);
+    > 101 |   expect(message.messages[0]).toStrictEqual({
+          |                               ^
+      102 |     messageBody,
+      103 |     playerId,
+      104 |     playerName,
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:101:31)
+
+  ● messageBody less than 1 character - chat post
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: {}
+
+      121 | iter3test('messageBody less than 1 character - chat post', () => {
+      122 |   const res = playerPostChat(playerId, '');
+    > 123 |   expect(res).toBe(400);
+          |               ^
+      124 | });
+      125 |
+      126 | iter3test('messageBody more than 100 characters - chat post', () => {
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:123:15)
+
+  ● messageBody more than 100 characters - chat post
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: {}
+
+      126 | iter3test('messageBody more than 100 characters - chat post', () => {
+      127 |   const res = playerPostChat(playerId, 'a'.repeat(101));
+    > 128 |   expect(res).toBe(400);
+          |               ^
+      129 | });
+      130 |
+      131 | iter3test('Invalid messageBody after a valid one - chat post', () => {
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:128:15)
+
+  ● Invalid messageBody after a valid one - chat post
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: {}
+
+      133 |   const timestamp = Math.round(Date.now() / 1000);
+      134 |   const res = playerPostChat(playerId, '');
+    > 135 |   expect(res).toBe(400);
+          |               ^
+      136 |   const message = playerGetChat(playerId);
+      137 |   expect(message.messages.length).toBe(1);
+      138 |   expect(message.messages[0]).toStrictEqual({
+
+      at Object.<anonymous> (httpTests/player/playerPostChat.test.ts:135:15)
+
+FAIL httpTests/adminQuizSession/adminQuizSessionStart.test.ts
+  ● Test quizId invalid error, cannot start session
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: 400
+    Received: {"description": "Second quiz description", "duration": 4, "name": "Second quiz", "numQuestions": 1, "questions": [{"answers": [{"answer": "Prince Charles", "answerId": 1, "colour": "blue", "correct": true}, {"answer": "Prince George", "answerId": 2, "colour": "yellow", "correct": false}, {"answer": "Princess Charlotte", "answerId": 3, "colour": "purple", "correct": false}, {"answer": "Prince William", "answerId": 4, "colour": "orange", "correct": false}], "duration": 4, "points": 5, "question": "Who is the Monarch of England?", "questionId": 1, "thumbnailUrl": "http://localhost:48237/static/60630563.jpg"}], "quizId": 2, "timeCreated": 1692466961, "timeLastEdited": 1692466961}
+
+      80 | iter3test('Test quizId invalid error, cannot start session', () => {
+      81 |   const quiz = adminQuizInfo(token, quizId+1);
+    > 82 |   expect(quiz).toStrictEqual(400);
+         |                ^
+      83 | });
+      84 |
+      85 | iter3test('Test unauthorised quiz to start session', () => {
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStart.test.ts:82:16)
+
+  ● Test successful session progress to question after autostart time ends
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    Expected: "QUESTION_COUNTDOWN"
+    Received: "LOBBY"
+
+      100 |   playerJoin(sessionId, 'Yuchao');
+      101 |   playerJoin(sessionId, 'Giuliana');
+    > 102 |   expect(getSessionState(token, quizId, sessionId)).toStrictEqual("QUESTION_COUNTDOWN");
+          |                                                     ^
+      103 | });
+      104 |
+      105 | /* iter3test('Test invalid token structure, quiz to read', () => {
+
+      at Object.<anonymous> (httpTests/adminQuizSession/adminQuizSessionStart.test.ts:102:53)
+
+FAIL httpTests/player/playerGetChat.test.ts
+  ● Successful get chat - conversation fetched by player 2
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 2
+
+      Object {
+    +   "messageBody": Object {
+          "messageBody": "I am Tahook-ed on this game",
+    +   },
+        "playerId": 1,
+        "playerName": "Hayden Smith",
+        "timeSent": Any<Number>,
+      }
+
+      61 |   const timestamp = Math.round(Date.now() / 1000);
+      62 |   const message = playerGetChat(playerId2);
+    > 63 |   expect(message.messages[0]).toStrictEqual({
+         |                               ^
+      64 |     messageBody,
+      65 |     playerId: playerId1,
+      66 |     playerName: playerName1,
+
+      at Object.<anonymous> (httpTests/player/playerGetChat.test.ts:63:31)
+
+  ● Messages from other sessions player isnt in arent returned - chat get for playerId1
+
+    expect(received).toStrictEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 2
+
+      Object {
+    +   "messageBody": Object {
+          "messageBody": "I am Tahook-ed on this game",
+    +   },
+        "playerId": 1,
+        "playerName": "Hayden Smith",
+        "timeSent": Any<Number>,
+      }
+
+      83 |   const timestamp = Math.round(Date.now() / 1000);
+      84 |   const message = playerGetChat(playerId1);
+    > 85 |   expect(message.messages[0]).toStrictEqual({
+         |                               ^
+      86 |     messageBody,
+      87 |     playerId: playerId1,
+      88 |     playerName: playerName1,
+
+      at Object.<anonymous> (httpTests/player/playerGetChat.test.ts:85:31)
+
+
+Test Suites: 7 failed, 28 passed, 35 total
+Tests:       17 failed, 41 skipped, 253 passed, 311 total
+Snapshots:   0 total
+Time:        69.185 s
+Ran all test suites matching /httpTests\//i.
+npm notice 
+npm notice New minor version of npm available! 9.6.7 -> 9.8.1
+npm notice Changelog: <https://github.com/npm/cli/releases/tag/v9.8.1>
+npm notice Run `npm install -g npm@9.8.1` to update!
+npm notice 
