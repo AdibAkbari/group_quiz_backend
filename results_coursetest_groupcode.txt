@@ -1,35 +1,104 @@
-npm verb cli /import/kamen/3/cs1531/.nvm/versions/node/v18.16.0/bin/node /import/kamen/3/cs1531/.nvm/versions/node/v18.16.0/bin/npm
-npm info using npm@9.5.1
-npm info using node@v18.16.0
-npm verb title npm run test course_tests/
-npm verb argv "run" "test" "--loglevel" "verbose" "course_tests/"
-npm verb logfile logs-max:10 dir:/import/kamen/3/cs1531/.npm/_logs/2023-07-03T23_44_21_569Z-
-npm verb logfile /import/kamen/3/cs1531/.npm/_logs/2023-07-03T23_44_21_569Z-debug-0.log
+FAIL course_tests/tests/quiz_tests/quizInfo.test.js
+  ✓ Test successful quiz read - single quiz (6 ms)
+  ✕ Test successful quiz read - correct timestamp format (4 ms)
+  ✓ Test successful quiz read after edit is different to creation time (4 ms)
+  ✓ Test quizId invalid error, cannot read (1 ms)
+  ✓ Test unauthorised quiz to read (1 ms)
 
-> test
-> jest course_tests/
+  ● Test successful quiz read - correct timestamp format
 
-npm http fetch GET 200 https://registry.npmjs.org/npm 39ms (cache hit)
-PASS course_tests/tests/auth_tests/userDetails.test.js
-PASS course_tests/tests/quiz_tests/quizList.test.js
-PASS course_tests/tests/quiz_tests/quizDescriptionUpdate.test.js
-PASS course_tests/tests/quiz_tests/quizCreate.test.js
-PASS course_tests/tests/quiz_tests/quizNameUpdate.test.js
-PASS course_tests/tests/quiz_tests/quizInfo.test.js
+    expect(received).toMatch(expected)
+
+    Expected pattern: /^\d{10}$/
+    Received string:  "1696775355.699"
+
+      24 | test('Test successful quiz read - correct timestamp format', () => {
+      25 |   const quiz = adminQuizInfo(userId, quizId);
+    > 26 |   expect(quiz.timeCreated.toString()).toMatch(/^\d{10}$/);
+         |                                       ^
+      27 |   expect(quiz.timeLastEdited.toString()).toMatch(/^\d{10}$/);
+      28 | });
+      29 |
+
+      at Object.<anonymous> (course_tests/tests/quiz_tests/quizInfo.test.js:26:39)
+
 PASS course_tests/tests/auth_tests/authRegister.test.js
-PASS course_tests/tests/other_tests/clear.test.js
-PASS course_tests/tests/quiz_tests/quizRemove.test.js
-PASS course_tests/tests/auth_tests/authLogin.test.js
+  ✓ Test register with invalid email (5 ms)
+  ✓ Test register with invalid password (1 ms)
+  ✓ Test register with invalid first name (1 ms)
+  ✓ Test register with invalid last name (1 ms)
+  ✓ Test duplicate email register (1 ms)
+  ✓ Test successful case auth register (1 ms)
+  ✓ Test short names auth register (1 ms)
+  ✓ Test long names auth register
+  ✓ Test same password auth register
+  ✓ Test same name auth register
 
-Test Suites: 10 passed, 10 total
-Tests:       54 passed, 54 total
+PASS course_tests/tests/quiz_tests/quizNameUpdate.test.js
+  ✓ Test successful quiz rename (6 ms)
+  ✓ Test successful quiz rename back to its original name (1 ms)
+  ✓ Test quiz doesnt exist to edit name error (2 ms)
+  ✓ Test user doesnt have permission to edit quiz name error (1 ms)
+  ✓ Test name is already used by user error (1 ms)
+  ✓ Test name is non-alphanumeric or spaces (1 ms)
+  ✓ Test quiz name too long for edit error (1 ms)
+  ✓ Test quiz name too short for edit error
+
+PASS course_tests/tests/quiz_tests/quizDescriptionUpdate.test.js
+  ✓ Test successful quiz rename of description, empty string (4 ms)
+  ✓ Test successful quiz rename of description, alphanumeric string (1 ms)
+  ✓ Test successful quiz rename of description, URL
+  ✓ Test successful quiz rename of description back to its original name
+  ✓ Test quiz doesnt exist to edit description error (2 ms)
+  ✓ Test user doesnt have permission to edit quiz description error (1 ms)
+  ✓ Test quiz description too long for edit error
+
+PASS course_tests/tests/auth_tests/authLogin.test.js
+  ✓ Test unregistered user (4 ms)
+  ✓ Test registered but incorrect password (2 ms)
+  ✓ Test successful login (1 ms)
+
+PASS course_tests/tests/quiz_tests/quizList.test.js
+  ✓ Test successful quiz list - single quiz (7 ms)
+  ✓ Test successful quiz list - two quizes (2 ms)
+  ✓ Test successful list after quiz deletion (1 ms)
+  ✓ Test invalid token structure - quiz list (1 ms)
+
+PASS course_tests/tests/quiz_tests/quizCreate.test.js
+  ✓ Test successful quiz creation (4 ms)
+  ✓ Test successful quiz creation qith empty description (1 ms)
+  ✓ Test invalid userId (1 ms)
+  ✓ Test non-alphanumeric characters in quiz name error
+  ✓ Test quiz name too long error
+  ✓ Test quiz name too short error (1 ms)
+  ✓ Test repeated quiz name for the same user (1 ms)
+  ✓ Test description too long error
+
+PASS course_tests/tests/auth_tests/userDetails.test.js
+  ✓ Test valid user details (5 ms)
+  ✓ Test invalid userId user details (1 ms)
+  ✓ Test numSuccessfulLogins more than one (1 ms)
+  ✓ Test numFailedPasswordsSinceLastLogin more than 0
+  ✓ Test numFailedPasswordsSinceLastLogin reset to 0 after login
+
+PASS course_tests/tests/quiz_tests/quizRemove.test.js
+  ✓ Test successful quiz deletion (5 ms)
+  ✓ Test quiz deletion - invalid quiz error
+
+PASS course_tests/tests/other_tests/clear.test.js
+  ✓ Test cant login after clear (4 ms)
+
+--------------|---------|----------|---------|---------|---------------------
+File          | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s   
+--------------|---------|----------|---------|---------|---------------------
+All files     |   96.59 |    87.23 |     100 |   96.22 |                     
+ auth.js      |   98.18 |    94.11 |     100 |      98 | 47                  
+ dataStore.js |     100 |      100 |     100 |     100 |                     
+ other.js     |     100 |      100 |     100 |     100 |                     
+ quiz.js      |   95.32 |    83.33 |     100 |   94.79 | 129,140,161,199,252 
+--------------|---------|----------|---------|---------|---------------------
+Test Suites: 1 failed, 9 passed, 10 total
+Tests:       1 failed, 52 passed, 53 total
 Snapshots:   0 total
-Time:        2.495 s
+Time:        8.437 s
 Ran all test suites matching /course_tests\//i.
-npm notice 
-npm notice New minor version of npm available! 9.5.1 -> 9.7.2
-npm notice Changelog: <https://github.com/npm/cli/releases/tag/v9.7.2>
-npm notice Run `npm install -g npm@9.7.2` to update!
-npm notice 
-npm verb exit 0
-npm info ok 
